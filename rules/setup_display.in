@@ -1,0 +1,8 @@
+## SECTION=elrest_specific_tools
+
+config SETUP_DISPLAY
+	tristate
+  select LIBCONFPARSE
+	prompt "setup_display"
+	help
+	  FIXME

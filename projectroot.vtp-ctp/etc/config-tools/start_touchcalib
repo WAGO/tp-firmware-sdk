@@ -1,0 +1,28 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# Script-name: start_touchcalib
+#
+# starting touchscreen calibration tool ts_lib
+#
+# Author: Wolfgang Rückl,  elrest GmbH
+#-----------------------------------------------------------------------------#
+
+
+# load general definitions and functions
+if [ ! -f "/etc/config-tools/config_tool_lib" ]; then
+  echo "config_tool_lib missing"
+  exit 255
+fi
+
+. /etc/config-tools/config_tool_lib
+
+file="/usr/bin/ts_calibrate"
+
+if [ -e $file ]; then
+$file
+status=$?
+else  
+status=$FILE_OPEN_ERROR
+fi
+
+exit $status

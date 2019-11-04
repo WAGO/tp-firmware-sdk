@@ -1,0 +1,9 @@
+## SECTION=elrest_specific_applications
+
+config VIRTUALKEYBOARD
+	tristate
+	prompt "virtualkeyboard"
+	select QT5
+	help
+	  FIXME
+

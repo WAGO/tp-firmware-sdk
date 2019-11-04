@@ -1,0 +1,101 @@
+## SECTION=graphics_and_multimedia
+
+#menu "directfb & friends            "
+#source "generated/multimedia_directfb.in"
+#endmenu
+
+menuconfig MENU_XORG_FONTS
+	bool
+	prompt "fonts                         "
+	select XORG_LIB_XFONT_PCF_FONTS if XORG_SERVER
+	default y if XORG_SERVER
+	help
+	  These fonts can be used with an x-server, standalone directfb or
+	  gtk ontop of directfb.
+
+if MENU_XORG_FONTS
+
+config XORG_FONTS
+	depends on MENU_XORG_FONTS
+	bool
+	select XORG_FONT_UTIL
+	select XORG_FONT_ALIAS
+	select HOST_XORG_APP_MKFONTDIR
+	select HOST_XORG_APP_MKFONTSCALE
+	select HOST_XORG_APP_BDFTOPCF
+	select HOST_XORG_FONT_UTIL
+	select RC_ONCE			if XORG_FONTS_FC_CACHE && RUNTIME
+
+config XORG_FONTS_FC_CACHE
+	default FONTCONFIG
+	select FONTCONFIG_UTILS
+	bool
+
+config XORG_FONTS_QT4_LINKS
+	depends on QT4_PLATFORM_EMBEDDED
+	bool
+	prompt "Make fonts accessible for QtEmbedded"
+	help
+	  QtEmbedded only looks in one directory for fonts.  This will create
+	  links to all fonts int the Qt Font directory to allow QtEmbedded
+	  applications to use these fonts.
+
+source "generated/multimedia_xorg_font.in"
+endif
+
+source "generated/multimedia_fltk.in"
+
+menu "framebuffer                   "
+source "generated/multimedia_framebuffer.in"
+endmenu
+
+menu "gstreamer 0.10                "
+source "generated/multimedia_gstreamer.in"
+endmenu
+
+menu "gstreamer 1.0                 "
+source "generated/multimedia_gstreamer1.in"
+endmenu
+
+menu "gtk+ & friends                "
+source "generated/multimedia_gtk.in"
+endmenu
+
+# moved to staging
+#source "generated/multimedia_mplayer.in"
+
+menu "qt                            "
+source "generated/qt.in"
+endmenu
+
+menu "sdl                           "
+source "generated/multimedia_sdl.in"
+endmenu
+
+menu "sound                         "
+source "generated/multimedia_sound.in"
+endmenu
+
+source "generated/multimedia_tk.in"
+
+menu "tools                         "
+source "generated/multimedia_tools.in"
+endmenu
+
+menu "libs                          "
+source "generated/multimedia_libs.in"
+endmenu
+
+menuconfig XORG
+	bool
+	prompt "xorg                          "
+	help
+	  Enable this entry if you want the whole world of X.
+
+if XORG
+source "generated/multimedia_xorg.in"
+endif
+
+menu "wayland                       "
+source "generated/multimedia_wayland.in"
+endmenu

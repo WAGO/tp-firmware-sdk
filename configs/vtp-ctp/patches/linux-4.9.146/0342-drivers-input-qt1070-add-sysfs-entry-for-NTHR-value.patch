@@ -1,0 +1,95 @@
+From 78c02d6638f787b0fa69a035243615d476f29672 Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Tue, 21 May 2019 11:10:34 +0200
+Subject: [PATCH] drivers: input: qt1070: add sysfs entry for NTHR value
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ drivers/input/keyboard/qt1070.c | 50 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/drivers/input/keyboard/qt1070.c b/drivers/input/keyboard/qt1070.c
+index 73e06d2..f6bf8ce 100644
+--- a/drivers/input/keyboard/qt1070.c
++++ b/drivers/input/keyboard/qt1070.c
+@@ -67,6 +67,8 @@ struct qt1070_data {
+ 	u8 last_keys;
+ };
+ 
++static int NTHR_VALUE;
++
+ static int qt1070_read(struct i2c_client *client, u8 reg)
+ {
+ 	int ret;
+@@ -140,6 +142,46 @@ static irqreturn_t qt1070_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
++static ssize_t nthr_value_show(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	int nthr;
++
++	if (client) {
++		nthr = qt1070_read(client, NTHR_KEY0);
++		NTHR_VALUE = nthr;
++		return sprintf(buf, "%d\n", NTHR_VALUE);
++	} else
++		return -EINVAL;
++}
++
++static ssize_t nthr_value_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf,
++				size_t count)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	int ret, i;
++
++	ret = sscanf(buf, "%du\n", &NTHR_VALUE);
++	if ((ret < 1) || (ret > 3))
++		return -EINVAL;
++
++	if ((NTHR_VALUE > 255) || (NTHR_VALUE < 0))
++		return -EINVAL;
++
++	if (client) {
++		for (i = 0; i < 7; i++)
++			qt1070_write(client, NTHR_KEY0 + i, NTHR_VALUE);
++	}
++	return count;
++
++}
++
++static DEVICE_ATTR(NTHR_VALUE, 0644, nthr_value_show, nthr_value_store);
++
+ static int qt1070_probe(struct i2c_client *client,
+ 				const struct i2c_device_id *id)
+ {
+@@ -225,6 +267,12 @@ static int qt1070_probe(struct i2c_client *client,
+ 	/* Read to clear the chang line */
+ 	qt1070_read(client, DET_STATUS);
+ 
++	err = device_create_file(&client->dev, &dev_attr_NTHR_VALUE);
++	if (err) {
++		dev_err(&client->dev,
++			"qt1070 device_create_file failed %d\n", err);
++		return err;
++	}
+ 	return 0;
+ 
+ err_free_irq:
+@@ -239,6 +287,8 @@ static int qt1070_remove(struct i2c_client *client)
+ {
+ 	struct qt1070_data *data = i2c_get_clientdata(client);
+ 
++	device_remove_file(&client->dev, &dev_attr_NTHR_VALUE);
++
+ 	/* Release IRQ */
+ 	free_irq(client->irq, data);
+ 
+-- 
+2.7.4
+

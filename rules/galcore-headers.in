@@ -1,0 +1,10 @@
+## SECTION=multimedia_libs
+
+config GALCORE_HEADERS
+	tristate
+	default n
+	prompt "galcore-headers"
+	help
+		Collection of various headers for different versions
+		of the galcore kernel module,
+		used for compilation of etnaviv drivers and libs

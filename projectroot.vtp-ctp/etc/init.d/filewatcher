@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PIDFILE="/var/run/filewatcher.pid"
+DAEMON="/etc/script/init_filewatch.sh"
+
+
+case $1 in
+	
+	start)
+		echo "starting PLC List Watch Daemon"
+		start-stop-daemon -S -m -p $PIDFILE -x $DAEMON -o -b
+		echo "done"
+		;;
+	 stop)	
+	 	echo "Terminating PLC List Watch Daemon"
+	 	start-stop-daemon -K -p $PIDFILE -q
+	 	echo "done"
+	 	;;
+esac

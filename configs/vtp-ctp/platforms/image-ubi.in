@@ -1,0 +1,9 @@
+## SECTION=image2
+
+config IMAGE_DATA_UBI
+	tristate
+	select HOST_GENIMAGE
+	select HOST_MTD_UTILS
+	prompt "Generate images/data.ubi"
+	help
+	  FIXME

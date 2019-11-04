@@ -1,0 +1,10 @@
+## SECTION=elrest_specific_commandline_tools
+
+config GET_GESTURE
+	tristate
+	select UDEV
+	select LIBMSGTOOL
+	select CONFIG_TOOLS
+	prompt "get_gesture"
+	help
+	  FIXME

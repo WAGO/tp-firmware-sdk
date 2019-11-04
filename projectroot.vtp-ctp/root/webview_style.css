@@ -1,0 +1,10 @@
+body {
+-webkit-user-select: none;
+"*{font: bold 10pt \"Arial\";
+}
+
+/*
+::-webkit-scrollbar { 
+    display: none; 
+}
+*/

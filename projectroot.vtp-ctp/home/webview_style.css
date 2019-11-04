@@ -1,0 +1,21 @@
+body{
+-webkit-user-select: none;
+"*{font: bold 10pt \"Arial\";
+}
+
+::-webkit-scrollbar {
+  background: #F6F6F6; 
+  width: 20px;
+}
+
+
+::-webkit-scrollbar-thumb {
+border: 2px solid #f6f6f6;
+background: #E3E3E3;
+}
+
+::-webkit-scrollbar-thumb:active {
+background: #9C9D9D;
+}
+
+

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- toolbar (menu) configuration of perspecto II product! -->
+<menu>
+
+<globals>
+  <qt_style_window>color:#004494; background-color:#f6f6f6; border-color:white; border-width:2px; border-style:solid</qt_style_window>
+  <qt_style_button>QPushButton:pressed{background-color:#ccdaea}</qt_style_button>
+  <qt_style_button_control>color:white; background-color:#004494; QPushButton{background-color: #004494} QPushButton:pressed{background-color:#ccdaea}</qt_style_button_control>                  
+</globals>
+
+<translation>
+<textid>ID_WBM</textid>  
+<de_DE>WBM</de_DE>
+<en_US>WBM</en_US>
+</translation>
+
+<translation>
+<textid>ID_PLCLIST</textid>  
+<de_DE>Browser Favorites</de_DE>
+<en_US>Browser Favorites</en_US>
+</translation>
+
+<translation>
+<textid>ID_TARGETVISU</textid>  
+<de_DE>Visu</de_DE>
+<en_US>Visu</en_US>
+</translation>
+
+<translation>
+<textid>ID_DISPLAYCLEANING</textid>  
+<de_DE>Reinigung</de_DE>
+<en_US>Cleaning</en_US>
+</translation>
+
+<!-- small 480x272 px -->
+<small>
+  <menu_slide_px_height>7</menu_slide_px_height>
+  <qt_form_style>color:#004494; background-color:white; font-size:12pt; font-family:Helvetica</qt_form_style>  
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_WBM</text>
+    <icon></icon>
+    <action>ID_WBM</action>
+  </item>
+  <item>
+    <width>100</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_PLCLIST</text>
+    <icon></icon>
+    <action>ID_PLCLIST</action>
+  </item>
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_TARGETVISU</text>
+    <icon></icon>
+    <action>ID_TARGETVISU</action>
+  </item>
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_DISPLAYCLEANING</text>
+    <icon></icon>
+    <action>ID_DISPLAYCLEANING</action>
+  </item>
+
+</small>
+
+<!-- small 272x480 px -->
+<small_portrait>
+  <menu_slide_px_height>7</menu_slide_px_height>
+  <qt_form_style>color:#004494; background-color:white; font-size:12pt; font-family:Helvetica</qt_form_style>
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>10</leftspacing>
+    <text>ID_WBM</text>
+    <icon></icon>
+    <action>ID_WBM</action>
+  </item>
+  <item>
+    <width>100</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>10</leftspacing>
+    <text>ID_PLCLIST</text>
+    <icon></icon>
+    <action>ID_PLCLIST</action>
+  </item>
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>10</leftspacing>
+    <text>ID_TARGETVISU</text>
+    <icon></icon>
+    <action>ID_TARGETVISU</action>
+  </item>
+  <item>
+    <width>80</width>
+    <height>30</height>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>10</leftspacing>
+    <text>ID_DISPLAYCLEANING</text>
+    <icon></icon>
+    <action>ID_DISPLAYCLEANING</action>
+  </item>
+
+</small_portrait>
+
+<!--medium  800x480 px -->
+<!--medium 1280x800 px -->
+<medium>
+  <menu_slide_px_height>7</menu_slide_px_height>
+  <qt_form_style>color:#004494; background-color:white; font-size:24pt; font-family:Helvetica</qt_form_style>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_WBM</text>
+    <icon></icon>
+    <action>ID_WBM</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_PLCLIST</text>
+    <icon></icon>
+    <action>ID_PLCLIST</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_TARGETVISU</text>
+    <icon></icon>
+    <action>ID_TARGETVISU</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_DISPLAYCLEANING</text>
+    <icon></icon>
+    <action>ID_DISPLAYCLEANING</action>
+  </item>
+</medium>
+
+<!--big -->
+<big>
+  <menu_slide_px_height>7</menu_slide_px_height>
+  <qt_form_style>color:#004494; background-color:white; font-size:24pt; font-family:Helvetica</qt_form_style>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_WBM</text>
+    <icon></icon>
+    <action>ID_WBM</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_PLCLIST</text>
+    <icon></icon>
+    <action>ID_PLCLIST</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_TARGETVISU</text>
+    <icon></icon>
+    <action>ID_TARGETVISU</action>
+  </item>
+  <item>
+    <width></width>
+    <height>40</height>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <leftspacing>20</leftspacing>
+    <text>ID_DISPLAYCLEANING</text>
+    <icon></icon>
+    <action>ID_DISPLAYCLEANING</action>
+  </item>
+</big>
+
+</menu>

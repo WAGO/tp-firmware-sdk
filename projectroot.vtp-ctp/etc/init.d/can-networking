@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# /etc/init.d/canInterfaces
+#
+# $Id$
+#
+
+case $1 in
+
+  start)
+    echo "${0}.start"
+    ifconfig can0 down
+    canconfig can0 bitrate 125000
+    canconfig can0 ctrlmode triple-sampling on
+    canconfig can0 restart-ms 1000
+    ifconfig can0 up
+  ;;
+  
+  stop)
+    echo "${0}.stop"
+    ifconfig can0 down
+  ;;
+    
+esac
+

@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Xorg and pekwm,  further Qt Applications
+#
+
+case $1 in
+
+    start)
+	/etc/script/start_panel.sh
+	;;
+
+    stop)
+	echo "Terminating Xorg not implemented."
+	;;
+
+esac
+
+
+
+
+
+

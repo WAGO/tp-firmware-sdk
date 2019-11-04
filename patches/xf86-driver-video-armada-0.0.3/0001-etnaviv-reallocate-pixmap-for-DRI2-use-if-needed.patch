@@ -1,0 +1,76 @@
+From c2ef91db30c27bebc4b9624aaf0983f1096e529f Mon Sep 17 00:00:00 2001
+From: Lucas Stach <l.stach@pengutronix.de>
+Date: Fri, 21 Jul 2017 16:36:52 +0200
+Subject: [PATCH] etnaviv: reallocate pixmap for DRI2 use if needed
+
+If the pixmap is incompatible with the 3D GPU requirements (mostly pitch
+alignment) then we need to reallocate the pixmap if it's going to be used
+for DRI2. As the pixmap may already contain valid content, make sure to
+copy this over into the newly allocated pixmap.
+
+Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
+---
+ etnaviv/etnaviv_dri2.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/etnaviv/etnaviv_dri2.c b/etnaviv/etnaviv_dri2.c
+index 1ecd28b82e8f..250bb3844b0a 100644
+--- a/etnaviv/etnaviv_dri2.c
++++ b/etnaviv/etnaviv_dri2.c
+@@ -38,6 +38,25 @@ struct etnaviv_dri2_info {
+ 	char *devname;
+ };
+ 
++static Bool etnaviv_replace_drawable(DrawablePtr drawable, PixmapPtr pixmap)
++{
++	GCPtr gc;
++
++	/* Copy the old drawable to the new buffer */
++
++	gc = GetScratchGC(pixmap->drawable.depth, drawable->pScreen);
++	if (!gc)
++		return FALSE;
++
++	ValidateGC(&pixmap->drawable, gc);
++	gc->ops->CopyArea(drawable, &pixmap->drawable, gc, 0, 0,
++			  drawable->width, drawable->height,
++			  0, 0);
++	FreeScratchGC(gc);
++
++	return TRUE;
++}
++
+ static DRI2Buffer2Ptr etnaviv_dri2_CreateBuffer(DrawablePtr drawable,
+ 	unsigned int attachment, unsigned int format)
+ {
+@@ -51,9 +70,15 @@ static DRI2Buffer2Ptr etnaviv_dri2_CreateBuffer(DrawablePtr drawable,
+ 		return NULL;
+ 
+ 	if (attachment == DRI2BufferFrontLeft) {
++		struct etnaviv_pixmap *vpix;
++		uint32_t pitch;
+ 		pixmap = drawable_pixmap(drawable);
+ 
+-		if (!etnaviv_get_pixmap_priv(pixmap)) {
++		vpix = etnaviv_get_pixmap_priv(pixmap);
++		pitch = etnaviv_3d_pitch(pixmap->drawable.width,
++					 pixmap->drawable.bitsPerPixel);
++
++		if (!vpix || vpix->pitch < pitch) {
+ 			/* Force the backing buffer to be reallocated */
+ 			drawable = &pixmap->drawable;
+ 			pixmap = NULL;
+@@ -68,6 +93,10 @@ static DRI2Buffer2Ptr etnaviv_dri2_CreateBuffer(DrawablePtr drawable,
+ 						   CREATE_PIXMAP_USAGE_3D);
+ 		if (!pixmap)
+ 			goto err;
++
++		if (attachment == DRI2BufferFrontLeft &&
++		    !etnaviv_replace_drawable(drawable, pixmap))
++			goto err;
+ 	}
+ 
+ 	if (!etnaviv_pixmap_flink(pixmap, &name))
+-- 
+2.11.0
+

@@ -1,0 +1,44 @@
+From: Lucas Stach <l.stach@pengutronix.de>
+Date: Wed, 20 Sep 2017 14:10:06 +0200
+Subject: [PATCH] qtdeclarative: use correct STAT call
+
+Using the default stat call can fail on 32bit systems if the
+underlying filesystem contains 64bit inodes.
+
+Use the correct QT calls to get the proper largefile aware
+versions.
+
+Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
+---
+ qtdeclarative/src/qml/qml/qqmltypeloader.cpp | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/qtdeclarative/src/qml/qml/qqmltypeloader.cpp b/qtdeclarative/src/qml/qml/qqmltypeloader.cpp
+index 342e6c072555..ce6664d0bb0a 100644
+--- a/qtdeclarative/src/qml/qml/qqmltypeloader.cpp
++++ b/qtdeclarative/src/qml/qml/qqmltypeloader.cpp
+@@ -68,11 +68,7 @@
+ 
+ #include <functional>
+ 
+-#if defined (Q_OS_UNIX)
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#endif
++#include "qplatformdefs.h"
+ 
+ #if defined (QT_LINUXBASE)
+ // LSB doesn't declare NAME_MAX. Use SYMLINK_MAX instead, which seems to
+@@ -1806,9 +1802,9 @@ QString QQmlTypeLoader::absoluteFilePath(const QString &path)
+     } else {
+         bool exists = false;
+ #ifdef Q_OS_UNIX
+-        struct stat statBuf;
++        QT_STATBUF statBuf;
+         // XXX Avoid encoding entire path. Should store encoded dirpath in cache
+-        if (::stat(QFile::encodeName(path).constData(), &statBuf) == 0)
++        if (QT_STAT(QFile::encodeName(path).constData(), &statBuf) == 0)
+             exists = S_ISREG(statBuf.st_mode);
+ #else
+         exists = QFile::exists(path);

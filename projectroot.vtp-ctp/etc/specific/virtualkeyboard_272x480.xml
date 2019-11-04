@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- virtual keyboard configuration of perspecto II product! -->
+
+<layouts>
+  <!-- virtual keyboard layout 1 (button switch keyboard) -->
+  <layout>
+    <font>
+      <family></family>
+      <bold>false</bold>
+      <italic>false</italic>
+      <minpointsize>8</minpointsize>
+    </font>
+    
+    <repetition_rate>200</repetition_rate>
+    <vpixels_limit_textfield>200</vpixels_limit_textfield>
+    
+    <!-- consider font size -->
+    <style>
+      <minbtnwidth>30</minbtnwidth>
+      <minbtnheight>25</minbtnheight>
+      <rowcount>7</rowcount>
+      <colcount>6</colcount>
+      <hspace>0</hspace>
+      <vspace>0</vspace>
+        
+      <!-- QT function setStyleSheet: be careful to use correct qt syntax -->     
+      <qt_style_window>color:#004494; background-color:#f6f6f6; border-color:white; border-width:2px; border-style:solid</qt_style_window>
+      <qt_style_button>QPushButton:pressed{background-color:#ccdaea}</qt_style_button>
+      <qt_style_button_control>color:white; background-color:#004494; QPushButton{background-color: #004494} QPushButton:pressed{background-color:#ccdaea}</qt_style_button_control>                
+      
+    </style>
+
+    <rows>        
+      <row id="1">
+        <key widthscale="1.0">
+          <char>a</char>
+          <code></code>
+          <char_shift>A</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>0</autorepeat>
+          <icon></icon>
+        </key>
+        <key widthscale="1">
+          <char>b</char>
+          <code></code>
+          <char_shift>B</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>c</char>
+          <code></code>
+          <char_shift>C</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>d</char>
+          <code></code>
+          <char_shift>D</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>e</char>
+          <code></code>
+          <char_shift>E</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>f</char>
+          <code></code>
+          <char_shift>F</char_shift>
+          <code_shift></code_shift>
+        </key>
+      </row>
+      
+      <row id="2">
+        <key widthscale="1.0">
+          <char>g</char>
+          <code></code>
+          <char_shift>G</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>h</char>
+          <code></code>
+          <char_shift>H</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>i</char>
+          <code></code>
+          <char_shift>I</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>j</char>
+          <code></code>
+          <char_shift>J</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>k</char>
+          <code></code>
+          <char_shift>K</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>l</char>
+          <code></code>
+          <char_shift>L</char_shift>
+          <code_shift></code_shift>
+        </key>
+
+      </row>
+      
+      <row id="3">
+        
+        <key widthscale="1.0">
+          <char>m</char>
+          <code></code>
+          <char_shift>M</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>n</char>
+          <code></code>
+          <char_shift>N</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>o</char>
+          <code></code>
+          <char_shift>O</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>p</char>
+          <code></code>
+          <char_shift>P</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>q</char>
+          <code></code>
+          <char_shift>Q</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>r</char>
+          <code></code>
+          <char_shift>R</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        
+      </row>
+
+      <row id="4">
+        
+        <key widthscale="1.0">
+          <char>s</char>
+          <code></code>
+          <char_shift>S</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>t</char>
+          <code></code>
+          <char_shift>T</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>u</char>
+          <code></code>
+          <char_shift>U</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>v</char>
+          <code></code>
+          <char_shift>V</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>w</char>
+          <code></code>
+          <char_shift>W</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>x</char>
+          <code></code>
+          <char_shift>X</char_shift>
+          <code_shift></code_shift>
+        </key>            
+      </row>
+      
+      <row id="5">
+        
+        <key widthscale="1.0">
+          <char>y</char>
+          <code></code>
+          <char_shift>Y</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>z</char>
+          <code></code>
+          <char_shift>Z</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>.</char>
+          <code></code>
+          <char_shift>.</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>:</char>
+          <code></code>
+          <char_shift>:</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>/</char>
+          <code></code>
+          <char_shift>/</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+         <key widthscale="1.0">
+          <char>{bksp}</char>
+          <control_text>bksp</control_text>
+          <code></code>
+          <char_shift>{bksp}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/bksp.png</icon>          
+        </key>
+      </row>
+      
+      <row id="6">
+        
+        <key widthscale="1.0">
+          <char>{shiftlock}</char>
+          <control_text>lock</control_text>
+          <code></code>
+          <char_shift>{shiftlock}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        <key widthscale="3.0">
+          <char>{space}</char>
+          <control_text>space</control_text>
+          <code></code>
+          <char_shift>{space}</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+         <key widthscale="1.0">
+          <char>{up}</char>
+          <control_text>up</control_text>
+          <code></code>
+          <char_shift>{up}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-up.png</icon>          
+        </key>
+                
+        <key widthscale="1.0">
+          <char>{enter}</char>
+          <control_text>enter</control_text>
+          <code></code>
+          <char_shift>{enter}</char_shift>
+          <code_shift></code_shift>
+          <icon>/etc/specific/enter.png</icon>
+        </key>
+        
+      </row>
+      
+      <row id="7">
+        
+        <key widthscale="1.0">
+          <char>{shift}</char>
+          <control_text>shift</control_text>
+          <code></code>
+          <char_shift>{shift}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        
+        <key widthscale="1.0">
+          <char>{swap}</char>
+          <control_text>123</control_text>
+          <code></code>
+          <char_shift>{swap}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+       <key widthscale="1.0">
+          <char>{ok}</char>
+          <control_text>OK</control_text>
+          <code></code>
+          <char_shift>{ok}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{left}</char>
+          <control_text>left</control_text>
+          <code></code>
+          <char_shift>{left}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-left.png</icon>          
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{down}</char>
+          <control_text>down</control_text>
+          <code></code>
+          <char_shift>{down}</char_shift>
+          <code_shift></code_shift>          
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-down.png</icon>          
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{right}</char>
+          <control_text>right</control_text>
+          <code></code>
+          <char_shift>{right}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-right.png</icon>          
+        </key>
+
+        
+      </row>
+      
+    </rows>
+  </layout>
+  
+
+  <!-- virtual keyboard layout 2 (button switch keyboard) -->
+  <layout>
+    <font>
+      <family></family>
+      <bold>false</bold>
+      <italic>false</italic>
+      <minpointsize>8</minpointsize>
+    </font>
+    
+    <repetition_rate>200</repetition_rate>
+    <vpixels_limit_textfield>200</vpixels_limit_textfield>
+    
+    <!-- consider font size -->
+    <style>
+      <minbtnwidth>30</minbtnwidth>
+      <minbtnheight>25</minbtnheight>
+      <rowcount>7</rowcount>
+      <colcount>6</colcount>
+      <hspace>0</hspace>
+      <vspace>0</vspace>
+        
+      <!-- QT function setStyleSheet: be careful to use correct qt syntax -->     
+      <qt_style_window>color:#004494; background-color:#f6f6f6; border-color:white; border-width:2px; border-style:solid</qt_style_window>
+      <qt_style_button>QPushButton:pressed{background-color:#ccdaea}</qt_style_button>
+      <qt_style_button_control>color:white; background-color:#004494; QPushButton{background-color: #004494} QPushButton:pressed{background-color:#ccdaea}</qt_style_button_control>                
+    </style>
+
+    <rows>        
+      <row id="1">
+        <key widthscale="1.0">
+          <char>!</char>
+          <code></code>
+          <char_shift>!</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>0</autorepeat>
+          <icon></icon>
+        </key>
+        <key widthscale="1">
+          <char>?</char>
+          <code></code>
+          <char_shift>?</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>_</char>
+          <code></code>
+          <char_shift>_</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>#</char>
+          <code></code>
+          <char_shift>#</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1">
+          <char>&quot;</char>
+          <code></code>
+          <char_shift>&quot;</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>&apos;</char>
+          <code></code>
+          <char_shift>&apos;</char_shift>
+          <code_shift></code_shift>
+        </key>
+      </row>
+      
+      <row id="2">
+        <key widthscale="1.0">
+          <char>+</char>
+          <code></code>
+          <char_shift>+</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>-</char>
+          <code></code>
+          <char_shift>-</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>*</char>
+          <code></code>
+          <char_shift>*</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>/</char>
+          <code></code>
+          <char_shift>/</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>=</char>
+          <code></code>
+          <char_shift>=</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>%</char>
+          <code></code>
+          <char_shift>%</char_shift>
+          <code_shift></code_shift>
+        </key>
+
+      </row>
+      
+      <row id="3">
+        
+        <key widthscale="1.0">
+          <char>:</char>
+          <code></code>
+          <char_shift>:</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>7</char>
+          <code></code>
+          <char_shift>7</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>8</char>
+          <code></code>
+          <char_shift>8</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char>9</char>
+          <code></code>
+          <char_shift>9</char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char></char>
+          <code></code>
+          <char_shift></char_shift>
+          <code_shift></code_shift>
+        </key>
+        <key widthscale="1.0">
+          <char></char>
+          <code></code>
+          <char_shift></char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        
+      </row>
+
+      <row id="4">
+        
+        <key widthscale="1.0">
+          <char>;</char>
+          <code></code>
+          <char_shift>;</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>4</char>
+          <code></code>
+          <char_shift>4</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>5</char>
+          <code></code>
+          <char_shift>5</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>6</char>
+          <code></code>
+          <char_shift>6</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>&lt;</char>
+          <code></code>
+          <char_shift>&lt;</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>&gt;</char>
+          <code></code>
+          <char_shift>&gt;</char_shift>
+          <code_shift></code_shift>
+        </key>            
+      </row>
+      
+      <row id="5">
+        
+        <key widthscale="1.0">
+          <char>,</char>
+          <code></code>
+          <char_shift>,</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>1</char>
+          <code></code>
+          <char_shift>1</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>2</char>
+          <code></code>
+          <char_shift>2</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>3</char>
+          <code></code>
+          <char_shift>3</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char></char>
+          <code></code>
+          <char_shift></char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+         <key widthscale="1.0">
+          <char>{bksp}</char>
+          <control_text>bksp</control_text>
+          <code></code>
+          <char_shift>{bksp}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/bksp.png</icon>          
+        </key>
+      </row>
+      
+      <row id="6">
+        
+        <key widthscale="1.0">
+          <char>{shiftlock}</char>
+          <control_text>lock</control_text>
+          <code></code>
+          <char_shift>{shiftlock}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>.</char>
+          <code></code>
+          <char_shift>.</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>0</char>
+          <code></code>
+          <char_shift>0</char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+        <key widthscale="1.0">
+          <char></char>
+          <code></code>
+          <char_shift></char_shift>
+          <code_shift></code_shift>
+        </key>
+        
+         <key widthscale="1.0">
+          <char>{up}</char>
+          <control_text>up</control_text>
+          <code></code>
+          <char_shift>{up}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-up.png</icon>          
+        </key>
+                
+        <key widthscale="1.0">
+          <char>{enter}</char>
+          <control_text>enter</control_text>
+          <code></code>
+          <char_shift>{enter}</char_shift>
+          <code_shift></code_shift>
+          <icon>/etc/specific/enter.png</icon>
+        </key>
+        
+      </row>
+      
+      <row id="7">
+        
+        <key widthscale="1.0">
+          <char>{shift}</char>
+          <control_text>shift</control_text>
+          <code></code>
+          <char_shift>{shift}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        
+        <key widthscale="1.0">
+          <char>{swap}</char>
+          <control_text>ABC</control_text>
+          <code></code>
+          <char_shift>{swap}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+       <key widthscale="1.0">
+          <char>{ok}</char>
+          <control_text>OK</control_text>
+          <code></code>
+          <char_shift>{ok}</char_shift>
+          <code_shift></code_shift>
+          <icon></icon>
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{left}</char>
+          <control_text>left</control_text>
+          <code></code>
+          <char_shift>{left}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-left.png</icon>          
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{down}</char>
+          <control_text>down</control_text>
+          <code></code>
+          <char_shift>{down}</char_shift>
+          <code_shift></code_shift>          
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-down.png</icon>          
+        </key>
+        
+        <key widthscale="1.0">
+          <char>{right}</char>
+          <control_text>right</control_text>
+          <code></code>
+          <char_shift>{right}</char_shift>
+          <code_shift></code_shift>
+          <autorepeat>1</autorepeat>
+          <icon>/etc/specific/ico-right.png</icon>          
+        </key>
+
+        
+      </row>
+      
+    </rows>
+    
+  </layout>
+  
+</layouts>

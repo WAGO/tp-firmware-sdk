@@ -1,0 +1,7 @@
+## SECTION=elrest_specific_tools
+
+config SI1142
+	tristate
+	prompt "si1142"
+	help
+	  FIXME

@@ -1,0 +1,13 @@
+## SECTION=multimedia_xorg_app
+
+config XCB_UTIL_IMAGE
+	tristate
+	select LIBC_PTHREAD
+	select XORG_PROTO_X
+	select XCB_PROTO
+	select XCB_UTIL
+	select LIBXCB
+	select HOST_GPERF
+	prompt "xcb-util-image"
+	help
+	  FIXME

@@ -1,0 +1,25 @@
+From 8aa157c9c769cd614f5620cf7fe7a1c3964b0318 Mon Sep 17 00:00:00 2001
+From: Heinrich Toews <heinrich.toews@wago.com>
+Date: Wed, 23 Jan 2019 11:08:54 +0100
+Subject: [PATCH] doc: vendor-pref: add vendor WAGO
+
+Signed-off-by: Heinrich Toews <heinrich.toews@wago.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index bceffff..94737ec 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -300,6 +300,7 @@ via	VIA Technologies, Inc.
+ virtio	Virtual I/O Device Specification, developed by the OASIS consortium
+ vivante	Vivante Corporation
+ voipac	Voipac Technologies s.r.o.
++wago	WAGO Kontakttechnik GmbH & Co. KG
+ wd	Western Digital Corp.
+ wexler	Wexler
+ winbond Winbond Electronics corp.
+-- 
+2.7.4
+

@@ -1,0 +1,71 @@
+From ec9795972b278b06c3b79b653617fcd3c4e5459d Mon Sep 17 00:00:00 2001
+From: Oleg Karfich <oleg.karfich@wago.com>
+Date: Fri, 25 Jan 2019 14:55:27 +0100
+Subject: [PATCH] dts: vtpctp: add devconf to compatible string
+
+---
+ arch/arm/boot/dts/imx6q-vtpctp-0004.dts | 3 +--
+ arch/arm/boot/dts/imx6q-vtpctp-0005.dts | 3 +--
+ arch/arm/boot/dts/imx6q-vtpctp-0007.dts | 3 +--
+ arch/arm/boot/dts/imx6q-vtpctp-0010.dts | 3 +--
+ 4 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6q-vtpctp-0004.dts b/arch/arm/boot/dts/imx6q-vtpctp-0004.dts
+index 99f21ac..588bd94 100644
+--- a/arch/arm/boot/dts/imx6q-vtpctp-0004.dts
++++ b/arch/arm/boot/dts/imx6q-vtpctp-0004.dts
+@@ -17,8 +17,7 @@
+ 
+ / {
+ 	model = "VTPCTP Quad Board";
+-	compatible = "wago,imx6q-vtpctp-762_4xxx",
+-				 "wago,imx6q-vtpctp", "fsl,imx6q";
++	compatible = "wago,imx6q-vtpctp-762_4xxx-1000", "wago,imx6q-vtpctp", "fsl,imx6q";
+ 
+ 	memory {
+ 		reg = <0x10000000 0x80000000>;
+diff --git a/arch/arm/boot/dts/imx6q-vtpctp-0005.dts b/arch/arm/boot/dts/imx6q-vtpctp-0005.dts
+index 75bf094..15cca03 100644
+--- a/arch/arm/boot/dts/imx6q-vtpctp-0005.dts
++++ b/arch/arm/boot/dts/imx6q-vtpctp-0005.dts
+@@ -17,8 +17,7 @@
+ 
+ / {
+ 	model = "VTPCTP Quad Board";
+-	compatible = "wago,imx6q-vtpctp-762_4xxx",
+-				 "wago,imx6q-vtpctp", "fsl,imx6q";
++	compatible = "wago,imx6q-vtpctp-762_4xxx-1001", "wago,imx6q-vtpctp", "fsl,imx6q";
+ 
+ 	memory {
+ 		reg = <0x10000000 0x80000000>;
+diff --git a/arch/arm/boot/dts/imx6q-vtpctp-0007.dts b/arch/arm/boot/dts/imx6q-vtpctp-0007.dts
+index af528e5..280b0c4 100644
+--- a/arch/arm/boot/dts/imx6q-vtpctp-0007.dts
++++ b/arch/arm/boot/dts/imx6q-vtpctp-0007.dts
+@@ -17,8 +17,7 @@
+ 
+ / {
+ 	model = "VTPCTP Quad Board";
+-	compatible = "wago,imx6q-vtpctp-762_4xxx",
+-				 "wago,imx6q-vtpctp", "fsl,imx6q";
++	compatible = "wago,imx6q-vtpctp-762_4xxx-1002", "wago,imx6q-vtpctp", "fsl,imx6q";
+ 
+ 	memory {
+ 		reg = <0x10000000 0x80000000>;
+diff --git a/arch/arm/boot/dts/imx6q-vtpctp-0010.dts b/arch/arm/boot/dts/imx6q-vtpctp-0010.dts
+index 53a356d..3b2cc4b 100644
+--- a/arch/arm/boot/dts/imx6q-vtpctp-0010.dts
++++ b/arch/arm/boot/dts/imx6q-vtpctp-0010.dts
+@@ -17,8 +17,7 @@
+ 
+ / {
+ 	model = "VTPCTP Quad Board";
+-	compatible = "wago,imx6q-vtpctp-762_4xxx",
+-				 "wago,imx6q-vtpctp", "fsl,imx6q";
++	compatible = "wago,imx6q-vtpctp-762_4xxx-1003", "wago,imx6q-vtpctp", "fsl,imx6q";
+ 
+ 	memory {
+ 		reg = <0x10000000 0x80000000>;
+-- 
+2.7.4
+

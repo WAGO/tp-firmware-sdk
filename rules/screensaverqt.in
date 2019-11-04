@@ -1,0 +1,9 @@
+## SECTION=elrest_specific_applications
+
+config SCREENSAVERQT
+	tristate
+	prompt "screensaverqt"
+	select QT5
+	help
+	  FIXME
+

@@ -1,0 +1,9 @@
+## SECTION=elrest_specific_applications
+
+config CLEAR_SCREEN
+	tristate
+	prompt "clear_screen"
+	select QT5
+	help
+	  FIXME
+

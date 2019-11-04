@@ -1,0 +1,12 @@
+## SECTION=hosttools_noprompt
+
+config HOST_MESALIB
+	tristate
+	default ALLYES
+	select HOST_MAKEDEPEND
+	select HOST_SYSTEM_PYTHON
+	select HOST_SYSTEM_PYTHON_XML2
+	select HOST_SYSTEM_PYTHON_MAKO
+	select HOST_LIBPTHREAD_STUBS
+	select HOST_ZLIB
+	select HOST_EXPAT

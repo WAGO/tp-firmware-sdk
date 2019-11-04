@@ -1,0 +1,35 @@
+From 20bf6c97ab2b5c54cd3e90a1dcdae83c303f7511 Mon Sep 17 00:00:00 2001
+From: Christian Hohnstaedt <Christian.Hohnstaedt@wago.com>
+Date: Tue, 22 Jan 2019 14:40:54 +0100
+Subject: [PATCH] Configure beeper as acoustic LED
+
+This way it benefits from all the different LED triggers.
+Especially the "oneshot" with configurable "on-time" is
+our friend for acoustic response of display touches.
+
+Accessible via "/sys/class/leds/beeper/"
+
+This patch replaces the 236 lines-of-code beeper_driver.c
+by 2 lines of user-space code.
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index b1a0d59..e3a3333 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -239,6 +239,10 @@
+ 			gpios = <&gpio2 16 GPIO_ACTIVE_LOW>;
+ 			default-state = "off";
+ 		};
++		beeper {
++			gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
++			default-state = "oneshot";
++		};
+ 	};
+ 
+ 	v4l2_cap_1 {
+-- 
+2.7.4
+

@@ -1,0 +1,57 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# Script-name: touchcal
+#
+# starting touch calibration at boottime
+#
+# Author: Wolfgang Rückl,  elrest GmbH
+#-----------------------------------------------------------------------------#
+
+case $1 in
+
+  start)
+
+
+	#if systeminfo is provided by cmdline use it, otherwise read eeprom
+	(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+	if [ $? -eq 0 ]; then
+		cap=$(cat /proc/cmdline)
+		cap=$(echo ${cap#*systeminfo=0x00})
+		cap=$(echo ${cap:0:1})
+	else
+		(cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
+		if [ $? -eq 0 ]; then
+			cap="1"
+		else
+			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+			if [ $? -eq 0 ]; then
+				cap="1"
+			else
+				cap="0"
+			fi
+		fi
+
+	fi
+
+	if [ "$cap" == 0 ] ; then
+		if [ -e /etc/pointercal ]; then
+			if [ -e /etc/specific/display.conf ]; then
+				CALIBONBOOT=`getconfvalue /etc/specific/display.conf calibonboot -l`  
+			else
+				CALIBONBOOT="yes"  
+			fi
+		else
+			CALIBONBOOT="yes"
+		fi
+
+		#echo "$? CALIBONBOOT=$CALIBONBOOT"
+
+		if [ $CALIBONBOOT == "yes" ]; then
+			#echo "start ts_calibrate "
+			/etc/script/start_calibration.sh
+		fi
+	fi
+
+	;;
+
+esac

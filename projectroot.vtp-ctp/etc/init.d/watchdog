@@ -1,0 +1,30 @@
+#!/bin/bash
+# Start watchdog daemon.
+
+case $1 in
+	start)
+		echo "starting watchdog..."
+		/usr/sbin/watchdog -c /etc/watchdog.conf
+		echo "done: watchdog started"
+		;;
+	debug)
+		echo "starting watchdog in debug mode..."
+		/usr/sbin/watchdog -qvc /etc/watchdog.conf
+		echo "done: watchdog started in debug mode"
+		;;
+	stop)
+		wdlist=(pidof watchdog)
+		for wdpid in $(pidof watchdog); do
+			if [ "$wdpid" != "$$" ]; then
+				echo "stopping watchdog ($wdpid)..."
+				kill $wdpid
+			fi
+		done
+		echo "done: watchdog stopped"
+		;;
+	*)	
+		echo "watchdog init script"
+		echo "usage: /etc/init.d/watchdog start|debug|stop"
+		;;
+esac
+

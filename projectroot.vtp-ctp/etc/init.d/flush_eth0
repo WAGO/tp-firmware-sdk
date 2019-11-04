@@ -1,0 +1,2 @@
+echo flushing eth0
+ip addr flush dev eth0

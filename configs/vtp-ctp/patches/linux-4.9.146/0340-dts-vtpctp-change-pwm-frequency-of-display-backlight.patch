@@ -1,0 +1,26 @@
+From 901588abf5bd852f7d5252279b83321d6730a74e Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Fri, 17 May 2019 10:04:31 +0200
+Subject: [PATCH] dts: vtpctp: change pwm frequency of display backlight
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index 62a62db..4cf085b 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -142,7 +142,7 @@
+ 
+ 	backlight {
+ 		compatible = "pwm-backlight";
+-		pwms = <&pwm3 0 5000000>;
++		pwms = <&pwm3 0 50512>;
+ 		brightness-levels =
+ 			< 0   1   2   3   4   5   6   7   8   9
+ 			 10  11  12  13  14  15  16  17  18  19
+-- 
+2.7.4
+

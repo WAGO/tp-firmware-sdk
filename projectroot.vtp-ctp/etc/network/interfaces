@@ -1,0 +1,26 @@
+
+#   Auto-generated /etc/network/interfaces
+#   Don't edit manually!
+#
+
+# dsa_mode=0
+
+auto lo eth0 br0
+
+
+iface lo inet loopback
+
+
+iface eth0 inet manual 
+ pre-up    sudo /sbin/ip link set dev eth0 up 
+ post-down sudo /sbin/ip link set dev eth0 down || true
+ pre-up sudo /usr/sbin/ethtool -s eth0 autoneg on
+
+iface br0 inet manual 
+ pre-up    sudo /sbin/ip link set dev br0 up 
+ post-down sudo /sbin/ip link set dev br0 down || true
+ pre-up    sudo /usr/sbin/brctl addif br0 eth0
+ post-down sudo /usr/sbin/brctl delif br0 eth0 || true
+ up /sbin/udhcpc -i br0 -h `/bin/hostname` > /dev/null 2> /dev/null &
+ down /usr/bin/killall udhcpc || true
+ down   sudo /sbin/ip addr flush dev br0 || true

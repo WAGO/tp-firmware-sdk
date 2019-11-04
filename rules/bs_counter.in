@@ -1,0 +1,7 @@
+## SECTION=elrest_specific_tools
+
+config BS_COUNTER
+	tristate
+	prompt "bs_counter"
+	help
+	  FIXME

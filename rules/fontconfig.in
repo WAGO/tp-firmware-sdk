@@ -1,0 +1,38 @@
+## SECTION=multimedia_tools
+
+menuconfig FONTCONFIG
+	tristate
+	prompt "fontconfig                    "
+	select FREETYPE
+	select EXPAT
+	help
+	  Fontconfig is a font configuration and
+	  customization library, which does not depend on
+	  the X Window System.  It is designed to locate
+ 	  fonts within the system and select them according
+	  to requirements specified by applications.
+
+	  Fontconfig is not a rasterization library, nor
+	  does it impose a particular rasterization library
+	  on the application.  The X-specific library 'Xft'
+	  uses fontconfig along with freetype to specify and
+ 	  rasterize fonts.
+
+if FONTCONFIG
+
+config FONTCONFIG_UTILS
+	bool "install utilities for Fontconfig     "
+	help
+	  The fontconfig utilities package contains fc-list,
+	  fc-match, and fc-cache.
+	  fc-list lists fonts and styles available on the system
+	    for applications using fontconfig.
+	  fc-match  matches fontpattern (empty pattern by
+	    default) using the normal fontconfig matching rules to
+	    find the best font available.
+	  fc-cache  scans the font directories on the system and
+	    builds font information cache files for applications
+	    using fontconfig for their font handling.
+
+endif
+

@@ -1,0 +1,8 @@
+## SECTION=multimedia_libs
+
+config LIBETNAVIV
+	tristate
+	prompt "libetnaviv"
+	select GALCORE_HEADERS
+	help
+	  libetnaviv used for xorg-driver-video-armada

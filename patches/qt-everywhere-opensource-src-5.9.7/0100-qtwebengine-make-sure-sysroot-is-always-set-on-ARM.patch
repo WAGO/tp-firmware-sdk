@@ -1,0 +1,12 @@
+diff -Naur qt-everywhere-opensource-src-5.9.2_org/qtwebengine/src/core/config/linux.pri qt-everywhere-opensource-src-5.9.2/qtwebengine/src/core/config/linux.pri
+--- qt-everywhere-opensource-src-5.9.2_org/qtwebengine/src/core/config/linux.pri	2017-10-03 11:06:38.000000000 +0200
++++ qt-everywhere-opensource-src-5.9.2/qtwebengine/src/core/config/linux.pri	2017-10-20 11:20:50.000000000 +0200
+@@ -60,6 +60,8 @@
+         gn_args += arm_version=$$MARMV
+     }
+ 
++    gn_args += sysroot=\"$${PKG_CONFIG_SYSROOT_DIR}\"
++
+     !lessThan(MARMV, 8) {
+         gn_args += arm_use_neon=true
+     } else {

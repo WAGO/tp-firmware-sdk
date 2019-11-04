@@ -1,0 +1,53 @@
+From f8b38d5dbf07812d5d7d250b10a51399a77e1937 Mon Sep 17 00:00:00 2001
+From: Christian Hohnstaedt <Christian.Hohnstaedt@wago.com>
+Date: Thu, 17 Jan 2019 09:52:49 +0100
+Subject: [PATCH] Drop "qtouch_led_pca9552" brightness LED driver
+
+This home-grown driver started one kernel-thread for each LED
+just to give button-press-response.
+it is (soon: was) located in the PFC sources at:
+ local_src/qtouch_led_driver-1
+
+Replace it by the default LED driver in "oneshot" mode
+and 4 lines user-space code in brightness_control.c
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index 4748772..b1a0d59 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -644,12 +644,25 @@
+ 		wakeup-source;
+ 	};
+ 
+-	qtouch_led_pca9552: qtouch_led_pca9552@60 {
+-		compatible = "qtouch_led_pca9552";
++	pca9552@60 {
++		compatible = "nxp,pca9552";
++		status = "okay";
+ 		reg = <0x60>;
+-		wakeup-source;
+-	};
++		#address-cells = <1>;
++		#size-cells = <0>;
+ 
++		bright-minus@9 {
++			label = "bright-minus";
++			reg = <9>;
++			linux,default-trigger = "oneshot";
++		};
++
++		bright-plus@8 {
++			label = "bright-plus";
++			reg = <8>;
++			linux,default-trigger = "oneshot";
++		};
++	};
+ };
+ 
+ &iomuxc {
+-- 
+2.7.4
+

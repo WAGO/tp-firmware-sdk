@@ -1,0 +1,25 @@
+From 17ae0fb0f447f54c6d5286a15622fd30db360b43 Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Sat, 8 Dec 2018 11:56:59 +0100
+Subject: [PATCH] driver: hid: add Pixcir cap touch id to hid-ids
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ drivers/hid/hid-ids.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+index 6f4c84d..aadc46c 100644
+--- a/drivers/hid/hid-ids.h
++++ b/drivers/hid/hid-ids.h
+@@ -1134,4 +1134,7 @@
+ #define USB_VENDOR_ID_UGTIZER			0x2179
+ #define USB_DEVICE_ID_UGTIZER_TABLET_GP0610	0x0053
+ 
++#define USB_VENDOR_ID_WELTREND 0x040B
++#define USB_DEVICE_ID_PIXCIR_MT_TOUCH 0x2230
++
+ #endif
+-- 
+2.7.4
+

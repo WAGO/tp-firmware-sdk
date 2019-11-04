@@ -1,0 +1,88 @@
+#!/bin/bash
+COMMAND="$1"
+
+export QT_QPA_EGLFS_HIDECURSOR=1
+export QT_TSLIB_TOUCHMODE=1
+export QT_IM_MODULE=Maliit
+#export http_proxy="http://proxy:port"
+# For maliits default language
+export LANG=de_DE@UTF-8
+
+PLATFORM=eglfs
+
+ENABLE_X=1
+if [ $ENABLE_X -gt 0 ]; then
+	export DISPLAY=:0
+	export LD_LIBRARY_PATH=/usr/local/XSGX/lib
+	PLATFORM=xcb
+fi
+
+export QT_QPA_PLATFORM=$PLATFORM
+
+
+test -f $HOME/.dbusenv && source $HOME/.dbusenv
+
+function start {
+	stop
+	if [ $ENABLE_X -gt 0 ]; then
+		test -d /usr/local/XSGX/var/log/ || mkdir -p /usr/local/XSGX/var/log/
+		/usr/local/XSGX/bin/X -v -dpms -s 9999 -nocursor -config /etc/xorg.conf &
+	fi
+	logger "launching browser"
+	/usr/examples/webkitwidgets/browser/browser -plugin Tslib:/dev/input/event0 -platform $PLATFORM &
+	
+}
+
+function stop {
+	if [ -n "$DBUS_SESSION_BUS_PID" ]; then
+		kill $DBUS_SESSION_BUS_PID
+	fi
+	killall browser 
+	if [ $ENABLE_X -gt 0 ]; then
+		killall X
+	fi
+}
+
+case $COMMAND in 
+start)
+	logger "basysKom init script starting"
+	logger "disabling cursor in framebuffer"
+	echo "0" > /sys/class/graphics/fbcon/cursor_blink 
+	if [ -z "$(lsmod | grep pvrsrvkm)" ]; then
+		logger "running depmod"
+		depmod
+
+		logger "initializing PowerVR chip"
+		/usr/bin/devmem2 0x48004B48 w 0x2 > /dev/null
+		/usr/bin/devmem2 0x48004B10 w 0x1 > /dev/null
+		/usr/bin/devmem2 0x48004B00 w 0x2 > /dev/null
+
+		logger "loading powervr kernel modules"
+		if [ $ENABLE_X -gt 0 ]; then
+			modprobe drm
+		else
+			modprobe omaplfb
+		fi
+		modprobe pvrsrvkm
+		if [ $ENABLE_X -lt 1 ]; then
+			sleep 1
+			logger "starting povervrctl"
+			/usr/bin/pvrsrvctl --start --no-module | logger
+		fi
+	else
+		logger "Kernel modules already loaded..."
+	fi
+	start
+	;;
+stop)
+	stop
+	;;
+restart)
+	stop
+	start
+	;;
+*)
+	echo "Unsupported command: $COMMAND" 
+	exit 1
+esac
+

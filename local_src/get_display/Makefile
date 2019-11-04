@@ -1,0 +1,31 @@
+#
+# Simple development makefile
+#
+
+#
+# add more flags here,
+# but don't remove the "+="
+#
+GLIB_CFLAGS  = -I$(PTXDIST_SYSROOT_TARGET)/usr/include/glib-2.0
+GLIB_CFLAGS += -I$(PTXDIST_SYSROOT_TARGET)/usr/lib/glib-2.0/include
+GLIB_LDFLAGS = -lglib-2.0
+override LDFLAGS += -L$(PTXDIST_SYSROOT_TARGET)/lib -ludev -lmsgtool -lctcommon $(GLIB_LDFLAGS)
+override CFLAGS += $(GLIB_CFLAGS)
+override CFLAGS+=-O0 -ggdb3
+
+all: get_display
+
+get_display: get_display.o
+	$(CC) $(LDFLAGS) -o $@ get_display.o $(LDLIBS$(LDLIBS-$(@)))
+
+
+clean:
+	rm -f get_display *.gdb *.o
+
+
+install:
+
+
+.PHONY: all install clean
+
+# end of development makefile

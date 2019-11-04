@@ -1,0 +1,11 @@
+## SECTION=elrest_specific_applications
+
+config WAITHITTOUCH
+	tristate
+	prompt "waithittouch"
+#	select XORG_LIB_SM
+#	select XORG_LIB_ICE
+#	select XORG_LIB_XCURSOR
+	select QT5
+	help
+	  FIXME

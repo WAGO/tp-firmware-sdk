@@ -1,0 +1,8 @@
+## SECTION=elrest_specific_drivers
+
+config SPREADING
+	tristate
+	select KERNEL
+	prompt "spreading"
+	help
+	  FIXME

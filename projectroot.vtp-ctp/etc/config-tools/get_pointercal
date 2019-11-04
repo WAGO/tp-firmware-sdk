@@ -1,0 +1,21 @@
+#!/bin/bash
+
+file="/etc/pointercal"
+
+# show help-text if requested
+if [ $# -gt 0 ]; then
+    if [ "$1" = "-h" -o "$1" = "--help" ]; then
+        echo
+        echo "* Get touch-calibration file on resistive TP600 *"
+        echo
+        echo "Usage: get_pointercal -h | --help       	print this usage"
+        echo "       get_pointercal"
+        exit 0
+    else
+        exit 1      
+    fi
+else
+  if [ -e "$file" ]; then
+    cat $file  
+  fi
+fi

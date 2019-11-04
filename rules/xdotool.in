@@ -1,0 +1,11 @@
+## SECTION=elrest_specific_tools
+config XDOTOOL
+	tristate
+	select XORG_SERVER
+	select XORG_LIB_X11
+	select LIBXKBCOMMON
+	select XORG_LIB_XTST
+	select XORG_LIB_XINERAMA
+	prompt "xdotool"
+	help
+	  FIXME

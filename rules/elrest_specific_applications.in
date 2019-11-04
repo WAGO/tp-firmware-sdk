@@ -1,0 +1,5 @@
+## SECTION=elrest_specific_applications
+
+menu "Browser                       "
+source "generated/elrest_specific_applications_browser.in"
+endmenu

@@ -1,0 +1,10 @@
+## SECTION=elrest_specific_commandline_tools
+
+config CONFIG_BROWSERSECURITY
+	tristate
+	select UDEV
+	select LIBMSGTOOL
+	select CONFIG_TOOLS
+	prompt "config_browsersecurity"
+	help
+	  FIXME

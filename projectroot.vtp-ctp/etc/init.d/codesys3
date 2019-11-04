@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# /etc/init.d/codesys3
+#
+
+THISFILE=$0
+PROGRAM=/usr/bin/codesys3
+
+export PlcConfigFile=@CDS3_PLCCONFIGFILE@
+
+
+usage() {
+        echo "codesys3 usage: $THISFILE [start|stop|debug]"
+}
+
+set_licence()
+{
+        DEVICEID=$(/etc/config-tools/get_typelabel_value DEVICEID)
+        LINK=/etc/specific/3S.$DEVICEID.dat
+        if [ "$LINK" != "$(readlink /home/codesys3/3S.dat)" ]
+        then
+                ln -sf /etc/specific/3S.$DEVICEID.dat /home/codesys3/3S.dat
+        fi
+}
+
+checkCDSrun()
+{
+  sleep 10
+  start-stop-daemon  -K -t -x "$1" -q
+  if [ "$?" == "1" ]
+  then
+    eventmsg 0x00040008
+  fi
+}
+
+
+case $1 in
+
+        start)
+                echo "Start codesys V3"
+                set_licence
+                start-stop-daemon -S -x "$PROGRAM" -o -b --
+                checkCDSrun "$PROGRAM" &
+
+                ;;
+
+        stop)
+                echo "Stop codesys V3"
+                start-stop-daemon -K -x "$PROGRAM"
+                ;;
+
+        debug)
+                echo "Start codesys V3 in foeground"
+                set_licence
+                start-stop-daemon -S -x "$PROGRAM" -o
+
+                ;;
+
+
+        *)
+
+                usage
+                exit 1
+                ;;
+
+esac
+

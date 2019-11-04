@@ -1,0 +1,18 @@
+## SECTION=elrest_specific_applications_browser
+
+config WEBENGINEBROWSER
+	bool
+	prompt "webenginebrowser"
+	select QT5
+	help
+	  FIXME
+
+if WEBENGINEBROWSER
+
+config WEBENGINEBROWSER_TRUNK
+	bool
+#	prompt "use trunk"
+	help
+	  Build trunk instead of latest release.
+
+endif

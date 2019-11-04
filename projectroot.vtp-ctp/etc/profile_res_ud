@@ -1,0 +1,66 @@
+#
+# /etc/profile
+#
+export DISPLAY=:0
+#setterm -blank 0 2> /dev/null
+
+export PATH="$PATH:/usr/bin:/bin:/sbin:/usr/sbin"
+export LANG="de_DE.UTF-8"
+export MB_KBD_VARIANT=en
+
+export QWS_MOUSE_PROTO=tslib:/dev/input/touchscreen
+export TSLIB_CALIBFILE=/etc/pointercal
+export TSLIB_CONSOLEDEVICE=none
+export TSLIB_FBDEVICE=/dev/fb0
+#export TSLIB_PLUGINDIR=/lib/ts
+export TSLIB_CONFFILE=/etc/ts.conf
+export TSLIB_TSDEVICE=/dev/input/touchscreen
+
+export QTWEBENGINEPROCESS_PATH=/usr/lib/qt5/libexec/QtWebEngineProcess
+
+#Qt5
+export QT_QPA_FB_TSLIB=1
+#export QT_QPA_DEFAULT_PLATFORM=linuxfb
+export QT_QPA_DEFAULT_PLATFORM=xcb
+# enable virtual keyboard
+export QT_IM_MODULE=vkim
+export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/qt5/plugins
+export QT_XCB_NO_XI2=1
+export XDG_RUNTIME_DIR="/tmp/runtime-root"
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="rotate=180"
+
+# This fixes the backspace when telnetting in.
+if [ "$TERM" != "linux" ]; then
+        stty erase ^H
+fi
+
+PS1="\\u@\\h:\\w "
+PS2=" >"
+PS4="+ "
+
+alias vim='vi'
+alias l='ls -l'
+alias ll='ls -al'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias md='mkdir'
+alias rd='rmdir'
+#source /etc/timezone
+
+# set idle timeout
+TMOUT=300
+readonly TMOUT
+export TMOUT
+
+# source this file for subsequent shells too
+export ENV=/etc/profile
+
+# Exec local profile
+
+if [ -e "/etc/profile.local" ]; then
+	echo "running /etc/profile.local"
+	. /etc/profile.local
+fi
+
+hostname=$(hostname)
+echo -e "\n\n\e[00;32mWAGO Linux Terminal\e[00m on \033[1;31m$hostname\e[00m.\n\n"

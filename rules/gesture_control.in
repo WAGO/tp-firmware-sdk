@@ -1,0 +1,9 @@
+## SECTION=elrest_specific_tools
+
+config GESTURE_CONTROL
+	tristate
+	prompt "gesture_control"
+	select LIBMSGTOOL
+	select CONFIG_TOOLS
+	help
+	  FIXME

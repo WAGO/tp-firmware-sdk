@@ -1,0 +1,10 @@
+#!/bin/bash
+# Restart dnsmasq on network interface configuration changes.
+# Only restart dnsmasq if it is already running.
+# $(Id)
+# Hoffmann, Hans-Josef
+
+if pidof dnsmasq > /dev/null; then
+    sudo /etc/init.d/dnsmasq restart > /dev/null
+fi
+

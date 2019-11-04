@@ -1,0 +1,16 @@
+#!/bin/sh -e
+# Called when a new interface comes up
+#
+# don't restart when lo is configured.
+if [ "$IFACE" != "eth0" ]; then
+    exit 0
+fi
+#
+# Only run from ifup.
+if [ "$MODE" != "start" ]; then
+    exit 0
+fi
+#
+# Set static multicast route for CoDeSys
+sudo /sbin/route add -net 224.0.0.0 netmask 224.0.0.0 eth0
+#

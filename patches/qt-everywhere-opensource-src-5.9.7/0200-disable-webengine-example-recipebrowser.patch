@@ -1,0 +1,10 @@
+diff -Naur qt-everywhere-opensource-src-5.9.2_org/qtwebengine/examples/webengine/webengine.pro qt-everywhere-opensource-src-5.9.2/qtwebengine/examples/webengine/webengine.pro
+--- qt-everywhere-opensource-src-5.9.2_org/qtwebengine/examples/webengine/webengine.pro	2017-10-27 08:03:31.678687598 +0200
++++ qt-everywhere-opensource-src-5.9.2/qtwebengine/examples/webengine/webengine.pro	2017-10-27 08:03:51.294687549 +0200
+@@ -3,5 +3,4 @@
+ SUBDIRS += \
+     customdialogs \
+     minimal \
+-    quicknanobrowser \
+-    recipebrowser
++    quicknanobrowser

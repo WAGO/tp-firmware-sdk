@@ -1,0 +1,8 @@
+## SECTION=elrest_specific_drivers
+
+config DIO_DRV
+	tristate
+	select KERNEL
+	prompt "dio_drv"
+	help
+	  FIXME

@@ -1,0 +1,5 @@
+#  PIXCIR HID Touch Panel udev.rule
+#
+KERNEL=="event[0-9]*", SUBSYSTEM=="input", \
+  ATTRS{name}=="PIXCIR HID Touch Panel", \
+  SYMLINK+="input/captouch"

@@ -1,0 +1,11 @@
+## SECTION=elrest_specific_commandline_tools
+
+config GET_DISPLAY
+	tristate
+	select LIBMSGTOOL
+	select UDEV_LIBUDEV
+	select UDEV
+	select CONFIG_TOOLS
+	prompt "get_display"
+	help
+	  FIXME

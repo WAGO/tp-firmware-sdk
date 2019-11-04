@@ -1,0 +1,5 @@
+system=fbdev
+fbdev=/dev/fb0
+#depth=16
+vsync-none
+pixelformat=RGB16
