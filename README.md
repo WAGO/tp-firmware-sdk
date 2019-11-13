@@ -130,13 +130,16 @@ http://www.github.com/wago/gcc-linaro.toolchain-2017
     >sudo apt install libx11-dev        #used to build xorg-lib-x11
     >sudo apt install python-libxml2    #used to build host-system-python
     >sudo apt install python-mako       #used to build host-system-python
+    >sudo apt install gcc-multilib      #used to build qt5
+    >sudo apt install g++-multilib      #used to build qt5
 ```
 
 or in one-shot:
 
 ```
     >sudo apt install libncurses5-dev gawk flex bison texinfo python-dev g++ dialog lzop autoconf \
-    libtool xmlstarlet xsltproc doxygen autopoint libx11-dev python-libxml2 python-mako
+    libtool xmlstarlet xsltproc doxygen autopoint libx11-dev python-libxml2 python-mako \
+    gcc-multilib g++-multilib
 ```
 
 ### 3.2) Clone the build tool "ptxdist" somewhere, we expect ~/ptxdist
