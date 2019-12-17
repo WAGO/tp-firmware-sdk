@@ -16,29 +16,32 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_NETWORKING) += wbm-ng-plugin-networking
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_NETWORKING                := wbm-networking
-WBM_NG_PLUGIN_NETWORKING_VERSION        := 1.3.0-rc.156162408119
-WBM_NG_PLUGIN_NETWORKING_SUFFIX         := tgz
-WBM_NG_PLUGIN_NETWORKING_ARCHIVE        := $(WBM_NG_PLUGIN_NETWORKING)-$(WBM_NG_PLUGIN_NETWORKING_VERSION).$(WBM_NG_PLUGIN_NETWORKING_SUFFIX)
-WBM_NG_PLUGIN_NETWORKING_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_PLUGIN_NETWORKING_ARCHIVE)
-WBM_NG_PLUGIN_NETWORKING_MD5            := 6abb163ff9e17b5ec87af38d59fd2cef
-
+WBM_NG_PLUGIN_NETWORKING_VERSION        := 1.3.0
+WBM_NG_PLUGIN_NETWORKING                := wbm-networking-$(WBM_NG_PLUGIN_NETWORKING_VERSION)
+WBM_NG_PLUGIN_NETWORKING_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_NETWORKING)
+WBM_NG_PLUGIN_NETWORKING_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_NETWORKING_URL))
+WBM_NG_PLUGIN_NETWORKING_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_NETWORKING)$(WBM_NG_PLUGIN_NETWORKING_SUFFIX)
+WBM_NG_PLUGIN_NETWORKING_MD5             = $(shell [ -f $(WBM_NG_PLUGIN_NETWORKING_MD5_FILE) ] && cat $(WBM_NG_PLUGIN_NETWORKING_MD5_FILE))
+WBM_NG_PLUGIN_NETWORKING_MD5_FILE       := $(WBM_NG_PLUGIN_NETWORKING_SOURCE).md5
+WBM_NG_PLUGIN_NETWORKING_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_PLUGIN_NETWORKING_URL))
 WBM_NG_PLUGIN_NETWORKING_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng-plugin-networking
-WBM_NG_PLUGIN_NETWORKING_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_NETWORKING_ARCHIVE)
 WBM_NG_PLUGIN_NETWORKING_DIR            := $(WBM_NG_PLUGIN_NETWORKING_BUILDROOT_DIR)
 WBM_NG_PLUGIN_NETWORKING_LICENSE        := unknown
 WBM_NG_PLUGIN_NETWORKING_MAKE_ENV       :=
 ifeq ($(PTXCONF_WBM),y)
-WBM_NG_PLUGIN_NETWORKING_TARGET_DIR     := /var/www/wbm-ng/plugins/$(WBM_NG_PLUGIN_NETWORKING)
+WBM_NG_PLUGIN_NETWORKING_TARGET_DIR     := /var/www/wbm-ng/plugins/wbm-networking
 else
-WBM_NG_PLUGIN_NETWORKING_TARGET_DIR     := /var/www/wbm/plugins/$(WBM_NG_PLUGIN_NETWORKING)
+WBM_NG_PLUGIN_NETWORKING_TARGET_DIR     := /var/www/wbm/plugins/wbm-networking
 endif
 
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_PLUGIN_NETWORKING_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_PLUGIN_NETWORKING_URL)' '$@' '$(WBM_NG_PLUGIN_NETWORKING_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract

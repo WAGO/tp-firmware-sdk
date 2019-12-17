@@ -54,6 +54,9 @@ show_bootscreen () {
 		elif [ "$devconf" == "6" ] ; then
 			devconf="1004"
 			xres="1920"
+		elif [ "$devconf" == "7" ] ; then
+			devconf="1005"
+			xres="1920"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
 			devconf="1000"
@@ -71,6 +74,8 @@ show_bootscreen () {
 		elif [ "$devconf" = "1003" ]; then
 			xres="1280"
 		elif [ "$devconf" = "1004" ]; then
+			xres="1920"
+		elif [ "$devconf" = "1005" ]; then
 			xres="1920"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
@@ -150,6 +155,21 @@ set_profile () {
 			fi
 		fi
 	elif [ "$devconf" = "1004" ]; then
+		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
+		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+		if [ $? -eq 0 ]; then
+			cap=$(cat /proc/cmdline)
+			cap=$(echo ${cap#*systeminfo=0x00})
+			cap=$(echo ${cap:0:1})
+		else
+			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+			if [ $? -eq 0 ]; then
+				cap="1"
+			else
+				cap="0"
+			fi
+		fi
+	elif [ "$devconf" = "1005" ]; then
 		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
 		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
 		if [ $? -eq 0 ]; then

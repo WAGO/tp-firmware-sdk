@@ -16,29 +16,32 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_CLOCK) += wbm-ng-plugin-clock
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_CLOCK                := wbm-clock
-WBM_NG_PLUGIN_CLOCK_VERSION        := 1.0.1-rc.156162410411
-WBM_NG_PLUGIN_CLOCK_SUFFIX         := tgz
-WBM_NG_PLUGIN_CLOCK_ARCHIVE        := $(WBM_NG_PLUGIN_CLOCK)-$(WBM_NG_PLUGIN_CLOCK_VERSION).$(WBM_NG_PLUGIN_CLOCK_SUFFIX)
-WBM_NG_PLUGIN_CLOCK_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_PLUGIN_CLOCK_ARCHIVE)
-WBM_NG_PLUGIN_CLOCK_MD5            := 63c4e9d22126501819ec9bdda7ef14d1
-
+WBM_NG_PLUGIN_CLOCK_VERSION        := 1.0.1
+WBM_NG_PLUGIN_CLOCK                := wbm-clock-$(WBM_NG_PLUGIN_CLOCK_VERSION)
+WBM_NG_PLUGIN_CLOCK_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_CLOCK)
+WBM_NG_PLUGIN_CLOCK_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_CLOCK_URL))
+WBM_NG_PLUGIN_CLOCK_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_CLOCK)$(WBM_NG_PLUGIN_CLOCK_SUFFIX)
+WBM_NG_PLUGIN_CLOCK_MD5             = $(shell [ -f $(WBM_NG_PLUGIN_CLOCK_MD5_FILE) ] && cat $(WBM_NG_PLUGIN_CLOCK_MD5_FILE))
+WBM_NG_PLUGIN_CLOCK_MD5_FILE       := $(WBM_NG_PLUGIN_CLOCK_SOURCE).md5
+WBM_NG_PLUGIN_CLOCK_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_PLUGIN_CLOCK_URL))
 WBM_NG_PLUGIN_CLOCK_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng-plugin-clock
-WBM_NG_PLUGIN_CLOCK_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_CLOCK_ARCHIVE)
 WBM_NG_PLUGIN_CLOCK_DIR            := $(WBM_NG_PLUGIN_CLOCK_BUILDROOT_DIR)
 WBM_NG_PLUGIN_CLOCK_LICENSE        := unknown
 WBM_NG_PLUGIN_CLOCK_MAKE_ENV       :=
 ifeq ($(PTXCONF_WBM),y)
-WBM_NG_PLUGIN_CLOCK_TARGET_DIR     := /var/www/wbm-ng/plugins/$(WBM_NG_PLUGIN_CLOCK)
+WBM_NG_PLUGIN_CLOCK_TARGET_DIR     := /var/www/wbm-ng/plugins/wbm-clock
 else
-WBM_NG_PLUGIN_CLOCK_TARGET_DIR     := /var/www/wbm/plugins/$(WBM_NG_PLUGIN_CLOCK)
+WBM_NG_PLUGIN_CLOCK_TARGET_DIR     := /var/www/wbm/plugins/wbm-clock
 endif
 
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_PLUGIN_CLOCK_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_PLUGIN_CLOCK_URL)' '$@' '$(WBM_NG_PLUGIN_CLOCK_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract

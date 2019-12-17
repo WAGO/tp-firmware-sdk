@@ -1,0 +1,34 @@
+From 42220853bf3748feadb11660f31946fa6e21a305 Mon Sep 17 00:00:00 2001
+From: Oleg Karfich <oleg.karfich@wago.com>
+Date: Tue, 15 Jan 2019 14:56:52 +0100
+Subject: [PATCH] arm: dts: vtpctp: add ethernet alias and remove mac-address
+ property
+
+Signed-off-by: Oleg Karfich <oleg.karfich@wago.com>
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index 7d659a1..4748772 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -20,6 +20,7 @@
+ 		mdio-gpio0 = &bitbang_mdio0;
+ 		mmc0 = &usdhc1;
+ 		mmc1 = &usdhc3;
++		ethernet1 = &fec;
+ 	};
+ 
+ 	wsysinit_init {
+@@ -389,7 +390,6 @@
+ 	pinctrl-0 = <&pinctrl_enet>;
+ 	phy-mode = "rmii";
+ 	status = "okay";
+-	mac-address = [ 00 00 00 00 00 00 ];
+ 	fixed-link {
+ 		speed = <100>;
+ 		full-duplex;
+-- 
+2.7.4
+

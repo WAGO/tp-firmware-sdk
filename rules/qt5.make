@@ -112,43 +112,40 @@ QT5_CONF_OPT	:= \
 	-examplesdir /usr/lib/qt5/examples \
 	-hostbindir /usr/bin/qt5 \
 	-release \
-	--disable-optimized-tools \
 	-opensource \
 	-confirm-license \
-	--enable-shared \
-	--$(call ptx/endis, PTXCONF_QT5_ACCESSIBILITY)-accessibility \
-	--disable-sql-db2 \
-	--disable-sql-ibase \
-	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL)-sql-mysql \
-	--disable-sql-oci \
-	--disable-sql-odbc \
-	--disable-sql-psql \
-	--disable-sql-sqlite2 \
-	--disable-sql-tds \
-	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sql-sqlite \
-	$(call ptx/qt5-system, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sqlite \
-	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)-qml-debug \
+	$(call ptx/ifdef, PTXCONF_QT5_ACCESSIBILITY,-accessibility,-no-accessibility) \
+	-no-sql-db2 \
+	-no-sql-ibase \
+	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL,-sql-mysql,-no-sql-mysql) \
+	-no-sql-oci \
+	-no-sql-odbc \
+	-no-sql-psql \
+	-no-sql-sqlite2 \
+	-no-sql-tds \
+	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE,-sql-sqlite,-no-sql-sqlite) \
+	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG,-qml-debug,-no-qml-debug) \
 	-pkg-config \
 	-force-pkg-config \
 	\
 	-system-zlib \
-	--disable-mtdev \
-	--$(call ptx/endis, PTXCONF_QT5_JOURNALD)-journald \
-	--disable-syslog \
+	-no-mtdev \
+	$(call ptx/ifdef, PTXCONF_QT5_JOURNALD,-journald,-no-journald) \
+	-no-syslog \
 	$(call ptx/ifdef, PTXCONF_QT5_GIF,,-no-gif) \
 	$(call ptx/qt5-system, QT5_LIBPNG)-libpng \
-	$(call ptx/qt5-system, QT5_LIBJPEG)-libjpeg \
+	$(call ptx/ifdef, QT5_LIBJPEG,-qt-libjpeg,-qt-libjpeg) \
 	$(call ptx/qt5-system, QT5_GUI)-freetype \
 	-qt-harfbuzz \
-	--$(call ptx/endis, PTXCONF_QT5_OPENSSL)-openssl \
-	--disable-libproxy \
+	$(call ptx/ifdef, PTXCONF_QT5_OPENSSL,-openssl,-no-openssl) \
+	-no-libproxy \
 	-qt-pcre \
 	-system-xcb \
 	$(call ptx/qt5-system, QT5_PLATFORM_XCB)-xkbcommon-x11 \
-	--$(call ptx/endis, PTXCONF_QT5_INPUT_LIBINPUT)-xkbcommon-evdev \
-	--$(call ptx/endis, PTXCONF_QT5_XI)-xinput2 \
-	--$(call ptx/endis, PTXCONF_QT5_X11)-xcb-xlib \
-	--$(call ptx/endis, PTXCONF_QT5_GLIB)-glib \
+	$(call ptx/ifdef, PTXCONF_QT5_INPUT_LIBINPUT,-xkbcommon-evdev,-no-xkbcommon-evdev) \
+	$(call ptx/ifdef, PTXCONF_QT5_XI,-xinput2,-no-xinput2) \
+	$(call ptx/ifdef, PTXCONF_QT5_X11,-xcb-xlib,-no-xcb-xlib) \
+	$(call ptx/ifdef, PTXCONF_QT5_GLIB,-glib,-no-glib) \
 	\
 	-make libs \
 	-make tools \
@@ -191,33 +188,32 @@ QT5_CONF_OPT	:= \
 	-skip qtwinextras \
 	$(call ptx/qt5-module, QTX11EXTRAS, qtx11extras) \
 	$(call ptx/qt5-module, QTXMLPATTERNS, qtxmlpatterns) \
-	--$(call ptx/endis, PTXCONF_QT5_PREPARE_EXAMPLES)-compile-examples \
-	--$(call ptx/endis, PTXCONF_QT5_GUI)-gui \
-	--$(call ptx/endis, PTXCONF_QT5_WIDGETS)-widgets \
-	--disable-rpath \
-	--disable-cups \
+	$(call ptx/ifdef, PTXCONF_QT5_PREPARE_EXAMPLES,-compile-examples,-no-compile-examples) \
+	$(call ptx/ifdef, PTXCONF_QT5_GUI,-gui,-no-gui) \
+	$(call ptx/ifdef, PTXCONF_QT5_WIDGETS,-widgets,-no-widgets) \
+	-no-rpath \
+	-no-cups \
 	--$(call ptx/endis, $(call ptx/ifdef, PTXCONF_QT5_ICU,,PTXCONF_ICONV))-iconv \
-	--$(call ptx/endis, PTXCONF_QT5_INPUT_EVDEV)-evdev \
-	--$(call ptx/endis, PTXCONF_QT5_INPUT_TSLIB)-tslib \
-	--$(call ptx/endis, PTXCONF_QT5_ICU)-icu \
-	--$(call ptx/endis, PTXCONF_QT5_GUI)-fontconfig \
-	--disable-strip \
-	--disable-pch \
-	--disable-ltcg \
-	-$(call ptx/ifdef, PTXCONF_QT5_DBUS,dbus-linked,no-dbus) \
-	--disable-separate-debug-info \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_XCB)-xcb \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_EGLFS)-eglfs \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_EGLFS_KMS)-kms \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_EGLFS_KMS)-gbm \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_DIRECTFB)-directfb \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_LINUXFB)-linuxfb \
-	--disable-mirclient \
+	$(call ptx/ifdef, PTXCONF_QT5_INPUT_EVDEV,-evdev,-no-evdev) \
+	$(call ptx/ifdef, PTXCONF_QT5_INPUT_TSLIB,-tslib,-no-tslib) \
+	$(call ptx/ifdef, PTXCONF_QT5_ICU,-icu,-no-icu) \
+	$(call ptx/ifdef, PTXCONF_QT5_GUI,-fontconfig,-no-fontconfig) \
+	-no-strip \
+	-no-pch \
+	-no-ltcg \
+	-no-separate-debug-info \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_XCB,-xcb,-no-xcb) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS,-eglfs,-no-eglfs) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS_KMS,-kms,-no-kms) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS_KMS,-gbm,-no-gbm) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_DIRECTFB,-directfb,-no-directfb) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_LINUXFB,-linuxfb,-no-linuxfb) \
+	-no-mirclient \
 	$(call ptx/ifdef, PTXCONF_QT5_GUI,-qpa $(PTXCONF_QT5_PLATFORM_DEFAULT)) \
 	-xplatform linux-ptx-g++ \
 	-$(call ptx/ifdef, PTXCONF_QT5_OPENGL,opengl $(PTXCONF_QT5_OPENGL_API),no-opengl) \
-	--$(call ptx/endis, PTXCONF_QT5_INPUT_LIBINPUT)-libinput \
-	--disable-system-proxies \
+	$(call ptx/ifdef, PTXCONF_QT5_INPUT_LIBINPUT,-libinput,-no-libinput) \
+	-no-system-proxies \
 	-v
 
 ifdef PTXCONF_QT5_MODULE_QTMULTIMEDIA
@@ -249,10 +245,10 @@ endif
 
 # Note: these options are not listed in '--help' but they exist
 QT5_CONF_OPT += \
-	--disable-sm \
-	--$(call ptx/endis, PTXCONF_QT5_GUI)-libudev \
-	--$(call ptx/endis, PTXCONF_QT5_OPENGL)-egl \
-	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_XCB)-xkb
+	-no-sm \
+	$(call ptx/ifdef, PTXCONF_QT5_GUI,-libudev,-no-libudev) \
+	$(call ptx/ifdef, PTXCONF_QT5_OPENGL,-egl,-no-egl) \
+	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_XCB,-xkb,-no-xkb)
 
 ifdef PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL
 QT5_CONF_OPT += -mysql_config $(SYSROOT)/usr/bin/mysql_config
@@ -272,24 +268,11 @@ endif
 
 $(STATEDIR)/qt5.prepare:
 	@$(call targetinfo)
-	@rm -rf "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++"
-	@mkdir "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++"
-	@$(foreach file, $(wildcard $(QT5_MKSPECS)/*), \
-		$(QT5_CONF_ENV) ptxd_replace_magic "$(file)" > \
-		"$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/$(notdir $(file))";)
-
-	@cp -a /$(PTXDIST_PLATFORMDIR)/../config/qt5/mkspecs/linux-ptx-g++/qmake.conf $(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf
-	@for file in $(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/*.conf; do \
-		sed -e "s,USER_SYSROOT_DIR,$(PTXDIST_PLATFORMDIR),g" \
-		    $$file > $${file%%.conf}; \
-	done && \
-	mv $(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake $(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf
-	@$(call world/prepare, QT5)
+	sed -i "s|USER_SYSROOT_DIR|$(PTXCONF_SYSROOT_TARGET)|g" "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf" && \
+	sed -i "s|CROSS_PREFIX|$(COMPILER_PREFIX)|g" "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf" && \
 	rm -Rf $(PTXCONF_SYSROOT_TARGET)/usr/lib/qt5 && \
 	rm -Rf $(PTXCONF_SYSROOT_TARGET)/usr/lib/libQt5*
-#	cd $(QT5_DIR)-build/qtbase/bin && ./qmake $(QT5_QMAKE_OPT) $(QT5_DIR)
-
-#	@$(call world/prepare, QT5)
+	@$(call world/prepare, QT5)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: brightness_control.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
 ///
 /// \brief   brightness control, display backlight settings
 ///

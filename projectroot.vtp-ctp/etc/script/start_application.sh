@@ -1,11 +1,20 @@
 #!/bin/bash
 #-----------------------------------------------------------------------------#
-# Script-name: start_application.sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# starting up applications
-#
-# Author: Wolfgang Rückl,  elrest GmbH
+# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
 #-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   start_application.sh
+#
+# Brief:    starting up applications
+#
+# Author:   Wolfgang Rückl: elrest Automationssysteme GmbH
+#
+#-----------------------------------------------------------------------------#
+
 
 . /etc/profile > /dev/null 2>&1
 HOME=/root
@@ -137,6 +146,8 @@ function StartGestureControl
           devconf="1003"
         elif [ "$xres" == "6" ] ; then
           devconf="1004"
+        elif [ "$xres" == "7" ] ; then
+          devconf="1005"
         else
           echo "screen resolution touch not recognized set default 800x480"
           xres="800"
@@ -182,6 +193,21 @@ function StartGestureControl
           fi
         fi
       elif [ "$devconf" = "1004" ]; then
+        #if systeminfo is provided by cmdline use it, otherwise read eeprom 
+        (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+        if [ $? -eq 0 ]; then
+          cap=$(cat /proc/cmdline)
+          cap=$(echo ${cap#*systeminfo=0x00})
+          cap=$(echo ${cap:0:1})
+        else
+          (cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+          if [ $? -eq 0 ]; then
+            cap="1"
+          else
+            cap="0"
+          fi
+        fi
+      elif [ "$devconf" = "1005" ]; then
         #if systeminfo is provided by cmdline use it, otherwise read eeprom 
         (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
         if [ $? -eq 0 ]; then

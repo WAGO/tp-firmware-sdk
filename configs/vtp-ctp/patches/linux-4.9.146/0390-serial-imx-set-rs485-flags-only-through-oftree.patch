@@ -1,0 +1,29 @@
+From 6f6f27fa9acc0cedd8bca218069dcdb28651df8c Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Thu, 17 Jan 2019 13:45:26 +0100
+Subject: [PATCH] serial: imx: set rs485 flags only through oftree
+
+rs485 settings are set through oftree and should not be hardcoded here.
+
+Signed-off-by: Heinrich Toews <heinrich.toews@wago.com>
+---
+ drivers/tty/serial/imx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/tty/serial/imx.c b/drivers/tty/serial/imx.c
+index c79f06c..0340c94 100644
+--- a/drivers/tty/serial/imx.c
++++ b/drivers/tty/serial/imx.c
+@@ -2136,8 +2136,7 @@ static int serial_imx_probe(struct platform_device *pdev)
+ 	sport->port.fifosize = 32;
+ 	sport->port.ops = &imx_pops;
+ 	sport->port.rs485_config = imx_rs485_config;
+-	sport->port.rs485.flags =
+-		SER_RS485_RTS_ON_SEND | SER_RS485_RX_DURING_TX;
++	sport->port.rs485.flags = 0;
+ 	sport->port.flags = UPF_BOOT_AUTOCONF;
+ 	init_timer(&sport->timer);
+ 	sport->timer.function = imx_timeout;
+-- 
+2.7.4
+

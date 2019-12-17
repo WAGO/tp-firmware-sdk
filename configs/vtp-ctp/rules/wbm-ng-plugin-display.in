@@ -27,3 +27,12 @@ config WBM_NG_PLUGIN_DISPLAY
 
 	help
 	 "Plugin to the Modular WBM that contains the 'Display' Pages such as Brightness and Screensaver settings."
+
+config WBM_NG_PLUGIN_DISPLAY_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_DISPLAY
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-display/wbm-display-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

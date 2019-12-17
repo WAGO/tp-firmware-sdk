@@ -1,0 +1,180 @@
+From eaa4f506f6b826dc5cd46ba5b78fe6fd150de71d Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Wed, 20 Nov 2019 14:58:48 +0100
+Subject: [PATCH] drivers: input: qt1070: add sysfs entries for AVE_AKS an DI
+ value
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ drivers/input/keyboard/qt1070.c | 97 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 92 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/input/keyboard/qt1070.c b/drivers/input/keyboard/qt1070.c
+index 0484587..783f930 100644
+--- a/drivers/input/keyboard/qt1070.c
++++ b/drivers/input/keyboard/qt1070.c
+@@ -44,6 +44,8 @@
+ 
+ #define KEY_STATUS         0x03
+ #define NTHR_KEY0          0x20
++#define AVE_AKS0           0x27
++#define DI0                0x2E
+ 
+ /* Calibrate */
+ #define CALIBRATE_CMD      0x38
+@@ -91,12 +93,13 @@ static int qt1070_write(struct i2c_client *client, u8 reg, u8 data)
+ 	return ret;
+ }
+ 
+-static void qt1070_write_nthr_value(struct i2c_client *client, u8 nthr)
++static void qt1070_write_register_value(struct i2c_client *client,
++				u8 value, u8 reg)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < 7; i++)
+-		qt1070_write(client, NTHR_KEY0 + i, nthr);
++		qt1070_write(client, reg + i, value);
+ }
+ 
+ static bool qt1070_identify(struct i2c_client *client)
+@@ -148,6 +151,7 @@ static irqreturn_t qt1070_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
++/* ------------------ negative threshold NTHR ----------------------- */
+ static ssize_t NTHR_VALUE_show(struct device *dev,
+ 				struct device_attribute *attr,
+ 				char *buf)
+@@ -170,18 +174,76 @@ static ssize_t NTHR_VALUE_store(struct device *dev,
+ 	if (ret)
+ 		return ret;
+ 
+-	qt1070_write_nthr_value(client, val);
++	qt1070_write_register_value(client, val, NTHR_KEY0);
+ 	return count;
+ }
+ 
+ static DEVICE_ATTR_RW(NTHR_VALUE);
+ 
++/* ------- averaging Factor/adjacent Key Suppression AVE_AKS -------- */
++static ssize_t AVE_AKS_VALUE_show(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++
++	return sprintf(buf, "%d\n", qt1070_read(client, AVE_AKS0));
++}
++
++static ssize_t AVE_AKS_VALUE_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf,
++				size_t count)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	int ret;
++	u8 val;
++
++	ret = kstrtou8(buf, 0, &val);
++	if (ret)
++		return ret;
++
++	qt1070_write_register_value(client, val, AVE_AKS0);
++	return count;
++}
++
++static DEVICE_ATTR_RW(AVE_AKS_VALUE);
++
++/* -------------------- detection integrator DI --------------------- */
++static ssize_t DI_VALUE_show(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++
++	return sprintf(buf, "%d\n", qt1070_read(client, DI0));
++}
++
++static ssize_t DI_VALUE_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf,
++				size_t count)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	int ret;
++	u8 val;
++
++	ret = kstrtou8(buf, 0, &val);
++	if (ret)
++		return ret;
++
++	qt1070_write_register_value(client, val, DI0);
++	return count;
++}
++
++static DEVICE_ATTR_RW(DI_VALUE);
++
+ static int qt1070_probe(struct i2c_client *client,
+ 				const struct i2c_device_id *id)
+ {
+ 	struct qt1070_data *data;
+ 	struct input_dev *input;
+-	u32 nthr;
++	u32 nthr, ave_aks, di;
+ 	int i;
+ 	int err;
+ 
+@@ -238,7 +300,13 @@ static int qt1070_probe(struct i2c_client *client,
+ 	msleep(QT1070_RESET_TIME);
+ 
+ 	if (!of_property_read_u32(client->dev.of_node, "at,threshold", &nthr))
+-		qt1070_write_nthr_value(client, nthr);
++		qt1070_write_register_value(client, nthr, NTHR_KEY0);
++
++	if (!of_property_read_u32(client->dev.of_node, "at,ave_aks", &ave_aks))
++		qt1070_write_register_value(client, ave_aks, AVE_AKS0);
++
++	if (!of_property_read_u32(client->dev.of_node, "at,di", &di))
++		qt1070_write_register_value(client, di, DI0);
+ 
+ 	err = request_threaded_irq(client->irq, NULL, qt1070_interrupt,
+ 				   IRQF_TRIGGER_NONE | IRQF_ONESHOT,
+@@ -265,8 +333,25 @@ static int qt1070_probe(struct i2c_client *client,
+ 		dev_err(&client->dev, "Failed to create sysfs file\n");
+ 		goto err_free_irq;
+ 	}
++
++	err = device_create_file(&client->dev, &dev_attr_AVE_AKS_VALUE);
++	if (err) {
++		dev_err(&client->dev, "Failed to create sysfs file\n");
++		goto err_create_ave;
++	}
++
++	err = device_create_file(&client->dev, &dev_attr_DI_VALUE);
++	if (err) {
++		dev_err(&client->dev, "Failed to create sysfs file\n");
++		goto err_create_di;
++	}
++
+ 	return 0;
+ 
++err_create_di:
++	device_remove_file(&client->dev, &dev_attr_AVE_AKS_VALUE);
++err_create_ave:
++	device_remove_file(&client->dev, &dev_attr_NTHR_VALUE);
+ err_free_irq:
+ 	free_irq(client->irq, data);
+ err_free_mem:
+@@ -280,6 +365,8 @@ static int qt1070_remove(struct i2c_client *client)
+ 	struct qt1070_data *data = i2c_get_clientdata(client);
+ 
+ 	device_remove_file(&client->dev, &dev_attr_NTHR_VALUE);
++	device_remove_file(&client->dev, &dev_attr_AVE_AKS_VALUE);
++	device_remove_file(&client->dev, &dev_attr_DI_VALUE);
+ 
+ 	/* Release IRQ */
+ 	free_irq(client->irq, data);
+-- 
+2.7.4
+

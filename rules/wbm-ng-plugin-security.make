@@ -16,29 +16,32 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_SECURITY) += wbm-ng-plugin-security
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_SECURITY                := wbm-security
-WBM_NG_PLUGIN_SECURITY_VERSION        := 1.1.0-rc.15616241069
-WBM_NG_PLUGIN_SECURITY_SUFFIX         := tgz
-WBM_NG_PLUGIN_SECURITY_ARCHIVE        := $(WBM_NG_PLUGIN_SECURITY)-$(WBM_NG_PLUGIN_SECURITY_VERSION).$(WBM_NG_PLUGIN_SECURITY_SUFFIX)
-WBM_NG_PLUGIN_SECURITY_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_PLUGIN_SECURITY_ARCHIVE)
-WBM_NG_PLUGIN_SECURITY_MD5            := a0b29cdeee8383f37002f23d9c18a28a
-
+WBM_NG_PLUGIN_SECURITY_VERSION        := 1.1.0
+WBM_NG_PLUGIN_SECURITY                := wbm-security-$(WBM_NG_PLUGIN_SECURITY_VERSION)
+WBM_NG_PLUGIN_SECURITY_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_SECURITY)
+WBM_NG_PLUGIN_SECURITY_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_SECURITY_URL))
+WBM_NG_PLUGIN_SECURITY_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_SECURITY)$(WBM_NG_PLUGIN_SECURITY_SUFFIX)
+WBM_NG_PLUGIN_SECURITY_MD5             = $(shell [ -f $(WBM_NG_PLUGIN_SECURITY_MD5_FILE) ] && cat $(WBM_NG_PLUGIN_SECURITY_MD5_FILE))
+WBM_NG_PLUGIN_SECURITY_MD5_FILE       := $(WBM_NG_PLUGIN_SECURITY_SOURCE).md5
+WBM_NG_PLUGIN_SECURITY_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_PLUGIN_SECURITY_URL))
 WBM_NG_PLUGIN_SECURITY_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng-plugin-security
-WBM_NG_PLUGIN_SECURITY_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_SECURITY_ARCHIVE)
 WBM_NG_PLUGIN_SECURITY_DIR            := $(WBM_NG_PLUGIN_SECURITY_BUILDROOT_DIR)
 WBM_NG_PLUGIN_SECURITY_LICENSE        := unknown
 WBM_NG_PLUGIN_SECURITY_MAKE_ENV       :=
 ifeq ($(PTXCONF_WBM),y)
-WBM_NG_PLUGIN_SECURITY_TARGET_DIR     := /var/www/wbm-ng/plugins/$(WBM_NG_PLUGIN_SECURITY)
+WBM_NG_PLUGIN_SECURITY_TARGET_DIR     := /var/www/wbm-ng/plugins/wbm-security
 else
-WBM_NG_PLUGIN_SECURITY_TARGET_DIR     := /var/www/wbm/plugins/$(WBM_NG_PLUGIN_SECURITY)
+WBM_NG_PLUGIN_SECURITY_TARGET_DIR     := /var/www/wbm/plugins/wbm-security
 endif
 
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_PLUGIN_SECURITY_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_PLUGIN_SECURITY_URL)' '$@' '$(WBM_NG_PLUGIN_SECURITY_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract

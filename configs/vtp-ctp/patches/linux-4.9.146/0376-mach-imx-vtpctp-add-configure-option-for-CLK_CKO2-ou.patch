@@ -1,0 +1,49 @@
+From 5250df292250cedc31d39d19686c6c800c3ec08f Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Sat, 8 Dec 2018 10:27:23 +0100
+Subject: [PATCH] mach-imx: vtpctp: add configure option for CLK_CKO2 output
+ clock rate setting
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ arch/arm/mach-imx/Kconfig   | 8 ++++++++
+ drivers/clk/imx/clk-imx6q.c | 4 ++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/arch/arm/mach-imx/Kconfig b/arch/arm/mach-imx/Kconfig
+index 50447e8..32cd980 100644
+--- a/arch/arm/mach-imx/Kconfig
++++ b/arch/arm/mach-imx/Kconfig
+@@ -523,6 +523,14 @@ config IMX6Q_USE_PLL2_VIDEO_CLK
+ 	  video controller. This option is necessary for spread spectrum
+ 	  of video clock.
+ 
++config IMX6Q_SET_IMX6QDL_CLK_CKO2_12MHZ
++	bool "i.MX6 set CLK_CKO2 output clock rate to 12MHz"
++
++	help
++	  This option sets clock rate of the IMX6QDL_CLK_CKO2 clock output to
++	  12MHz. If this option is not selected we use the standard clock rate
++	  of 24 MHz.
++
+ endif
+ 
+ config SOC_IMX6SL
+diff --git a/drivers/clk/imx/clk-imx6q.c b/drivers/clk/imx/clk-imx6q.c
+index e1a7ec8..446d997 100644
+--- a/drivers/clk/imx/clk-imx6q.c
++++ b/drivers/clk/imx/clk-imx6q.c
+@@ -641,6 +641,10 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
+ 	if (ret)
+ 		pr_warn("failed to set up CLKO: %d\n", ret);
+ 
++#ifdef CONFIG_IMX6Q_SET_IMX6QDL_CLK_CKO2_12MHZ
++	clk_set_rate(clk[IMX6QDL_CLK_CKO2], 12000000);
++#endif
++
+ 	/* Audio-related clocks configuration */
+ 	clk_set_parent(clk[IMX6QDL_CLK_SPDIF_SEL], clk[IMX6QDL_CLK_PLL3_PFD3_454M]);
+ 
+-- 
+2.7.4
+

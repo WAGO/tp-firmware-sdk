@@ -98,7 +98,7 @@ MESALIB_CONF_OPT	:= \
 	--disable-lmsensors \
 	--enable-dri3 \
 	--$(call ptx/endis, PTXCONF_MESALIB_GLX)-glx \
-	--disable-osmesa \
+	--enable-osmesa \
 	--disable-gallium-osmesa \
 	--$(call ptx/endis, PTXCONF_MESALIB_EGL)-egl \
 	--disable-xa \

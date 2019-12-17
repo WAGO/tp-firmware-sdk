@@ -1,0 +1,26 @@
+From 537e829bdb640e0ae9d78bd860601be44cac8e11 Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Thu, 23 May 2019 14:07:31 +0200
+Subject: [PATCH] dts: vtpctp: enable RS485 mode at boot time for ttymxc1
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index 4cf085b..8be18a3 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -207,7 +207,7 @@
+ 
+ 		rs-sel {
+ 			gpios = <&gpio6 9 GPIO_ACTIVE_HIGH>;
+-			default-state = "on";
++			default-state = "off";
+ 		};
+ 
+ 		sys-red {
+-- 
+2.7.4
+

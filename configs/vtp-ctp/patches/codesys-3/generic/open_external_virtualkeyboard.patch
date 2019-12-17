@@ -1,5 +1,5 @@
---- codesys-3_org/Components/CmpTargetVisu/CmpTargetVisuImpl.c	2019-07-17 09:03:54.461172000 +0200
-+++ codesys-3/Components/CmpTargetVisu/CmpTargetVisuImpl.c	2019-07-17 10:16:10.701172000 +0200
+--- codesys-3_org/Components/CmpTargetVisu/CmpTargetVisuImpl.c	2019-04-26 11:16:42.630542999 +0200
++++ codesys-3/Components/CmpTargetVisu/CmpTargetVisuImpl.c	2019-04-26 08:31:42.829440727 +0200
 @@ -5,6 +5,9 @@
  #include "CmpTargetVisuImpl.h"
  #include "CmpTargetVisuBmpBuffer.h"
@@ -10,11 +10,11 @@
  #define CMP_VENDORID	RTS_VENDORID_3S
  
  #define SYSGRAPHIC_TRANSFORMATION_SUPPORTED (CHK_SysGraphicCreateTransformation && CHK_SysGraphicFreeTransformation && \
-@@ -4243,6 +4246,14 @@
+@@ -4220,6 +4223,14 @@
  	{
  		CAL_SysMemFreeData(COMPONENT_NAME, pCmd->pwsInitVal);
  	}
-+  
++ 
 +  int fd = open("/dev/virtualkeyboard", O_RDWR | O_NONBLOCK);
 +  if (fd >= 0)
 +  {

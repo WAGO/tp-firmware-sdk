@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    globals.h
 ///
-/// \version $Id: globals.h 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: globals.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
 ///
 /// \brief   global settings / variables
 ///

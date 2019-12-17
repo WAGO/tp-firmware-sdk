@@ -9,7 +9,7 @@
 ///
 /// \file    gesture_control.c
 ///
-/// \version $Id: gesture_control.c 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: gesture_control.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
 ///
 /// \brief   gesture control, show toolbarmenu on swipe
 ///

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file tools.cpp
 ///
-/// \version $Id: tools.cpp 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: tools.cpp 43411 2019-10-08 11:14:03Z wrueckl_elrest $
 ///
 /// \brief tool functions
 ///

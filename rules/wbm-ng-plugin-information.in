@@ -25,3 +25,12 @@ config WBM_NG_PLUGIN_INFORMATION
 
 	help
 	 "Plugin to the Modular WBM that contains the 'Information' page. This plugin is also required if you want to install further plugins which provide content to the 'Configuration' section."
+
+config WBM_NG_PLUGIN_INFORMATION_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_INFORMATION
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-information/wbm-information-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

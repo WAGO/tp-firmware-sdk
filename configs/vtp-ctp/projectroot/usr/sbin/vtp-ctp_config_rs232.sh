@@ -24,9 +24,8 @@ function ConnectLinuxToRS232
     status=$?
 
     if [ "$SUCCESS" = $status ]; then
-
       # change file /etc/inittab - remove the comment-character in front of line
-      sudo $SED -i 's/^#'"$INITTAB_CONSOLE_STRING"'/'"$INITTAB_CONSOLE_STRING"'/g' $INITTAB
+      sudo $SED -i -e 's!^#'"$INITTAB_CONSOLE_STRING"'!'"$INITTAB_CONSOLE_STRING"'!g' $INITTAB
       if [ $? != $SUCCESS ]; then
         status=$WRITE_FILE_ERROR
         ReportError $status "($INITTAB)"
@@ -84,7 +83,7 @@ function DisconnectLinuxFromRS232
       sync
 
       # change file /etc/inittab - add comment-character in front of line
-      sudo $SED -i 's/^'"$INITTAB_CONSOLE_STRING"'/#'"$INITTAB_CONSOLE_STRING"'/g' $INITTAB
+      sudo $SED -i -e 's!^'"$INITTAB_CONSOLE_STRING"'!#'"$INITTAB_CONSOLE_STRING"'!g' $INITTAB
       if [ $? != $SUCCESS ]; then
         status=$WRITE_FILE_ERROR
         ReportError $status "($INITTAB)"
@@ -232,6 +231,10 @@ function RS232SetMode
       ReportError $status "($newOwner)"
       SetLastError "RS232-owner invalid"
     else
+      if [ "$actualOwner" == "Linux" ] || [ "$newOwner" == "Linux" ] ; then
+        # set RS232 mode in case of Linux-Console
+        /etc/config-tools/set_serial_mode rs232
+      fi
       if [ "$newOwner" != "$actualOwner" ]; then
         # disconnect actual user ...
         DisconnectRS232

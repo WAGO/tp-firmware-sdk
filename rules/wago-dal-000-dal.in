@@ -120,7 +120,10 @@ config LIBBACNET
 	select EXPAT
 	select HOST_CT_BUILD
 	select GOOGLETEST
+	select LIBBACNETSTACK
 	select LIBFFI
+	select LIBWAGODRM
+	select LIBBACNETCONFIG
 	prompt "BACnet Library"
 	help
 		Build BACnet.

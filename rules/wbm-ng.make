@@ -16,15 +16,16 @@ PACKAGES-$(PTXCONF_WBM_NG) += wbm-ng
 #
 # Paths and names
 #
-WBM_NG                := wbm-pfc
-WBM_NG_VERSION        := 2.2.0-rc.156162428539
-WBM_NG_SUFFIX         := tgz
-WBM_NG_ARCHIVE        := $(WBM_NG)-$(WBM_NG_VERSION).$(WBM_NG_SUFFIX)
-WBM_NG_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_ARCHIVE)
-WBM_NG_MD5            := 4ee8cc7217311b3a7a2272097165101b
+WBM_NG_VERSION        := 2.2.0
+WBM_NG                := wbm-pfc-$(WBM_NG_VERSION)
+WBM_NG_URL            := $(call jfrog_template_to_url, WBM_NG)
+WBM_NG_SUFFIX         := $(suffix $(WBM_NG_URL))
+WBM_NG_SOURCE         := $(SRCDIR)/$(WBM_NG)$(WBM_NG_SUFFIX)
+WBM_NG_MD5             = $(shell [ -f $(WBM_NG_MD5_FILE) ] && cat $(WBM_NG_MD5_FILE))
+WBM_NG_MD5_FILE       := $(WBM_NG_SOURCE).md5
+WBM_NG_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_URL))
 
 WBM_NG_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng
-WBM_NG_SOURCE         := $(SRCDIR)/$(WBM_NG_ARCHIVE)
 WBM_NG_DIR            := $(WBM_NG_BUILDROOT_DIR)
 ifeq ($(PTXCONF_WBM),y)
 WBM_NG_TARGET_DIR     := /var/www/wbm-ng
@@ -46,7 +47,10 @@ endif
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_URL)' '$@' '$(WBM_NG_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract

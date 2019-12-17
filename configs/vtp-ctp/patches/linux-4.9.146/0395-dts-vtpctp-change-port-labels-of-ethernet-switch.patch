@@ -1,0 +1,34 @@
+From 340af5d82608cc6821b9c2f58d0f3de3390beadc Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <gliese@elrest.de>
+Date: Thu, 24 Jan 2019 14:33:11 +0100
+Subject: [PATCH] dts: vtpctp: change port labels of ethernet switch
+
+Signed-off-by: Ralf Gliese <gliese@elrest.de>
+---
+ arch/arm/boot/dts/imx6qdl-vtpctp.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+index 79251b2..7d659a1 100644
+--- a/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-vtpctp.dtsi
+@@ -351,14 +351,14 @@
+ 
+ 			port@0 {
+ 				reg = <1>;
+-				label = "ethX1";
++				label = "ethX2";
+ 				phy-handle = <&phy1>;
+ 				phy-pwrdown;
+ 			};
+ 
+ 			port@1 {
+ 				reg = <2>;
+-				label = "ethX2";
++				label = "ethX1";
+ 				phy-handle = <&phy2>;
+ 				phy-pwrdown;
+ 			};
+-- 
+2.7.4
+

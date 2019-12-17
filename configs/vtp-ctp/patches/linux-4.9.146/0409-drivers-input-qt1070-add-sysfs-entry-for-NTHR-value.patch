@@ -1,0 +1,102 @@
+From 30985dafa909baf2599074fd86ea825cf60543eb Mon Sep 17 00:00:00 2001
+From: Oleg Karfich <oleg.karfich@wago.com>
+Date: Wed, 23 Oct 2019 16:17:01 +0200
+Subject: [PATCH] drivers: input: qt1070: add sysfs entry for NTHR value
+
+Signed-off-by: Oleg Karfich <oleg.karfich@wago.com>
+---
+ drivers/input/keyboard/qt1070.c | 50 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/input/keyboard/qt1070.c b/drivers/input/keyboard/qt1070.c
+index 73e06d2..0484587 100644
+--- a/drivers/input/keyboard/qt1070.c
++++ b/drivers/input/keyboard/qt1070.c
+@@ -91,6 +91,14 @@ static int qt1070_write(struct i2c_client *client, u8 reg, u8 data)
+ 	return ret;
+ }
+ 
++static void qt1070_write_nthr_value(struct i2c_client *client, u8 nthr)
++{
++	int i;
++
++	for (i = 0; i < 7; i++)
++		qt1070_write(client, NTHR_KEY0 + i, nthr);
++}
++
+ static bool qt1070_identify(struct i2c_client *client)
+ {
+ 	int id, ver;
+@@ -140,6 +148,34 @@ static irqreturn_t qt1070_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
++static ssize_t NTHR_VALUE_show(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++
++	return sprintf(buf, "%d\n", qt1070_read(client, NTHR_KEY0));
++}
++
++static ssize_t NTHR_VALUE_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf,
++				size_t count)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	int ret;
++	u8 val;
++
++	ret = kstrtou8(buf, 0, &val);
++	if (ret)
++		return ret;
++
++	qt1070_write_nthr_value(client, val);
++	return count;
++}
++
++static DEVICE_ATTR_RW(NTHR_VALUE);
++
+ static int qt1070_probe(struct i2c_client *client,
+ 				const struct i2c_device_id *id)
+ {
+@@ -201,10 +237,9 @@ static int qt1070_probe(struct i2c_client *client,
+ 	qt1070_write(client, RESET, 1);
+ 	msleep(QT1070_RESET_TIME);
+ 
+-	if (!of_property_read_u32(client->dev.of_node, "at,threshold", &nthr)) {
+-		for (i = 0; i < 7; i++)
+-			qt1070_write(client, NTHR_KEY0 + i, nthr);
+-	}
++	if (!of_property_read_u32(client->dev.of_node, "at,threshold", &nthr))
++		qt1070_write_nthr_value(client, nthr);
++
+ 	err = request_threaded_irq(client->irq, NULL, qt1070_interrupt,
+ 				   IRQF_TRIGGER_NONE | IRQF_ONESHOT,
+ 				   client->dev.driver->name, data);
+@@ -225,6 +260,11 @@ static int qt1070_probe(struct i2c_client *client,
+ 	/* Read to clear the chang line */
+ 	qt1070_read(client, DET_STATUS);
+ 
++	err = device_create_file(&client->dev, &dev_attr_NTHR_VALUE);
++	if (err) {
++		dev_err(&client->dev, "Failed to create sysfs file\n");
++		goto err_free_irq;
++	}
+ 	return 0;
+ 
+ err_free_irq:
+@@ -239,6 +279,8 @@ static int qt1070_remove(struct i2c_client *client)
+ {
+ 	struct qt1070_data *data = i2c_get_clientdata(client);
+ 
++	device_remove_file(&client->dev, &dev_attr_NTHR_VALUE);
++
+ 	/* Release IRQ */
+ 	free_irq(client->irq, data);
+ 
+-- 
+2.7.4
+

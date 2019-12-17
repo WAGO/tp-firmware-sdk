@@ -1,0 +1,19 @@
+Firmware Release 03.03.10 (99)
+System:
+[New] Added new pages to WBM on TP devices:
+    • Firewall
+    • Upload Certificates
+    • OpenVPN/IPsec
+    • DNS-Server-Configuration
+    • Routing
+    • PLC-Runtime-3, Configuration + Information
+    • PLC-Runtime-Server-Configuration
+    • Diagnose
+    • DNS-Server-Configuration
+    • DHCP-Server-Configuration
+    • Modbus-Server-Configuration
+
+[KNOWN] Fallback to Default-IP-Settings in case of
+"illegal" separated network config after reboot
+
+[NEW] Browser Element usable in Target Visu

@@ -1,4 +1,20 @@
 #!/bin/sh
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   start_panel.sh
+#
+# Brief:    starting up panel / Xorg
+#
+# Author:   Ralf Gliese: elrest Automationssysteme GmbH
+#
+#-----------------------------------------------------------------------------#
+
 
 eeprom_device="/sys/bus/i2c/devices/1-0054/eeprom"
 
@@ -26,6 +42,9 @@ set_xorg_conf () {
 		elif [ "$xres" == "6" ] ; then
 			devconf="1004"
 			addchar_xres="_1920_1080"
+		elif [ "$xres" == "7" ] ; then
+			devconf="1004"
+			addchar_xres="_1920_1080"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
 			addchar_xres="_800_480"
@@ -43,6 +62,8 @@ set_xorg_conf () {
 		elif [ "$devconf" == "1003" ] ; then
 			addchar_xres="_1280_800"
 		elif [ "$devconf" == "1004" ] ; then
+			addchar_xres="_1920_1080"
+		elif [ "$devconf" == "1005" ] ; then
 			addchar_xres="_1920_1080"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
@@ -103,6 +124,21 @@ set_xorg_conf () {
 				cap="0"
 			fi
 		fi
+	elif [ "$devconf" = "1005" ]; then
+		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
+		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+		if [ $? -eq 0 ]; then
+			cap=$(cat /proc/cmdline)
+			cap=$(echo ${cap#*systeminfo=0x00})
+			cap=$(echo ${cap:0:1})
+		else
+			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+			if [ $? -eq 0 ]; then
+				cap="1"
+			else
+				cap="0"
+			fi
+		fi
 	else
 		echo "no valid display resolution in eeprom found, use default resolution 800x480"
 		cap="0"
@@ -112,10 +148,10 @@ set_xorg_conf () {
 		echo "cap touch found"
 		addchar="_cap"
 		xorg_conf_file=$xorg_conf_file$addchar
-		echo 15 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+		#echo 15 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 	elif [ "$cap" == "0" ] ; then
 		echo "res touch found"
-		echo 10 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+		#echo 10 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 	else
 		echo "cap/res touch not recognized"
 	fi

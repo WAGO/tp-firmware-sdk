@@ -9,7 +9,7 @@
 ///
 /// \file    config_virtualkeyboard.c
 ///
-/// \version $Id: config_virtualkeyboard.c 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: config_virtualkeyboard.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
 ///
 /// \brief   change virtualkeyboard settings / config-tools
 ///

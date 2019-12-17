@@ -1,11 +1,20 @@
 #!/bin/bash
 #-----------------------------------------------------------------------------#
-# Script-name: brightnesscontrol
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# starting brightnesscontrol at boottime
-#
-# Author: Wolfgang Rückl,  elrest GmbH
+# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
 #-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   brightnesscontrol.sh
+#
+# Brief:    starting brightnesscontrol at boottime
+#
+# Author:   Wolfgang Rückl: elrest Automationssysteme GmbH
+#
+#-----------------------------------------------------------------------------#
+
 
 PID=""
 

@@ -1,0 +1,576 @@
+From d3444887954b9e15ba4eeac0dce422e9cf9bd22c Mon Sep 17 00:00:00 2001
+From: Oleg Karfich <oleg.karfich@wago.com>
+Date: Tue, 22 Jan 2019 16:03:14 +0100
+Subject: [PATCH] dts: imx6dl-vtpctp: remove deprecated platform files
+
+Remove dual core oftree configuration
+
+Signed-off-by: Oleg Karfich <oleg.karfich@wago.com>
+Reviewed-by: Heinrich Toews <heinrich.toews@wago.com>
+---
+ arch/arm/boot/dts/Makefile               |   4 -
+ arch/arm/boot/dts/imx6dl-vtpctp-0004.dts | 126 ------------------------------
+ arch/arm/boot/dts/imx6dl-vtpctp-0005.dts | 129 ------------------------------
+ arch/arm/boot/dts/imx6dl-vtpctp-0007.dts | 130 -------------------------------
+ arch/arm/boot/dts/imx6dl-vtpctp-0010.dts | 128 ------------------------------
+ 5 files changed, 517 deletions(-)
+ delete mode 100644 arch/arm/boot/dts/imx6dl-vtpctp-0004.dts
+ delete mode 100644 arch/arm/boot/dts/imx6dl-vtpctp-0005.dts
+ delete mode 100644 arch/arm/boot/dts/imx6dl-vtpctp-0007.dts
+ delete mode 100644 arch/arm/boot/dts/imx6dl-vtpctp-0010.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 3192dc4..3d75903 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -358,10 +358,6 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
+ 	imx6dl-tx6u-81xx-mb7.dtb \
+ 	imx6dl-udoo.dtb \
+ 	imx6dl-wandboard.dtb \
+-	imx6dl-vtpctp-0004.dtb \
+-	imx6dl-vtpctp-0005.dtb \
+-	imx6dl-vtpctp-0007.dtb \
+-	imx6dl-vtpctp-0010.dtb \
+ 	imx6dl-wandboard-revb1.dtb \
+ 	imx6q-apalis-ixora.dtb \
+ 	imx6q-apf6dev.dtb \
+diff --git a/arch/arm/boot/dts/imx6dl-vtpctp-0004.dts b/arch/arm/boot/dts/imx6dl-vtpctp-0004.dts
+deleted file mode 100644
+index 310cc13..0000000
+--- a/arch/arm/boot/dts/imx6dl-vtpctp-0004.dts
++++ /dev/null
+@@ -1,126 +0,0 @@
+-/*
+- * Copyright 2017 elrest GmbH
+- * Copyright 2012 Freescale Semiconductor, Inc.
+- * Copyright 2011 Linaro Ltd.
+- *
+- * The code contained herein is licensed under the GNU General Public
+- * License. You may obtain a copy of the GNU General Public License
+- * Version 2 or later at the following locations:
+- *
+- * http://www.opensource.org/licenses/gpl-license.html
+- * http://www.gnu.org/copyleft/gpl.html
+- */
+-
+-/dts-v1/;
+-#include "imx6dl.dtsi"
+-#include "imx6qdl-vtpctp.dtsi"
+-
+-/ {
+-	model = "VTPCTP Dual-lite Board";
+-	compatible = "wago,imx6dl-vtpctp-762_4xxx",
+-				 "wago,imx6dl-vtpctp", "fsl,imx6dl";
+-
+-	memory {
+-		reg = <0x10000000 0x80000000>;
+-	};
+-
+-	display: display@di0 {
+-		compatible = "fsl,imx-parallel-display";
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_ipu_disp>;
+-		interface-pix-fmt = "rgb24";
+-		status = "okay";
+-
+-		display-timings {
+-			native-mode = <&timing0>;
+-			timing0: hsd100pxn1 {
+-				clock-frequency = <9000000>;
+-				hactive = <480>;
+-				vactive = <272>;
+-				hfront-porch = <2>;
+-				hback-porch = <2>;
+-				hsync-len = <41>;
+-				vback-porch = <2>;
+-				vfront-porch = <2>;
+-				vsync-len = <10>;
+-				hsync-active = <0>;
+-				vsync-active = <0>;
+-				de-active    = <1>;
+-				pixelclk-active = <0>;
+-			};
+-		};
+-
+-		port {
+-			display0_in: endpoint {
+-				remote-endpoint = <&ipu1_di0_disp0>;
+-			};
+-		};
+-	};
+-
+-};
+-
+-&ipu1_di0_disp0 {
+-	remote-endpoint = <&display0_in>;
+-};
+-
+-&mxcfb1 {
+-	status = "okay";
+-};
+-
+-&ecspi4 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_ecspi4>;
+-	fsl,spi-num-chipselects = <2>;
+-	cs-gpios = <
+-		&gpio3 20 0
+-		&gpio5 2 0
+-	>;
+-	status = "ok";
+-
+-	/* touch controller */
+-	touch:	tsc2046@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_tsc2046>;
+-
+-		compatible = "ti,tsc2046";
+-		vcc-supply = <&tsc2046reg>;
+-
+-		reg = <0>;	/* CS0 */
+-		spi-max-frequency = <250000>;
+-
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <3 0>;
+-		pendown-gpio = <&gpio1 3 0>;
+-
+-		//ti,keep-vref-on;
+-		//ti,vref-delay-usecs = <800>;
+-
+-		ti,x-min = /bits/ 16 <0x0>;
+-		ti,x-max = /bits/ 16 <0x0ffff>;
+-		ti,y-min = /bits/ 16 <0x0>;
+-		ti,y-max = /bits/ 16 <0x0ffff>;
+-
+-		ti,x-plate-ohms = /bits/ 16 <150>;
+-		ti,pressure-max = /bits/ 16 <1000>;
+-
+-		ti,debounce-max = /bits/ 16 <30>;
+-		ti,debounce-tol = /bits/ 16 <10>;
+-		ti,debounce-rep = /bits/ 16 <1>;
+-
+-		linux,wakeup;
+-	};
+-
+-	di0_spi: dio_spi@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_dio_spi>;
+-		compatible = "dio_spi";
+-		reg = <1>;
+-		spi-max-frequency = <1000000>;
+-	};
+-
+-};
+-
+-&cpu0 {
+-	arm-supply = <&sw1a_reg>;
+-	soc-supply = <&sw1c_reg>;
+-};
+diff --git a/arch/arm/boot/dts/imx6dl-vtpctp-0005.dts b/arch/arm/boot/dts/imx6dl-vtpctp-0005.dts
+deleted file mode 100644
+index 7ffbcfe..0000000
+--- a/arch/arm/boot/dts/imx6dl-vtpctp-0005.dts
++++ /dev/null
+@@ -1,129 +0,0 @@
+-/*
+- * Copyright 2017 elrest GmbH
+- * Copyright 2012 Freescale Semiconductor, Inc.
+- * Copyright 2011 Linaro Ltd.
+- *
+- * The code contained herein is licensed under the GNU General Public
+- * License. You may obtain a copy of the GNU General Public License
+- * Version 2 or later at the following locations:
+- *
+- * http://www.opensource.org/licenses/gpl-license.html
+- * http://www.gnu.org/copyleft/gpl.html
+- */
+-
+-/dts-v1/;
+-#include "imx6dl.dtsi"
+-#include "imx6qdl-vtpctp.dtsi"
+-
+-/ {
+-	model = "VTPCTP Dual-lite Board";
+-	compatible = "wago,imx6dl-vtpctp-762_4xxx",
+-				 "wago,imx6dl-vtpctp", "fsl,imx6dl";
+-
+-	memory {
+-		reg = <0x10000000 0x80000000>;
+-	};
+-};
+-
+-&ldb {
+-	lvds-channel@0 {
+-		crtc = "ipu1-di0";
+-	};
+-
+-	lvds-channel@1 {
+-		crtc = "ipu1-di1";
+-	};
+-};
+-
+-/* 5" Display */
+-&ldb {
+-	status = "okay";
+-
+-	lvds-channel@0 {
+-		fsl,data-mapping = "spwg";
+-		//fsl,data-mapping = "jeida";
+-		fsl,data-width = <18>;
+-		primary;
+-		status = "okay";
+-
+-		display-timings {
+-			native-mode = <&timing0>;
+-			timing0: hsd100pxn1 {
+-				clock-frequency = <25000000>;
+-				hactive = <640>;
+-				vactive = <480>;
+-				hback-porch = <114>;
+-				hfront-porch = <16>;
+-				vback-porch = <32>;
+-				vfront-porch = <10>;
+-				hsync-len = <30>;
+-				vsync-len = <3>;
+-				hsync-active = <0>;
+-				vsync-active = <0>;
+-				de-active    = <1>;
+-			};
+-		};
+-	};
+-};
+-
+-&mxcfb1 {
+-	status = "okay";
+-};
+-
+-&ecspi4 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_ecspi4>;
+-	fsl,spi-num-chipselects = <2>;
+-	cs-gpios = <
+-		&gpio3 20 0
+-		&gpio5 2 0
+-	>;
+-	status = "ok";
+-
+-	/* touch controller */
+-	touch:	tsc2046@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_tsc2046>;
+-
+-		compatible = "ti,tsc2046";
+-		vcc-supply = <&tsc2046reg>;
+-
+-		reg = <0>;	/* CS0 */
+-		spi-max-frequency = <500000>;
+-
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <3 0>;
+-		pendown-gpio = <&gpio1 3 0>;
+-
+-		ti,keep-vref-on;
+-		ti,vref-delay-usecs = <800>;
+-
+-		ti,x-min = /bits/ 16 <0x0>;
+-		ti,x-max = /bits/ 16 <0x0ffff>;
+-		ti,y-min = /bits/ 16 <0x0>;
+-		ti,y-max = /bits/ 16 <0x0ffff>;
+-
+-		ti,x-plate-ohms = /bits/ 16 <200>;
+-		ti,pressure-max = /bits/ 16 <1000>;
+-
+-		ti,debounce-max = /bits/ 16 <30>;
+-		ti,debounce-tol = /bits/ 16 <10>;
+-		ti,debounce-rep = /bits/ 16 <1>;
+-
+-		linux,wakeup;
+-	};
+-
+-	di0_spi: dio_spi@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_dio_spi>;
+-		compatible = "dio_spi";
+-		reg = <1>;
+-		spi-max-frequency = <1000000>;
+-	};
+-
+-};
+-
+-&cpu0 {
+-	arm-supply = <&sw1a_reg>;
+-	soc-supply = <&sw1c_reg>;
+-};
+diff --git a/arch/arm/boot/dts/imx6dl-vtpctp-0007.dts b/arch/arm/boot/dts/imx6dl-vtpctp-0007.dts
+deleted file mode 100644
+index 4d3857d..0000000
+--- a/arch/arm/boot/dts/imx6dl-vtpctp-0007.dts
++++ /dev/null
+@@ -1,130 +0,0 @@
+-/*
+- * Copyright 2017 elrest GmbH
+- * Copyright 2012 Freescale Semiconductor, Inc.
+- * Copyright 2011 Linaro Ltd.
+- *
+- * The code contained herein is licensed under the GNU General Public
+- * License. You may obtain a copy of the GNU General Public License
+- * Version 2 or later at the following locations:
+- *
+- * http://www.opensource.org/licenses/gpl-license.html
+- * http://www.gnu.org/copyleft/gpl.html
+- */
+-
+-/dts-v1/;
+-#include "imx6dl.dtsi"
+-#include "imx6qdl-vtpctp.dtsi"
+-
+-/ {
+-	model = "VTPCTP Dual-lite Board";
+-	compatible = "wago,imx6dl-vtpctp-762_4xxx",
+-				 "wago,imx6dl-vtpctp", "fsl,imx6dl";
+-
+-	memory {
+-		reg = <0x10000000 0x80000000>;
+-	};
+-};
+-
+-&ldb {
+-	lvds-channel@0 {
+-		crtc = "ipu1-di0";
+-	};
+-
+-	lvds-channel@1 {
+-		crtc = "ipu1-di1";
+-	};
+-};
+-
+-/* 7" Display */
+-&ldb {
+-	status = "okay";
+-
+-	lvds-channel@0 {
+-		fsl,data-mapping = "spwg";
+-		//fsl,data-mapping = "jeida";
+-		fsl,data-width = <24>;
+-		primary;
+-		status = "okay";
+-
+-		display-timings {
+-			native-mode = <&timing0>;
+-			timing0: hsd100pxn1 {
+-				clock-frequency = <33260000>;
+-				hactive = <800>;
+-				vactive = <480>;
+-				hback-porch = <205>;
+-				hfront-porch = <20>;
+-				vback-porch = <26>;
+-				vfront-porch = <5>;
+-				hsync-len = <10>;
+-				vsync-len = <10>;
+-				hsync-active = <0>;
+-				vsync-active = <0>;
+-				de-active    = <1>;
+-			};
+-		};
+-	};
+-};
+-
+-&mxcfb1 {
+-	status = "okay";
+-};
+-
+-&ecspi4 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_ecspi4>;
+-	fsl,spi-num-chipselects = <2>;
+-	cs-gpios = <
+-		&gpio3 20 0
+-		&gpio5 2 0
+-	>;
+-	status = "ok";
+-
+-	/* touch controller */
+-	touch:	tsc2046@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_tsc2046>;
+-
+-		compatible = "ti,tsc2046";
+-		vcc-supply = <&tsc2046reg>;
+-
+-		reg = <0>;	/* CS0 */
+-		spi-max-frequency = <125000>;
+-
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <3 0>;
+-		pendown-gpio = <&gpio1 3 0>;
+-
+-		//ti,keep-vref-on;
+-		//ti,vref-delay-usecs = <800>;
+-
+-		ti,x-min = /bits/ 16 <0x0>;
+-		ti,x-max = /bits/ 16 <0x0ffff>;
+-		ti,y-min = /bits/ 16 <0x0>;
+-		ti,y-max = /bits/ 16 <0x0ffff>;
+-
+-		ti,x-plate-ohms = /bits/ 16 <300>;
+-		ti,pressure-min = /bits/ 16 <50>;
+-		ti,pressure-max = /bits/ 16 <1000>;
+-
+-		ti,debounce-max = /bits/ 16 <30>;
+-		ti,debounce-tol = /bits/ 16 <10>;
+-		ti,debounce-rep = /bits/ 16 <1>;
+-
+-		linux,wakeup;
+-	};
+-
+-	di0_spi: dio_spi@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_dio_spi>;
+-		compatible = "dio_spi";
+-		reg = <1>;
+-		spi-max-frequency = <1000000>;
+-	};
+-
+-};
+-
+-&cpu0 {
+-	arm-supply = <&sw1a_reg>;
+-	soc-supply = <&sw1c_reg>;
+-};
+diff --git a/arch/arm/boot/dts/imx6dl-vtpctp-0010.dts b/arch/arm/boot/dts/imx6dl-vtpctp-0010.dts
+deleted file mode 100644
+index a65a0ec..0000000
+--- a/arch/arm/boot/dts/imx6dl-vtpctp-0010.dts
++++ /dev/null
+@@ -1,128 +0,0 @@
+-/*
+- * Copyright 2017 elrest GmbH
+- * Copyright 2012 Freescale Semiconductor, Inc.
+- * Copyright 2011 Linaro Ltd.
+- *
+- * The code contained herein is licensed under the GNU General Public
+- * License. You may obtain a copy of the GNU General Public License
+- * Version 2 or later at the following locations:
+- *
+- * http://www.opensource.org/licenses/gpl-license.html
+- * http://www.gnu.org/copyleft/gpl.html
+- */
+-
+-/dts-v1/;
+-#include "imx6dl.dtsi"
+-#include "imx6qdl-vtpctp.dtsi"
+-
+-/ {
+-	model = "VTPCTP Dual-lite Board";
+-	compatible = "wago,imx6dl-vtpctp-762_4xxx",
+-				 "wago,imx6dl-vtpctp", "fsl,imx6dl";
+-
+-	memory {
+-		reg = <0x10000000 0x80000000>;
+-	};
+-};
+-
+-&ldb {
+-	lvds-channel@0 {
+-		crtc = "ipu1-di0";
+-	};
+-
+-	lvds-channel@1 {
+-		crtc = "ipu1-di1";
+-	};
+-};
+-
+-&ldb {
+-	status = "okay";
+-
+-	lvds-channel@0 {
+-		fsl,data-mapping = "spwg";
+-		//fsl,data-mapping = "jeida";
+-		fsl,data-width = <24>;
+-		primary;
+-		status = "okay";
+-
+-		display-timings {
+-			native-mode = <&timing0>;
+-			timing0: hsd100pxn1 {
+-				clock-frequency = <71100000>;
+-				hactive = <1280>;
+-				vactive = <800>;
+-				hback-porch = <160>;
+-				hfront-porch = <190>;
+-				vback-porch = <23>;
+-				vfront-porch = <33>;
+-				hsync-len = <60>;
+-				vsync-len = <15>;
+-				hsync-active = <0>;
+-				vsync-active = <0>;
+-				de-active    = <1>;
+-			};
+-		};
+-	};
+-};
+-
+-&mxcfb1 {
+-	status = "okay";
+-};
+-
+-&ecspi4 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_ecspi4>;
+-	fsl,spi-num-chipselects = <2>;
+-	cs-gpios = <
+-		&gpio3 20 0
+-		&gpio5 2 0
+-	>;
+-	status = "ok";
+-
+-	/* touch controller */
+-	touch:	tsc2046@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_tsc2046>;
+-
+-		compatible = "ti,tsc2046";
+-		vcc-supply = <&tsc2046reg>;
+-
+-		reg = <0>;	/* CS0 */
+-		spi-max-frequency = <250000>;
+-
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <3 0>;
+-		pendown-gpio = <&gpio1 3 0>;
+-
+-		ti,keep-vref-on;
+-		ti,vref-delay-usecs = <400>;
+-
+-		ti,x-min = /bits/ 16 <0x0>;
+-		ti,x-max = /bits/ 16 <0x0ffff>;
+-		ti,y-min = /bits/ 16 <0x0>;
+-		ti,y-max = /bits/ 16 <0x0ffff>;
+-
+-		ti,x-plate-ohms = /bits/ 16 <600>;
+-		ti,pressure-max = /bits/ 16 <1000>;
+-
+-		ti,debounce-max = /bits/ 16 <30>;
+-		ti,debounce-tol = /bits/ 16 <10>;
+-		ti,debounce-rep = /bits/ 16 <1>;
+-
+-		linux,wakeup;
+-	};
+-
+-	di0_spi: dio_spi@1 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_dio_spi>;
+-		compatible = "dio_spi";
+-		reg = <1>;
+-		spi-max-frequency = <1000000>;
+-	};
+-
+-};
+-
+-&cpu0 {
+-	arm-supply = <&sw1a_reg>;
+-	soc-supply = <&sw1c_reg>;
+-};
+-- 
+2.7.4
+

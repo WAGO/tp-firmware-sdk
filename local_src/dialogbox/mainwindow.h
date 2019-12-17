@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.h
 ///
-/// \version $Id: mainwindow.h 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: mainwindow.h 43411 2019-10-08 11:14:03Z wrueckl_elrest $
 ///
 /// \brief   dialogbox tool
 ///

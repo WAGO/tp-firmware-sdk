@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    get_fonts.c
 ///
-/// \version $Id: get_fonts.c 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: get_fonts.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
 ///
 /// \brief   get font settings
 ///

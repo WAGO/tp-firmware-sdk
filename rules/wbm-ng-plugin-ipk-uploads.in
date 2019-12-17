@@ -25,5 +25,17 @@ config WBM_NG_PLUGIN_IPK_UPLOADS
 	# as it provided the required wbm menu entry point
 	select WBM_NG_PLUGIN_NETWORKING
 
+	# Depends on a configtool to check for recent ipk Uploads
+	select CT_GET_WBM_UPLOADS
+
 	help
 	 "Plugin to the Modular WBM that contains the 'Software Uploads' Page"
+
+config WBM_NG_PLUGIN_IPK_UPLOADS_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_IPK_UPLOADS
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-ipk-uploads/wbm-ipk-uploads-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

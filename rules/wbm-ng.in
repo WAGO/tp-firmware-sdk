@@ -27,6 +27,15 @@ config WBM_NG
 	help
 	 "Modular Web-based-Management"
 
+config WBM_NG_URL_TEMPLATE
+      string
+      depends on WBM_NG
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-pfc/wbm-pfc-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.
+
 #
 #config WBM_NG_FEATURE_EXAMPLE_A
 #	bool

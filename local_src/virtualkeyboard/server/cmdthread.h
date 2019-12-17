@@ -16,7 +16,7 @@
 ///------------------------------------------------------------------------------
 /// \file cmdthread.h
 ///
-/// \version $Id: cmdthread.h 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: cmdthread.h 43771 2019-10-18 09:36:27Z wrueckl_elrest $
 ///
 /// \brief Thread for receiving command f.e. open menu
 ///

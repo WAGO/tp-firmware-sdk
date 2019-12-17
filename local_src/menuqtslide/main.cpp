@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 /// \file main.cpp
 ///
-/// \version $Id: main.cpp 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: main.cpp 43411 2019-10-08 11:14:03Z wrueckl_elrest $
 ///
 /// \brief Thread for receiving command f.e. open menu
 ///

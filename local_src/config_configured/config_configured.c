@@ -9,7 +9,7 @@
 ///
 /// \file    config_configured.c
 ///
-/// \version $Id: config_configured.c 44064 2019-10-24 12:34:47Z wrueckl_elrest $
+/// \version $Id: config_configured.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
 ///
 /// \brief   change IsConfigured settings / config-tools
 ///

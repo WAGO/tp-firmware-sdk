@@ -16,29 +16,32 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_INFORMATION) += wbm-ng-plugin-information
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_INFORMATION                := wbm-information
-WBM_NG_PLUGIN_INFORMATION_VERSION        := 2.0.1-rc.156162408816
-WBM_NG_PLUGIN_INFORMATION_SUFFIX         := tgz
-WBM_NG_PLUGIN_INFORMATION_ARCHIVE        := $(WBM_NG_PLUGIN_INFORMATION)-$(WBM_NG_PLUGIN_INFORMATION_VERSION).$(WBM_NG_PLUGIN_INFORMATION_SUFFIX)
-WBM_NG_PLUGIN_INFORMATION_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_PLUGIN_INFORMATION_ARCHIVE)
-WBM_NG_PLUGIN_INFORMATION_MD5            := 10c1fd1d27542aeadafedcf738fe4250
-
+WBM_NG_PLUGIN_INFORMATION_VERSION        := 2.0.1
+WBM_NG_PLUGIN_INFORMATION                := wbm-information-$(WBM_NG_PLUGIN_INFORMATION_VERSION)
+WBM_NG_PLUGIN_INFORMATION_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_INFORMATION)
+WBM_NG_PLUGIN_INFORMATION_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_INFORMATION_URL))
+WBM_NG_PLUGIN_INFORMATION_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_INFORMATION)$(WBM_NG_PLUGIN_INFORMATION_SUFFIX)
+WBM_NG_PLUGIN_INFORMATION_MD5             = $(shell [ -f $(WBM_NG_PLUGIN_INFORMATION_MD5_FILE) ] && cat $(WBM_NG_PLUGIN_INFORMATION_MD5_FILE))
+WBM_NG_PLUGIN_INFORMATION_MD5_FILE       := $(WBM_NG_PLUGIN_INFORMATION_SOURCE).md5
+WBM_NG_PLUGIN_INFORMATION_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_PLUGIN_INFORMATION_URL))
 WBM_NG_PLUGIN_INFORMATION_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng-plugin-information
-WBM_NG_PLUGIN_INFORMATION_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_INFORMATION_ARCHIVE)
 WBM_NG_PLUGIN_INFORMATION_DIR            := $(WBM_NG_PLUGIN_INFORMATION_BUILDROOT_DIR)
 WBM_NG_PLUGIN_INFORMATION_LICENSE        := unknown
 WBM_NG_PLUGIN_INFORMATION_MAKE_ENV       :=
 ifeq ($(PTXCONF_WBM),y)
-WBM_NG_PLUGIN_INFORMATION_TARGET_DIR     := /var/www/wbm-ng/plugins/$(WBM_NG_PLUGIN_INFORMATION)
+WBM_NG_PLUGIN_INFORMATION_TARGET_DIR     := /var/www/wbm-ng/plugins/wbm-information
 else
-WBM_NG_PLUGIN_INFORMATION_TARGET_DIR     := /var/www/wbm/plugins/$(WBM_NG_PLUGIN_INFORMATION)
+WBM_NG_PLUGIN_INFORMATION_TARGET_DIR     := /var/www/wbm/plugins/wbm-information
 endif
 
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_PLUGIN_INFORMATION_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_PLUGIN_INFORMATION_URL)' '$@' '$(WBM_NG_PLUGIN_INFORMATION_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract

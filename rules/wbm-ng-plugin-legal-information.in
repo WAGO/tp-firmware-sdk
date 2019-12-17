@@ -28,3 +28,12 @@ config WBM_NG_PLUGIN_LEGAL_INFORMATION
 
 	help
 	 "Plugin to the Modular WBM that contains the 'Legal Information' pages including the Open Source Licenses Page."
+
+config WBM_NG_PLUGIN_LEGAL_INFORMATION_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_LEGAL_INFORMATION
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-legal-information/wbm-legal-information-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

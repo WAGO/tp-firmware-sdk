@@ -16,29 +16,32 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_IPK_UPLOADS) += wbm-ng-plugin-ipk-uploads
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_IPK_UPLOADS                := wbm-ipk-uploads
-WBM_NG_PLUGIN_IPK_UPLOADS_VERSION        := 1.0.1-rc.15616241019
-WBM_NG_PLUGIN_IPK_UPLOADS_SUFFIX         := tgz
-WBM_NG_PLUGIN_IPK_UPLOADS_ARCHIVE        := $(WBM_NG_PLUGIN_IPK_UPLOADS)-$(WBM_NG_PLUGIN_IPK_UPLOADS_VERSION).$(WBM_NG_PLUGIN_IPK_UPLOADS_SUFFIX)
-WBM_NG_PLUGIN_IPK_UPLOADS_URL            := http://svsv01003/wago-ptxdist-src/$(WBM_NG_PLUGIN_IPK_UPLOADS_ARCHIVE)
-WBM_NG_PLUGIN_IPK_UPLOADS_MD5            := a48f2fa1a2c51b4578ab42e66cdaf71c
-
+WBM_NG_PLUGIN_IPK_UPLOADS_VERSION        := 1.0.1
+WBM_NG_PLUGIN_IPK_UPLOADS                := wbm-ipk-uploads-$(WBM_NG_PLUGIN_IPK_UPLOADS_VERSION)
+WBM_NG_PLUGIN_IPK_UPLOADS_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_IPK_UPLOADS)
+WBM_NG_PLUGIN_IPK_UPLOADS_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_IPK_UPLOADS_URL))
+WBM_NG_PLUGIN_IPK_UPLOADS_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_IPK_UPLOADS)$(WBM_NG_PLUGIN_IPK_UPLOADS_SUFFIX)
+WBM_NG_PLUGIN_IPK_UPLOADS_MD5             = $(shell [ -f $(WBM_NG_PLUGIN_IPK_UPLOADS_MD5_FILE) ] && cat $(WBM_NG_PLUGIN_IPK_UPLOADS_MD5_FILE))
+WBM_NG_PLUGIN_IPK_UPLOADS_MD5_FILE       := $(WBM_NG_PLUGIN_IPK_UPLOADS_SOURCE).md5
+WBM_NG_PLUGIN_IPK_UPLOADS_ARTIFACT        = $(call jfrog_get_filename,$(WBM_NG_PLUGIN_IPK_UPLOADS_URL))
 WBM_NG_PLUGIN_IPK_UPLOADS_BUILDROOT_DIR  := $(BUILDDIR)/wbm-ng-plugin-ipk-uploads
-WBM_NG_PLUGIN_IPK_UPLOADS_SOURCE         := $(SRCDIR)/$(WBM_NG_PLUGIN_IPK_UPLOADS_ARCHIVE)
 WBM_NG_PLUGIN_IPK_UPLOADS_DIR            := $(WBM_NG_PLUGIN_IPK_UPLOADS_BUILDROOT_DIR)
 WBM_NG_PLUGIN_IPK_UPLOADS_LICENSE        := unknown
 WBM_NG_PLUGIN_IPK_UPLOADS_MAKE_ENV       :=
 ifeq ($(PTXCONF_WBM),y)
-WBM_NG_PLUGIN_IPK_UPLOADS_TARGET_DIR     := /var/www/wbm-ng/plugins/$(WBM_NG_PLUGIN_IPK_UPLOADS)
+WBM_NG_PLUGIN_IPK_UPLOADS_TARGET_DIR     := /var/www/wbm-ng/plugins/wbm-ipk-uploads
 else
-WBM_NG_PLUGIN_IPK_UPLOADS_TARGET_DIR     := /var/www/wbm/plugins/$(WBM_NG_PLUGIN_IPK_UPLOADS)
+WBM_NG_PLUGIN_IPK_UPLOADS_TARGET_DIR     := /var/www/wbm/plugins/wbm-ipk-uploads
 endif
 
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
 
-# use ptxdist default
+$(WBM_NG_PLUGIN_IPK_UPLOADS_SOURCE):
+	@$(call targetinfo)
+	${PTXDIST_WORKSPACE}/scripts/wago/artifactory.sh fetch \
+        '$(WBM_NG_PLUGIN_IPK_UPLOADS_URL)' '$@' '$(WBM_NG_PLUGIN_IPK_UPLOADS_MD5_FILE)'
 
 # ----------------------------------------------------------------------------
 # Extract
@@ -82,6 +85,9 @@ $(STATEDIR)/wbm-ng-plugin-ipk-uploads.targetinstall:
 	@$(call install_fixup, wbm-ng-plugin-ipk-uploads, SECTION, base)
 	@$(call install_fixup, wbm-ng-plugin-ipk-uploads, AUTHOR,"Marius Hellmeier, WAGO Kontakttechnik GmbH \& Co. KG")
 	@$(call install_fixup, wbm-ng-plugin-ipk-uploads, DESCRIPTION, missing)
+
+	# create a directory owned by user and group "www" to store the uploaded file for configtool
+	@$(call install_copy, wbm-ng-plugin-ipk-uploads, 12, 102, 0750, /var/downloads/update-script)
 
 	# create target directory itself
 	@$(call install_copy, wbm-ng-plugin-ipk-uploads, 0, 0, 0755, $(WBM_NG_PLUGIN_IPK_UPLOADS_TARGET_DIR))

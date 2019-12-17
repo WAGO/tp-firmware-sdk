@@ -27,3 +27,12 @@ config WBM_NG_PLUGIN_BROWSER_SETTINGS
 
 	help
 	 "Plugin to the Modular WBM that contains the 'Browser Settings' Pages such as Security Level and Favourite list."
+
+config WBM_NG_PLUGIN_BROWSER_SETTINGS_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_BROWSER_SETTINGS
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-browser-settings/wbm-browser-settings-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

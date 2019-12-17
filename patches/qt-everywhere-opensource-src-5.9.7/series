@@ -15,6 +15,8 @@
 #0101-configure-add-sysroot.patch
 0102-webengine-disable-use-optinal-use-of-neon.patch
 #0103-suppress-additional-touch-begin-events.patch
+0105-add-linux-ptxconf-to-mkspecs.patch
 #0200-disable-webengine-example-recipebrowser.patch
 #0201-webengine-disable-pinch.patch
+#0202-xlibeglintegration-enable-egl-display.patch
 # 4fd233bfe22b630f07bfe11c34552797  - git-ptx-patches magic

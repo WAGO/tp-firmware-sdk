@@ -27,3 +27,12 @@ config WBM_NG_PLUGIN_PORTS
 
 	help
 	 "Plugin to the Modular WBM that contains the 'Network Services' Page"
+
+config WBM_NG_PLUGIN_PORTS_URL_TEMPLATE
+      string
+      depends on WBM_NG_PLUGIN_PORTS
+      prompt "URL template"
+      default "%ARTIFACTORY_BASE_URL%/wbm-generic-prod/wago/wbm-ports/wbm-ports-%VERSION%.tgz"
+      help
+        Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+        See Confluence for further details.

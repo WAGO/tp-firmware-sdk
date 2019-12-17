@@ -28,7 +28,6 @@ fi
 
 source /etc/config-tools/config_tool_lib
 
-BACKUP_FILE_LINE_COUNT=489 # how long is a settings file? (be generous because of multiple dns servers etc.)
 progressFile=/tmp/progressFile.tmp
 
 BACKUP_RESTORE_SCRIPT_DIR="/etc/config-tools/backup-restore"
