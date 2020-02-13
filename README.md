@@ -388,7 +388,7 @@ By default, TP tries to find a DHCP-Server to retrieve an IP-Address.
 2. Insert SD-Card with custom-image
 3. PowerOn TP
 
-## 8.) Default settings for TP 03.03.10
+## 8.) Default settings for TP
 
 ### 8.1) User accounts (usr/pwd):
 

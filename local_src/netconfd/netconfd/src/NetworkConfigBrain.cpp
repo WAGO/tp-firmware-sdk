@@ -376,6 +376,7 @@ Status NetworkConfigBrain::SetAllIPConfigs(::std::string const& config) {
   ModifyIpConfigByDipSwitch(dip_switch_modified_ip_configs, ip_dip_switch_);
 
   status = ip_manager_.ValidateIPConfigs(dip_switch_modified_ip_configs, true);
+
   bool is_applicable_to_system = false;
   if (status.Ok()) {
     is_applicable_to_system = ip_manager_.IsApplicableToSystem(dip_switch_modified_ip_configs);
@@ -389,16 +390,16 @@ Status NetworkConfigBrain::SetAllIPConfigs(::std::string const& config) {
       status = ip_manager_.Configure(dip_switch_modified_ip_configs);
     }
 
-//  if (status.Ok()) {
-//    status = interface_manager_.SetBridgeUp(dip_switch_modified_ip_configs.at(0).interface_);
-//  }
-
     if (status.Ok()) {
       event_manager_.NotifyNetworkChanges();
       for (auto& ip_config : dip_switch_modified_ip_configs) {
         event_manager_.NotifyIpChange(ip_config.interface_);
       }
     }
+  }
+
+  if(status.NotOk()) {
+    return status;
   }
 
   // PERSISTENCE
@@ -420,8 +421,7 @@ Status NetworkConfigBrain::SetAllIPConfigs(::std::string const& config) {
         AddIPConfig(ip_config, new_ip_configs_to_persist);
       }
     }
-    persist_status = ip_manager_.ValidateIPConfigs(new_ip_configs_to_persist,
-                                                   false);
+    persist_status = ip_manager_.ValidateIPConfigs(new_ip_configs_to_persist, true);
   }
 
   // Apply ip config to persistence.

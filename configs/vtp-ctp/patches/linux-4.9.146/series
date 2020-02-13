@@ -415,3 +415,5 @@
 0415-drivers-input-qt1070-add-sysfs-entries-for-AVE_AKS-a.patch
 0416-dts-vtpctp-add-new-settings-for-NTHR-AVE_AKS-an-DI-v.patch
 0417-add-new-version-w02.06.00-vtpctp.patch
+0418-net-dsa-tag_tail-fix-bug-when-no-space-is-left-in-th.patch
+0419-add-new-version-w02.06.01-vtpctp.patch
