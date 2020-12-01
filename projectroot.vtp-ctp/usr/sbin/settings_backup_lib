@@ -6,7 +6,7 @@
 #
 # This file is part of PTXdist package wago-custom-install.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2020 WAGO Kontakttechnik GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   settings_backup_lib
@@ -17,7 +17,8 @@
 # Author:   AGa: WAGO Kontakttechnik GmbH & Co. KG
 # Author:   HJH: WAGO Kontakttechnik GmbH & Co. KG
 # Author:   MOe: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   OG: WAGO Kontakttechnik GmbH & Co. KG
+# Author:   OG:  WAGO Kontakttechnik GmbH & Co. KG
+# Author:   MSc: WAGO Kontakttechnik GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 
 # load general definitions and functions
@@ -51,6 +52,46 @@ RestoreMessageOutput()
   exec 1>&3 # restore stdout
 }
 
+# Check if the current firmware version is greater than the given version.
+#
+# Param 1: minimal major version
+# Param 2: minimal minor version
+# Param 3: minimal bugfix version
+#
+# Return: 0 if the current fw version is greater than the given fw version,
+#         1 otherwise.
+#-----------------------------------------------------------------------------#
+IsMinTargetVersion()
+{
+  local MIN_MAJOR=$1
+  local MIN_MINOR=$2
+  local MIN_BUGFIX=$3
+  local RESULT=1
+  
+  if [[ -n "${WAGO_BACKUP_TARGET_VERSION:-}" ]] ; then
+  
+    local MAJOR
+    MAJOR=$(echo -n $WAGO_BACKUP_TARGET_VERSION | cut -d'.' -f1)
+    local MINOR
+    MINOR=$(echo -n $WAGO_BACKUP_TARGET_VERSION | cut -d'.' -f2)
+    local BUGFIX
+    BUGFIX=$(echo -n $WAGO_BACKUP_TARGET_VERSION | cut -d'.' -f3 | cut -d'(' -f1)
+
+    if [[ ${MAJOR#0*} -gt $MIN_MAJOR || ( ${MAJOR#0*} -eq $MIN_MAJOR && ${MINOR#0*} -gt $MIN_MINOR ) || ( ${MAJOR#0*} -eq $MIN_MAJOR && ${MINOR#0*} -eq $MIN_MINOR && ${BUGFIX#0*} -ge $MIN_BUGFIX ) ]]; then
+      RESULT=0
+    fi
+  else
+    RESULT=0
+  fi
+  
+  return $RESULT
+}
+
+
+IsNetworkSettingsV2()
+{
+  IsMinTargetVersion 3 3 0
+}
 
 # list of the parameters which configuration should be saved
 # one line with 3 parts for each parameter, parts seperated by ';'
@@ -58,9 +99,15 @@ RestoreMessageOutput()
 # 2. part: executable to read the parameter value
 # 3. part: executable to write the parameter value (value will be added at the end of the string
 
-#FIXME: read dsa mode properly
-configParam=(     
-  "dsa-mode;                  /usr/bin/xmlstarlet sel -t -m //dsa_mode -v . /etc/specific/network-interfaces.xml; /etc/config-tools/set_dsa_mode --value "
+configParam=()
+
+if ! IsNetworkSettingsV2 ; then
+  configParam+=(
+    "dsa-mode;                $NETWORK_CONFIG --get --dsa-mode --quiet;                         $NETWORK_CONFIG --dsa-mode --quiet --set "
+  )
+fi
+
+configParam+=(
   "hostname;                  /etc/config-tools/get_coupler_details hostname;                   /etc/config-tools/change_hostname hostname="
   "domain-name;               /etc/config-tools/get_coupler_details domain-name;                /etc/config-tools/edit_dns_server domain-name="
   "default-gw-1-state;        /etc/config-tools/get_default_gateway_config number=1 state;      /etc/config-tools/config_default_gateway number=1 state="
@@ -144,14 +191,14 @@ configParam=(
   "iocheck-port;              /etc/config-tools/get_iocheckport_config state;                   /etc/config-tools/config_iocheckport state="
   
   "sim-pin;                   /etc/config-tools/settings_backup_mdmd backup sim-pin;            /etc/config-tools/settings_backup_mdmd restore sim-pin "
-  "port-enabled;              /etc/config-tools/settings_backup_mdmd backup port-enabled;       /etc/config-tools/settings_backup_mdmd restore port-enabled "
+  "port-state;                /etc/config-tools/settings_backup_mdmd backup port-state;         /etc/config-tools/settings_backup_mdmd restore port-state "
   "log-level;                 /etc/config-tools/settings_backup_mdmd backup log-level;          /etc/config-tools/settings_backup_mdmd restore log-level "
 
   "gprs-auth-type;            /etc/config-tools/settings_backup_mdmd backup gprs-auth-type;     /etc/config-tools/settings_backup_mdmd restore dummy "
   "gprs-username;             /etc/config-tools/settings_backup_mdmd backup gprs-username;      /etc/config-tools/settings_backup_mdmd restore dummy " 
   "gprs-apn;                  /etc/config-tools/settings_backup_mdmd backup gprs-apn;           /etc/config-tools/settings_backup_mdmd restore dummy "
   "gprs-connectivity;         /etc/config-tools/settings_backup_mdmd backup gprs-connectivity;  /etc/config-tools/settings_backup_mdmd restore gprs-connectivity "
-  "net-selection;             /etc/config-tools/settings_backup_mdmd backup net-selection;      /etc/config-tools/settings_backup_mdmd restore net-selection " 
+  "net-selection-mode;        /etc/config-tools/settings_backup_mdmd backup net-selection;      /etc/config-tools/settings_backup_mdmd restore net-selection " 
   
 # backlight
   "backlight-backlighton;       /etc/config-tools/get_backlight backlighton;                    /etc/config-tools/config_backlight backlighton="
@@ -183,6 +230,10 @@ configParam=(
   "gesture-state;             /etc/config-tools/get_gesture state;                              /etc/config-tools/config_gesture state="
   "gesture-scroll;            /etc/config-tools/get_gesture scroll;                             /etc/config-tools/config_gesture scroll="
   "gesture-menu;              /etc/config-tools/get_gesture menu;                               /etc/config-tools/config_gesture menu="
+  "gesture-btn0;              /etc/config-tools/get_gesture btn0;                               /etc/config-tools/config_gesture btn0="
+  "gesture-btn1;              /etc/config-tools/get_gesture btn1;                               /etc/config-tools/config_gesture btn1="
+  "gesture-btn2;              /etc/config-tools/get_gesture btn2;                               /etc/config-tools/config_gesture btn2="
+  "gesture-btn3;              /etc/config-tools/get_gesture btn3;                               /etc/config-tools/config_gesture btn3="
 # motion sensor
   "motion-state;              /etc/config-tools/get_motionsensor state;                         /etc/config-tools/config_motionsensor state="
   "motion-direction;          /etc/config-tools/get_motionsensor direction;                     /etc/config-tools/config_motionsensor direction="
@@ -191,65 +242,77 @@ configParam=(
   "plcselect-statemonitor;    /etc/config-tools/get_plcselect statemonitor;                     /etc/config-tools/config_plcselect statemonitor="
   "plcselect-plc_selected;    /etc/config-tools/get_plcselect plc_selected;                     /etc/config-tools/config_plcselect plc_selected="
 # plcselect index 0
-  "plcselect-url-0;           /etc/config-tools/get_plcselect 0 url;                            /etc/config-tools/config_plcselect 0 url="
-  "plcselect-txt-0;           /etc/config-tools/get_plcselect 0 txt;                            /etc/config-tools/config_plcselect 0 txt="
-  "plcselect-vkb-0;           /etc/config-tools/get_plcselect 0 vkb;                            /etc/config-tools/config_plcselect 0 vkb="
-  "plcselect-mon-0;           /etc/config-tools/get_plcselect 0 mon;                            /etc/config-tools/config_plcselect 0 mon="
+#  "plcselect-url-0;           /etc/config-tools/get_plcselect 0 url;                            /etc/config-tools/config_plcselect 0 url="
+#  "plcselect-txt-0;           /etc/config-tools/get_plcselect 0 txt;                            /etc/config-tools/config_plcselect 0 txt="
+#  "plcselect-vkb-0;           /etc/config-tools/get_plcselect 0 vkb;                            /etc/config-tools/config_plcselect 0 vkb="
+#  "plcselect-mon-0;           /etc/config-tools/get_plcselect 0 mon;                            /etc/config-tools/config_plcselect 0 mon="
+#  "plcselect-mic-0;           /etc/config-tools/get_plcselect 0 mic;                            /etc/config-tools/config_plcselect 0 mic="
 # plcselect index 1
-  "plcselect-url-1;           /etc/config-tools/get_plcselect 1 url;                            /etc/config-tools/config_plcselect 1 url="
-  "plcselect-txt-1;           /etc/config-tools/get_plcselect 1 txt;                            /etc/config-tools/config_plcselect 1 txt="
-  "plcselect-vkb-1;           /etc/config-tools/get_plcselect 1 vkb;                            /etc/config-tools/config_plcselect 1 vkb="
-  "plcselect-mon-1;           /etc/config-tools/get_plcselect 1 mon;                            /etc/config-tools/config_plcselect 1 mon="
+#  "plcselect-url-1;           /etc/config-tools/get_plcselect 1 url;                            /etc/config-tools/config_plcselect 1 url="
+#  "plcselect-txt-1;           /etc/config-tools/get_plcselect 1 txt;                            /etc/config-tools/config_plcselect 1 txt="
+#  "plcselect-vkb-1;           /etc/config-tools/get_plcselect 1 vkb;                            /etc/config-tools/config_plcselect 1 vkb="
+#  "plcselect-mon-1;           /etc/config-tools/get_plcselect 1 mon;                            /etc/config-tools/config_plcselect 1 mon="
+#  "plcselect-mic-1;           /etc/config-tools/get_plcselect 1 mic;                            /etc/config-tools/config_plcselect 1 mic="
 # plcselect index 2
   "plcselect-url-2;           /etc/config-tools/get_plcselect 2 url;                            /etc/config-tools/config_plcselect 2 url="
   "plcselect-txt-2;           /etc/config-tools/get_plcselect 2 txt;                            /etc/config-tools/config_plcselect 2 txt="
   "plcselect-vkb-2;           /etc/config-tools/get_plcselect 2 vkb;                            /etc/config-tools/config_plcselect 2 vkb="
   "plcselect-mon-2;           /etc/config-tools/get_plcselect 2 mon;                            /etc/config-tools/config_plcselect 2 mon="
+  "plcselect-mic-2;           /etc/config-tools/get_plcselect 2 mic;                            /etc/config-tools/config_plcselect 2 mic="
 # plcselect index 3
   "plcselect-url-3;           /etc/config-tools/get_plcselect 3 url;                            /etc/config-tools/config_plcselect 3 url="
   "plcselect-txt-3;           /etc/config-tools/get_plcselect 3 txt;                            /etc/config-tools/config_plcselect 3 txt="
   "plcselect-vkb-3;           /etc/config-tools/get_plcselect 3 vkb;                            /etc/config-tools/config_plcselect 3 vkb="
   "plcselect-mon-3;           /etc/config-tools/get_plcselect 3 mon;                            /etc/config-tools/config_plcselect 3 mon="
+  "plcselect-mic-3;           /etc/config-tools/get_plcselect 3 mic;                            /etc/config-tools/config_plcselect 3 mic="
 # plcselect index 4
   "plcselect-url-4;           /etc/config-tools/get_plcselect 4 url;                            /etc/config-tools/config_plcselect 4 url="
   "plcselect-txt-4;           /etc/config-tools/get_plcselect 4 txt;                            /etc/config-tools/config_plcselect 4 txt="
   "plcselect-vkb-4;           /etc/config-tools/get_plcselect 4 vkb;                            /etc/config-tools/config_plcselect 4 vkb="
   "plcselect-mon-4;           /etc/config-tools/get_plcselect 4 mon;                            /etc/config-tools/config_plcselect 4 mon="
+  "plcselect-mic-4;           /etc/config-tools/get_plcselect 4 mic;                            /etc/config-tools/config_plcselect 4 mic="
 # plcselect index 5
   "plcselect-url-5;           /etc/config-tools/get_plcselect 5 url;                            /etc/config-tools/config_plcselect 5 url="
   "plcselect-txt-5;           /etc/config-tools/get_plcselect 5 txt;                            /etc/config-tools/config_plcselect 5 txt="
   "plcselect-vkb-5;           /etc/config-tools/get_plcselect 5 vkb;                            /etc/config-tools/config_plcselect 5 vkb="  
   "plcselect-mon-5;           /etc/config-tools/get_plcselect 5 mon;                            /etc/config-tools/config_plcselect 5 mon="
+  "plcselect-mic-5;           /etc/config-tools/get_plcselect 5 mic;                            /etc/config-tools/config_plcselect 5 mic="
 # plcselect index 6
   "plcselect-url-6;           /etc/config-tools/get_plcselect 6 url;                            /etc/config-tools/config_plcselect 6 url="
   "plcselect-txt-6;           /etc/config-tools/get_plcselect 6 txt;                            /etc/config-tools/config_plcselect 6 txt="
   "plcselect-vkb-6;           /etc/config-tools/get_plcselect 6 vkb;                            /etc/config-tools/config_plcselect 6 vkb="
   "plcselect-mon-6;           /etc/config-tools/get_plcselect 6 mon;                            /etc/config-tools/config_plcselect 6 mon="
+  "plcselect-mic-6;           /etc/config-tools/get_plcselect 6 mic;                            /etc/config-tools/config_plcselect 6 mic="
 # plcselect index 7
   "plcselect-url-7;           /etc/config-tools/get_plcselect 7 url;                            /etc/config-tools/config_plcselect 7 url="
   "plcselect-txt-7;           /etc/config-tools/get_plcselect 7 txt;                            /etc/config-tools/config_plcselect 7 txt="
   "plcselect-vkb-7;           /etc/config-tools/get_plcselect 7 vkb;                            /etc/config-tools/config_plcselect 7 vkb="
   "plcselect-mon-7;           /etc/config-tools/get_plcselect 7 mon;                            /etc/config-tools/config_plcselect 7 mon="
+  "plcselect-mic-7;           /etc/config-tools/get_plcselect 7 mic;                            /etc/config-tools/config_plcselect 7 mic="
 # plcselect index 8
   "plcselect-url-8;           /etc/config-tools/get_plcselect 8 url;                            /etc/config-tools/config_plcselect 8 url="
   "plcselect-txt-8;           /etc/config-tools/get_plcselect 8 txt;                            /etc/config-tools/config_plcselect 8 txt="
   "plcselect-vkb-8;           /etc/config-tools/get_plcselect 8 vkb;                            /etc/config-tools/config_plcselect 8 vkb="
   "plcselect-mon-8;           /etc/config-tools/get_plcselect 8 mon;                            /etc/config-tools/config_plcselect 8 mon="
+  "plcselect-mic-8;           /etc/config-tools/get_plcselect 8 mic;                            /etc/config-tools/config_plcselect 8 mic="
 # plcselect index 9
   "plcselect-url-9;           /etc/config-tools/get_plcselect 9 url;                            /etc/config-tools/config_plcselect 9 url="
   "plcselect-txt-9;           /etc/config-tools/get_plcselect 9 txt;                            /etc/config-tools/config_plcselect 9 txt="
   "plcselect-vkb-9;           /etc/config-tools/get_plcselect 9 vkb;                            /etc/config-tools/config_plcselect 9 vkb="
   "plcselect-mon-9;           /etc/config-tools/get_plcselect 9 mon;                            /etc/config-tools/config_plcselect 9 mon="
+  "plcselect-mic-9;           /etc/config-tools/get_plcselect 9 mic;                            /etc/config-tools/config_plcselect 9 mic="
 # plcselect index 10
   "plcselect-url-10;          /etc/config-tools/get_plcselect 10 url;                           /etc/config-tools/config_plcselect 10 url="
   "plcselect-txt-10;          /etc/config-tools/get_plcselect 10 txt;                           /etc/config-tools/config_plcselect 10 txt="
   "plcselect-vkb-10;          /etc/config-tools/get_plcselect 10 vkb;                           /etc/config-tools/config_plcselect 10 vkb="
   "plcselect-mon-10;          /etc/config-tools/get_plcselect 10 mon;                           /etc/config-tools/config_plcselect 10 mon="
+  "plcselect-mic-10;          /etc/config-tools/get_plcselect 10 mic;                           /etc/config-tools/config_plcselect 10 mic="
 # plcselect index 11
   "plcselect-url-11;           /etc/config-tools/get_plcselect 11 url;                          /etc/config-tools/config_plcselect 11 url="
   "plcselect-txt-11;           /etc/config-tools/get_plcselect 11 txt;                          /etc/config-tools/config_plcselect 11 txt="
   "plcselect-vkb-11;           /etc/config-tools/get_plcselect 11 vkb;                          /etc/config-tools/config_plcselect 11 vkb="
   "plcselect-mon-11;           /etc/config-tools/get_plcselect 11 mon;                          /etc/config-tools/config_plcselect 11 mon="
+  "plcselect-mic-11;           /etc/config-tools/get_plcselect 11 mic;                          /etc/config-tools/config_plcselect 11 mic="
 # screensaver
   "screensaver-state;         /etc/config-tools/get_screensaver state;                          /etc/config-tools/config_screensaver state="
   "screensaver-mode;          /etc/config-tools/get_screensaver mode;                           /etc/config-tools/config_screensaver mode="
@@ -262,13 +325,14 @@ configParam=(
   "touchbeeper-duration;      /etc/config-tools/get_touchbeeper duration;                       /etc/config-tools/config_touchbeeper duration="
 # pointercal
   "touch-calibration;         /etc/config-tools/get_pointercal;                                 /etc/config-tools/config_pointercal "
+# ledserver settings
+  "ledserver-frontled;        /etc/config-tools/get_ledserver frontled;                         /etc/config-tools/config_ledserver frontled="
   )
 
 
-#FIXME: reimplement properly instead of parsing XML file
 GetPortsList ()
 {
-    /usr/bin/xmlstarlet sel -t -m //ip_settings/port_name -v . -o " " /etc/specific/network-interfaces.xml
+  echo "$(GetLegacyPorts)"
 }
 
 
@@ -337,3 +401,27 @@ ProcessErrBackupOperation ()
   return 0
 }
 
+# TODO: use this function in "settings_backup_vpn" script too.
+
+# Function to backup a know file with output to stdout.
+#
+# Param 1: parameter key in backup file
+# Param 2: name of file to backup
+
+# Return: 0 (succsess)
+#         CONFIG_FILE_MISSING (config file not found)
+#-----------------------------------------------------------------------------#
+BackupKnownFile()
+{
+  local RESULT=0
+  local KEY=$1
+  local FILE="$2"
+  
+  if [[ -f "$FILE" ]]; then
+      base64 "$FILE" | awk "\$0=\"$KEY=\"\$0"
+  else
+      RESULT=$CONFIG_FILE_MISSING
+  fi
+
+  return $RESULT
+}

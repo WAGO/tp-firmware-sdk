@@ -18,7 +18,7 @@ libnetconfddbus.a_INCLUDES += \
 -I$(libnetconfddbus_PROJECT_ROOT)/src/ \
 -isystem$(libnetconfddbus_PROJECT_ROOT)/generated/
 
-libnetconfddbus.a_DISABLEDWARNINGS += packed sign-conversion conversion format vla stack-protector  missing-declarations cast-qual unused-parameter 
+libnetconfddbus.a_DISABLEDWARNINGS += packed sign-conversion conversion format vla stack-protector  missing-declarations cast-qual unused-parameter suggest-attribute=const
 libnetconfddbus.a_CXXDISABLEDWARNINGS += $(libnetconfddbus.a_DISABLEDWARNINGS) useless-cast abi-tag
 libnetconfddbus.a_CDISABLEDWARNINGS += $(libnetconfddbus.a_DISABLEDWARNINGS) missing-prototypes bad-function-cast
 libnetconfddbus.a_PREREQUISITES +=
@@ -35,7 +35,7 @@ libnetconfddbus.a_CFLAGS += $(call option_std,c99)
 libnetconfddbus.a_CFLAGS += $(call option_disable_warning,$(libnetconfddbus.a_CDISABLEDWARNINGS))
 libnetconfddbus.a_CFLAGS += $(libnetconfddbus.a_CCXXFLAGS)
 libnetconfddbus.a_CXXFLAGS += $(call pkg_config_cxxflags,$(libnetconfddbus.a_PKG_CONFIGS))
-libnetconfddbus.a_CXXFLAGS += $(call option_std,c++14)
+libnetconfddbus.a_CXXFLAGS += $(call option_std,c++17)
 libnetconfddbus.a_CXXFLAGS += $(call option_disable_warning,$(libnetconfddbus.a_CXXDISABLEDWARNINGS))
 libnetconfddbus.a_CXXFLAGS += $(libnetconfddbus.a_CCXXFLAGS)
 libnetconfddbus.a_SOURCES += $(call fglob_r,$(libnetconfddbus_PROJECT_ROOT)/src,$(SOURCE_FILE_EXTENSIONS))

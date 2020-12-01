@@ -232,7 +232,7 @@
         <key widthscale="1.0">
           <char>/</char>
           <code></code>
-          <char_shift>/</char_shift>
+          <char_shift>\</char_shift>
           <code_shift></code_shift>
         </key>
         
@@ -384,9 +384,10 @@
     <rows>        
       <row id="1">
         <key widthscale="1.0">
-          <char>!</char>
+          <char>{esc}</char>
+          <control_text>ESC</control_text>
           <code></code>
-          <char_shift>!</char_shift>
+          <char_shift>{esc}</char_shift>
           <code_shift></code_shift>
           <autorepeat>0</autorepeat>
           <icon></icon>
@@ -394,25 +395,25 @@
         <key widthscale="1">
           <char>?</char>
           <code></code>
-          <char_shift>?</char_shift>
+          <char_shift>!</char_shift>
           <code_shift></code_shift>
         </key>
         <key widthscale="1">
           <char>_</char>
           <code></code>
-          <char_shift>_</char_shift>
+          <char_shift>€</char_shift>
           <code_shift></code_shift>
         </key>
         <key widthscale="1">
           <char>#</char>
           <code></code>
-          <char_shift>#</char_shift>
+          <char_shift>$</char_shift>
           <code_shift></code_shift>
         </key>
         <key widthscale="1">
           <char>&quot;</char>
           <code></code>
-          <char_shift>&quot;</char_shift>
+          <char_shift>§</char_shift>
           <code_shift></code_shift>
         </key>
         <key widthscale="1.0">
@@ -457,7 +458,7 @@
         <key widthscale="1.0">
           <char>%</char>
           <code></code>
-          <char_shift>%</char_shift>
+          <char_shift>@</char_shift>
           <code_shift></code_shift>
         </key>
 
@@ -538,14 +539,14 @@
         <key widthscale="1.0">
           <char>&lt;</char>
           <code></code>
-          <char_shift>&lt;</char_shift>
+          <char_shift>&amp;</char_shift>
           <code_shift></code_shift>
         </key>
         
         <key widthscale="1.0">
           <char>&gt;</char>
           <code></code>
-          <char_shift>&gt;</char_shift>
+          <char_shift></char_shift>
           <code_shift></code_shift>
         </key>            
       </row>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+<!--  SC ENTITY START -->
+	<!--  HEX_COLOR_TYPE --><!ENTITY Simple_Gradient_1 "#F2F2F2">
+	<!--  HEX_COLOR_TYPE --><!ENTITY Simple_Gradient_2 "#D1D2D2">
+	<!--  HEX_COLOR_TYPE --><!ENTITY Simple_Gradient_3 "#C9C9C9">
+	<!--  HEX_COLOR_TYPE --><!ENTITY Rectangle_Outline "#BDBEC0">
+	<!--  STRING_TYPE --><!ENTITY Rectangle_Outline_Width_Pixel "2">
+	<!--  ROTATE_ANGLE_TYPE --><!ENTITY Icon_Rotate_Angle "0"> 
+  <!--  ROTATE_CX_TYPE --><!ENTITY Icon_Rotate_Center_X "200"> 
+  <!--  ROTATE_CY_TYPE --><!ENTITY Icon_Rotate_Center_Y "50">
+  <!--  STRING_TYPE --><!ENTITY Opacity "1.0"> 
+<!--  SC ENTITY STOP -->
+]>
+<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="400px" height="100px" viewBox="0 0 400 100" enable-background="new 0 0 400 100" xml:space="preserve" opacity="&Opacity;">
+	 <g transform="rotate(&Icon_Rotate_Angle;, &Icon_Rotate_Center_X;, &Icon_Rotate_Center_Y;)">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="395.3203" y1="751.9199" x2="395.3203" y2="849.9199" gradientTransform="matrix(1 0 0 1 -195.3203 -750.9199)">
+	<stop  offset="0" stop-color="&Simple_Gradient_1;"/>
+	<stop  offset="0.5" stop-color="&Simple_Gradient_2;"/>
+	<stop  offset="1" stop-color="&Simple_Gradient_3;"/>
+</linearGradient>
+<rect x="1" y="1" fill="url(#SVGID_1_)" stroke="&Rectangle_Outline;" stroke-width="&Rectangle_Outline_Width_Pixel;" stroke-miterlimit="10" width="398" height="98"/>
+	</g>
+</svg>

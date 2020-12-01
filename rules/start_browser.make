@@ -78,8 +78,6 @@ $(STATEDIR)/start_browser.targetinstall:
 	@$(call install_fixup, start_browser,AUTHOR,"<elrest>")
 	@$(call install_fixup, start_browser,DESCRIPTION,missing)
 
-	@$(call install_copy, start_browser, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

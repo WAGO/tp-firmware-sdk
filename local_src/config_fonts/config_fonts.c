@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file     config_fonts.c
 ///
-/// \version $Id: config_fonts.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_fonts.c 49277 2020-05-26 12:14:44Z wrueckl_elrest $
 ///
 /// \brief    set font settings
 ///
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <glib.h>
 
 #include "msgtool.h"
@@ -46,6 +47,7 @@
 void ShowHelpText();
 void AppendErrorText(int iStatusCode, char * pText);
 int IsTrueTypeFontFile(char * pFontStr);
+int GetFontDirs(char * src_buf, int src_buflen, char * dest_buf, int dest_buflen);
 
 //------------------------------------------------------------------------------
 // macros
@@ -165,7 +167,7 @@ int main(int argc, char **argv)
               
               //copy font to userdefined ttf font directory
               sprintf(szCmd, "/usr/bin/cp -p \'%s\' \'%s\'", szSrc, szDest);
-              printf("call: %s\n", szCmd);
+              //printf("call: %s\n", szCmd);
               if (system(szCmd) == 0)
               {
                 char szCmdChdir[256];
@@ -173,12 +175,12 @@ int main(int argc, char **argv)
                 
                 //call mkfontscale -e
                 sprintf(szCmd, "%s ; /usr/bin/mkfontscale -e \'%s\'", szCmdChdir, szDest);
-                printf("call: %s\n", szCmd);
+                //printf("call: %s\n", szCmd);
                 if (system(szCmd) == 0)
                 {
                   //call mkfontdir -e
                   sprintf(szCmd, "%s ; /usr/bin/mkfontdir -e \'%s\'", szCmdChdir, szDest);
-                  printf("call: %s\n", szCmd);
+                  //printf("call: %s\n", szCmd);
                   if (system(szCmd) == 0)
                   {                
                     //sync filesystem
@@ -291,7 +293,7 @@ int main(int argc, char **argv)
             
               //remove font from userdefined ttf font directory
               sprintf(szCmd, "/bin/rm -f \'%s\'", szFileToRemove);
-              printf("call: %s\n", szCmd);
+              //printf("call: %s\n", szCmd);
               if (system(szCmd) == 0)
               {
                 char szCmdChdir[256];
@@ -299,12 +301,12 @@ int main(int argc, char **argv)
                 
                 //call mkfontscale -e
                 sprintf(szCmd, "%s ; /usr/bin/mkfontscale -e \'%s\'",szCmdChdir, szDest);
-                printf("call: %s\n", szCmd);
+                //printf("call: %s\n", szCmd);
                 if (system(szCmd) == 0)
                 {
                   //call mkfontdir -e
                   sprintf(szCmd, "%s ; /usr/bin/mkfontdir -e \'%s\'",szCmdChdir, szDest);
-                  printf("call: %s\n", szCmd);
+                  //printf("call: %s\n", szCmd);
                   if (system(szCmd) == 0)
                   {                
                     //sync filesystem

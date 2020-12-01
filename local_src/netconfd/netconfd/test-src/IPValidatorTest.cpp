@@ -8,435 +8,318 @@
 //------------------------------------------------------------------------------
 
 #include "IPValidator.hpp"
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <string>
+#include <boost/asio/ip/network_v4.hpp>
+#include <boost/asio/ip/address_v4.hpp>
 
 #include "MockIIPController.hpp"
+#include "NetDev.hpp"
 
+#include "TypesTestHelper.hpp"
+
+using namespace std::literals;
 using namespace testing;
 
-namespace netconfd {
+namespace netconf {
 
-class AIPValidator : public Test {
- public:
-  MockIIPController mock_ip_controller_;
-  IPValidator validator_;
+  class AnIPValidator : public Test {
+   public:
+    IPValidator validator_;
 
-  AIPValidator()
-      : validator_ { mock_ip_controller_ } {
+    AnIPValidator()
+        :
+        validator_ { } {
 
+    }
+
+    void SetUp() override
+    {
+    }
+
+    void TearDown() override
+    {
+
+    }
+
+  };
+
+  class AnIPValidatorP: public AnIPValidator, public testing::WithParamInterface<uint16_t>
+  {
+  };
+
+  TEST_F(AnIPValidator, ShouldValidateAnIPConfig) {
+
+    IPConfigs ip_configs = {{"br0", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
   }
 
-  void SetUp() override {
+  TEST_F(AnIPValidator, ShouldValidateAnIPConfigWithoutBroadcast) {
+
+    IPConfigs ip_configs = {{"br0", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
   }
 
-  void TearDown() override {
+  TEST_F(AnIPValidator, ShouldValidateTwoIPConfigs) {
 
+    IPConfigs ip_configs = {
+        {"br0", IPSource::STATIC, "192.168.1.1", "255.255.255.0"},
+        {"br1", IPSource::STATIC, "192.168.2.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
   }
 
-};
+  TEST_F(AnIPValidator, ShouldRejectZeroIpForStaticSource) {
 
-TEST_F(AIPValidator, ValidatesAnIPConfig) {
+    IPConfigs ip_configs = {
+        {"br0", IPSource::STATIC, ZeroIP, ZeroIP},
+        {"br1", IPSource::STATIC, "192.168.2.1", "255.255.255.0"},
+        {"br2", IPSource::STATIC, ZeroIP, ZeroIP}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
 
-  Interfaces actual_interfaces = { "br0" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "br0", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
+    EXPECT_FALSE(status.IsOk());
+  }
 
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
+  TEST_F(AnIPValidator, ShouldAcceptNoneToResetIpParameters) {
+
+    IPConfigs ip_configs = {
+        {"br0", IPSource::NONE, ZeroIP, ZeroIP},
+        {"br1", IPSource::STATIC, "192.168.2.1", "255.255.255.0"},
+        {"br2", IPSource::NONE, ZeroIP, ZeroIP}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnStaticIPConfigWhichContainsAnInterfaceThatNotExist) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidatesADHCPIPConfigWhichContainsAnInterfaceThatNotExist) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::DHCP, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidatesABootpIPConfigWhichContainsAnInterfaceThatNotExist) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::BOOTP, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAStaticIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateADHCPIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::DHCP, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateABootpIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::BOOTP, "192.168.1.1", "255.255.255.0"}};
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_TRUE(status.IsOk());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichContainsOneInterfaceSeveralTimes) {
+
+    IPConfigs ip_configs = {
+        {"ethX1", IPSource::STATIC, "192.168.2.1", "255.255.255.0"},
+        {"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+
+    EXPECT_EQ(ErrorCode::ENTRY_DUPLICATE, status.GetErrorCode()) << status.ToString();
+  }
+
+  TEST_F(AnIPValidator, AssigningNetworkAddressAsHostIsAccepted) {
+
+    // This is an exception for the wwan0 interface, the modem assigns such addresses :-(
+
+    IPConfigs ip_configs = {{"br0", IPSource::STATIC, "192.168.1.128", "255.255.255.128"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::OK, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichContainsAnInvalidAddress) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1111", "255.255.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::IP_INVALID, status.GetErrorCode()) << status.ToString();
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichAddressContainsOnlyOnes) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "255.255.255.255", "255.255.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::IP_INVALID, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichAddressContainsZeros) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, ZeroIP, "255.255.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::IP_INVALID, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichContainsAnInvalidNetmask) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", "255.X.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::NETMASK_INVALID, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichContainsZeroNetmask) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", ZeroIP}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::NETMASK_INVALID, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichSubnetmaskContainsZeros) {
+
+    IPConfigs ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", "255.111.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::NETMASK_INVALID, status.GetErrorCode());
+  }
+
+
+  TEST_F(AnIPValidator, FailedToValidateIPConfigsWithSeveralIpAddresses) {
+
+    IPConfigs ip_configs = {
+        {"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.255.0"},
+        {"ethX2", IPSource::STATIC, "192.168.2.1", "255.255.0.0", },
+        {"ethX3", IPSource::STATIC, "192.168.1.1", "255.0.0.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::IP_DISTRIBUTED_MULTIPLE_TIMES, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateIPConfigsWithSeveralNetworks) {
+
+    IPConfigs ip_configs = {
+        {"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.255.0"},
+        {"ethX2", IPSource::STATIC, "192.168.1.2", "255.255.255.0"},
+        {"ethX3", IPSource::STATIC, "192.168.2.1", "255.255.255.0"}};
+
+    Error status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateOverlappingNetmask) {
+
+    IPConfigs new_ip_configs = {{"ethX2", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+    IPConfigs remain_ip_configs = {{"ethX1", IPSource::DHCP, "192.168.1.2", "255.255.0.0"}};
+
+    Error status = validator_.ValidateCombinabilityOfIPConfigs(new_ip_configs, remain_ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichIPIsAlreadyAssignedOnTheSystem) {
+
+    IPConfigs remain_ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.1", "255.255.0.0"}};
+    IPConfigs new_ip_configs = {{"ethX2", IPSource::STATIC, "192.168.1.1", "255.255.255.0"}};
+
+    Error status = validator_.ValidateCombinabilityOfIPConfigs(new_ip_configs, remain_ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateAnIPConfigWhichNetworkAlreadyExistsOnTheSystem) {
+
+    IPConfigs remain_ip_configs = {{"ethX1", IPSource::STATIC, "192.168.1.2", "255.255.0.0"}};
+    IPConfigs new_ip_configs = {{"ethX2", IPSource::STATIC, "192.168.1.1", "255.255.0.0"}};
+
+    Error status = validator_.ValidateCombinabilityOfIPConfigs(new_ip_configs, remain_ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, FailedToValidateMultipleIPConfigsWhichIPAndNetworkAlreadyExistsOnTheSystem) {
+
+    IPConfig actual_ip_config_1 = {"ethX1", IPSource::STATIC, "192.168.1.2", "255.255.255.0"};
+    IPConfig actual_ip_config_2 = {"ethX2", IPSource::STATIC, "192.168.2.2", "255.255.255.0"};
+    IPConfig actual_ip_config_3 = {"ethX3", IPSource::STATIC, "192.168.3.2", "255.255.255.0"};
+    IPConfigs actual_ip_configs{actual_ip_config_1, actual_ip_config_2, actual_ip_config_3};
+
+    IPConfigs ip_configs = {
+        {"ethX4", IPSource::STATIC, "192.168.1.2", "255.255.0.0"},
+        {"ethX5", IPSource::STATIC, "192.168.2.1", "255.255.255.0"},
+        {"ethX6", IPSource::STATIC, "192.168.3.2", "255.255.255.0"}};
+
+    Error status = validator_.ValidateCombinabilityOfIPConfigs(ip_configs, actual_ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode());
+  }
+
+  TEST_F(AnIPValidator, ShouldAcceptRFC3021Ips) {
+    // RFC3021 defines that subnet mask 255.255.255.254 contains exactly 2 hosts without broadcast address.
+    // This is used in Point-to-Point IP links like modems.
+    // Further 255.255.255.255 is used to define exactly one IP address.
+    auto netmask_30 = IPConfigs{
+      {"wwan0", IPSource::TEMPORARY, "10.12.88.128", "255.255.255.254"},
+      {"wwan1", IPSource::TEMPORARY, "10.12.88.133", "255.255.255.254"},
+      {"wwan2", IPSource::TEMPORARY, "10.12.88.130", "255.255.255.255"}};
+
+    auto status = validator_.ValidateIPConfigs(netmask_30);
+
+    EXPECT_EQ(ErrorCode::OK, status.GetErrorCode()) << status.ToString();
+  }
+
+  TEST_F(AnIPValidator, validateOverlappingNetworksAsInvalidInCaseOfStaticIP) {
+
+    IPConfig ip_config_1 = {"ethX1", IPSource::STATIC, "192.168.1.2", "255.255.255.0"};
+    IPConfig ip_config_2 = {"ethX2", IPSource::STATIC, "192.168.2.2", "255.255.0.0"};
+    IPConfigs ip_configs{ip_config_1, ip_config_2};
+
+    auto status = validator_.ValidateIPConfigs(ip_configs);
+    EXPECT_EQ(ErrorCode::NETWORK_CONFLICT, status.GetErrorCode()) << status.ToString();
+  }
+
+  TEST_F(AnIPValidator, shouldValidateMultipleIPConfigs) {
+
+    IPConfig ip_config_1 = {"ethX1", IPSource::STATIC, "192.168.10.10", "255.255.255.0"};
+    IPConfigs ip_configs_1 = {ip_config_1};
+    IPConfig ip_config_2 = {"ethX2", IPSource::STATIC, "192.168.20.10", "255.255.255.0"};
+    IPConfigs ip_configs_2 = {ip_config_2};
+    IPConfig ip_config_3 = {"ethX3", IPSource::STATIC, "192.168.30.10", "255.255.255.0"};
+    IPConfigs ip_configs_3 = {ip_config_3};
+
+    Error status = validator_.ValidateCombinabilityOfIPConfigs(ip_configs_2, ip_configs_1);
+    EXPECT_EQ(ErrorCode::OK, status.GetErrorCode());
+
+    IPConfigs ip_configs_12 = {ip_config_1, ip_config_2};
+
+    status = validator_.ValidateCombinabilityOfIPConfigs(ip_configs_3, ip_configs_12);
+    EXPECT_EQ(ErrorCode::OK, status.GetErrorCode());
+  }
 }
-
-TEST_F(AIPValidator, ValidatesAnIPConfigWithoutBroadcast) {
-
-  Interfaces actual_interfaces = { "br0" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "br0", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, ValidatesIPConfigs) {
-
-  Interfaces actual_interfaces = { "br0", "br1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "br0", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" }, { "br1", IPSource::STATIC,
-      "192.168.2.1", "255.255.255.0", "192.168.2.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, ValidatesIPConfigsThatResetsIPParameterToZero) {
-
-  Interfaces actual_interfaces = { "br0", "br1", "br2" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "br0", IPSource::STATIC, "0.0.0.0", "0.0.0.0" }, {
-      "br1", IPSource::STATIC, "192.168.2.1", "255.255.255.0" }, { "br2",
-      IPSource::STATIC, "0.0.0.0", "0.0.0.0" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidatesStaticAnIPConfigWhichContainsAnInterfaceThatNotExist) {
-
-  Interfaces actual_interfaces = { };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidatesADHCPIPConfigWhichContainsAnInterfaceThatNotExist) {
-
-  Interfaces actual_interfaces = { };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::DHCP, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidatesABootpIPConfigWhichContainsAnInterfaceThatNotExist) {
-
-  Interfaces actual_interfaces = { };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::BOOTP, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidateAStaticIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { "ethX1" };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidateADHCPIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { "ethX1" };
-  IPConfigs ip_configs = { { "ethX1", IPSource::DHCP, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidateABootpIPConfigWhichContainsAnInterfaceThatIsNotAssignable) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { "ethX1" };
-  IPConfigs ip_configs = { { "ethX1", IPSource::BOOTP, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_FALSE(isInterfaceApplicableToSystem);
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichContainsOneInterfaceSeveralTimes) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.2.1",
-      "255.255.255.0", "192.168.2.255" }, { "ethX1", IPSource::STATIC,
-      "192.168.1.1", "255.255.255.0", "192.168.1.255" } };
-
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichContainsAnInvalidAddress) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1111",
-      "255.255.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichAddressContainsOnlyOnes) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "255.255.255.255",
-      "255.255.255.0", "255.255.255.0" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichAddressContainsZeros) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "0.0.0.0",
-      "255.255.255.0", "0.0.0.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichContainsAnInvalidNetmask) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.X.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichContainsZeroNetmask) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "0.0.0.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichNetmaskContainsOnlyOnes) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.255", "192.168.1.1" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichSubnetmaskContainsZeros) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.111.255.0", "192.168.1.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichContainsAnInvalidBroadcast) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "42" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichBroadcastDoesNotMatchTheIPAddress) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.0.0", "172.168.255.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichBroadcastDoesNotMatchTheNetmask) {
-
-  Interfaces actual_interfaces = { "ethX1" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.255.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateIPConfigsWithSeveralIpAddresses) {
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2", "ethX3" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" }, { "ethX2", IPSource::STATIC,
-      "192.168.2.1", "255.255.0.0", "192.168.255.255" }, { "ethX3",
-      IPSource::STATIC, "192.168.1.1", "255.0.0.0", "192.255.255.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateIPConfigsWithSeveralNetworks) {
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2", "ethX3" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" }, { "ethX2", IPSource::STATIC,
-      "192.168.1.2", "255.255.255.0", "192.168.1.255" }, { "ethX3",
-      IPSource::STATIC, "192.168.2.1", "255.255.255.0", "192.168.2.255" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigs(ip_configs, true);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichIPIsAlreadyAssignedOnTheSystem) {
-
-  IPConfig actual_ip_config = { "ethX1", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" };
-  EXPECT_CALL(mock_ip_controller_, GetIPConfig(Eq("ethX1"),_)).WillOnce(
-      DoAll(SetArgReferee<1>(actual_ip_config), Return(Status())));
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX2", IPSource::STATIC, "192.168.1.1",
-      "255.255.0.0", "192.168.255.255" } };
-
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigIsApplicableToSystem(
-      ip_configs, actual_interfaces);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateAnIPConfigWhichNetworkAlreadyExistsOnTheSystem) {
-
-  IPConfig actual_ip_config = { "ethX1", IPSource::STATIC, "192.168.1.2",
-      "255.255.255.0", "192.168.1.255" };
-  EXPECT_CALL(mock_ip_controller_, GetIPConfig(Eq("ethX1"),_)).WillOnce(
-      DoAll(SetArgReferee<1>(actual_ip_config), Return(Status())));
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX2", IPSource::STATIC, "192.168.1.1",
-      "255.255.255.0", "192.168.1.255" } };
-
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigIsApplicableToSystem(
-      ip_configs, actual_interfaces);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, FailedToValidateMultipleIPConfigsWhichIPAndNetworkAlreadyExistsOnTheSystem) {
-
-  //ip already exist ethX1 == ethX4
-  IPConfig actual_ip_config_1 = { "ethX1", IPSource::STATIC, "192.168.1.2",
-      "255.255.255.0", "192.168.1.255" };
-  EXPECT_CALL(mock_ip_controller_, GetIPConfig(Eq("ethX1"),_)).WillOnce(
-      DoAll(SetArgReferee<1>(actual_ip_config_1), Return(Status())));
-
-  //network already exist ethX2 == ethX5
-  IPConfig actual_ip_config_2 = { "ethX2", IPSource::STATIC, "192.168.2.2",
-      "255.255.255.0", "192.168.2.255" };
-  EXPECT_CALL(mock_ip_controller_, GetIPConfig(Eq("ethX2"),_)).WillOnce(
-      DoAll(SetArgReferee<1>(actual_ip_config_2), Return(Status())));
-
-  //ip and network already exist ethX3 == ethX6
-  IPConfig actual_ip_config_3 = { "ethX3", IPSource::STATIC, "192.168.3.2",
-      "255.255.255.0", "192.168.3.255" };
-  EXPECT_CALL(mock_ip_controller_, GetIPConfig(Eq("ethX3"),_)).WillOnce(
-      DoAll(SetArgReferee<1>(actual_ip_config_3), Return(Status())));
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2", "ethX3", "ethX4", "ethX5",
-      "ethX6" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX4", IPSource::STATIC, "192.168.1.2",
-      "255.255.0.0", "192.168.255.255" }, { "ethX5", IPSource::STATIC,
-      "192.168.2.1", "255.255.255.0", "192.168.2.255" }, { "ethX6",
-      IPSource::STATIC, "192.168.3.2", "255.255.255.0", "192.168.3.255" } };
-
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-
-  Status status = validator_.ValidateIPConfigIsApplicableToSystem(
-      ip_configs, actual_interfaces);
-  EXPECT_EQ(StatusCode::INVALID_PARAMETER, status.Get());
-}
-
-TEST_F(AIPValidator, DoesNotValidateIPParameterOfDHCPBootpAndNoneIPSources) {
-
-  Interfaces actual_interfaces = { "ethX1", "ethX2", "ethX3" };
-  Interfaces not_assignable_interfaces = { };
-  IPConfigs ip_configs = { { "ethX1", IPSource::NONE, "0.0.0.0", "0.0.0.0",
-      "0.0.0.0" }, { "ethX2", IPSource::DHCP, "0.0.0.0", "0.0.0.0", "0.0.0.0" },
-      { "ethX3", IPSource::BOOTP, "0.0.0.0", "0.0.0.0", "0.0.0.0" } };
-  bool isInterfaceApplicableToSystem = validator_.IsInterfaceApplicableToSystem(
-      ip_configs, actual_interfaces, not_assignable_interfaces);
-
-  EXPECT_TRUE(isInterfaceApplicableToSystem);
-}
-
-} /* namespace netconfd */

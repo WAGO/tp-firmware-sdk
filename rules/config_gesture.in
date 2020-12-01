@@ -2,7 +2,7 @@
 
 config CONFIG_GESTURE
 	tristate
-    default n
+	default n
 	select UDEV
 	select LIBMSGTOOL
 	select CONFIG_TOOLS

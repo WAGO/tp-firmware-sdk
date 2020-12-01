@@ -10,41 +10,47 @@
 
 #include "EthernetInterface.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 using namespace std::literals;
 
-BridgeManager::BridgeManager(IBridgeController& bridge_controller, IDevicePropertiesProvider& properies_provider)
+BridgeManager::BridgeManager(IBridgeController &bridge_controller, IDeviceProperties &properies_provider,
+                             INetDevManager &netdev_manager)
     : bridge_controller_ { bridge_controller },
       properies_provider_(properies_provider),
-      mac_distributor_(properies_provider_),
+      netdev_manager_ { netdev_manager },
       interface_validator_(bridge_controller_),
-      bridge_configurator_(bridge_controller_, mac_distributor_),
+      bridge_configurator_(bridge_controller_),
       bridge_config_transformator_(properies_provider_),
-      switch_config_{"/etc/switch_settings.conf"},
-      switch_settings_file_monitor_{"/etc/switch_settings.conf", [this] (FileMonitor&) {
-                this->UpdateAgetime();
-              }}
-{
+      switch_config_ { "/etc/switch_settings.conf" },
+      switch_settings_file_monitor_ { "/etc/switch_settings.conf", [this](FileMonitor&) {
+        this->UpdateAgetime();
+      } } {
   SetDefaultInterfaceUp();
   UpdateAgetime();
 }
 
-
-Status BridgeManager::SetDefaultInterfaceUp() const {
+Error BridgeManager::SetDefaultInterfaceUp() const {
   // CAUTION: eth0 has to be up, before ethX? devices can be set up.
-  return bridge_controller_.SetInterfaceUp("eth0");
+
+  Error system_error = bridge_controller_.SetInterfaceUp("eth0");
+  if(system_error.IsNotOk()){
+    Error error { ErrorCode::SET_INTERFACE_STATE, "eth0" };
+    LogError(error.ToString() + " " + system_error.ToString());
+  }
+  return system_error;
+
 }
 
-Status BridgeManager::ApplyBridgeConfig(BridgeConfig const& os_config) const {
+Error BridgeManager::ApplyBridgeConfig(BridgeConfig const &os_config) const {
 
-  Status status = SetDefaultInterfaceUp();
+  Error error = SetDefaultInterfaceUp();
 
-  if (status.Ok()) {
-    status = bridge_configurator_.Configure(os_config);
+  if (error.IsOk()) {
+    error = bridge_configurator_.Configure(os_config);
   }
 
-  return status;
+  return error;
 }
 
 Bridges BridgeManager::GetBridges() const {
@@ -52,7 +58,7 @@ Bridges BridgeManager::GetBridges() const {
   BridgeConfig bridge_config = bridge_configurator_.GetConfiguration();
 
   Bridges bridges;
-  for (auto& bridge_pair : bridge_config) {
+  for (auto &bridge_pair : bridge_config) {
     bridges.push_back(bridge_pair.first);
   }
 
@@ -67,117 +73,58 @@ BridgeConfig BridgeManager::GetBridgeConfig() const {
 
 }
 
-Status BridgeManager::IsValid(BridgeConfig const& product_config) const {
+Error BridgeManager::IsValid(BridgeConfig const &product_config) const {
 
-  Status status;
+  Error error;
 
   if (product_config.empty()) {
-    status.Prepend(StatusCode::JSON_CONVERT_ERROR, "Bridge config is empty error");
+    error.Set(ErrorCode::JSON_INCOMPLETE);
   }
 
   BridgeConfig os_config;
-  if (status.Ok()) {
-    os_config = bridge_config_transformator_.ConvertProductToOS(product_config);
-    if (os_config.empty()) {
-      status.Prepend(StatusCode::INVALID_CONFIG, "Conversion product to OS bridge config error");
-    }
+  if (error.IsOk()) {
+    error = interface_validator_.Validate(product_config);
   }
 
-  if (status.Ok()) {
-    status = interface_validator_.Validate(os_config);
-  }
-
-  return status;
+  return error;
 
 }
 
-Status BridgeManager::Configure(BridgeConfig const& product_config) const {
-
-  Status status;
+Error BridgeManager::ApplyBridgeConfiguration(BridgeConfig &product_config) const {
 
   BridgeConfig os_config = bridge_config_transformator_.ConvertProductToOS(product_config);
-  if (os_config.empty()) {
-    status.Prepend(StatusCode::INVALID_CONFIG, "Conversion product to OS bridge config error");
+
+  Error error = IsValid(os_config);
+  if (error.IsNotOk()) {
+    return error;
   }
 
-  if (status.Ok()) {
-    status = ApplyBridgeConfig(os_config);
+  if (error.IsOk()) {
+    error = ApplyBridgeConfig(os_config);
   }
 
-  if(status.Ok())
-  {
+  if (error.IsOk()) {
+    netdev_manager_.ConfigureBridges(product_config);
+  }
+
+  if (error.IsOk()) {
     UpdateAgetime();
   }
 
-  return status;
-}
-
-Status BridgeManager::SetBridgeUp(const Bridge& bridge) const {
-  return bridge_configurator_.SetBridgeUp(bridge);
-}
-
-Status BridgeManager::SetBridgeDown(const Bridge& bridge) const {
-  return bridge_configurator_.SetBridgeDown(bridge);
-}
-
-Interfaces BridgeManager::GetInterfaces() const {
-  return bridge_controller_.GetInterfaces();
-
+  return error;
 }
 
 Interfaces BridgeManager::GetBridgeAssignedInterfaces() const {
   return bridge_configurator_.GetBridgeAssignedInterfaces();
 }
 
-bool BridgeManager::HasAnyInterfacesUp(const Bridge& bridge) const {
-
-  auto interfaces = bridge_controller_.GetBridgeInterfaces(bridge);
-  try {
-    for (auto& interface : interfaces) {
-      if(IsInterfaceUp(interface)) {
-        return true;
-      }
-    }
-  } catch (std::exception& e) {
-    LogError("Failed to query ethernet interface state! ("s.append(e.what()).append(")"s));
-  }
-  return false;
-}
-
-Bridge BridgeManager::GetBridgeOfInterface(const Interface& itf) const {
-  auto config_os = bridge_configurator_.GetConfiguration();
-
-  for (auto& entry : config_os) {
-    auto itfit = ::std::find(entry.second.begin(), entry.second.end(), itf);
-    if (itfit != entry.second.end()){
-      return entry.first;
-    }
-  }
-  return Bridge { };
-}
-
-bool BridgeManager::IsBridge(const Interface& itf) const {
-  auto bridges = bridge_controller_.GetBridges();
-  return (std::find(bridges.begin(), bridges.end(), itf) != bridges.end());
-}
-
-bool BridgeManager::IsInterfaceUp(const Interface& itf) const {
-  bool isUp = false;
-  auto result = bridge_controller_.IsInterfaceUp(itf, isUp);
-  if(result.NotOk())
-  {
-    LogError(result.GetMessage());
-  }
-  return isUp;
-}
-
 void BridgeManager::UpdateAgetime() const {
   auto bridges = bridge_controller_.GetBridges();
   auto age_time = switch_config_.GetFastAgeing() ? 0 : 300;
   LogInfo("UpdateAgetime");
-  ::std::for_each(bridges.begin(), bridges.end(), [age_time, this] (Bridge& b) {
+  ::std::for_each(bridges.begin(), bridges.end(), [age_time, this](Bridge &b) {
     this->bridge_controller_.SetAgetime(b, age_time);
   });
 }
 
-} /* namespace netconfd */
+} /* namespace netconf */

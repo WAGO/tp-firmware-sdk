@@ -54,8 +54,7 @@ LIBETNAVIV_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 $(STATEDIR)/libetnaviv.prepare:
 	@$(call targetinfo)
 	cd $(LIBETNAVIV_DIR) && \
-	export CC=$(CROSS_CC) && \
-	./configure --prefix=/usr --host=arm-linux \
+	CC=$(CROSS_CC) ./configure --prefix=/usr --host=arm-linux \
 	CFLAGS="-I$(PTXCONF_SYSROOT_TARGET)/usr/include  -I$(BUILDDIR)/galcore_headers/include_imx6_v4_6_9" \
 	LDFLAGS="-L$(PTXCONF_SYSROOT_TARGET)/usr/lib" && \
 	PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig && \

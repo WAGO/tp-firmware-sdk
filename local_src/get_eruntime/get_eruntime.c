@@ -9,7 +9,7 @@
 ///
 /// \file    get_eruntime.c
 ///
-/// \version $Id: get_eruntime.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: get_eruntime.c 45922 2020-01-20 15:31:05Z wrueckl_elrest $
 ///
 /// \brief   get eruntime cfg contents / config-tools
 ///
@@ -198,7 +198,8 @@ void ShowHelpText()
   printf("options:\n");
   printf("all-json print all values in JSON format \n"); 
   printf("\n");
-  printf("parameter: bootapp\n\n");   
+  printf("parameter: multicore value: yes | no\n");   
+  printf("parameter: bootapp   value: yes | no\n\n");   
 }
 
 /// \brief Print error text to /tmp/last_error.txt

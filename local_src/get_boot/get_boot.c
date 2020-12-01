@@ -9,7 +9,7 @@
 ///
 /// \file    get_boot.c
 ///
-/// \version $Id: get_boot.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: get_boot.c 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   get boot settings / config-tools
 ///

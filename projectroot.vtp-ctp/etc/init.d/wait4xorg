@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+#
+# Waiting until XOrg / X11 start is completely done (blocking)
+# This script has to be called before /etc/init.d/runtime
+#
+
+function wait4xorg
+{
+  #VTPCTP
+  local COUNTER=0
+  while [ ! -e "/var/run/xorg.start.done" ]; do
+    #Xorg not running
+    #echo "Waiting for XOrg"
+    ((COUNTER++))
+
+    #sleep 500 ms
+    usleep 500000
+    
+    if [ $COUNTER -gt 900 ]; then
+      echo "Timeout waiting for Xorg"
+      break;
+    fi
+    #echo "Waiting for Xorg $COUNTER"
+  done
+
+  #echo "Waiting for Xorg DONE"
+}
+
+case $1 in
+
+start)
+   if [ ! -e "/var/run/framebuffer.mode" ]; then
+     wait4xorg
+   fi
+	;;
+
+stop)
+	echo "Terminating wait4xorg not implemented."
+	;;
+
+esac
+

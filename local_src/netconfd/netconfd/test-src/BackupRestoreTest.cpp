@@ -10,11 +10,12 @@
 #include "MockIFileEditor.hpp"
 #include <gtest/gtest.h>
 #include "FileEditorFake.hpp"
+#include "TypesTestHelper.hpp"
 #include <limits>
 
 using namespace testing;
 
-namespace netconfd {
+namespace netconf {
 
 using ::std::string;
 using ::std::unique_ptr;
@@ -29,7 +30,8 @@ class ABackupRestore : public Test {
   unique_ptr<BackupRestore> backup_restore_;
   uint32_t restored_version;
   size_t backup_chars_per_line;
-  string data;
+  string network_data;
+  string dipswitch_data;
   string path;
   string expected_file_content;
 
@@ -55,33 +57,37 @@ TEST_F(ABackupRestore, GetBackupParameterCount) {
 TEST_F(ABackupRestore, CreatesABackup) {
 
 
-  data = "abc";
+  network_data = "abc";
+  dipswitch_data = "xxx";
   expected_file_content = R"(network.version=42
 network.data=abc
+network.dipswitch=xxx
 )";
 
-  Status status = backup_restore_->Backup(path, data, 42);
+  Error status = backup_restore_->Backup(path, network_data, dipswitch_data, 42);
 
 
 
-  ASSERT_EQ(StatusCode::OK, status.Get());
+  ASSERT_EQ(ErrorCode::OK, status.GetErrorCode());
   EXPECT_EQ(expected_file_content, mock_file_editor_.content_);
 
 }
 
 TEST_F(ABackupRestore, CreatesABackupOverSeveralLines) {
 
-  data = "0123456789abcd";
+  network_data = "0123456789abcd";
+  dipswitch_data = "xxx";
 
   expected_file_content = R"(network.version=42
 network.data=01234
 network.data=56789
 network.data=abcd
+network.dipswitch=xxx
 )";
 
-  Status status = backup_restore_->Backup(path, data, 42);
+  Error status = backup_restore_->Backup(path, network_data, dipswitch_data, 42);
 
-  EXPECT_EQ(StatusCode::OK, status.Get());
+  EXPECT_EQ(ErrorCode::OK, status.GetErrorCode());
   EXPECT_EQ(expected_file_content, mock_file_editor_.content_);
 }
 
@@ -92,15 +98,17 @@ XXX=123
 XXX=123
 network.version=42
 network.data=abc
+network.dipswitch=xxx
 XXX=123
    )";
 
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("abc", data);
+  EXPECT_EQ("abc", network_data);
+  EXPECT_EQ("xxx", dipswitch_data);
   EXPECT_EQ(42, restored_version);
-  ASSERT_EQ(StatusCode::OK, status.Get());
+  ASSERT_EQ(ErrorCode::OK, status.GetErrorCode());
 }
 
 TEST_F(ABackupRestore, RestoresAnEmptyBackup) {
@@ -109,15 +117,17 @@ TEST_F(ABackupRestore, RestoresAnEmptyBackup) {
 XXX=123
 XXX=123
 network.data=
+network.dipswitch=
 XXX=123
    )";
 
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("", data);
+  EXPECT_EQ("", network_data);
+  EXPECT_EQ("", dipswitch_data);
   EXPECT_EQ(0, restored_version);
-  EXPECT_EQ(StatusCode::BACKUP_FILE_ERROR, status.Get());
+  EXPECT_EQ(ErrorCode::BACKUP_CONTENT_MISSING, status.GetErrorCode()) << status.ToString();
 }
 
 TEST_F(ABackupRestore, RestoresABackupOverSeveralLines) {
@@ -130,13 +140,15 @@ network.version=42
 network.data=01234
 network.data=56789
 network.data=abcd
+network.dipswitch=abc
 XXX=123
    )";
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("0123456789abcd", data);
-  ASSERT_EQ(StatusCode::OK, status.Get());
+  EXPECT_EQ("0123456789abcd", network_data);
+  EXPECT_EQ("abc", dipswitch_data);
+  ASSERT_EQ(ErrorCode::OK, status.GetErrorCode());
 }
 
 TEST_F(ABackupRestore, RestoresABackupOverSeveralLinesAndIgnoreUninterstingKeys) {
@@ -150,14 +162,16 @@ network.data=56789
 #packet: network=xxx
 network.data=abcd
 XXX=123
+network.dipswitch=999
    )";
 
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("56789abcd", data);
+  EXPECT_EQ("56789abcd", network_data);
+  EXPECT_EQ("999", dipswitch_data);
   EXPECT_EQ(42, restored_version);
-  ASSERT_EQ(StatusCode::OK, status.Get());
+  ASSERT_EQ(ErrorCode::OK, status.GetErrorCode());
 }
 
 TEST_F(ABackupRestore, FailedToRestoresABackupReadReturnsAError) {
@@ -168,12 +182,12 @@ XXX=123
 XXX=123
    )";
 
-  mock_file_editor_.return_status = Status(StatusCode::FILE_READ_ERROR);
+  mock_file_editor_.return_status = Error(ErrorCode::FILE_READ);
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("", data);
-  EXPECT_EQ(StatusCode::FILE_READ_ERROR, status.Get());
+  EXPECT_EQ("", network_data);
+  EXPECT_EQ(ErrorCode::FILE_READ, status.GetErrorCode());
 }
 
 TEST_F(ABackupRestore, FailedToRestoresABackupNoKeyFound) {
@@ -185,10 +199,10 @@ XXX=123
    )";
 
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("", data);
-  EXPECT_EQ(StatusCode::BACKUP_FILE_ERROR, status.Get());
+  EXPECT_EQ("", network_data);
+  EXPECT_EQ(ErrorCode::BACKUP_CONTENT_MISSING, status.GetErrorCode()) << status.ToString();
 }
 
 TEST_F(ABackupRestore, FailedToRestoresABackupNetconfdBackupVersionInvalid) {
@@ -196,17 +210,18 @@ TEST_F(ABackupRestore, FailedToRestoresABackupNetconfdBackupVersionInvalid) {
   mock_file_editor_.content_ = R"(
 network.version=42;01234
 network.data=56789
+network.dipswitch=xxx
 XXX=123
    )";
 
 
-  Status status = backup_restore_->Restore(path, data, restored_version);
+  Error status = backup_restore_->Restore(path, network_data, dipswitch_data, restored_version);
 
-  EXPECT_EQ("", data);
+  EXPECT_EQ("", network_data);
   EXPECT_EQ(0, restored_version);
-  EXPECT_EQ(StatusCode::BACKUP_FILE_ERROR, status.Get());
+  EXPECT_EQ(ErrorCode::BACKUP_VERSION, status.GetErrorCode()) << status.ToString();
 }
 
 
 
-} /* namespace netconfd */
+} /* namespace netconf */

@@ -1,6 +1,6 @@
 Dominik Brodowski
 Karlstr. 11a
-72072 Tübingen
+72072 TÃ¼bingen
 Germany
 <linux@brodo.de>
 

@@ -16,5 +16,9 @@
 #-----------------------------------------------------------------------------#
 
 . /etc/profile > /dev/null 2>&1
-/usr/bin/ts_calibrate
 
+ORDER="$(/etc/config-tools/get_typelabel_value ORDER)"
+#do not calibrate EDGE controller
+if [ "${ORDER:0:3}" == "762" ]; then
+/usr/bin/ts_calibrate
+fi

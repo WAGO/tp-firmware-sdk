@@ -9,7 +9,7 @@
 ///
 ///  \file     get_screensaver.c
 ///
-///  \version  $Id: get_screensaver.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+///  \version  $Id: get_screensaver.c 49277 2020-05-26 12:14:44Z wrueckl_elrest $
 ///
 ///  \brief    get screensaver settings / config-tools
 ///
@@ -59,6 +59,7 @@ tConfList * g_pList = NULL;
 void ShowHelpText();
 void AppendErrorText(int iStatusCode, char * pText);
 int GetScreensaverActivity();
+int ReadJSONPngList(char * pszOut, int bufsize);
 
 /// \brief main function
 /// \param[in]  argc number of arguments
@@ -144,7 +145,14 @@ int main (int argc, char **argv)
         {
           status = ERROR;
         }
-        ConfRemoveJsonSeparatorFromEnd(&szJson[0]);        
+        
+        strcat(szJson, "\"png_list\": [");
+        psz = szJson + strlen(szJson);
+        
+        ReadJSONPngList(psz, sizeof(szJson) - strlen(psz) - 3);
+        
+        strcat(szJson, "]");
+        //ConfRemoveJsonSeparatorFromEnd(&szJson[0]);
         strcat(szJson, "}");
         printf(szJson);
         
@@ -227,12 +235,67 @@ int main (int argc, char **argv)
             {
               status = ERROR;
             }
-                        
-                        
           }
-          
+          else if (stricmp(pStr, "png_src_dir") == 0) 
+          {
+            if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
+            {
+              //printf("%s=%s\n", pStr, szOut);
+              printf("%s", szOut);
+              status = SUCCESS;
+            }
+          }
+          else if (stricmp(pStr, "png_dest_dir") == 0) 
+          {
+            if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
+            {
+              //printf("%s=%s\n", pStr, szOut);
+              printf("%s", szOut);
+              status = SUCCESS;
+            }
+          }
+          else if (stricmp(pStr, "png_list") == 0) 
+          {
+            //print a comma separated list of user defined truetype fonts
+            char szSrcDir[512] = "";
+            char szCmd[512] = "";
+            if (ConfGetValue(g_pList, "png_dest_dir", &szSrcDir[0], sizeof(szSrcDir)) == SUCCESS)
+            {
+              FILE * pf = NULL;
+              char buffer[4096];
+              char * pLine = NULL;
+              int len = strlen(szSrcDir);
+              if (len > 0)
+              {
+                if (szSrcDir[len-1] != '/')
+                    strcat(szSrcDir, "/");
+
+                sprintf(szCmd, "/bin/ls -1 %s | awk '/.[pP][nN][gG]/ {printf $0 \",\"}'", szSrcDir );
+                pf = popen(szCmd, "r");
+                if (pf)
+                {
+                  pLine = fgets(buffer, sizeof(buffer), pf);
+                  if (pLine)
+                  {
+                    len = strlen(pLine);
+                    if (len > 0)
+                    {
+                      if (pLine[len-1] == ',')
+                      {
+                        pLine[len-1] = '\0';
+                      }
+                    }
+                    printf("%s", pLine);                    
+                  }
+                  status = SUCCESS;
+                  pclose(pf);
+                }  
+              }
+            }
+          } 
+
         } 
-      }          
+      }
     }
   }
 
@@ -303,3 +366,47 @@ int GetScreensaverActivity()
   return status;
 }
 
+int ReadJSONPngList(char * pszOut, int bufsize)
+{
+  int status = ERROR;
+  FILE * pf = NULL;
+  char buffer[4096];
+  char * pLine = NULL;
+  char szCmd[512] = "";
+  char szSrcDir[512] = "";
+  if (ConfGetValue(g_pList, "png_dest_dir", &szSrcDir[0], sizeof(szSrcDir)) == SUCCESS)
+  {
+    int len = strlen(szSrcDir);  
+    if (len > 0)
+    {                            
+      //ls /usr/share/fonts/X11/truetype/other | awk '/.[tT][tT][fF]/ {printf $NF ","}'
+      
+      sprintf(szCmd, "/bin/ls -1 %s | awk '/.[pP][nN][gG]/ {printf \"\\\"\" $0 \"\\\"\" \",\"}'", szSrcDir );
+
+      //printf("cmd: %s \n", szCmd);
+      pf = popen(szCmd, "r");
+      if (pf)
+      {                                 
+        pLine = fgets(buffer, sizeof(buffer), pf);
+        
+        if (pLine)
+        {
+          len = strlen(pLine);
+          if (len > 0)
+          {
+            if (pLine[len-1] == ',')
+            {
+              pLine[len-1] = '\0';
+            }
+          }
+          strncpy(pszOut, pLine, bufsize);
+          //printf("%s", pLine);
+          status = SUCCESS;
+        }              
+        pclose(pf);
+      }  
+    }
+  }
+  
+  return status;
+}

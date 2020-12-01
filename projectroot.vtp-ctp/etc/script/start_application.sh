@@ -15,13 +15,33 @@
 #
 #-----------------------------------------------------------------------------#
 
-
 . /etc/profile > /dev/null 2>&1
+
 HOME=/root
 eeprom_device="/sys/bus/i2c/devices/1-0054/eeprom"
+ORDER="$(/etc/config-tools/get_typelabel_value ORDER)"
+
+#SET FEATURES
+if [ "${ORDER:0:3}" == "762" ]; then
+  #TP600
+  echo "hardware-available=true" >"/etc/specific/features/display"
+  echo "hardware-available=true" >"/etc/specific/features/touch"
+  echo "hardware-available=false" >"/etc/specific/features/hdmi"
+elif [ "${ORDER:0:5}" == "752-8" ]; then
+  #EC752-8303
+  echo "hardware-available=false" >"/etc/specific/features/display"
+  echo "hardware-available=false" >"/etc/specific/features/touch"
+  echo "hardware-available=true" >"/etc/specific/features/hdmi"
+fi
 
 if [ ! -d "/tmp/font_uploads" ]; then
   mkdir /tmp/font_uploads
+  chown www:www /tmp/font_uploads
+fi
+
+if [ ! -d "/tmp/png_uploads" ]; then
+  mkdir /tmp/png_uploads
+  chown www:www /tmp/png_uploads
 fi
 
 if [ ! -d "/dev/shm" ]; then
@@ -54,24 +74,46 @@ function StartVirtualKeyboard
   fi
 }
 
-function StartCtp
+function StartAudioserver
+{
+  #START AUDIOSERVER
+  PIDAUDIOSERVER=`pidof audioserver`
+  if [ -z $PIDAUDIOSERVER ]; then
+    echo "START AUDIOSERVER"
+    /usr/bin/audioserver 2>&1 > /dev/null
+  fi
+}
+
+function StartTP
 {
   local RUNNING_VERSION="$(/etc/config-tools/get_runtime_config running-version)"
-  echo "STARTCTP, RUNNING_VERSION: $RUNNING_VERSION"
-  if [ "$RUNNING_VERSION" == "0" ]; then
-    /etc/script/start_webbrowser.sh  
+  echo "STARTTP, RUNNING_VERSION: $RUNNING_VERSION"
+  if [ -e "/var/run/framebuffer.mode" ]; then
+    #start WBM coming from framebuffer mode and microbrowser is closed
+    if [ "$RUNNING_VERSION" == "3" ]; then
+      mv -f "/var/run/framebuffer.mode" "/var/run/framebuffer.done"
+      /etc/init.d/runtime start
+      sleep 1
+    else
+      /etc/script/start_wbm.sh 2>&1 > /dev/null &
+    fi
+  elif [ "$RUNNING_VERSION" == "0" ]; then
+    /etc/script/start_webbrowser.sh 2>&1 > /dev/null &
   fi
 }
 
 function InitTouchbeeper
 {
+if [ "${ORDER:0:3}" == "762" ]; then
   #initialize touchbeeper 
   /etc/config-tools/config_touchbeeper init
   #echo "initialize touchbeeper: $?"
+fi
 }
 
 function InitMotionsensor
 {
+if [ "${ORDER:0:3}" == "762" ]; then
   mount -t configfs none /sys/kernel/config
   modprobe si1145
   daemonize "/usr/bin/si1142"
@@ -88,6 +130,7 @@ function InitMotionsensor
     /etc/config-tools/config_motionsensor init
     #echo "initialize motionsensor: $?"
   fi
+fi
 }
 
 function InitTestability
@@ -105,16 +148,19 @@ function InitTestability
 
 function StartBrightnessControl
 {
+if [ "${ORDER:0:3}" == "762" ]; then
   #start brightness control at the end of this script
   PIDBRIGHT=`pidof brightness_control`
   if [ -z $PIDBRIGHT ]; then
     #echo "start brightness control"
     brightness_control &
   fi
+fi
 }
 
 function StartGestureControl
 {
+if [ "${ORDER:0:3}" == "762" ]; then
   #START MENUQT and GESTURECONTROL
   GESTURE_STATE=`getconfvalue /etc/specific/gesture.conf state -l`
   GESTURE_MENU=`getconfvalue /etc/specific/gesture.conf menu -l`
@@ -122,7 +168,7 @@ function StartGestureControl
   if [ "$GESTURE_MENU" == "yes" ]; then
     PIDMENUQT=`pidof menuqtslide`
     if [ -z $PIDMENUQT ]; then
-    #echo "start menuqt"
+      #echo "start menuqt"    
       /usr/bin/menuqtslide -nodetection &
       #sleep 1
     fi
@@ -145,9 +191,11 @@ function StartGestureControl
         elif [ "$xres" == "5" ] ; then
           devconf="1003"
         elif [ "$xres" == "6" ] ; then
-          devconf="1004"
+          devconf="1008"
         elif [ "$xres" == "7" ] ; then
-          devconf="1005"
+          devconf="1009"
+        elif [ "$xres" == "8" ] ; then
+          devconf="1010"
         else
           echo "screen resolution touch not recognized set default 800x480"
           xres="800"
@@ -163,65 +211,35 @@ function StartGestureControl
       elif [ "$devconf" = "1001" ]; then
         cap="0"
       elif [ "$devconf" = "1002" ]; then
-        #if systeminfo is provided by cmdline use it, otherwise read eeprom 
-        (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+        (cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
         if [ $? -eq 0 ]; then
-          cap=$(cat /proc/cmdline)
-          cap=$(echo ${cap#*systeminfo=0x00})
-          cap=$(echo ${cap:0:1})
+          cap="1"
         else
-          (cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
-          if [ $? -eq 0 ]; then
-            cap="1"
-          else
-            cap="0"
-          fi
+          cap="0"
         fi
       elif [ "$devconf" = "1003" ]; then
-        #if systeminfo is provided by cmdline use it, otherwise read eeprom 
-        (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+        (cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
         if [ $? -eq 0 ]; then
-          cap=$(cat /proc/cmdline)
-          cap=$(echo ${cap#*systeminfo=0x00})
-          cap=$(echo ${cap:0:1})
+          cap="1"
         else
-          (cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
-          if [ $? -eq 0 ]; then
-            cap="1"
-          else
-            cap="0"
-          fi
+          cap="0"
         fi
-      elif [ "$devconf" = "1004" ]; then
-        #if systeminfo is provided by cmdline use it, otherwise read eeprom 
-        (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+      elif [ "$devconf" = "1008" ]; then
+        (cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
         if [ $? -eq 0 ]; then
-          cap=$(cat /proc/cmdline)
-          cap=$(echo ${cap#*systeminfo=0x00})
-          cap=$(echo ${cap:0:1})
+          cap="1"
         else
-          (cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
-          if [ $? -eq 0 ]; then
-            cap="1"
-          else
-            cap="0"
-          fi
+          cap="0"
         fi
-      elif [ "$devconf" = "1005" ]; then
-        #if systeminfo is provided by cmdline use it, otherwise read eeprom 
-        (cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+      elif [ "$devconf" = "1009" ]; then
+        (cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
         if [ $? -eq 0 ]; then
-          cap=$(cat /proc/cmdline)
-          cap=$(echo ${cap#*systeminfo=0x00})
-          cap=$(echo ${cap:0:1})
+          cap="1"
         else
-          (cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
-          if [ $? -eq 0 ]; then
-            cap="1"
-          else
-            cap="0"
-          fi
+          cap="0"
         fi
+      elif [ "$devconf" = "1010" ]; then
+        cap="0"
       else
         echo "no valid display resolution in eeprom found, use default resolution 800x480"
         cap="0"
@@ -239,18 +257,20 @@ function StartGestureControl
     fi
   fi
   fi
+fi
 }
 
 #Startsequence
 StartVirtualKeyboard
+StartAudioserver
 InitTouchbeeper
 InitMotionsensor
 InitTestability
-StartCtp
+StartTP
 StartBrightnessControl
 StartGestureControl
-#Xorg and pekwm are running so /etc/init.d/runtime is able to start codesys3
-touch /tmp/.start_application.done
+#Xorg and fluxbox are running so /etc/init.d/runtime is able to start codesys3
+touch /var/run/xorg.start.done
 
 #not with fluxbox if [ -e /etc/script/wndactivate.sh ]; then
 #not with fluxbox /etc/script/wndactivate.sh 2>&1 > /dev/null &

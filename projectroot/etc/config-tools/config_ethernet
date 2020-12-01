@@ -3,7 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2020 WAGO Kontakttechnik GmbH & Co. KG
 
 #-----------------------------------------------------------------------------#
 # Script-name: config_ethernet
@@ -14,37 +14,30 @@
 #-----------------------------------------------------------------------------#
 
 # load general definitions and functions
-if [ ! -f "/etc/config-tools/config_tool_defines" ]; then
-  echo "config_tool_defines missing"
-  exit 255
+if [[ ! -f "/etc/config-tools/config_tool_lib" ]]; then
+  echo "config_tool_lib missing"
+  exit 64
 fi
 
-. /etc/config-tools/config_tool_defines
+. /etc/config-tools/config_tool_lib
 
 status=$SUCCESS
 
-set_interface_config () {
-  local json_config="$1"
-  out=$(dbus-send --system --print-reply --reply-timeout=15000 --type=method_call --dest=de.wago.netconfd /de/wago/netconfd/interface_config de.wago.netconfd1.interface_config.setinterfaceconfig string:"${json_config}")
-  for token in $out; do 
-      dbus_out=$token
-  done  
-  dbus_out=${dbus_out#\"}
-  dbus_out=${dbus_out%\"}  
-  echo "$dbus_out"
-}
+if [[ $# -lt 1 ]]; then
+    exit 1
+fi
 
 # show help-text if requested
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+if [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
   echo
   echo "* Change the ethernet port settings *"
   echo
   echo "Usage: $0 < [interface=interface-value] port=port-value [state=state-value ] [ autoneg=autoneg-value ] [ speed=speed-value ] [duplex=duplex-value ]"
-  echo "With autoneg=on, no speed or duplex values have to be provided."
+  echo "With autoneg=enabled, no speed or duplex values have to be provided."
   echo
 # pfc200-specific settings
   echo "interface-value: eth0 [ignored]"
-  echo "port-value: $(/etc/config-tools/get_eth_config --print-ports)"
+  echo "port-value: $(GetPorts)"
   echo "state-value: enabled/disabled"
   echo "autoneg-value: enabled/disabled"
   echo "speed-value: 10M/100M"
@@ -55,6 +48,18 @@ fi
 
 declare -A params
 
+function is_supported_port {
+    value=$1
+
+    for port in $(GetPorts); do
+        if [[ "$value" == "$port" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 while [[ $# -ne 0 ]]; do
     case "$1" in
         interface=*)
@@ -62,38 +67,36 @@ while [[ $# -ne 0 ]]; do
         port=*)
             port=${1#port=}
             params[device]="\"$port\""
+            if ! is_supported_port $port; then
+                status=${CONFIG_DATA_ERROR}
+            fi
             ;;
         state=*)
-
-            if [[ "${1#state=}" == "on" || "${1#state=}" == "enabled" ]]; then
-                state="up"
-            elif [[ "${1#state=}" == "off" || "${1#state=}" == "disabled" ]]; then
-                state="down"
-            else
-                state="${1#state=}"
+            value=${1#state=}
+            if [[ "$value" == "on" || "$value" == "enabled" ]]; then
+                value="up"
+            elif [[ "$value" == "off" || "$value" == "disabled" ]]; then
+                value="down"
             fi
-            params[state]="\"$state\""
+            params[state]="\"$value\""
             ;;
         autoneg=*)
-
-            if [[ "${1#autoneg=}" == "on" || "${1#autoneg=}" == "enabled" ]]; then
-                autoneg=true
-            elif [[ "${1#autoneg=}" == "off" || "${1#autoneg=}" == "disabled" ]]; then
-                autoneg=false
-            else
-                autoneg=${1#autoneg=}
+            value=${1#autoneg=}
+            if [[ "$value" == "on" || "$value" == "enabled" ]]; then
+                value="on"
+            elif [[ "$value" == "off" || "$value" == "disabled" ]]; then
+                value="off"
             fi
-            params[autonegotiation]="$autoneg"
+            params[autonegotiation]="\"$value\""
             ;;
         speed=*)
-            if [[ "${1#speed=}" == "10M" ]]; then
-                speed=10
-            elif [[ "${1#speed=}" == "100M" ]]; then
-                speed=100
-            else
-                speed="${1#speed=}"
+            value=${1#speed=}
+            if [[ "$value" == "10M" ]]; then
+                value=10
+            elif [[ "$value" == "100M" ]]; then
+                value=100
             fi
-            params[speed]=$speed
+            params[speed]=$value
             ;;
         duplex=*)
             params[duplex]="\"${1#duplex=}\""
@@ -112,13 +115,13 @@ if [[ $status == $SUCCESS ]]; then
     json_content=""
     for i in "${!params[@]}" ; do
         if [[ $add_separator == false ]]; then
-                json_content="\"$i\":${params[$i]}"
-                add_separator=true
+            json_content="\"$i\":${params[$i]}"
+            add_separator=true
         else
-                json_content="$json_content,\"$i\":${params[$i]}"
+            json_content="$json_content,\"$i\":${params[$i]}"
         fi
-    done    
-    set_interface_config "{${json_content}}"
+    done
+    $NETWORK_CONFIG --interface-config --set "{${json_content}}" --format=json --quiet
     status=$?
 fi
 

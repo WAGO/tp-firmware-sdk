@@ -16,8 +16,8 @@ PACKAGES-$(PTXCONF_LINUX_PAM) += linux-pam
 #
 # Paths and names
 #
-LINUX_PAM_VERSION       := 1.3.1
-LINUX_PAM_MD5           := 558ff53b0fc0563ca97f79e911822165
+LINUX_PAM_VERSION       := 1.4.0
+LINUX_PAM_MD5           := 39fca0523bccec6af4b63b5322276c84
 LINUX_PAM               := Linux-PAM-$(LINUX_PAM_VERSION)
 LINUX_PAM_SUFFIX        := tar.xz
 LINUX_PAM_URL           := https://github.com/linux-pam/linux-pam/releases/download/v$(LINUX_PAM_VERSION)/$(LINUX_PAM).$(LINUX_PAM_SUFFIX)
@@ -44,6 +44,13 @@ LINUX_PAM_LICENSE       := GPLv2
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+#
+# autoconf
+#
+LINUX_PAM_AUTOCONF := \
+        $(CROSS_AUTOCONF_USR) \
+	--$(call ptx/endis, PTXCONF_LINUX_PAM_PAM_CRACKLIB)-cracklib
 
 #$(STATEDIR)/linux-pam.prepare:
 #	@$(call targetinfo)
@@ -121,7 +128,13 @@ $(STATEDIR)/linux-pam.targetinstall:
 	#
 	# Linux-PAM configuration files for services
 	#
+
+	# NOTE: Do not install blindly all configuration files from '/etc/pam.d/',
+	#       instead install them by the package using actually the configuration!
+	#       Here we only install the basic configuration files "manually"
+	#       ony-by-one.
 #	#@$(call install_alternative_tree, linux-pam, 0, 0, /etc/pam.d)
+
 	@$(call install_copy, linux-pam, 0, 0, 755, /etc/pam.d)
 	@$(call install_alternative, linux-pam, 0, 0, 644, /etc/pam.d/common-auth)
 	@$(call install_alternative, linux-pam, 0, 0, 644, /etc/pam.d/common-account)
@@ -134,8 +147,6 @@ $(STATEDIR)/linux-pam.targetinstall:
 	# configuration dir for Linux-PAM modules
 	#
 	@$(call install_copy, linux-pam, 0, 0, 0755, /etc/security)
-
-# TODO: Check file permissions
 
 	#
 	# install modules and file(s) (i.e. scripts and helper binaries):
@@ -194,8 +205,8 @@ endif
 
 ifdef PTXCONF_LINUX_PAM_PAM_UNIX
 	@$(call install_copy, linux-pam, 0, 0, 0755, -, /usr/lib/security/pam_unix.so)
-	@$(call install_copy, linux-pam, 0, 0, 2755, -, /sbin/unix_chkpwd)
-	@$(call install_copy, linux-pam, 0, 0, 0755, -, /sbin/unix_update)
+	@$(call install_copy, linux-pam, 0, 42, 0750, -, /sbin/unix_chkpwd)
+	@$(call install_copy, linux-pam, 0, 42, 4750, -, /sbin/unix_update)
 endif
 
 	#

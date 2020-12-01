@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CODESYS3) += codesys3
 
-CODESYS3_VERSION    := 3.5.14.3.3
+CODESYS3_VERSION    := 3.5.15.4.0
 CODESYS3            := codesys-3
 CODESYS3_DIR        := $(BUILDDIR)/$(CODESYS3)
 CODESYS3_URL        := file://$(PTXDIST_WORKSPACE)/wago_intern/plc/codesys/$(CODESYS3)/
@@ -343,10 +343,12 @@ ifdef PTXCONF_CDS3_PRODUCT_PAC_2101
 	@$(call install_alternative, codesys3, 0, 0, 0444, /usr/share/codesys3/3S.0x2101.dat, n)
 endif
 
+	@$(call install_alternative, codesys3, 0, 0, 0444, /usr/share/codesys3/3S.default.dat, n)
+
     # Codesys home
 ifdef PTXCONF_CDS3_HOME
-# Set setgid bit so that every file created in /home_codesys_root will have group 'admin'. 
-	@$(call install_copy. codesys3, 0, 0, 0755, /home) 
+# Set setgid bit so that every file created in /home/codesys_root will have group 'admin'. 
+	@$(call install_copy, codesys3, 0, 0, 0755, /home)
 	@$(call install_copy, codesys3, 0, $(PTXCONF_ROOTFS_PASSWD_ADMIN_GID), 2775, /home/codesys_root)
 	@$(call install_link, codesys3, /home/codesys_root, /home/codesys)
 	@$(call install_replace, codesys3, $(PTXCONF_CDS3_PLCCONFIGDIR)/$(PTXCONF_CDS3_PLCCONFIGFILE), @CDS3_HOME@, $(PTXCONF_CDS3_HOME_PATH));
@@ -367,16 +369,20 @@ endif
 
 	@cd $(CODESYS3_DIR)/cmp/ && \
 	for file in `find -name "*.so*"`; do \
-	  if [[ -h $$file ]]; then \
-	    if [[ "$$(basename $$file)" != "libCmpBlkDrvCom.so" ]]; then \
-	      $(call install_link, codesys3, ./$$(readlink $$file), /usr/lib/$$file); \
-	     fi \
-	  elif [[ -f $$file ]]; then \
-	    $(call install_copy, codesys3, 0, 0, 0755, $(CODESYS3_DIR)/cmp/$$file, /usr/lib/$$file); \
-	  fi; \
-	  if [[ $$file == *.so ]]; then \
-	    if [[ "$$(basename $$file)" != "libCmpBlkDrvCom.so" ]]; then \
-	      $(call install_link, codesys3, ../$$file, /usr/lib/cds3-custom-components/$$file); \
+	if [[ "$$(basename $$file)" == *"libCmpOPCUA"* ]] && [[ $(call ptx/endis, PTXCONF_OPCUASERVER) == "enable" ]]; then \
+	    echo "INFO wago opcua server is enabled: did not install: "$$(basename $$file); \
+	  else \
+	    if [[ -h $$file ]]; then \
+	      if [[ "$$(basename $$file)" != "libCmpBlkDrvCom.so" ]]; then \
+	        $(call install_link, codesys3, ./$$(readlink $$file), /usr/lib/$$file); \
+	       fi \
+	    elif [[ -f $$file ]]; then \
+	      $(call install_copy, codesys3, 0, 0, 0755, $(CODESYS3_DIR)/cmp/$$file, /usr/lib/$$file); \
+	    fi; \
+	    if [[ $$file == *.so ]]; then \
+	      if [[ "$$(basename $$file)" != "libCmpBlkDrvCom.so" ]]; then \
+	        $(call install_link, codesys3, ../$$file, /usr/lib/cds3-custom-components/$$file); \
+	      fi; \
 	    fi; \
 	  fi; \
 	done
@@ -399,7 +405,15 @@ ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
 	# Backup binaries in configs/@platform@/packages/
 	cp $(PKGDIR)/$(CODESYS3_PACKAGE_NAME).ipk $(CODESYS3_PLATFORMCONFIGPACKAGEDIR)/
 endif
+
+ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
+ifdef PTXCONF_CDS3_RTS_FEATURE_OPCUA
+	$(PTXDIST_WORKSPACE)/scripts/opcuaserver-helpers/make-metaipk-3s.sh
+endif
+endif
 	@$(call touch)
+	
+
 
 # ----------------------------------------------------------------------------
 # Clean

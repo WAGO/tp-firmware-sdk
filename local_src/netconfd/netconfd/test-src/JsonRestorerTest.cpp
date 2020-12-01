@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -8,7 +9,7 @@
 #include "JsonRestorer.hpp"
 #include "Types.hpp"
 
-using namespace netconfd;
+using namespace netconf;
 
 TEST(JsonRestorer, restoreInterfaceConfig) {
   auto bfc =

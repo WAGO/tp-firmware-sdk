@@ -1,20 +1,12 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-//------------------------------------------------------------------------------
-///  \file     ICommandExecutor.hpp
-///
-///  \brief    <short description of the file contents>
-///
-///  \author   <author> : WAGO Kontakttechnik GmbH & Co. KG
-//------------------------------------------------------------------------------
-#ifndef NETCONFD_EXTERN_IEXECUTECOMMAND_HPP_
-#define NETCONFD_EXTERN_IEXECUTECOMMAND_HPP_
+// SPDX-License-Identifier: LGPL-3.0-or-later
+#pragma once
 
 #include <cstdio>
 #include <string>
 
-#include "Status.hpp"
+#include "Error.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class ICommandExecutor {
 
@@ -27,13 +19,10 @@ class ICommandExecutor {
   ICommandExecutor(ICommandExecutor&&) = default;
   ICommandExecutor& operator=(ICommandExecutor&&) = default;
 
-  virtual Status Execute(const ::std::string& command) const = 0;
-  virtual Status Execute(const ::std::string& command, ::std::string & result) const = 0;
+  virtual Error Execute(const ::std::string& command) const = 0;
+  virtual Error Execute(const ::std::string& command, ::std::string & result) const = 0;
 
 };
 
-}  // namespace netconfd
-
-#endif
-//---- End of source file ------------------------------------------------------
+}  // namespace netconf
 

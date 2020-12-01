@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.h
 ///
-/// \version $Id: toolbarmenu.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: toolbarmenu.h 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///
@@ -126,6 +126,7 @@ public:
   bool IsCompleteVisible();
   void startCmdThread();  
 
+  int m_iBtnCount;
   int m_iInitialWndHeight;
   tMenuItems m_menu;
   QRect m_DesktopRect;

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.h
 ///
-/// \version $Id: mainwindow.h 43411 2019-10-08 11:14:03Z wrueckl_elrest $
+/// \version $Id: mainwindow.h 46255 2020-02-03 12:58:03Z rgliese_elrest $
 ///
 /// \brief   dialogbox tool
 ///
@@ -43,6 +43,8 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QCheckBox>
+
+#include <QStyle>
 
 namespace Ui {
 class MainWindow;

@@ -20,15 +20,19 @@
 #include "error.hpp"
 #include "process.hpp"
 #include "regex.hpp"
+#include "interface_mapping_provider.hpp"
 #include <libxml/parser.h>
-#include <iostream>
 
 
-namespace wago
-{
+namespace wago {
+namespace firewall {
+namespace ebtables {
 
+namespace impl {
 
-static void set_mode(xmldoc& doc, const std::vector<std::string>& argv)
+namespace {
+
+void set_mode(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (1 != argv.size())
         throw invalid_param_error();
@@ -45,7 +49,7 @@ static void set_mode(xmldoc& doc, const std::vector<std::string>& argv)
         update_attribute(ethernet, "mode", mode);
 }
 
-static void set_log(xmldoc& doc, const std::vector<std::string>& argv)
+void set_log(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (5 != argv.size())
         throw invalid_param_error();
@@ -76,58 +80,7 @@ static void set_log(xmldoc& doc, const std::vector<std::string>& argv)
     }
 }
 
-static void set_if(xmldoc& doc, const std::vector<std::string>& argv)
-{
-    if (2 != argv.size())
-        throw invalid_param_error();
-
-    const std::string& state(argv[0]);
-    const std::string& ifname(argv[1]);
-
-    if (!is_match_std(regex::rex_ifstate, state) ||
-        !is_match_std(regex::rex_ifname, ifname))
-        throw invalid_param_error();
-
-    xmlctx ctx(get_ctx(doc));
-    xmlnode interface(get_node(ctx,
-                               "/f:firewall/f:ethernet/f:interfaces/f:interface[@if='" + ifname + "']",
-                               false));
-
-    if (interface.is_empty())
-    {
-        xmlnode interfaces(get_node(ctx, "/f:firewall/f:ethernet/f:interfaces"));
-        interface = append_node(interfaces, "interface");
-
-        append_attribute(interface, "if", ifname);
-        append_attribute(interface, "state", state);
-    }
-    else
-    {
-        update_attribute(interface, "if", ifname);
-        update_attribute(interface, "state", state);
-    }
-}
-
-static void rem_if(xmldoc& doc, const std::vector<std::string>& argv)
-{
-    if (1 != argv.size())
-        throw invalid_param_error();
-
-    const std::string& ifname(argv[0]);
-
-    if (!is_match_std(regex::rex_ifname, ifname))
-        throw invalid_param_error();
-
-    xmlctx ctx(get_ctx(doc));
-    xmlnode interface(get_node(ctx,
-                               "/f:firewall/f:ethernet/f:interfaces/f:interface[@if='" + ifname + "']",
-                               false));
-
-    if (!interface.is_empty())
-        remove_node(std::move(interface));
-}
-
-static void toggle_eproto(xmldoc& doc, const std::vector<std::string>& argv)
+void toggle_eproto(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (1 != argv.size())
         throw invalid_param_error();
@@ -146,7 +99,7 @@ static void toggle_eproto(xmldoc& doc, const std::vector<std::string>& argv)
     }
 }
 
-static void add_eproto(xmldoc& doc, const std::vector<std::string>& argv)
+void add_eproto(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (1 != argv.size())
         throw invalid_param_error();
@@ -174,7 +127,7 @@ static void add_eproto(xmldoc& doc, const std::vector<std::string>& argv)
     }
 }
 
-static void rem_eproto(xmldoc& doc, const std::vector<std::string>& argv)
+void rem_eproto(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (1 != argv.size())
         throw invalid_param_error();
@@ -193,7 +146,7 @@ static void rem_eproto(xmldoc& doc, const std::vector<std::string>& argv)
         remove_node(std::move(protocol));
 }
 
-static void add_host(xmldoc& doc, const std::vector<std::string>& argv)
+void add_host(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (3 != argv.size())
         throw invalid_param_error();
@@ -217,7 +170,7 @@ static void add_host(xmldoc& doc, const std::vector<std::string>& argv)
         append_attribute(host, "mask", mask);
 }
 
-static void upd_host(xmldoc& doc, const std::vector<std::string>& argv)
+void upd_host(xmldoc& doc, const std::vector<std::string>& argv)
 {
     if (4 != argv.size())
         throw invalid_param_error();
@@ -244,37 +197,99 @@ static void upd_host(xmldoc& doc, const std::vector<std::string>& argv)
     }
 }
 
-static void rem_host(xmldoc& doc, const std::vector<std::string>& argv)
+void rem_host(xmldoc& doc, const std::vector<std::string>& argv)
 {
     remove(doc, argv, "/f:firewall/f:ethernet/f:whitelist/f:host");
 }
 
-void process_ebtables(xmldoc& doc, const std::string& cmd, const std::vector<std::string>& argv)
+} // anonymous namespace
+
+void set_if(xmldoc& doc, const std::vector<std::string>& argv)
 {
-    if ("--set-mode" == cmd)
-        set_mode(doc, argv);
-    else if ("--set-log" == cmd)
-        set_log(doc, argv);
-    else if ("--set-if" == cmd)
-        set_if(doc, argv);
-    else if ("--rem-if" == cmd)
-        rem_if(doc, argv);
-    else if ("--toggle-eproto" == cmd)
-        toggle_eproto(doc, argv);
-    else if ("--add-eproto" == cmd)
-        add_eproto(doc, argv);
-    else if ("--rem-eproto" == cmd)
-        rem_eproto(doc, argv);
-    else if ("--add-host" == cmd)
-        add_host(doc, argv);
-    else if ("--upd-host" == cmd)
-        upd_host(doc, argv);
-    else if ("--rem-host" == cmd)
-        rem_host(doc, argv);
+    if (2 != argv.size())
+        throw invalid_param_error();
+
+    const std::string& state(argv[0]);
+    const std::string& ifname(argv[1]);
+
+    InterfaceMappingProvider mapping;
+    ::std::string corresponding_interface = mapping.get_interface(ifname);
+
+    if (!is_match_std(regex::rex_ifstate, state) ||
+        !is_match_std(regex::rex_ifname, corresponding_interface))
+        throw invalid_param_error();
+
+    xmlctx ctx(get_ctx(doc));
+    xmlnode interface(get_node(ctx,
+                               "/f:firewall/f:ethernet/f:interfaces/f:interface[@if='" + corresponding_interface + "']",
+                               false));
+
+    if (interface.is_empty())
+    {
+        xmlnode interfaces(get_node(ctx, "/f:firewall/f:ethernet/f:interfaces"));
+        interface = append_node(interfaces, "interface");
+
+        append_attribute(interface, "if", corresponding_interface);
+        append_attribute(interface, "state", state);
+    }
     else
-        throw invalid_param_error("Unrecognized ebtables option");
+    {
+        update_attribute(interface, "if", corresponding_interface);
+        update_attribute(interface, "state", state);
+    }
 }
 
+void rem_if(xmldoc& doc, const std::vector<std::string>& argv)
+{
+    if (1 != argv.size())
+        throw invalid_param_error();
 
+    const std::string& ifname(argv[0]);
+    InterfaceMappingProvider mapping;
+    ::std::string corresponding_interface = mapping.get_interface(ifname);
+
+    if (!is_match_std(regex::rex_ifname, corresponding_interface))
+        throw invalid_param_error();
+
+    xmlctx ctx(get_ctx(doc));
+    xmlnode interface(get_node(ctx,
+                               "/f:firewall/f:ethernet/f:interfaces/f:interface[@if='" + corresponding_interface + "']",
+                               false));
+
+    if (!interface.is_empty())
+        remove_node(std::move(interface));
+}
+
+} // namespace impl
+
+void process(xmldoc& doc, const std::string& cmd, const std::vector<std::string>& argv)
+{
+    if ("--set-mode" == cmd)
+      impl::set_mode(doc, argv);
+    else if ("--set-log" == cmd)
+      impl::set_log(doc, argv);
+    else if ("--set-if" == cmd)
+      impl::set_if(doc, argv);
+    else if ("--rem-if" == cmd)
+      impl::rem_if(doc, argv);
+    else if ("--toggle-eproto" == cmd)
+      impl::toggle_eproto(doc, argv);
+    else if ("--add-eproto" == cmd)
+      impl::add_eproto(doc, argv);
+    else if ("--rem-eproto" == cmd)
+      impl::rem_eproto(doc, argv);
+    else if ("--add-host" == cmd)
+      impl::add_host(doc, argv);
+    else if ("--upd-host" == cmd)
+      impl::upd_host(doc, argv);
+    else if ("--rem-host" == cmd)
+      impl::rem_host(doc, argv);
+    else
+      throw invalid_param_error("Unrecognized ebtables option");
+}
+
+}
+
+} // namespace firewall
 } // namespace wago
 

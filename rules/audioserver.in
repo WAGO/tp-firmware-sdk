@@ -1,0 +1,7 @@
+## SECTION=elrest_specific_applications
+
+config AUDIOSERVER
+	tristate
+	prompt "audioserver"
+	help
+	  FIXME

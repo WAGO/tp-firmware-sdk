@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * FileEditorFake.hpp
  *
@@ -10,7 +11,7 @@
 #include "IFileEditor.hpp"
 #include <string>
 
-namespace netconfd {
+namespace netconf {
 
 class FileEditorFake : public IFileEditor {
  public:
@@ -18,27 +19,27 @@ class FileEditorFake : public IFileEditor {
   FileEditorFake() = default;
   ~FileEditorFake() = default;
 
-  Status Read(const ::std::string& file_path, ::std::string& data) const override {
+  Error Read(const ::std::string& file_path, ::std::string& data) const override {
     (void) file_path;
     data = content_;
     return return_status;
   }
 
-  Status Write(const ::std::string& file_path, const ::std::string& data) const override {
+  Error Write(const ::std::string& file_path, const ::std::string& data) const override {
     (void) file_path;
     content_ = data;
     return return_status;
   }
 
-  Status Append(const ::std::string& file_path, const ::std::string& data) const override {
+  Error Append(const ::std::string& file_path, const ::std::string& data) const override {
     (void) file_path;
     content_ += data;
     return return_status;
   }
 
-  Status return_status;
+  Error return_status;
 
   mutable ::std::string content_;
 };
 
-}  // namespace netconfd
+}  // namespace netconf

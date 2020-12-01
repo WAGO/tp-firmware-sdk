@@ -5,7 +5,7 @@
 #include "Types.hpp"
 #include "NetworkInterfaceConstants.hpp"
 
-namespace netconfd
+namespace netconf
 {
 
   class INetworkDevice
@@ -20,10 +20,10 @@ namespace netconfd
       INetworkDevice& operator=(INetworkDevice&&) = default;
 
       virtual int GetIfIndex() const = 0;
-      virtual Status SetState(DeviceState state) = 0;
+      virtual Error SetState(DeviceState state) = 0;
       virtual DeviceState GetState() const = 0;
 
 
   };
 
-} /* namespace netconfd */
+} /* namespace netconf */

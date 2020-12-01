@@ -14,7 +14,6 @@
 /// \author Mariusz Podlesny : WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
 
-
 #include "process_services.hpp"
 
 #include "error.hpp"
@@ -27,9 +26,10 @@
 #include <iostream>
 
 
-namespace wago
-{
+namespace wago {
+namespace firewall {
 
+namespace {
 
 class status
 {
@@ -67,7 +67,7 @@ bool status::operator<(const status& rhs) const
 }
 
 
-static std::vector<std::string> filter_files(const std::vector<struct dirent>& des)
+std::vector<std::string> filter_files(const std::vector<struct dirent>& des)
 {
     regex::regex rex("^.*\\.xml$");
     std::vector<std::string> fnames;
@@ -83,7 +83,7 @@ static std::vector<std::string> filter_files(const std::vector<struct dirent>& d
     return fnames;
 }
 
-static std::vector<struct dirent> scan_dir(const std::string& dir)
+std::vector<struct dirent> scan_dir(const std::string& dir)
 {
     assert(0 < dir.length());
 
@@ -103,12 +103,12 @@ static std::vector<struct dirent> scan_dir(const std::string& dir)
     return des;
 }
 
-static std::vector<std::string> list_configs(const std::string& dir)
+std::vector<std::string> list_configs(const std::string& dir)
 {
     return filter_files(scan_dir(dir));
 }
 
-static void scan_service(const std::string& fname, std::vector<status>& sts)
+void scan_service(const std::string& fname, std::vector<status>& sts)
 {
     xmldoc doc(read_file(fname));
     xmlctx ctx(get_ctx(doc));
@@ -122,7 +122,7 @@ static void scan_service(const std::string& fname, std::vector<status>& sts)
 
     for (int i = 0; i < ncount; ++i)
     {
-        const std::string xpbase("string(/f:firewall/f:ipv4/f:service/f:interfaces/f:interface[" + 
+        const std::string xpbase("string(/f:firewall/f:ipv4/f:service/f:interfaces/f:interface[" +
                                  std::to_string(1 + i) + "]/@");
 
         const std::string state(get_string(ctx, xpbase + "state)"));
@@ -132,7 +132,7 @@ static void scan_service(const std::string& fname, std::vector<status>& sts)
     }
 }
 
-static void print_xml(const std::vector<status>& sts)
+void print_xml(const std::vector<status>& sts)
 {
     std::cout << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << "\n";
     std::cout << "<firewall>" << "\n";
@@ -161,7 +161,7 @@ static void print_xml(const std::vector<status>& sts)
     std::cout << "</firewall>" << "\n";
 }
 
-static void print_json(const std::vector<status>& sts)
+void print_json(const std::vector<status>& sts)
 {
     // The function is quite simple for now, but in case more types of info
     // should be added to the generated json, please, use a real json library!
@@ -208,7 +208,45 @@ static void print_json(const std::vector<status>& sts)
     std::cout << "}" << "\n";
 }
 
-static void get_ifs_status(std::string dir,
+void get_ifs_status(std::string dir,
+                           const std::vector<std::string>& argv)
+{
+    if (dir.length() < 1 || 1 != argv.size())
+        throw invalid_param_error();
+
+    if ('/' != dir.at(dir.length() - 1))
+        dir += '/';
+
+    const std::string& format(argv[0]);
+
+    if ("xml" != format && "json" != format)
+        throw invalid_param_error("Unsupported format requested.");
+
+    const std::vector<std::string> fnames(list_configs(dir));
+
+    std::vector<status> sts; // Status of all services on all interfaces.
+
+    for (const std::string& fname : fnames)
+        scan_service(dir + fname, sts);
+
+    // Replace br0 and br1 entries by X1 and X2, respectively.
+    for (auto& serviceState : sts) {
+      if (serviceState.interface == "br0") {
+        serviceState.interface = "X1";
+      }else if (serviceState.interface == "br1") {
+        serviceState.interface = "X2";
+      }
+    }
+
+    std::sort(sts.begin(), sts.end());
+
+    if ("xml" == format)
+        print_xml(sts);
+    else
+        print_json(sts);
+}
+
+void get_ifs_status_ng(std::string dir,
                            const std::vector<std::string>& argv)
 {
     if (dir.length() < 1 || 1 != argv.size())
@@ -237,16 +275,23 @@ static void get_ifs_status(std::string dir,
         print_json(sts);
 }
 
+} // anonymous namespace
+
 void process_services(const std::string& cmd,
                       const std::string& dir,
                       const std::vector<std::string>& argv)
 {
-    if ("--get-ifs-status" == cmd)
+    if ("--get-ifs-status" == cmd) {
         get_ifs_status(dir, argv);
-    else
+    }
+    else if ("--get-ifs-status-ng" == cmd) {
+        get_ifs_status_ng(dir, argv);
+    }
+    else {
         throw invalid_param_error("Unrecognized command.");
+    }
 }
 
-
+} // namespace firewall
 } // namespace wago
 

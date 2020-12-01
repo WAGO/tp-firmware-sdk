@@ -1,13 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-//------------------------------------------------------------------------------
-///  \file     EthernetInterface.cpp
-///
-///  \author   u014487 : WAGO Kontakttechnik GmbH & Co. KG
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// include files
-//------------------------------------------------------------------------------
+// SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "EthernetInterface.hpp"
 
@@ -23,13 +14,11 @@
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <cstring>
-//------------------------------------------------------------------------------
-// function implementation
-//------------------------------------------------------------------------------
+
 
 extern "C" char *if_indextoname(unsigned int __ifindex, char *__ifname);
 
-namespace netconfd {
+namespace netconf {
 
 using eth::DeviceState;
 using eth::Duplex;
@@ -188,8 +177,8 @@ EthernetMauType EthernetInterface::GetMauType() const {
   return mautype;
 }
 
-const MacAddress EthernetInterface::GetMac() const {
-  return MacAddress(mac_);
+MacAddress EthernetInterface::GetMac() const {
+  return MacAddress(::gsl::make_span(mac_));
 }
 
 bool EthernetInterface::GetAutonegSupport() const {
@@ -212,6 +201,7 @@ MediaType EthernetInterface::GetMediaType() const {
   return data_get_.media_type_;
 }
 
+[[gnu::pure]]
 ::std::uint32_t EthernetInterface::GetMTU() const {
   return mtu_;
 }
@@ -285,6 +275,7 @@ constexpr auto GetAutonegAdvertisedCapability(::std::uint32_t advertised) {
   return advertised_capability;
 }
 
+[[gnu::pure]]
 ::std::uint32_t EthernetInterface::GetAutonegCapabilitiesXdot3() const {
   return GetAutonegAdvertisedCapability(data_get_.autoneg_advertising_);
 }
@@ -303,9 +294,6 @@ int16_t EthernetInterface::GetIfFlags() const {
   return ifreq_.ifr_flags;  // NOLINT: must access union members in legacy data structures.
 }
 
-::std::string const & EthernetInterface::GetName() const {
-  return name_;
-}
 
 DeviceState EthernetInterface::GetState() const {
   guard with(data_mutex_);
@@ -445,6 +433,7 @@ void EthernetInterface::SetState(DeviceState state) {
   data_set_.if_state_ = state;
 }
 
+[[gnu::pure]]
 ::std::uint32_t EthernetInterface::GetInterfaceIndex() const {
   return if_index_;
 }
@@ -456,5 +445,3 @@ void EthernetInterface::SetState(DeviceState state) {
 }
 
 }  // namespace pfcspecific
-
-//---- End of source file ------------------------------------------------------

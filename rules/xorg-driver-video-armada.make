@@ -58,10 +58,8 @@ XORG_DRIVER_VIDEO_ARMADA_CONF_OPT	:= \
 
 $(STATEDIR)/xorg-driver-video-armada.prepare:
 	@$(call targetinfo)
-#	@$(call world/prepare, XORG_DRIVER_VIDEO_ARMADA)
 	cd $(XORG_DRIVER_VIDEO_ARMADA_DIR) && \
-	export CC=$(CROSS_CC) && \
-	export LD=$(CROSS_LD) && \
+	CC=$(CROSS_CC) LD=$(CROSS_LD) \
 	./configure $(XORG_DRIVER_VIDEO_ARMADA_CONF_OPT) \
 	--with-sysroot=$(PTXCONF_SYSROOT_TARGET) \
 	--prefix=/usr \

@@ -31,11 +31,13 @@ $(STATEDIR)/elrest-custom-install.targetinstall:
 ifdef PTXCONF_ELREST_CUSTOM_INIT_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/touchcal)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/basyskom)
-	@$(call install_link, elrest-custom-install, ../init.d/touchcal, /etc/rc.d/S88touchcal)
+	@$(call install_link, elrest-custom-install, ../init.d/touchcal, /etc/rc.d/S88_touchcal)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/start_panel)
-	@$(call install_link, elrest-custom-install, ../init.d/start_panel, /etc/rc.d/S91start_panel)
+	@$(call install_link, elrest-custom-install, ../init.d/start_panel, /etc/rc.d/S91_start_panel)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/wait4xorg)
+	@$(call install_link, elrest-custom-install, ../init.d/wait4xorg, /etc/rc.d/S97_wait4xorg)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/can-networking)
-	@$(call install_link, elrest-custom-install, ../init.d/can-networking, /etc/rc.d/S60can-networking)
+	@$(call install_link, elrest-custom-install, ../init.d/can-networking, /etc/rc.d/S60_can-networking)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_PROFILE_FILES_INSTALL
@@ -63,6 +65,8 @@ ifdef PTXCONF_ELREST_CUSTOM_UDEV_RULES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/63-gpio-keys.rules)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/63-gpio-keys-polled.rules)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/64-captouch.rules)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/64-captouch-egalax-ph80h84-133.rules)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/64-captouch-egalax-ph80h84-134.rules)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/96-change-ttymxc-permissions.rules)
 endif
 
@@ -83,6 +87,10 @@ ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_CCW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_UD.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CCW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_UD.conf)	
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CCW.conf)
@@ -91,6 +99,14 @@ ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_CCW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_UD.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_CW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_CCW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_UD.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_CW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_CCW.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_UD.conf)
 	@$(call install_link, elrest-custom-install, /etc/X11/xorg_800_480.conf, /etc/X11/xorg.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /usr/bin/startx)
 endif
@@ -132,14 +148,25 @@ ifdef PTXCONF_CDS3_RTS_FEATURE_TARGETVISU
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/codesys3.d/CmpTargetvisu.cfg)
 endif
 
+ifdef PTXCONF_START_MICROBROWSER
+	@$(call install_link, elrest-custom-install, /usr/lib/libssl.so, /usr/lib/libssl.so.1.0.2)
+	@$(call install_link, elrest-custom-install, /usr/lib/libcrypto.so, /usr/lib/libcrypto.so.1.0.2)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /usr/local/bin/microbrowser/mb)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /usr/local/bin/microbrowser/close_mb.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0664, /usr/local/bin/microbrowser/mb_config.ini)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0664, /usr/local/bin/microbrowser/alphapad.teq)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0664, /usr/local/bin/microbrowser/keypad.teq)
+	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /usr/local/bin/microbrowser/mb_config)
+endif
+
 ifdef PTXCONF_ELREST_CUSTOM_USER_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /home/user/logo.png)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_CONFIG_FILES_INSTALL
-	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /etc/config-tools);
-
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_application.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_framebuffer.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_x_wbm.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/brightnesscontrol)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/start_displaycleaning)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/start_touchcalib)
@@ -199,18 +226,22 @@ ifdef PTXCONF_ELREST_CUSTOM_CONFIG_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_640.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_800.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_1280.png)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_1920.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_cw_480.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_cw_640.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_cw_800.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_cw_1280.png)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_cw_1920.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ud_480.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ud_640.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ud_800.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ud_1280.png)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ud_1920.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ccw_480.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ccw_640.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ccw_800.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ccw_1280.png)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_ccw_1920.png)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_PLCLIST

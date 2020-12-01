@@ -5,41 +5,38 @@
 #include <map>
 #include <string>
 
-#include "IInterfaceInformation.hpp"
-#include "IJsonConfigConverter.hpp"
+#include "IBridgeInformation.hpp"
 #include "IEthernetInterfaceFactory.hpp"
 #include "IEthernetInterface.hpp"
+#include "IInterfaceInformation.hpp"
 #include "IPersistence.hpp"
+#include "INetDevManager.hpp"
 
-namespace netconfd {
+namespace netconf {
 
-class InterfaceConfigManager {
+class InterfaceConfigManager : public IInterfaceInformation{
  public:
-  InterfaceConfigManager(
-      IInterfaceInformation& itf_info,
+  InterfaceConfigManager(INetDevManager& netdev_manager,
       IPersistence<InterfaceConfigs>& persistence_provider,
-      IJsonConfigConverter& json_config_converter,
       IEthernetInterfaceFactory& eth_factory);
   virtual ~InterfaceConfigManager() = default;
 
-  virtual Status Configure(InterfaceConfigs& port_configs);
-  virtual InterfaceConfigs const& GetPortConfigs();
+  virtual void InitializePorts();
+  virtual Error Configure(InterfaceConfigs& port_configs);
+  virtual InterfaceConfigs const& GetPortConfigs() override;
 
  private:
-  Status IsPortConfigValid(const InterfaceConfigs& port_configs);
-  Status ApplyPortConfig(InterfaceConfig const& cfg);
-  Status ApplyAllConfigs(InterfaceConfigs& port_configs);
-  void InitializeEthernetInterfaceMap(const Interfaces& considered_interfaces);
-  void InitializePortConfigs(const Interfaces& considered_interfaces, const InterfaceConfigs& persistet_configs);
-  void UpdateCurrentConfig(const InterfaceConfigs& port_configs);
+  Error IsPortConfigValid(const InterfaceConfigs& port_configs);
+  Error ApplyPortConfig(InterfaceConfig const& cfg);
+  Error ApplyPortConfigs(InterfaceConfigs& port_configs);
+  void InitializeEthernetInterfaceMap(const NetDevs& netdevs);
+  void InitializeCurrentConfigs(const NetDevs& netdevs, const InterfaceConfigs& persistet_configs);
+  void UpdateCurrentInterfaceConfigs(const InterfaceConfigs &port_configs);
 
-  IInterfaceInformation& itf_info_;
   IPersistence<InterfaceConfigs>& persistence_provider_;
-  IJsonConfigConverter& json_config_converter_;
   IEthernetInterfaceFactory& ethernet_interface_factory_;
   ::std::map<::std::string, ::std::unique_ptr<IEthernetInterface>> ethernet_interfaces_;
   InterfaceConfigs current_config_;
 };
 
-} /* namespace netconfd */
-
+} /* namespace netconf */

@@ -27,19 +27,13 @@
     <led name="NS" state="STATIC_OFF">
     </led>
     <string>
-        <en>Ethernet/IP driver is not loaded</en>
+        <en>not active</en>
       </string>
     
   </event>
-  <event id="x0005" name="DoubleIP_br0">
+  <event id="x0005" name="IpConflict">
     <string>
-        <en>ipwatchd: Duplicate IP address detected in network attached to socket X1</en>
-      </string>
-    
-  </event>
-  <event id="x0006" name="DoubleIP_br1">
-    <string>
-        <en>ipwatchd: Duplicate IP address detected in network attached to socket X2</en>
+	      <en>IP address conflict detected. See /var/log/messages for details.</en>
       </string>
     
   </event>
@@ -93,9 +87,53 @@
       </string>
     
   </event>
+  <event id="x000D" name="fieldbus_not_active_bf">
+    <led name="BF" state="STATIC_OFF">
+    </led>
+    <string>
+        <en>Fieldbus not active</en>
+      </string>
+    
+  </event>
+  <event id="x000E" name="fieldbus_not_active_dia">
+    <led name="DIA" state="STATIC_OFF">
+    </led>
+    <string>
+        <en>Fieldbus not active</en>
+      </string>
+    
+  </event>
+  <event id="x000F" name="fieldbus_not_active_can">
+    <led name="CAN" state="STATIC_OFF">
+    </led>
+    <string>
+        <en>Fieldbus not active</en>
+      </string>
+    
+  </event>
+  <event id="x0010" name="not_active_ec">
+    <led name="EC" state="STATIC_OFF">
+    </led>
+    <string>
+        <en>not active</en>
+      </string>
+    
+  </event>
   <event id="x00C0" name="system_start" persistent="yes">
+    <led name="SYS" state="STATIC_GRN">
+    </led>
     <string>
         <en>System Booted</en>
+      </string>
+    
+  </event>
+  <event id="x00D0" name="wait_to_start">
+    <led name="SYS" state="BLINK_GRN_RED">
+      <on>500</on>
+      <off>500</off>
+    </led>
+    <string>
+        <en>Wait to start</en>
       </string>
     
   </event>
@@ -2083,6 +2121,16 @@
       </string>
     
   </event>
+  <event id="x0780" name="ec_blink_seq_750" persistent="none">
+    <led name="EC" state="BLINK_SEQ_750">
+      <blinkcode>$1</blinkcode>
+      <blinkarg>$2</blinkarg>
+    </led>
+    <string>
+        <en>EC LED is in ErrorMode Code: $1, Argument: $2</en>
+      </string>
+    
+  </event>
 </eventclass>
 <eventclass class_range="x0003" name="iocheck">
   <event id="x0000" name="start-eth">
@@ -3264,6 +3312,24 @@
       </string>
     
   </event>
+  <event id="x000D" name="Warm-Reset-run">
+    <led name="RUN" state="FLASH_OFF_GRN">
+      <on>300</on>
+    </led>
+    <string>
+        <en>Warm reset performed but PLC is already running</en>
+      </string>
+    
+  </event>
+  <event id="x000E" name="Cold-Reset-run">
+    <led name="RUN" state="FLASH_OFF_GRN">
+      <on>1000</on>
+    </led>
+    <string>
+        <en>Cold reset performed but PLC is already running</en>
+      </string>
+    
+  </event>
   <event id="x0010" name="EDEC_KBUS_conf_mismatch">
     <led name="MS" state="BLINK_SEQ_750">
       <blinkcode>1</blinkcode>
@@ -3284,7 +3350,7 @@
     <led name="BT" default="yes" state="STATIC_OFF">
     </led>
     <string>
-        <en>BACnet: Not active.</en>
+        <en>BACnet - Is stopped.</en>
       </string>
     
   </event>
@@ -3292,7 +3358,7 @@
     <led name="BT" state="STATIC_GRN">
     </led>
     <string>
-        <en>BACnet: Is operating.</en>
+        <en>BACnet - Is running.</en>
       </string>
     
   </event>
@@ -3302,7 +3368,7 @@
       <off>500</off>
     </led>
     <string>
-        <en>BACnet: Is starting.</en>
+        <en>BACnet - Is starting.</en>
       </string>
     
   </event>
@@ -3310,7 +3376,7 @@
     <led name="BT" state="STATIC_RED">
     </led>
     <string>
-        <en>BACnet: Internal error.</en>
+        <en>BACnet - Internal error.</en>
       </string>
     
   </event>
@@ -3320,7 +3386,7 @@
       <off>500</off>
     </led>
     <string>
-        <en>BACnet: Invalid configuration</en>
+        <en>BACnet - Invalid configuration</en>
       </string>
     
   </event>
@@ -3328,7 +3394,7 @@
     <led name="BT" state="STATIC_YLW">
     </led>
     <string>
-        <en>BACnet: Difference between Runtime and BACnet object.</en>
+        <en>BACnet - Difference between Runtime and BACnet object.</en>
       </string>
     
   </event>
@@ -3338,7 +3404,7 @@
       <off>500</off>
     </led>
     <string>
-        <en>BACnet: Storage access. Do not turn off Device to prevent data loss!</en>
+        <en>BACnet - Storage access. Do not turn off Device to prevent data loss!</en>
       </string>
     
   </event>
@@ -3348,7 +3414,7 @@
       <off>1000</off>
     </led>
     <string>
-        <en>BACnet: Overload.</en>
+        <en>BACnet - Overload. Packet loss is possible.</en>
       </string>
     
   </event>
@@ -3358,7 +3424,7 @@
       <off>1000</off>
     </led>
     <string>
-        <en>BACnet: Backup and Restore.</en>
+        <en>BACnet - Backup and Restore is running.</en>
       </string>
     
   </event>
@@ -3368,7 +3434,17 @@
       <off>500</off>
     </led>
     <string>
-        <en>BACnet: Storage access. Do not turn off Device to prevent data loss!</en>
+        <en>BACnet - Storage access. Do not turn off Device to prevent data loss!</en>
+      </string>
+    
+  </event>
+  <event id="x000B" name="_BT_WARNING_ERROR_EXPIRED">
+    <led name="BT" state="BLINK_YLW_RED">
+      <on>1000</on>
+      <off>1000</off>
+    </led>
+    <string>
+        <en>BACnet - License is Expired.</en>
       </string>
     
   </event>
@@ -3399,6 +3475,254 @@
     </led>
     <string>
         <en>drm eval-mode expired</en>
+      </string>
+    
+  </event>
+</eventclass>
+<eventclass class_range="x0016" name="MM">
+  <event id="x0001" name="MDMDNG_ERR_NO_SIM">
+    <led name="NET" state="BLINK_SEQ_750">
+      <blinkcode>1</blinkcode>
+      <blinkarg>1</blinkarg>
+    </led>
+    <string>
+        <en>Modem SIM card not inserted or not readable</en>
+        <de>Modem SIM-Karte nicht eingelegt oder nicht lesbar</de>
+      </string>
+    
+  </event>
+  <event id="x0003" name="MDMDNG_ERR_DETECTION_FAIL">
+    <led name="NET" state="BLINK_SEQ_750">
+      <blinkcode>2</blinkcode>
+      <blinkarg>1</blinkarg>
+    </led>
+    <string>
+      	<en>Modem not available</en>
+      	<de>Modem nicht verfügbar</de>
+      </string>
+    
+  </event>
+  <event id="x0010" name="MDMDNG_OPER_NO_NET">
+    <led name="NET" state="STATIC_RED">
+    </led>
+    <string>
+      	<en>Radio access network not registered</en>
+      	<de>Mobilfunknetz nicht verbunden</de>
+      </string>
+    
+  </event>
+  <event id="x0011" name="MDMDNG_OPER_NET_2G">
+    <led name="NET" state="STATIC_YLW">
+    </led>
+    <string>
+        <en>2G radio access network registered</en>
+        <de>2G Mobilfunknetz verbunden</de>
+      </string>
+    
+  </event>
+  <event id="x0012" name="MDMDNG_OPER_NET_3G">
+    <led name="NET" state="STATIC_GRN">
+    </led>
+    <string>
+        <en>3G radio access network registered</en>
+        <de>3G Mobilfunknetz verbunden</de>
+      </string>
+    
+  </event>
+  <event id="x0013" name="MDMDNG_OPER_NET_4G">
+    <led name="NET" state="STATIC_GRN">
+    </led>
+    <string>
+        <en>4G radio access network registered</en>
+        <de>4G Mobilfunknetz verbunden</de>
+      </string>
+    
+  </event>
+  <event id="x0020" name="MDMDNG_SIGNAL_0_MSG">
+    <led name="S1" state="STATIC_OFF">
+    </led>
+    <string>
+      	<en>Signal strength 0</en>
+      	<de>Signalstärke 0</de>
+      </string>
+    
+  </event>
+  <event id="x0021" name="MDMDNG_SIGNAL_1_MSG">
+    <led name="S1" state="BLINK_YLW">
+      <on>500</on>
+      <off>500</off>
+    </led>
+    <string>
+      	<en>Signal strength 1</en>
+      	<de>Signalstärke 1</de>
+      </string>
+    
+  </event>
+  <event id="x0022" name="MDMDNG_SIGNAL_2_MSG">
+    <led name="S1" state="STATIC_YLW">
+    </led>
+    <string>
+      	<en>Signal strength 2</en>
+      	<de>Signalstärke 2</de>
+      </string>
+    
+  </event>
+  <event id="x0023" name="MDMDNG_SIGNAL_3_MSG">
+    <led name="S1" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength 3</en>
+      	<de>Signalstärke 3</de>
+      </string>
+    
+  </event>
+  <event id="x0024" name="MDMDNG_SIGNAL_4_MSG">
+    <led name="S2" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength 4</en>
+      	<de>Signalstärke 4</de>
+      </string>
+    
+  </event>
+  <event id="x0025" name="MDMDNG_SIGNAL_5_MSG">
+    <led name="S3" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength 5</en>
+      	<de>Signalstärke 5</de>
+      </string>
+    
+  </event>
+  <event id="x0026" name="MDMDNG_SIGNAL_6_MSG">
+    <led name="S4" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength 6</en>
+      	<de>Signalstärke 6</de>
+      </string>
+    
+  </event>
+  <event id="x0027" name="MDMDNG_SIGNAL_3_HIGHER" persistent="none">
+    <led name="S1" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength above 3</en>
+      	<de>Signalstärke über 3</de>
+      </string>
+    
+  </event>
+  <event id="x0028" name="MDMDNG_SIGNAL_4_LOWER" persistent="none">
+    <led name="S2" state="STATIC_OFF">
+    </led>
+    <string>
+      	<en>Signal strength below 4</en>
+      	<de>Signalstärke unter 4</de>
+      </string>
+    
+  </event>
+  <event id="x0029" name="MDMDNG_SIGNAL_4_HIGHER" persistent="none">
+    <led name="S2" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength above 4</en>
+      	<de>Signalstärke über 4</de>
+      </string>
+    
+  </event>
+  <event id="x002A" name="MDMDNG_SIGNAL_5_LOWER" persistent="none">
+    <led name="S3" state="STATIC_OFF">
+    </led>
+    <string>
+      	<en>Signal strength below 5</en>
+      	<de>Signalstärke unter 5</de>
+      </string>
+    
+  </event>
+  <event id="x002B" name="MDMDNG_SIGNAL_5_HIGHER" persistent="none">
+    <led name="S3" state="STATIC_GRN">
+    </led>
+    <string>
+      	<en>Signal strength above 5</en>
+      	<de>Signalstärke über 5</de>
+      </string>
+    
+  </event>
+  <event id="x002C" name="MDMDNG_SIGNAL_6_LOWER" persistent="none">
+    <led name="S4" state="STATIC_OFF">
+    </led>
+    <string>
+      	<en>Signal strength below 6</en>
+      	<de>Signalstärke unter 6</de>
+      </string>
+    
+  </event>
+  <event id="x0030" name="MDMDNG_WDS_OFF">
+    <led name="WDS" state="STATIC_OFF">
+    </led>
+    <string>
+        <en>Wireless Data Service disabled</en>
+        <de>Wireless Data Service abgeschaltet</de>
+      </string>
+    
+  </event>
+  <event id="x0031" name="MDMDNG_WDS_OPER_OFF">
+    <led name="WDS" state="STATIC_YLW">
+    </led>
+    <string>
+        <en>Wireless Data Service not registered</en>
+        <de>Wireless Data Service nicht registriert</de>
+      </string>
+    
+  </event>
+  <event id="x0032" name="MDMDNG_WDS_OPER_ON">
+    <led name="WDS" state="STATIC_GRN">
+    </led>
+    <string>
+        <en>Wireless Data Service registered</en>
+        <de>Wireless Data Service registriert</de>
+      </string>
+    
+  </event>
+  <event id="x0033" name="MDMDNG_WDS_DENIED">
+    <led name="WDS" state="STATIC_RED">
+    </led>
+    <string>
+        <en>Wireless Data Service denied</en>
+        <de>Mobiler Datendienst abgelehnt</de>
+      </string>
+    
+  </event>
+  <event id="x0034" name="MDMDNG_NET_SIM_PIN_PUK_REQUIRED">
+    <led name="NET" state="BLINK_SEQ_750">
+      <blinkcode>1</blinkcode>
+      <blinkarg>3</blinkarg>
+    </led>
+    <string>
+      	<en>Modem SIM card requires PIN/PUK</en>
+      	<de>Modem SIM-Karte erfordert PIN/PUK</de>
+      </string>
+    
+  </event>
+  <event id="x0035" name="MDMDNG_NET_SIM_BLOCKED">
+    <led name="NET" state="BLINK_SEQ_750">
+      <blinkcode>1</blinkcode>
+      <blinkarg>2</blinkarg>
+    </led>
+    <string>
+        <en>Modem SIM card is blocked</en>
+        <de>Modem SIM-Karte ist gesperrt</de>
+      </string>
+    
+  </event>
+  <event id="x0036" name="MDMDNG_NET_SEARCHING_MODEM">
+    <led name="NET" state="BLINK_RED">
+      <on>500</on>
+      <off>500</off>
+    </led>
+    <string>
+        <en>Searching for modem</en>
+        <de>Suche nach Modem</de>
       </string>
     
   </event>
@@ -3610,6 +3934,8 @@
     
   </event>
   <event id="xFFFF" name="DRIVER_NOT_OPENED">
+    <led name="IO" state="STATIC_OFF">
+    </led>
     <string>
         <en>KBus device has not been opened</en>
         <de>KBus-Treiber nicht geladen oder nicht geöffnet.</de>

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include <cstdio>
 #include <csignal>
 #include <sys/types.h>
@@ -9,10 +10,11 @@
 
 #include <getopt.h>
 #include "NetworkConfigurator.hpp"
-#include "Status.hpp"
 #include <gsl/gsl>
-#include "Daemonizer.hpp"
 
+#include "Error.hpp"
+#include "Daemonizer.hpp"
+#include "InterprocessCondition.h"
 #include "Logger.hpp"
 
 #define XSTR(s) #s
@@ -39,20 +41,11 @@ static char const * const usage_text =
         "         -d, --daemon            Daemonize this program\n"
         "         -r, --rundir=<dir>      Run directory, default = /var/run/netconfd\n"
         "         -p, --pidfile=<name>    Name of pidfile, default = netconfd.pid\n"
-        "         -l, --loglevel=<level>  Level of logging, default = warning\n"
+        "         -l, --loglevel=<level>  Level of logging, default = debug\n"
         "                                 loglevel: error, warning, info, debug\n";
 
 static char const * const version_text =
     "%s version " STR(NETCONFD_VERSION) "\n";
-
-static void signal_handler(int signal) {
-  static const int any_child = -1;
-  if (signal == SIGCHLD) {
-    int status;
-    while (waitpid(any_child, &status, WNOHANG) > 0) {
-    };
-  }
-}
 
 int main(int argc, char *argv[]) {
 
@@ -98,17 +91,17 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  netconfd::SetLogSink(netconfd::LogSink::SYSLOG);
-  netconfd::SetLogLevel(netconfd::LogLevelFromString(loglevel));
+  netconf::SetLogSink(netconf::LogSink::SYSLOG);
+  netconf::SetLogLevel(netconf::LogLevelFromString(loglevel));
 
-  netconfd::Status status;
-  netconfd::Daemonizer daemon(run_dir, pid_file_name);
+  netconf::Error status;
+  netconf::Daemonizer daemon(run_dir, pid_file_name);
 
-  if (status.Ok()) {
+  if (status.IsOk()) {
     status = daemon.PreparePidDir();
   }
 
-  if (status.Ok()) {
+  if (status.IsOk()) {
     bool pidFileIsLocked = daemon.IsPidFileLocked();
     if (pidFileIsLocked) {
       fprintf( stderr, "Pid file is locked. "
@@ -118,41 +111,41 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (daemonize) {
-    status = daemon.Daemonize();
+  netconf::InterprocessCondition start_condition{"netconfd_interprocess"};
 
-    if (status.NotOk()) {
-      netconfd::LogError(status.GetMessage());
+  if (daemonize) {
+    status = daemon.Daemonize(start_condition);
+
+    if (status.IsNotOk()) {
+      netconf::LogError(status.ToString());
       abort();
     }
   }
 
-  if (status.Ok()) {
+  if (status.IsOk()) {
     status = daemon.WritePidFile();
   }
 
-  if (status.Ok()) {
+  if (status.IsOk()) {
     daemon.SetUnlinkPidOnExit();
   }
 
-  if (status.NotOk()) {
-    netconfd::LogWarning(status.GetMessage());
+  if (status.IsNotOk()) {
+    netconf::LogWarning(status.ToString());
   }
-
-  ::std::signal(SIGCHLD, signal_handler);
 
   auto context = g_main_context_default();
   auto loop = g_main_loop_new(context, 0);
 
   try {
-    netconfd::NetworkConfigurator network_configurator;
+    netconf::NetworkConfigurator network_configurator{start_condition};
     g_main_loop_run(loop);
   } catch (::std::exception& ex) {
     ::std::string exception_message(ex.what());
-    netconfd::LogError("NetConf initialization exception: " + exception_message);
+    netconf::LogError("NetConf initialization exception: " + exception_message);
     exit(EXIT_FAILURE);
   } catch (...) {
-    netconfd::LogError("NetConf unknown initialization exception");
+    netconf::LogError("NetConf unknown initialization exception");
     exit(EXIT_FAILURE);
   }
 

@@ -17,7 +17,7 @@ PACKAGES-$(PTXCONF_CONFIG_TOOLS) += config-tools
 #
 # Paths and names
 #
-CONFIG_TOOLS_VERSION 	      := 1.1.7
+CONFIG_TOOLS_VERSION 	      := 1.2.0
 CONFIG_TOOLS		            := config-tools
 CONFIG_TOOLS_URL            := file://$(PTXDIST_WORKSPACE)/local_src/$(CONFIG_TOOLS)
 CONFIG_TOOLS_DIR	          := $(BUILDDIR)/$(CONFIG_TOOLS)
@@ -32,9 +32,6 @@ $(STATEDIR)/config-tools.extract:
 	rsync -a --exclude=.libs/ --exclude=objs/ --exclude="*.o" --exclude="*.a" --exclude="*.so" --exclude="*.so" \
     $(PTXDIST_WORKSPACE)/local_src/$(CONFIG_TOOLS) $(BUILDDIR)
 	@$(call touch)
-
-# Copy ct_error_handling.h before compile. It's needed by some tools. 
-	@cp $(CONFIG_TOOLS_DIR)/ct_error_handling.h      $(PTXCONF_SYSROOT_TARGET)/usr/include/ct_error_handling.h
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -220,10 +217,6 @@ ifdef PTXCONF_CT_CONFIG_MDMD
 	CT_MAKE_ARGS+=config_mdmd
 endif
 
-ifdef PTXCONF_CT_CONFIG_DNSMASQ
-	CT_MAKE_ARGS+=config_dnsmasq
-endif
-
 ifdef PTXCONF_CT_GET_ETH_CONFIG
 	CT_MAKE_ARGS+=get_eth_config
 endif
@@ -232,9 +225,6 @@ ifdef PTXCONF_CT_GET_ACTUAL_ETH_CONFIG
 	CT_MAKE_ARGS+=get_actual_eth_config
 endif
 
-ifdef PTXCONF_CT_GET_DSA_MODE
-	CT_MAKE_ARGS+=get_dsa_mode
-endif
 ifdef PTXCONF_CT_GET_SWITCH_SETTINGS
 	CT_MAKE_ARGS+=get_switch_settings
 endif
@@ -327,7 +317,6 @@ $(STATEDIR)/config-tools.targetinstall:
 	@$(call install_fixup,config-tools,AUTHOR,"Wago Kontakttechnik")
 	@$(call install_fixup,config-tools,DESCRIPTION,missing)
 
-	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools);
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/post_netconfig.d)
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/codesys_after_download_hook, /etc/config-tools/codesys_after_download_hook);
 
@@ -514,6 +503,7 @@ endif
 ifdef PTXCONF_CT_FIRMWARE_RESTORE
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/firmware_restore, /etc/config-tools/firmware_restore);
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/firmware_restore_admin, /etc/config-tools/firmware_restore_admin);
+	@$(call install_copy, config-tools, 0, 0, 0755, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/firmware_restore_status, /etc/config-tools/firmware_restore_status);
 endif
 
 ifdef PTXCONF_CT_GET_PLC_CONFIG
@@ -530,17 +520,22 @@ endif
 
 ifdef PTXCONF_CT_RESTART_WEBSERVER
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/restart_webserver, /etc/config-tools/restart_webserver);
+	@$(call install_replace, config-tools, /etc/config-tools/restart_webserver, @LIGHTTPD_BBINIT_LINK@, $(PTXCONF_LIGHTTPD_BBINIT_LINK))
 endif
 
 ifdef PTXCONF_CT_RS232_OWNER
 	@$(call install_alternative, config-tools, 0, 0, 0640, /etc/config-tools/RS232_OWNER);
 endif
 
+ifdef PTXCONF_CT_LEDSERVER
+	@$(call install_alternative, config-tools, 0, 0, 0644, /etc/specific/leds.conf)
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_ledserver, /etc/config-tools/config_ledserver);
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/get_ledserver, /etc/config-tools/get_ledserver);
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_ledserver_generate, /etc/config-tools/config_ledserver_generate);
+endif
+
 ifdef PTXCONF_CT_SETTINGS_BACKUP
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/settings_backup, /etc/config-tools/settings_backup);
-	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/settings_factory, /etc/config-tools/settings_factory);
-	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/settings_factory, /etc/config-tools/settings_factory);
-	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/rc.once.d/save-factory-defaults, /etc/rc.once.d/save-factory-defaults);
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/backup-restore);
 endif
 
@@ -829,25 +824,24 @@ ifdef PTXCONF_CT_LIBCTNETWORK
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/snmp/);
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/ssh/);
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/ssl/);
-ifneq ($(PTXCONF_PLATFORM), wago-pac100)
+	
+
+ifdef PTXCONF_WAGO_CUSTOM_INSTALL_PROTOCOL_TELNET_ON
+	# Does not install /etc/config-tools/events/telnet if Telnet protocol is not available (default for PFC_ADV)
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/telnet/);
+endif
+
+ifdef PTXCONF_WAGO_CUSTOM_INSTALL_PROTOCOL_TFTP_ON
+  # Does not install /etc/config-tools/events/tftp if TPTF service is not available (default for PFC_ADV)
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/tftp/);
 endif
+
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/iocheckport/);
 	@$(call install_copy, config-tools, 0, 0, 0755, /etc/config-tools/events/networking/);
+	@$(call install_copy, config-tools, 0, 0, 0644, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/events/networking/README, /etc/config-tools/events/networking/README);
 
 
 	@$(call install_copy, config-tools, 0, 0, 0755, $(CONFIG_TOOLS_DIR)/libnet/libctnetwork.so, /usr/lib/libctnetwork.so);
-endif
-
-ifdef PTXCONF_CT_CONFIG_DNSMASQ
-	# Does not install /etc/dnsmasq.conf because dnsmasq packet has already installed or will install our config file.
-	@$(call install_copy,         config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/config_dnsmasq, /etc/config-tools/config_dnsmasq_c)
-	@$(call install_copy,        config-tools, 0, 0, 0750, /etc/dnsmasq.d)
-	@$(call install_alternative, config-tools, 0, 0, 0644, /etc/dnsmasq.d/dnsmasq_default.conf)
-	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/post_netconfig.d/30_dnsmasq)
-	@$(call install_alternative, config-tools, 0, 0, 0644, /etc/specific/network-services.xml)
-	@$(call install_alternative, config-tools, 0, 0, 0700, /etc/config-tools/events/dns/addLocalhostToResolvConf)
 endif
 
 ifdef PTXCONF_CT_GET_ETH_CONFIG
@@ -862,18 +856,15 @@ ifdef PTXCONF_CT_CONFIG_ETHERNET
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_ethernet, /etc/config-tools/config_ethernet);
 endif
 
-ifndef PTXCONF_NETCONFD
 ifdef PTXCONF_CT_CONFIG_INTERFACES
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_interfaces, /etc/config-tools/config_interfaces);
+endif
+ifdef PTXCONF_CT_GET_DSA_MODE
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/get_dsa_mode, /etc/config-tools/get_dsa_mode);
 endif
 ifdef PTXCONF_CT_SET_DSA_MODE
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/set_dsa_mode, /etc/config-tools/set_dsa_mode);
 endif
-
-ifdef PTXCONF_CT_GET_DSA_MODE
-	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/get_dsa_mode, /etc/config-tools/get_dsa_mode);
-endif
-endif #PTXCONF_NETCONFD
 ifdef PTXCONF_CT_GET_SWITCH_SETTINGS
 	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/get_switch_settings, /etc/config-tools/get_switch_settings);
 	@$(call install_alternative, config-tools, 0, 0, 0640, /etc/switch_settings.conf)
@@ -889,15 +880,26 @@ ifdef PTXCONF_CT_SET_SERIAL_MODE
 	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/set_serial_mode, /etc/config-tools/set_serial_mode);
 endif
 ifdef PTXCONF_CT_WWAN_INTERFACE
-ifndef PTXCONF_NETCONFD
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_wwan, /etc/config-tools/config_wwan);
-endif #PTXCONF_NETCONFD
 	@$(call install_alternative, config-tools, 0, 0, 0644, /etc/specific/wwan.conf);
 endif
 
 ifdef PTXCONF_CT_VPNCFG
 	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/vpncfg/vpncfg, /etc/config-tools/vpncfg);
 	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/settings_backup_vpn, /etc/config-tools/settings_backup_vpn);
+endif
+
+
+ifdef PTXCONF_CT_GET_INTERNAL_BOOT
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/get_boot_mode, /etc/config-tools/get_boot_mode);
+endif
+
+ifdef PTXCONF_CT_CONF_INTERNAL_BOOT
+	@$(call install_copy, config-tools, 0, 0, 0750, $(PTXDIST_WORKSPACE)/projectroot/etc/config-tools/config_boot_mode, /etc/config-tools/config_boot_mode);
+endif
+
+ifdef PTXCONF_IPWATCHD
+	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/events/networking/update_ipwatchd);
 endif
 
 

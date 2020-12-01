@@ -8,80 +8,42 @@
 #include "Logger.hpp"
 #include "Helper.hpp"
 
-namespace netconfd {
+namespace netconf {
 
-BridgeConfigurator::BridgeConfigurator(IBridgeController& bridge_controller,
-                                       IMacDistributor& mac_distributor)
-    : bridge_controller_ { bridge_controller },
-      mac_distributor_ { mac_distributor } {
+BridgeConfigurator::BridgeConfigurator(IBridgeController &bridge_controller)
+    : bridge_controller_ { bridge_controller } {
 
 }
 
-Status BridgeConfigurator::SetInterfaceUpAndAddToBridge(const Interface& interface,
-                                                        const Bridge& bridge) const {
+Error BridgeConfigurator::SetBridgeDownAndDelete(const Bridge &bridge) const {
 
-  //first set interface up before adding to bridge, not the other way around!
-  Status status = bridge_controller_.SetInterfaceUp(interface);
+  Error status = bridge_controller_.SetInterfaceDown(bridge);
 
-  if (status.Ok()) {
-    status = bridge_controller_.AddInterface(bridge, interface);
-  }
-
-  return status;
-}
-
-Status BridgeConfigurator::SetBridgeDownAndDelete(const Bridge& bridge) const {
-
-  Status status = bridge_controller_.SetInterfaceDown(bridge);
-
-  if (status.Ok()) {
+  if (status.IsOk()) {
     status = bridge_controller_.DeleteBridge(bridge);
   }
 
   return status;
 }
 
-Status BridgeConfigurator::SetInterfaceDownAndDeleteFromBridge(
-    const Interface& interface, const Bridge& bridge) const {
-  Status status = bridge_controller_.SetInterfaceDown(interface);
-
-  if (status.Ok()) {
-    status = bridge_controller_.DeleteInterface(bridge, interface);
-  }
+Error BridgeConfigurator::AddBridge(const Bridge &bridge) const {
+  Error status = bridge_controller_.AddBridge(bridge);
 
   return status;
 }
 
-Status BridgeConfigurator::AddBridge(const Bridge& bridge) const {
-  Status status = bridge_controller_.AddBridge(bridge);
+Error BridgeConfigurator::RemoveAllActualBridgesThatAreNotNeeded(BridgeConfig const &config_os,
+                                                                 Bridges &adapted_target_bridges) const {
 
-  if (status.Ok()) {
-    status = mac_distributor_.SetMac(bridge);
-  }
-
-  return status;
-}
-
-Status BridgeConfigurator::RemoveAllActualBridgesThatAreNotNeeded(
-    BridgeConfig const& config_os, Bridges& adapted_target_bridges) const {
-
-  Status status;
+  Error status;
   adapted_target_bridges.clear();
   Bridges actual_bridges = bridge_controller_.GetBridges();
 
-  for (const auto& actual_bridge : actual_bridges) {
+  for (const auto &actual_bridge : actual_bridges) {
     if (config_os.find(actual_bridge) == config_os.end()) {
-      Interfaces actual_interfaces = bridge_controller_.GetBridgeInterfaces(
-          actual_bridge);
 
-      for (const auto& actual_interface : actual_interfaces) {
-        status = SetInterfaceDown(actual_interface);
-        if (status.NotOk()) {
-          return status;
-        }
-      }
       status = SetBridgeDownAndDelete(actual_bridge);
-      if (status.NotOk()) {
+      if (status.IsNotOk()) {
         return status;
       }
     } else {
@@ -92,19 +54,19 @@ Status BridgeConfigurator::RemoveAllActualBridgesThatAreNotNeeded(
   return status;
 }
 
-Status BridgeConfigurator::RemoveAllActualBridgeInterfacesThatAreNotNeeded(
-    Bridges const& actual_bridges, BridgeConfig const& config_os) const {
+Error BridgeConfigurator::RemoveAllActualBridgeInterfacesThatAreNotNeeded(Bridges const &actual_bridges,
+                                                                          BridgeConfig const &config_os) const {
 
-  Status status;
-  for (const auto& actual_bridge : actual_bridges) {
+  Error status;
+  for (const auto &actual_bridge : actual_bridges) {
 
     Interfaces actual_interfaces = bridge_controller_.GetBridgeInterfaces(actual_bridge);
-    Interfaces const& target_interfaces = config_os.at(actual_bridge);
+    Interfaces const &target_interfaces = config_os.at(actual_bridge);
 
-    for (const auto& actual_interface : actual_interfaces) {
+    for (const auto &actual_interface : actual_interfaces) {
       if (IsNotIncluded(actual_interface, target_interfaces)) {
-        status = SetInterfaceDownAndDeleteFromBridge(actual_interface, actual_bridge);
-        if (status.NotOk()) {
+        status = bridge_controller_.DeleteInterface(actual_bridge, actual_interface);
+        if (status.IsNotOk()) {
           return status;
         }
       }
@@ -115,19 +77,19 @@ Status BridgeConfigurator::RemoveAllActualBridgeInterfacesThatAreNotNeeded(
 
 }
 
-Status BridgeConfigurator::AddMissingInterfacesToActualBridges(
-    Bridges const& actual_bridges, BridgeConfig const& config_os) const {
+Error BridgeConfigurator::AddMissingInterfacesToActualBridges(Bridges const &actual_bridges,
+                                                              BridgeConfig const &config_os) const {
 
-  Status status;
-  for (const auto& actual_bridge : actual_bridges) {
+  Error status;
+  for (const auto &actual_bridge : actual_bridges) {
 
     Interfaces actual_interfaces = bridge_controller_.GetBridgeInterfaces(actual_bridge);
-    Interfaces const& target_interfaces = config_os.at(actual_bridge);
+    Interfaces const &target_interfaces = config_os.at(actual_bridge);
 
-    for (const auto& target_interface : target_interfaces) {
+    for (const auto &target_interface : target_interfaces) {
       if (IsNotIncluded(target_interface, actual_interfaces)) {
-        status = SetInterfaceUpAndAddToBridge(target_interface, actual_bridge);
-        if (status.NotOk()) {
+        status = bridge_controller_.AddInterface(actual_bridge, target_interface);
+        if (status.IsNotOk()) {
           return status;
         }
       }
@@ -136,24 +98,24 @@ Status BridgeConfigurator::AddMissingInterfacesToActualBridges(
   return status;
 }
 
-Status BridgeConfigurator::AddMissingBridgesAndTheirInterfaces(
-    const Bridges& actual_bridges, BridgeConfig const& config_os) const {
+Error BridgeConfigurator::AddMissingBridgesAndTheirInterfaces(const Bridges &actual_bridges,
+                                                              BridgeConfig const &config_os) const {
 
-  Status status;
-  for (const auto& bridge_pair : config_os) {
+  Error status;
+  for (const auto& [bridge, interfaces] : config_os) {
 
-    auto target_bridge = bridge_pair.first;
+    auto target_bridge = bridge;
     if (IsNotIncluded(target_bridge, actual_bridges)) {
 
       status = AddBridge(target_bridge);
-      if (status.NotOk()) {
+      if (status.IsNotOk()) {
         return status;
       }
-      auto& target_interfaces = bridge_pair.second;
+      auto &target_interfaces = interfaces;
 
-      for (const auto& target_interface : target_interfaces) {
-        status = SetInterfaceUpAndAddToBridge(target_interface, target_bridge);
-        if (status.NotOk()) {
+      for (const auto &target_interface : target_interfaces) {
+        status = bridge_controller_.AddInterface(target_bridge, target_interface);
+        if (status.IsNotOk()) {
           return status;
         }
       }
@@ -170,7 +132,7 @@ BridgeConfig BridgeConfigurator::GetConfiguration() const {
 
   Bridges bridges = bridge_controller_.GetBridges();
 
-  for (const auto& bridge : bridges) {
+  for (const auto &bridge : bridges) {
     BridgePair bridge_pair;
 
     bridge_pair.first = bridge;
@@ -183,49 +145,59 @@ BridgeConfig BridgeConfigurator::GetConfiguration() const {
 
 }
 
-Status BridgeConfigurator::Configure(BridgeConfig const& config_os) const {
+Error BridgeConfigurator::SetAllBridgesUp(BridgeConfig const &config_os) const {
+
+  Error error;
+  for (auto& [bridge, interfaces] : config_os) {
+    Error er = bridge_controller_.SetInterfaceUp(bridge);
+    if (er.IsNotOk()) {
+      Error user_error { ErrorCode::SET_INTERFACE_STATE, bridge };
+      LogError(user_error.ToString() + " " + er.ToString());
+      error = user_error;
+    }
+  }
+  return error;
+}
+
+Error BridgeConfigurator::Configure(BridgeConfig const &config_os) const {
 
   Bridges actual_bridges;
 
-  Status status = RemoveAllActualBridgesThatAreNotNeeded(config_os, actual_bridges);
-  if (status.Ok()) {
+  Error status = RemoveAllActualBridgesThatAreNotNeeded(config_os, actual_bridges);
+  if (status.IsOk()) {
     status = RemoveAllActualBridgeInterfacesThatAreNotNeeded(actual_bridges, config_os);
   }
-  if (status.Ok()) {
+  if (status.IsOk()) {
     status = AddMissingInterfacesToActualBridges(actual_bridges, config_os);
   }
-  if (status.Ok()) {
+  if (status.IsOk()) {
     status = AddMissingBridgesAndTheirInterfaces(actual_bridges, config_os);
+  }
+  if (status.IsOk()) {
+    status = SetAllBridgesUp(config_os);
   }
 
   return status;
 
 }
 
-Status BridgeConfigurator::SetInterfaceDown(const Interface& interface) const {
+Error BridgeConfigurator::SetInterfaceDown(const Interface &interface) const {
 
-  return bridge_controller_.SetInterfaceDown(interface);
-}
+  Error system_error = bridge_controller_.SetInterfaceDown(interface);
+  if (system_error.IsNotOk()) {
+    Error user_error { ErrorCode::SET_INTERFACE_STATE, interface };
+    LogError(user_error.ToString() + " " + system_error.ToString());
+    return user_error;
+  }
 
-Status BridgeConfigurator::SetBridgeUp(const Bridge& bridge) const {
-
-  Status status = bridge_controller_.SetInterfaceUp(bridge);
-
-  return status;
-}
-
-Status BridgeConfigurator::SetBridgeDown(const Bridge& bridge) const {
-
-  Status status = bridge_controller_.SetInterfaceDown(bridge);
-
-  return status;
+  return Error::Ok();
 }
 
 Interfaces BridgeConfigurator::GetBridgeAssignedInterfaces() const {
   Interfaces interfaces;
   BridgeConfig bridges = GetConfiguration();
-  for (const auto& bridge : bridges) {
-    for (const auto& interface : bridge.second) {
+  for (const auto &bridge : bridges) {
+    for (const auto &interface : bridge.second) {
       interfaces.push_back(interface);
     }
   }

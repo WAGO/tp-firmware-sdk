@@ -1,16 +1,15 @@
-#ifndef NETCONFD_TEST_EXTERN_MOCKS_MOCKIEVENTMANAGER_HPP_
-#define NETCONFD_TEST_EXTERN_MOCKS_MOCKIEVENTMANAGER_HPP_
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
 
 #include <gmock/gmock.h>
 #include "IEventManager.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class MockIEventManager : public IEventManager {
  public:
-  MOCK_METHOD0(NotifyNetworkChanges, void() );
+  MOCK_METHOD3(NotifyNetworkChanges, void(const EventType, const EventLayer, Interface) );
+  MOCK_METHOD0(ProcessEvents, void());
 };
 
 }
-  // namespace netconfd
-#endif 

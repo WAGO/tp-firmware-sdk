@@ -20,14 +20,15 @@
 #include <iostream>
 
 
-namespace wago
-{
+namespace wago {
+namespace firewall {
 
 
 const std::string error_msg_unknown = "Unknown execution error.";
 const std::string error_msg_missing_param = "Missing application parameter(s).";
 const std::string error_msg_invalid_param = "Invalid application parameter(s).";
 const std::string error_msg_file_open_error = "Can't open a requested file.";
+const std::string error_msg_file_write_error = "Can't write a requested file.";
 const std::string error_msg_file_read_error = "Can't read a requested file.";
 const std::string error_msg_file_close_error = "Couldn't properly close a requested file.";
 const std::string error_msg_system_call_error = "System call error.";
@@ -89,6 +90,12 @@ file_open_error::file_open_error(const std::string& _what,
 
 file_open_error::~file_open_error() { }
 
+file_write_error::file_write_error(const std::string& _what,
+                       const std::string& _msg)
+    : execution_error(_what, FILE_WRITE_ERROR, _msg) {}
+
+file_write_error::~file_write_error() { }
+
 file_read_error::file_read_error(const std::string& _what,
                        const std::string& _msg)
     : execution_error(_what, FILE_READ_ERROR, _msg) {}
@@ -113,5 +120,6 @@ invalid_config_error::invalid_config_error(const std::string& _what,
 
 invalid_config_error::~invalid_config_error() { }
 
+} // namespace firewall
 } // namespace wago
 

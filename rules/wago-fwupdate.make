@@ -105,10 +105,9 @@ $(STATEDIR)/wago-fwupdate.targetinstall:
 	@$(call install_fixup, wago-fwupdate,AUTHOR,"<PEn>")
 	@$(call install_fixup, wago-fwupdate,DESCRIPTION,missing)
 
-	@$(call install_copy, wago-fwupdate, 0, 0, 0755, /etc/config-tools);
-
 	@$(call install_copy, wago-fwupdate, 0, 0, 0700, $(WAGO_FWUPDATE_DIR)/scripts/fwupdate, /etc/config-tools/fwupdate)
 	@$(call install_copy, wago-fwupdate, 0, 0, 0600, $(WAGO_FWUPDATE_DIR)/scripts/fwupdate_basic_defines, /usr/sbin/fwupdate_basic_defines)
+	@$(call install_replace, wago-fwupdate, /usr/sbin/fwupdate_basic_defines, @FW_UPDATE_GROUP@, $(PTXCONF_WAGO_FW_UPDATE_GROUP))
 	@$(call install_copy, wago-fwupdate, 0, 0, 0600, $(WAGO_FWUPDATE_DIR)/scripts/fwupdate_private_storage, /usr/sbin/fwupdate_private_storage)
 	@$(call install_copy, wago-fwupdate, 0, 0, 0600, $(WAGO_FWUPDATE_DIR)/scripts/fwupdate_common, /usr/sbin/fwupdate_common)
 	@$(call install_copy, wago-fwupdate, 0, 0, 0700, $(WAGO_FWUPDATE_DIR)/scripts/fwupdate_background_service, /usr/sbin/fwupdate_background_service)

@@ -48,10 +48,9 @@ LIBDRM_ARMADA_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 $(STATEDIR)/libdrm-armada.prepare:
 	@$(call targetinfo)
 	cd $(LIBDRM_ARMADA_DIR) && \
-	export PKG_CONFIG_LIBDIR=$(PTXCONF_SYSROOT_TARGET)/usr/lib && \
-	export PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib && \
-	export CC=$(CROSS_CC) && \
-	./configure --prefix=/usr/lib --host=arm-linux \
+	PKG_CONFIG_LIBDIR=$(PTXCONF_SYSROOT_TARGET)/usr/lib \
+	PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib \
+	CC=$(CROSS_CC) ./configure --prefix=/usr/lib --host=arm-linux \
 	--with-sysroot=$(PTXCONF_SYSROOT_TARGET) \
 	CFLAGS="-I$(PTXCONF_SYSROOT_TARGET)/usr/include  -I$(PTXCONF_SYSROOT_TARGET)/usr/include/libdrm" \
 	LDFLAGS="-L$(PTXCONF_SYSROOT_TARGET)/usr/lib" \
@@ -59,7 +58,6 @@ $(STATEDIR)/libdrm-armada.prepare:
 	LIBDRM_LIBS="-L$(PTXCONF_SYSROOT_TARGET)/usr/lib -ldrm" && \
 	PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig && \
 	make clean
-#	@$(call world/prepare, LIBDRM_ARMADA)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -69,7 +67,6 @@ $(STATEDIR)/libdrm-armada.prepare:
 $(STATEDIR)/libdrm-armada.compile:
 	@$(call targetinfo)
 	cd $(LIBDRM_ARMADA_DIR) && make
-#	@$(call world/compile, LIBDRM_ARMADA)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -118,7 +115,7 @@ $(STATEDIR)/libdrm-armada.targetinstall:
 # Clean
 # ----------------------------------------------------------------------------
 
-#$(STATEDIR)/libdrm-armada.clean:
+$(STATEDIR)/libdrm-armada.clean:
 #	@$(call targetinfo)
 #	@$(call clean_pkg, LIBDRM_ARMADA)
 

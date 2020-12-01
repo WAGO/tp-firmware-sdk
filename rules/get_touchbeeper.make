@@ -78,8 +78,6 @@ $(STATEDIR)/get_touchbeeper.targetinstall:
 	@$(call install_fixup, get_touchbeeper,AUTHOR,"<elrest>")
 	@$(call install_fixup, get_touchbeeper,DESCRIPTION,missing)
 
-	@$(call install_copy, get_touchbeeper, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

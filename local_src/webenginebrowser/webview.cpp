@@ -83,6 +83,7 @@
 #include <time.h>
 #include "globals.h"
 
+#include <QWebEngineCertificateError>
 
 #define HTML_FILE_NO_CONN    "/etc/specific/webengine/noConnection.html"
 #define SSL_CB_OFFSET         100
@@ -606,7 +607,7 @@ void WebPage::onPageWbm()
   WebView * pView = qobject_cast<WebView*>(this->view());
   if (pView)
   {
-    QString sUrl = "http://127.0.0.1/wbm-ng/index.html";
+    QString sUrl = "http://127.0.0.1/wbm/index.html";
     if (g_webengine.slUrls.count()>0)
     {
       sUrl = g_webengine.slUrls.at(0);
@@ -616,7 +617,7 @@ void WebPage::onPageWbm()
   else
   {  
     qDebug() << "certificateError: LoadWBM";
-    QUrl UrlWbm("http://127.0.0.1/wbm-ng/index.html");
+    QUrl UrlWbm("http://127.0.0.1/wbm/index.html");
     load(UrlWbm);
   }
 }
@@ -1576,16 +1577,35 @@ bool WebView::IsMonitoringConfigured()
         sPath = sPath.left(sPath.length()-1);
       }
 
+      //host match
       if (sCurrentHost.compare(sHost, Qt::CaseInsensitive) == 0)
       {
-         if (sCurrentPath.compare(sPath, Qt::CaseInsensitive) == 0)
-         {
-           if (m.compare("1") == 0)
-           {
-             bRet = true;
-           }
-           break;
-         }
+        //check exact path
+        if (sCurrentPath.compare(sPath, Qt::CaseInsensitive) == 0)
+        {
+          //exact path equal
+          if (m.compare("1") == 0)
+          {
+            bRet = true;
+          }
+          else
+          {
+            bRet = false;
+          }
+          break;
+        }
+
+        //check shortened path
+        QString sCurrentPathShortened = sCurrentPath.left(sPath.length());
+        if (sCurrentPathShortened.compare(sPath, Qt::CaseInsensitive) == 0)
+        {
+          //shortened path equal
+          if (m.compare("1") == 0)
+          {
+            bRet = true;
+          }
+        }
+
       }
     }
   }

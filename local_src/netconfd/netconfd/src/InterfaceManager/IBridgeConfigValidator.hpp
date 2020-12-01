@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "Error.hpp"
 #include "Types.hpp"
-#include "Status.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class IBridgeConfigValidator {
  public:
@@ -17,9 +17,9 @@ class IBridgeConfigValidator {
   IBridgeConfigValidator(const IBridgeConfigValidator&&) = delete;
   IBridgeConfigValidator& operator=(const IBridgeConfigValidator&&) = delete;
 
-  virtual Status Validate(BridgeConfig const& config) const = 0;
+  virtual Error Validate(BridgeConfig const& config) const = 0;
 
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */
 

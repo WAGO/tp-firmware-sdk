@@ -4,7 +4,7 @@
 
 #include "IBootpClientController.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class BootpClientController : public IBootpClientController {
  public:
@@ -16,8 +16,8 @@ class BootpClientController : public IBootpClientController {
   BootpClientController(const BootpClientController&&) = delete;
   BootpClientController& operator=(const BootpClientController&&) = delete;
 
-  Status StartClient(const Bridge& bridge) const override;
-  Status StopClient(const Bridge& bridge) const override;
+  Error StartClient(const Bridge& bridge) const override;
+  void StopClient(const Bridge& bridge) const override;
   BootpClientStatus GetStatus(const Bridge& bridge) const override;
   void DeleteTempFiles(const Bridge& bridge) const;
 
@@ -25,4 +25,4 @@ class BootpClientController : public IBootpClientController {
   const ::std::string BOOTP_SCRIPT_PATH = "/sbin/bootpc-startup";
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */

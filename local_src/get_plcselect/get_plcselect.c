@@ -9,7 +9,7 @@
 ///
 /// \file    get_plcselect.c
 ///
-/// \version $Id: get_plcselect.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: get_plcselect.c 45958 2020-01-21 12:26:20Z wrueckl_elrest $
 ///
 /// \brief   read backlight settings / config-tools
 ///
@@ -225,6 +225,22 @@ int main(int argc, char **argv)
         }                        
       }
       ConfRemoveJsonSeparatorFromEnd(&szJson[0]);
+      strcat(szJson, "], ");
+      
+      //JSON MIC ARRAY
+      strcat(szJson, "\"mic\": [");
+      for (index=0; index < MAX_PLC_NUMBER; index++)
+      {
+        sprintf(szName, "mic%02d", index);  
+        if (ConfGetValue(g_pList, szName, &szOut[0], sizeof(szOut)) == SUCCESS)
+        {
+          sprintf(szLine, "\"%s\", ", szOut);          
+          strcat(szJson, szLine);
+          status = SUCCESS;
+        }                        
+      }
+      
+      ConfRemoveJsonSeparatorFromEnd(&szJson[0]);
       strcat(szJson, "]}");
       printf(szJson); 
       
@@ -334,6 +350,7 @@ int main(int argc, char **argv)
           char szTxt[64] = "";
           char szVkb[64] = "";
           char szMon[64] = "";
+          char szMic[64] = "";
           if (index >= 0)
           {
             //check lines url1= url2= url3= etc.
@@ -343,6 +360,7 @@ int main(int argc, char **argv)
             sprintf(szTxt, "txt%02d", index);  
             sprintf(szVkb, "vkb%02d", index);  
             sprintf(szMon, "mon%02d", index);  
+            sprintf(szMic, "mic%02d", index);  
             
             if (stricmp(pStr, "url") == 0) 
             {
@@ -388,6 +406,17 @@ int main(int argc, char **argv)
               break;
             }
             
+            if (stricmp(pStr, "mic") == 0) 
+            {
+              if (ConfGetValue(g_pList, szMic, &szOut[0], sizeof(szOut)) == SUCCESS)
+              {
+                //printf("%s=%s\n", pStr, szOut);
+                printf("%s",szOut);
+                status = SUCCESS;
+              }
+              break;
+            }
+            
           }
           
         }
@@ -415,7 +444,7 @@ void ShowHelpText()
   printf("\n");
   printf("Usage2:    get_plcselect <index> <parameter>\n");
   printf("index:     0..%d (0=WBM, 1=PLC select list)\n", MAX_PLC_NUMBER-1);
-  printf("parameter: url | txt | vkb | mon\n");
+  printf("parameter: url | txt | vkb | mon |mic\n");
   printf("\n");
 }
 

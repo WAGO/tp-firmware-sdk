@@ -2,197 +2,96 @@
 
 #include "IPConfigurator.hpp"
 
+#include <numeric>
 #include <cassert>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <numeric>
 #include <boost/filesystem.hpp>
-
+#include "TypesHelper.hpp"
 #include "Logger.hpp"
+#include "IPLink.hpp"
 
 using namespace std::literals;
 
-namespace netconfd {
+namespace netconf {
 
-IPConfigurator::IPConfigurator(
-    IIPController& ip_controller,
-    const IDHCPClientController& dhcp_client_controller,
-    const IBootpClientController& bootp_client_controller,
-    const IInterfaceInformation& itf_info)
+IPConfigurator::IPConfigurator(IIPController &ip_controller, const IDHCPClientController &dhcp_client_controller,
+                               const IBootpClientController &bootp_client_controller, IIPLinks &ip_links)
     : ip_controller_ { ip_controller },
       dhcp_client_controller_ { dhcp_client_controller },
       bootp_client_controller_ { bootp_client_controller },
-      itf_info_ { itf_info } {
+      ip_links_ { ip_links } {
 }
 
-void IPConfigurator::DeleteTempFiles(const Bridge& bridge) const {
+void IPConfigurator::DeleteTempFiles(const Bridge &bridge) const {
   const boost::filesystem::path file = TMP_FILE_PATH + bridge;
   if (boost::filesystem::exists(file)) {
     boost::filesystem::remove(file);
   }
+
 }
 
-IPConfigs IPConfigurator::GetConfigurations(const Bridges &bridges) const {
+Error IPConfigurator::SetStatic(const IPConfig &ip_config) const {
+  Error status;
 
-  IPConfigs configs;
-
-  for (const auto &bridge : bridges) {
-    IPConfig ip_config;
-    Status status = ip_controller_.GetIPConfig(bridge, ip_config);
-    if (status.NotOk()) {
-      configs.clear();
-      break;
-    }
-
-    auto bootp_status = bootp_client_controller_.GetStatus(bridge);
-    DHCPClientStatus dhcp_status = dhcp_client_controller_.GetStatus(bridge);
-
-    if (DHCPClientStatus::RUNNING == dhcp_status) {
-      ip_config.source_ = IPSource::DHCP;
-    } else if (bootp_status == BootpClientStatus::RUNNING) {
-      ip_config.source_ = IPSource::BOOTP;
-    } else {
-      ip_config.source_ = IPSource::STATIC;
-    }
-
-    configs.push_back(ip_config);
-  }
-
-  return configs;
-}
-
-Status IPConfigurator::SetStatic(const IPConfig &ip_config) const {
-  Status status;
   dhcp_client_controller_.StopClient(ip_config.interface_);
   bootp_client_controller_.StopClient(ip_config.interface_);
   DeleteTempFiles(ip_config.interface_);
-
-  bool is_up = false;
-
-  if (itf_info_.IsBridge(ip_config.interface_)) {
-    Bridge bridge { ip_config.interface_ };
-    is_up = itf_info_.HasAnyInterfacesUp(bridge);
-  } else {
-    is_up = itf_info_.IsInterfaceUp(ip_config.interface_);
-  }
-
-  if (is_up) {
-    status = ip_controller_.SetIPConfig(ip_config);
-  } else {
-    status = FlushIP(ip_config.interface_);
-  }
+  status = ip_controller_.SetIPConfig(ip_config);
 
   return status;
 }
 
-Status IPConfigurator::SetTemporary(const IPConfig &ip_config) const {
+Error IPConfigurator::SetTemporary(const IPConfig &ip_config) const {
 
   return ip_controller_.SetIPConfig(ip_config);
 }
 
-Status IPConfigurator::SetDHCP(const IPConfig &ip_config) const {
-
-  Status status;
-  bool isUp = false;
-
-  if (itf_info_.IsBridge(ip_config.interface_)) {
-    Bridge b { ip_config.interface_ };
-    isUp = itf_info_.HasAnyInterfacesUp(b);
-  } else {
-    isUp = itf_info_.IsInterfaceUp(ip_config.interface_);
-  }
+Error IPConfigurator::SetDHCP(const IPConfig &ip_config) const {
+  Error status;
 
   bootp_client_controller_.StopClient(ip_config.interface_);
-
-  if (isUp) {
-    if (dhcp_client_controller_.GetStatus(ip_config.interface_)
-        != DHCPClientStatus::RUNNING) {
-      FlushIP(ip_config.interface_);
-      DeleteTempFiles(ip_config.interface_);
-      status = dhcp_client_controller_.StartClient(ip_config.interface_);
-    }
-  } else {
-    dhcp_client_controller_.StopClient(ip_config.interface_);
-    DeleteTempFiles(ip_config.interface_);
+  if (dhcp_client_controller_.GetStatus(ip_config.interface_) != DHCPClientStatus::RUNNING) {
     FlushIP(ip_config.interface_);
-    LogDebug(
-        "No interface of bridge "s.append(ip_config.interface_).append(
-            " is up. Do not start DHCP client service."));
-  }
-
-  return status;
-}
-
-Status IPConfigurator::FlushIP(const Interface& interface) const {
-  Status status;
-  LogDebug("Flush IP of "s.append(interface));
-  IPConfig config(interface, IPSource::TEMPORARY, "0.0.0.0", "0.0.0.0");
-  status = ip_controller_.SetIPConfig(config);
-  if (status.NotOk()) {
-    status.Prepend("Failed to flush IP");
-  }
-
-  return status;
-}
-
-Status IPConfigurator::SetBootp(const IPConfig &ip_config) const {
-
-  Status status = dhcp_client_controller_.StopClient(ip_config.interface_);
-
-  bool isUp = false;
-
-  if (itf_info_.IsBridge(ip_config.interface_)) {
-    Bridge b { ip_config.interface_ };
-    isUp = itf_info_.HasAnyInterfacesUp(b);
-  } else {
-    isUp = itf_info_.IsInterfaceUp(ip_config.interface_);
-  }
-
-  if (isUp) {
-    if (status.Ok()) {
-      status = FlushIP(ip_config.interface_);
-    }
-
-    if (status.Ok()) {
-      if (bootp_client_controller_.GetStatus(ip_config.interface_)
-          != BootpClientStatus::RUNNING) {
-        DeleteTempFiles(ip_config.interface_);
-        status = bootp_client_controller_.StartClient(ip_config.interface_);
-      }
-    }
-  } else {
-    bootp_client_controller_.StopClient(ip_config.interface_);
     DeleteTempFiles(ip_config.interface_);
-    FlushIP(ip_config.interface_);
-    LogDebug(
-        "No interface of bridge "s.append(ip_config.interface_).append(
-            " is up. Do not start bootp client service."));
+    status = dhcp_client_controller_.StartClient(ip_config.interface_);
   }
 
   return status;
 }
 
-Status IPConfigurator::SetNone(const IPConfig &ip_config) const {
+Error IPConfigurator::SetBootp(const IPConfig &ip_config) const {
+  Error status;
 
-  Status status = dhcp_client_controller_.StopClient(ip_config.interface_);
+  dhcp_client_controller_.StopClient(ip_config.interface_);
+  FlushIP(ip_config.interface_);
 
-  if (status.Ok()) {
-    status = bootp_client_controller_.StopClient(ip_config.interface_);
+  if (bootp_client_controller_.GetStatus(ip_config.interface_) != BootpClientStatus::RUNNING) {
+    DeleteTempFiles(ip_config.interface_);
+    status = bootp_client_controller_.StartClient(ip_config.interface_);
   }
 
-  if (status.Ok()) {
-    status = FlushIP(ip_config.interface_);
-  }
+  return status;
+}
+
+void IPConfigurator::SetNone(const IPConfig &ip_config) const {
+  dhcp_client_controller_.StopClient(ip_config.interface_);
+  bootp_client_controller_.StopClient(ip_config.interface_);
+  FlushIP(ip_config.interface_);
 
   DeleteTempFiles(ip_config.interface_);
-
-  return status;
 }
 
-Status IPConfigurator::EnableGratuitousArp(const IPConfig &ip_config) const {
-  auto buffer_len = std::snprintf(nullptr, 0,
-                                  "/proc/sys/net/ipv4/conf/%s/arp_notify",
-                                  ip_config.interface_.c_str());
+Error IPConfigurator::FlushIP(const Interface &interface) const {
+  LogDebug("Flush IP of "s.append(interface));
+  IPConfig config(interface, IPSource::TEMPORARY, ZeroIP, ZeroIP);
+  return ip_controller_.SetIPConfig(config);
+}
+
+Error IPConfigurator::EnableGratuitousArp(const IPConfig &ip_config) const {
+  auto buffer_len = std::snprintf(nullptr, 0, "/proc/sys/net/ipv4/conf/%s/arp_notify", ip_config.interface_.c_str());
 
   assert(buffer_len > 0);  //NOLINT: do not implicitly decay an array into a pointer
 
@@ -200,9 +99,7 @@ Status IPConfigurator::EnableGratuitousArp(const IPConfig &ip_config) const {
 
   auto file_path = std::unique_ptr<char[]> { new char[len_with_zero] };
 
-  std::snprintf(file_path.get(), len_with_zero,
-                "/proc/sys/net/ipv4/conf/%s/arp_notify",
-                ip_config.interface_.c_str());
+  std::snprintf(file_path.get(), len_with_zero, "/proc/sys/net/ipv4/conf/%s/arp_notify", ip_config.interface_.c_str());
 
   auto arp_notify = std::ofstream { file_path.get() };
 
@@ -212,46 +109,58 @@ Status IPConfigurator::EnableGratuitousArp(const IPConfig &ip_config) const {
     arp_notify.close();
   }
 
-  return arp_notify.good() ? Status { StatusCode::OK } : Status {
-                                 StatusCode::FILE_WRITE_ERROR,
-                                 "Failed to enable gratuitous arp" };
+  return arp_notify.good() ? Error { ErrorCode::OK } : Error { ErrorCode::GENERIC_ERROR, "Failed to enable gratuitous arp" };
 }
 
-Status IPConfigurator::Configure(IPConfigs const &configs) const {
-  Status status(StatusCode::OK);
-
-  for (auto &ip_config : configs) {
-    Status set_status = EnableGratuitousArp(ip_config);
-    switch (ip_config.source_) {
-      case IPSource::STATIC:
-        set_status = SetStatic(ip_config);
-        break;
-      case IPSource::DHCP:
-        set_status = SetDHCP(ip_config);
-        break;
-      case IPSource::BOOTP:
-        set_status = SetBootp(ip_config);
-        break;
-      case IPSource::TEMPORARY:
-        set_status = SetTemporary(ip_config);
-        break;
-      case IPSource::NONE:
-        set_status = SetNone(ip_config);
-        break;
-      case IPSource::EXTERNAL:
-        /* Do nothing here*/
-        break;
-      default:
-        set_status = Status { StatusCode::INVALID_CONFIG, "Invalid IPSource" };
-        break;
-    }
-
-    if (set_status.NotOk()) {
-      status.Prepend(StatusCode::ERROR, set_status.GetMessage());
-    }
+Error IPConfigurator::Configure(const netconf::IPConfig &ip_config) const {
+  Error set_status = EnableGratuitousArp(ip_config);
+  switch (ip_config.source_) {
+    case IPSource::STATIC:
+      set_status = SetStatic(ip_config);
+      break;
+    case IPSource::DHCP:
+      set_status = SetDHCP(ip_config);
+      break;
+    case IPSource::BOOTP:
+      set_status = SetBootp(ip_config);
+      break;
+    case IPSource::TEMPORARY:
+      set_status = SetTemporary(ip_config);
+      break;
+    case IPSource::NONE:
+      SetNone(ip_config);
+      break;
+    case IPSource::EXTERNAL:
+      SetNone(ip_config);
+      break;
+    default:
+      set_status = Error { ErrorCode::IP_CONFIG_SOURCE, ip_config.interface_ };
+      break;
   }
 
-  return status;
+  return set_status;
 }
 
-} /* namespace netconfd */
+Error IPConfigurator::Configure(const IPConfigs &ip_configs) const {
+
+  auto configure_ip = [this](const IPConfig &ip_config) -> Error {
+    return this->Configure(ip_config);
+  };
+
+  auto merge_status = [this](Error &old_error, Error &new_error) -> Error {
+    if(new_error.IsNotOk()){
+      LogError(new_error.ToString());
+      return new_error;
+    }
+    return old_error;
+  };
+
+  ::std::vector<Error> errors;
+  errors.reserve(ip_configs.size());
+  ::std::transform(ip_configs.begin(), ip_configs.end(), ::std::back_inserter(errors), configure_ip);
+
+  return ::std::reduce(errors.begin(), errors.end(), Error::Ok(), merge_status);
+
+}
+
+} /* namespace netconf */

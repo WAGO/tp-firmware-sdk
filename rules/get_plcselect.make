@@ -78,8 +78,6 @@ $(STATEDIR)/get_plcselect.targetinstall:
 	@$(call install_fixup, get_plcselect,AUTHOR,"<elrest>")
 	@$(call install_fixup, get_plcselect,DESCRIPTION,missing)
 
-	@$(call install_copy, get_plcselect, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

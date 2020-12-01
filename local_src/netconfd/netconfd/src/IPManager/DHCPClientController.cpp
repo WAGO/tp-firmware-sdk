@@ -1,133 +1,116 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "DHCPClientController.hpp"
 
-#include <csignal>
+#include <glib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cstdlib>
 
+#include <csignal>
+#include <cstdlib>
+#include <thread>
+
+#include "Helper.hpp"
 #include "Logger.hpp"
 
 using namespace std::string_literals;
 
-namespace netconfd {
+namespace netconf {
 
-DHCPClientController::DHCPClientController(
-    const ICommandExecutor& command_executor,
-    const IDevicePropertiesProvider& properties_provider, const IFileEditor& file_editor)
-    : command_executor_ { command_executor },
-      properties_provider_ { properties_provider },
-      file_editor_ { file_editor } {
+DHCPClientController::DHCPClientController(const IDeviceProperties &properties_provider, const IFileEditor &file_editor)
+    : properties_provider_{properties_provider}, file_editor_{file_editor} {
 }
 
-Status DHCPClientController::StartClient(const Bridge& bridge) const {
-
-  Status status;
-
+Error DHCPClientController::StartClient(const Bridge &bridge) const {
   if (DHCPClientStatus::RUNNING == GetStatus(bridge)) {
     LogDebug("DHCP Client for bridge " + bridge + " is already started");
-    return status;
+    return Error::Ok();
   }
   LogDebug("Start DHCP Client for bridge " + bridge);
 
-  ::std::string hostname = properties_provider_.GetHostname();
-  ::std::string pid_file_path = "/var/run/udhcpc_" + bridge + ".pid";
+  ::std::string hostname_option = "hostname:" + properties_provider_.GetHostname();
+  ::std::string pid_file_path   = "/var/run/udhcpc_" + bridge + ".pid";
+  auto vendorclass              = properties_provider_.GetOrderNumber();
 
-  auto pid = fork();
-  if (pid == 0) {
-    /* child */
-    pid = fork();
-    if (pid > 0) {
-      /* parent of grand-child */
-      exit(0);
-    } else if (pid == 0) {
-      /* grand-child */
-      umask(0022);
-      auto exec_status = execl(DHCP_CLIENT_PATH.c_str(), DHCP_CLIENT_PATH.c_str(), "--interface",
-            bridge.c_str(), "--vendorclass", properties_provider_.GetOrderNumber().c_str(),
-            "--pidfile", pid_file_path.c_str(), "-x", "hostname:", hostname.c_str(),
-            "--syslog", nullptr);
+  auto argv_array =
+      make_array(DHCP_CLIENT_PATH.c_str(), "--interface", bridge.c_str(), "--vendorclass", vendorclass.c_str(),
+                 "--pidfile", pid_file_path.c_str(), "-x", hostname_option.c_str(), "--syslog", nullptr);
 
-      if (exec_status > 0) {
-        LogError("Failed to execute dhcp client");
-        abort();
-      }
-    } else {
-      LogError("Failed to start DHCP client create child process error");
-      abort();
-    }
-  } else if (pid < 0) {
-    status.Prepend(StatusCode::ERROR, "Failed to start DHCP client create child process error");
+  GPid pid;
+  GError *g_error;
+  auto spawned = g_spawn_async(nullptr, const_cast<gchar **>(argv_array.data()), nullptr, G_SPAWN_DEFAULT,
+                               nullptr,  // NOLINT(cppcoreguidelines-pro-type-const-cast)
+                               nullptr, &pid, &g_error);
+
+  if (spawned == TRUE) {
+    LogDebug("DHCPClientController: spawned udhcp pid#" + ::std::to_string(pid));
+  } else {
+    return Error{ErrorCode::DHCP_CLIENT_START, bridge};
   }
 
-  return status;
+  return Error::Ok();
 }
 
-Status DHCPClientController::StopClient(const Bridge& bridge) const {
-
-  Status status(StatusCode::OK);
-
+void DHCPClientController::StopClient(const Bridge &bridge) const {
   if (DHCPClientStatus::STOPPED == GetStatus(bridge)) {
-    return status;
+    return;
   }
 
   ::std::string pid_file_path = "/var/run/udhcpc_" + bridge + ".pid";
 
   ::std::string pid_str;
-  status = file_editor_.Read(pid_file_path, pid_str);
-  if(status.NotOk()){
-    status.Prepend("Failed to stop DHCP client. ");
-  }
-
-  if (status.Ok()) {
+  auto error = file_editor_.Read(pid_file_path, pid_str);
+  if (error.IsOk()) {
     pid_t pid = std::stoi(pid_str);
 
     if (0 == kill(pid, SIGKILL)) {
       LogDebug("Stopped DHCP Client for bridge " + bridge);
-
-      // At this point, we know that the pidfile exists.
-      bool remove_pid_file_successfully = (std::remove(pid_file_path.c_str()) == 0);
-      if( not remove_pid_file_successfully) {
-        status.Append("Failed to remove pid file: " + pid_file_path);
-      }
-    } else {
-      status.Prepend(StatusCode::ERROR, "Failed to kill DHCP client. ");
     }
-  }
 
-  return status;
+    WaitUntilClientIsStopped(bridge);
+  }
 }
 
-DHCPClientStatus DHCPClientController::GetStatus(const Bridge& bridge) const {
+void DHCPClientController::WaitUntilClientIsStopped(const Bridge &bridge) const {
+  int max_retries = 100;
+  int retries     = 0;
+  auto status     = GetStatus(bridge);
+  while (status == DHCPClientStatus::RUNNING && retries++ < max_retries) {
+    ::std::this_thread::sleep_for(::std::chrono::milliseconds{100});
+    status = GetStatus(bridge);
+  }
+  if (status == DHCPClientStatus::RUNNING) {
+    LogError("Failed to stop dhcp client for " + bridge);
+  }
+}
 
+static DHCPClientStatus DetermineProcessStatus(pid_t pid) {
+  int state = kill(pid, 0);
+  if (state == 0 || (state == -1 && errno == EPERM)) {
+    return DHCPClientStatus::RUNNING;
+  }
+  return DHCPClientStatus::STOPPED;
+}
+
+DHCPClientStatus DHCPClientController::GetStatus(const Bridge &bridge) const {
   ::std::string pid_file_path = "/var/run/udhcpc_" + bridge + ".pid";
 
   ::std::string pid_str;
-  Status status = file_editor_.Read(pid_file_path, pid_str);
+  Error status = file_editor_.Read(pid_file_path, pid_str);
+  LogStatus("read pid file", status);
 
-  pid_t pid = 0;
-  if (status.Ok()) {
+  DHCPClientStatus client_status = DHCPClientStatus::STOPPED;
+  if (status.IsOk()) {
     try {
-      pid = std::stoi(pid_str);
-      if (pid == 0) {
-        status.Append(StatusCode::ERROR, "Failed to get DHCP status.");
+      pid_t pid = std::stoi(pid_str);
+      if (pid != 0) {
+        client_status = DetermineProcessStatus(pid);
       }
     } catch (...) {
-      status.Append(StatusCode::ERROR, "Failed to get DHCP status (unexpected exception).");
     }
   }
 
-  if (status.Ok()) {
-    int state = kill(pid, 0);
-    if (state == 0 || (state == -1 && errno == EPERM)) {
-      return DHCPClientStatus::RUNNING;
-    }
-  }
-
-  return DHCPClientStatus::STOPPED;
-
+  return client_status;
 }
 
-
-} /* namespace netconfd */
+} /* namespace netconf */

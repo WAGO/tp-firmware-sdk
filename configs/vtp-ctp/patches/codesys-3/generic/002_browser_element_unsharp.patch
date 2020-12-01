@@ -1,0 +1,146 @@
+diff -Naur codesys-3_org/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.cpp codesys-3/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.cpp
+--- codesys-3_org/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.cpp	2020-03-13 10:20:57.714577000 +0100
++++ codesys-3/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.cpp	2020-03-30 08:42:03.785139600 +0200
+@@ -10,6 +10,12 @@
+  #else
+ 	#include <QtWebEngineWidgets/qwebengineview.h>
+ 	#include <QtWebEngineWidgets/qwebenginesettings.h>
++	#include <QtWebEngineWidgets/qwebenginepage.h>
++	#include <QtWebEngineWidgets/qwebengineprofile.h>
++	#include <QtWebEngineWidgets/qwebenginesettings.h>
++	#include <QtWebEngineWidgets/qwebenginescript.h>
++	#include <QtWebEngineWidgets/qwebenginescriptcollection.h>
++
+  #endif
+ #else
+  #include <qwidget.h>
+@@ -17,7 +23,12 @@
+  #include <qwebsettings.h>
+ #endif
+ 
++#include "SysNativeCommonControlsLinuxQt.h"
++
++#define CSS_SETTINGS  "* {user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; -webkit-user-drag: none; -webkit-app-region: no-drag; -moz-user-drag: none; user-drag: none; } ::-webkit-scrollbar { width: 16px; } ::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); -webkit-border-radius: 10px; border-radius: 10px; } ::-webkit-scrollbar-thumb { -webkit-border-radius: 10px; border-radius: 10px; background: rgba(192,192,192,0.8); -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); } ::-webkit-scrollbar-thumb:window-inactive { background: rgba(255,0,0,0.4); }"
++
+ #ifdef __cplusplus
++
+ extern "C" {
+   void *qt_create_browser_control(void *handle, int iTopLeftX, int iTopLeftY, int iBottomRightX, int iBottomRightY, int iPluginsEnabled);
+   void qt_move_browser_control(void *handle, int iX, int iY);
+@@ -52,9 +63,8 @@
+ 
+ static void* doCreateBrowserControl(QWidget* pParent, bool bPluginsEnabled)
+ {
+-	QWebEngineView* pBrowserControl = new QWebEngineView(pParent);
++	MyWebEngineView* pBrowserControl = new MyWebEngineView(pParent);
+ 	pBrowserControl->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, bPluginsEnabled);
+-
+ 	return pBrowserControl;
+ }
+ #endif
+@@ -106,3 +116,76 @@
+ {
+ 	delete browserControl(handle);
+ }
++
++MyWebEngineView::MyWebEngineView(QWidget* parent)
++  : QWebEngineView(parent)
++{ 
++  QWebEngineProfile *defaultProfile = QWebEngineProfile::defaultProfile();
++  if (defaultProfile)
++    defaultProfile->setHttpAcceptLanguage(QString("en"));
++   
++  QWebEngineSettings *defaultSettings = QWebEngineSettings::globalSettings();
++  if (defaultSettings)
++  {
++    defaultSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
++    defaultSettings->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, false);
++    defaultSettings->setAttribute(QWebEngineSettings::PluginsEnabled, true);
++    defaultSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
++  }
++  
++  connect(this, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));  
++}
++
++void MyWebEngineView::loadFinished(bool success)
++{
++  if (success)
++  { 
++    QWebEnginePage * pPage = page();
++    if (pPage)
++    {    
++      pPage->runJavaScript("document.getElementsByName('viewport').length;",[=](QVariant result){
++      int nViewports = result.toInt();
++      if (nViewports>0)
++      {
++          pPage->runJavaScript("document.getElementsByName('viewport')[0].content;", [=](QVariant resContent){
++              QString strContent = resContent.toString() ;
++              bool bRun = false;
++              if (strContent.contains("minimum-scale", Qt::CaseInsensitive)==false)
++              {
++                  strContent = strContent+", minimum-scale=1.0";
++                  bRun = true;
++              }
++              if(strContent.contains("user-scalable=no") && (strContent.contains("initial-scale")==false))
++              {
++                  strContent = strContent + ", initial-scale=1.0";
++                  bRun = true;
++              }
++              if (bRun)
++              {
++                  pPage->runJavaScript("document.getElementsByName('viewport')[0].content=\""+strContent+"\"", [=](QVariant res){
++                  });
++              }
++          });
++      }
++      });
++
++      setUserStyleSheet(pPage);
++    }
++  }
++}
++
++void MyWebEngineView::setUserStyleSheet(QWebEnginePage * pPage)
++{
++  QString source = QString::fromLatin1("(function() {"\
++                                       "var css = document.getElementById(\"_qt_testBrowser_userStyleSheet\");"\
++                                       "if (css == undefined) {"\
++                                       "    css = document.createElement(\"style\");"\
++                                       "    css.type = \"text/css\";"\
++                                       "    css.id = \"_qt_testBrowser_userStyleSheet\";"\
++                                       "    document.head.appendChild(css);"\
++                                       "}"\
++                                       "css.innerText = \"%1\";"\
++                                       "})()").arg(QString(CSS_SETTINGS));
++
++  pPage->runJavaScript(source);
++}
+diff -Naur codesys-3_org/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.h codesys-3/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.h
+--- codesys-3_org/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.h	1970-01-01 01:00:00.000000000 +0100
++++ codesys-3/Platforms/Linux/visu/SysNativeCommonControlsLinuxQt.h	2020-03-30 08:41:20.590747601 +0200
+@@ -0,0 +1,25 @@
++#ifndef SYSNATIVECOMMONCONTROLSLINUXQT_H
++#define SYSNATIVECOMMONCONTROLSLINUXQT_H
++
++#include <QtWebEngineWidgets/qwebengineview.h>
++#include <QtWebEngineWidgets/qwebenginepage.h>
++#include <QtWebEngineWidgets/qwebenginesettings.h>
++#include <QtWebEngineWidgets/qwebenginepage.h>
++#include <QtWebEngineWidgets/qwebengineprofile.h>
++
++class MyWebEngineView : public QWebEngineView
++{
++  Q_OBJECT
++
++public:
++  MyWebEngineView(QWidget *parent = 0);
++  
++private:
++  void setUserStyleSheet(QWebEnginePage * pPage);
++
++private slots:
++  void loadFinished(bool success);
++
++}; 
++  
++#endif

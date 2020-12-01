@@ -144,8 +144,8 @@ Credits for Pure-FTPd are going to the following ones.
     LFS fixes.
     RPM fixes.
 
-* Stefano F. <fs <at> sp.unipi.it> :
-* Alex Dupre <sysadmin <at> alexdupre.com> :
+* StefanoÂ F.Â <fs <at> sp.unipi.it> :
+* Alex DupreÂ <sysadmin <at> alexdupre.com> :
 
     Italian translation.
 
@@ -227,7 +227,7 @@ ratios.
 
     Maintainer of the NetBSD port.
 
-* Kurt Inge Smådal / EasyISP.org <kurt <at> easyisp.org>
+* Kurt Inge SmÃ¥dal / EasyISP.org <kurt <at> easyisp.org>
 * Brynjar Eide <post <at> mislykket.no>
 
     Norwegian translation.    
@@ -282,11 +282,11 @@ enabled.
 
     Maintainer of the PDF documentation - http://www.pureftpd.org/readme.pdf
 
-* Bánhalmi Csaba <banhalmi <at> enternet.hu>
+* BÃ¡nhalmi Csaba <banhalmi <at> enternet.hu>
 
     Hungarian translation.
 
-* Oriol Magrané <omagrane <at> mediapro.es>
+* Oriol MagranÃ© <omagrane <at> mediapro.es>
 
     Catalan translation.
 

@@ -14,44 +14,18 @@
 ///  \author   WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// include files
-//------------------------------------------------------------------------------
 #include "process_params.hpp"
 
 #include "process.hpp"
-#include "file_access.hpp"
 #include "error.hpp"
 
-#include <iostream>
 #include <fstream>
 #include <sys/stat.h>
 
+namespace wago {
+namespace firewall {
 
-//------------------------------------------------------------------------------
-// defines; structure, enumeration and type definitions
-//------------------------------------------------------------------------------
-
-namespace wago
-{
-
-//------------------------------------------------------------------------------
-// function prototypes
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// macros
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// variables' and constants' definitions
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// function implementation
-//------------------------------------------------------------------------------
-
-void update_network_interface_name_mapping()
+void update_network_interface_name_mapping(const FileAccessor& file_accessor)
 {
     /* Update params_gen.xml file based on params.xml file.
      * - for each interface name in forward section of ipcmn.xml
@@ -62,19 +36,19 @@ void update_network_interface_name_mapping()
     xmldoc ipcmn;
     xmlctx ctx_ipcmn;
 
-    xmldoc params(read_configuration("params", false));
+    xmldoc params(file_accessor.read_configuration("params", false));
 
     if (!params.is_empty())
     {
         try
         {
-          ipcmn = read_configuration("iptables", false);
+          ipcmn = file_accessor.read_configuration("iptables", false);
         }
         catch (std::runtime_error e)
         {
           // Just copy params.xml to params_gen.xml
-          std::ofstream dst(get_config_fname("params_gen"), std::ios::binary);
-          std::ifstream src(get_config_fname("params"), std::ios::binary);
+          std::ofstream dst(file_accessor.get_config_fname("params_gen"), std::ios::binary);
+          std::ifstream src(file_accessor.get_config_fname("params"), std::ios::binary);
           dst << src.rdbuf();
         }
     }
@@ -88,8 +62,7 @@ void update_network_interface_name_mapping()
     if(!ctx_ipcmn.is_empty())
     {
         // Get list of interfaces used in masquerading and port-forwarding rules.
-        std::vector<std::string> required_itf_list;
-        get_attribute_value_list(ctx_ipcmn, "/f:firewall/f:ipv4/f:forward", "if", required_itf_list);
+        auto required_itf_list = get_attribute_value_list(ctx_ipcmn, "/f:firewall/f:ipv4/f:forward", "if");
 
         xmlctx ctx_params(get_ctx(params));
 
@@ -115,11 +88,12 @@ void update_network_interface_name_mapping()
         }
 
         // Save xml changes to file.
-        store_configuration("params_gen", false, params);
+        file_accessor.store_configuration("params_gen", false, params);
     }
 }
 
-}
+} // namespace firewall
+} // namespace wago
 
 //---- End of source file ------------------------------------------------------
 

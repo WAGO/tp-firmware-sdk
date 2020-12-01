@@ -1,9 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
 #include "IEthernetInterfaceFactory.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class EthernetInterfaceFactory : public IEthernetInterfaceFactory {
  public:
@@ -14,5 +15,5 @@ class EthernetInterfaceFactory : public IEthernetInterfaceFactory {
 
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */
 

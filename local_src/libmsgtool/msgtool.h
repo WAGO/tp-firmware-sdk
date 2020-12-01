@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    msgtool.h
 ///
-/// \version $Id: msgtool.h 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: msgtool.h 51697 2020-09-02 13:59:51Z wrueckl_elrest $
 ///
 /// \brief   interprocess communication using messages
 ///
@@ -44,6 +44,7 @@
 #define TESTABILITY_CONF_FILE        "/etc/specific/testability.conf"
 #define VIRTUALKEYBOARD_CONF_FILE    "/etc/specific/virtualkeyboard.conf"
 #define ERUNTIME_CONF_FILE           "/etc/specific/eruntime.conf"
+#define MICROBROWSER_CONF_FILE       "/usr/local/bin/microbrowser/mb_config.ini"
 
 //Piped fifo names
 #define DEV_VIRTUALKEYBOARD          "/dev/virtualkeyboard"

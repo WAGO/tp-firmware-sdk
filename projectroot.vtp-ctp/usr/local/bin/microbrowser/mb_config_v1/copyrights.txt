@@ -1,0 +1,32 @@
+Open Source Software license information
+ 
+1) This product contains Open Source components which are licensed under the applicable open source licenses.
+A list of the applicable open source licenses is available below.
+The Open Source Software licenses are granted by the respective right holders directly.
+All listed software packages are copyright by their respective authors. Please see the source code for detailed information.
+
+Modifications of our programs which are linked to LGPL libraries are permitted for the customer's own use and reverse engineering for debugging such modifications.
+However, forwarding the information acquired during reverse engineering or debugging to third parties is prohibited.
+Furthermore, it is prohibited to distribute modified versions of our programs.
+
+All listed software packages are copyright by their respective authors. Please see the source code for detailed information
+ 
+2) WARRANTY DISCLAIMER
+THE OPEN SOURCE SOFTWARE IN THIS PRODUCT IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+See the applicable licenses for more details.
+ 
+3) Written offer
+This product contains software components that are licensed by the holder of the rights as free software, or Open Source Software,under the licenses as listed below.
+The source code for these software components can be obtained from us on a data carrier (e.g. CD-ROM, DVD or USB stick) by submitting a request to our department at the following address within three years after delivery of the product or as long as we offer spare parts or customer support for this product model:
+-
+tci Gesellschaft für technische Informatik mbH
+Ludwig-Rinn-Straße 10-14
+35452 Heuchelheim
+Germany
+PM@tci.de
+www.tci.de
+ 
+Please provide the following product information [Name] [Serial number] [Date of delivery].
+
+We will charge no more than your cost of physically performing source distribution.

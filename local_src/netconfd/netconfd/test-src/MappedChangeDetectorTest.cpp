@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * MappedChangeDetectorTest.cpp
  *
@@ -9,7 +10,7 @@
 #include <string>
 #include "InterfaceManager/MappedChangeDetector.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 using std::string;
 
@@ -30,4 +31,4 @@ TEST(MappedChangeDetectorTest, SomeChanges)
 
 
 
-}  // namespace netconfd
+}  // namespace netconf

@@ -21,10 +21,6 @@ config WBM_NG_PLUGIN_MODBUS
 
 	depends on WBM_NG
 
-	# This plugin requires the wbm-ports plugin to be installed
-	# as it provided the required wbm menu entry point
-	select WBM_NG_PLUGIN_PORTS
-
 	help
 	 "Plugin to the Modular WBM that contains the 'Modbus' Page."
 

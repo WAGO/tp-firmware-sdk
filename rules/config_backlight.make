@@ -78,8 +78,6 @@ $(STATEDIR)/config_backlight.targetinstall:
 	@$(call install_fixup, config_backlight,AUTHOR,"<elrest>")
 	@$(call install_fixup, config_backlight,DESCRIPTION,missing)
 
-	@$(call install_copy, config_backlight, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

@@ -2,15 +2,19 @@
 
 #pragma once
 
-#include "Status.hpp"
+#include "Error.hpp"
 #include "Types.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 enum class DHCPClientStatus {
   RUNNING,
   STOPPED,
 };
+
+static inline ::std::string ToString(DHCPClientStatus status) {
+  return status == DHCPClientStatus::RUNNING ? "running" : "stopped";
+}
 
 class IDHCPClientController {
  public:
@@ -22,9 +26,9 @@ class IDHCPClientController {
   IDHCPClientController(const IDHCPClientController&&) = delete;
   IDHCPClientController& operator=(const IDHCPClientController&&) = delete;
 
-  virtual Status StartClient(const Bridge& bridge) const = 0;
-  virtual Status StopClient(const Bridge& bridge) const = 0;
+  virtual Error StartClient(const Bridge& bridge) const = 0;
+  virtual void StopClient(const Bridge& bridge) const = 0;
   virtual DHCPClientStatus GetStatus(const Bridge& bridge) const = 0;
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */

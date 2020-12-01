@@ -1,28 +1,20 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-//------------------------------------------------------------------------------
-///  \file     IEthernetInterface.hpp
-///
-///  \brief    <short description of the file contents>
-///
-///  \author   <author> : WAGO Kontakttechnik GmbH & Co. KG
-//------------------------------------------------------------------------------
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #pragma once
 
 #include "NetworkInterfaceConstants.hpp"
-#include <gsl.hpp>
+#include "MacAddress.hpp"
+#include <gsl/gsl>
 
-namespace netconfd {
-
-using MacAddress = ::gsl::span<const ::std::uint8_t>;
+namespace netconf {
 
 class IEthernetInterface {
  public:
   virtual ~IEthernetInterface() = default;
 
   virtual void UpdateConfig() = 0;
-  virtual ::std::string const& GetName() const = 0;
   virtual eth::EthernetMauType GetMauType() const = 0;
-  virtual const MacAddress GetMac() const = 0;
+  virtual MacAddress GetMac() const = 0;
   virtual bool GetAutonegSupport() const = 0;
   virtual bool GetAutonegEnabled() const = 0;
   virtual ::std::uint32_t GetAutonegCapabilities() const = 0;
@@ -41,7 +33,7 @@ class IEthernetInterface {
 };
 
 
-}  // namespace netconfd
+}  // namespace netconf
 
 
 //---- End of header file ------------------------------------------------------

@@ -16,7 +16,7 @@
 ///------------------------------------------------------------------------------
 /// \file    virtualkeyb.cpp
 ///
-/// \version $Id: virtualkeyb.cpp 43771 2019-10-18 09:36:27Z wrueckl_elrest $
+/// \version $Id: virtualkeyb.cpp 47941 2020-03-26 11:50:44Z wrueckl_elrest $
 ///
 /// \brief   virtual keyboard
 ///
@@ -76,6 +76,7 @@ CVKButton::CVKButton(const QString & text, QWidget * parent) :
     m_iRepetitionAllowed(0), m_iSpecialBtn(0)
 {
   //QPushButton::QPushButton(text, parent);
+
 }
 
 VirtualKeyb::VirtualKeyb() :
@@ -360,11 +361,25 @@ void VirtualKeyb::HandleShift()
     ptr = m_btnList.at(k);
     if (m_iShift)
     {
-      ptr->setText(ptr->m_sKeyShifted);
+      if (ptr->m_sKeyShifted == "&")
+      {
+        ptr->setText(" && ");
+      }
+      else
+      {
+        ptr->setText(ptr->m_sKeyShifted);
+      }
     }
     else
     {
-      ptr->setText(ptr->m_sKey);
+      if (ptr->m_sKey == "&")
+      {
+        ptr->setText(" && ");
+      }
+      else
+      {
+        ptr->setText(ptr->m_sKey);
+      }
     }
   }
 }
@@ -381,7 +396,14 @@ void VirtualKeyb::HandleShiftLock()
   for (int k = 0; k < m_btnList.count(); k++)
   {
     ptr = m_btnList.at(k);
-    ptr->setText(ptr->m_sKeyShifted);
+    if (ptr->m_sKeyShifted == "&")
+    {
+      ptr->setText(" && ");
+    }
+    else
+    {
+      ptr->setText(ptr->m_sKeyShifted);
+    }
   }
 }
 

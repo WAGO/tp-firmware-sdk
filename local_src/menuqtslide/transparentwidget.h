@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    transparentwidget.h
 ///
-/// \version $Id: transparentwidget.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: transparentwidget.h 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   Thread for receiving command f.e. open menu
 ///
@@ -79,7 +79,7 @@ public slots:
   void slotMinimize();
   void slotFocus();
   void slotOnTimer();
-
+  void slotOnClose();
 
 };
 

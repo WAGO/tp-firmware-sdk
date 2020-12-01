@@ -1,0 +1,6 @@
+#  Egalax Panel udev.rule
+#
+KERNEL=="event[0-9]*", SUBSYSTEM=="input", \
+  ATTRS{name}=="eGalax Inc. eGalaxTouch P80H84 0134 v00_T0 k4.06.186", \
+  SYMLINK+="input/captouch"
+

@@ -1,13 +1,5 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-//------------------------------------------------------------------------------
-///  \file     IInterfaceEvent.h
-///
-///  \brief    <short description of the file contents>
-///
-///  \author   <author> : WAGO Kontakttechnik GmbH & Co. KG
-//------------------------------------------------------------------------------
-#ifndef PFCSPECIFIC_SRC_ALL_LOGICALDEVICE_IINTERFACEEVENT_H_
-#define PFCSPECIFIC_SRC_ALL_LOGICALDEVICE_IINTERFACEEVENT_H_
+// SPDX-License-Identifier: LGPL-3.0-or-later
+#pragma once
 
 //------------------------------------------------------------------------------
 // include files
@@ -18,20 +10,18 @@
 // defines; structure, enumeration and type definitions
 //------------------------------------------------------------------------------
 
-namespace netconfd {
+namespace netconf {
 
 class IInterfaceEvent{
 
  public:
   virtual ~IInterfaceEvent() = default;
 
-  virtual void LinkChange(::std::uint32_t if_index, eth::InterfaceLinkState new_state) = 0;
+  virtual void LinkChange(::std::uint32_t if_index, ::std::uint32_t new_state) = 0;
 
 };
 
 }  // namespace pfcspecific
 
 
-#endif /* PFCSPECIFIC_SRC_ALL_LOGICALDEVICE_IINTERFACEEVENT_H_ */
-//---- End of source file ------------------------------------------------------
 

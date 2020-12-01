@@ -20,7 +20,7 @@ INCLUDES += \
 -I$(PROJECT_ROOT)/src/
 
 CFLAGS += $(call option_std,c99)
-CXXFLAGS += $(call option_std,c++14)
+CXXFLAGS += $(call option_std,c++17)
 
 CLANG_TIDY_HEADER_FILTER :=
 
@@ -29,7 +29,7 @@ CLANG_TIDY_HEADER_FILTER :=
 
 -include $(SCRIPT_DIR)/platform_1.mk
 
-#######################################################################################################################
+######################################################################################################################
 # Custom toolchain configuration
 
 LINT_RULE_FILES = \
@@ -41,11 +41,11 @@ $(wildcard $(PROJECT_ROOT)/suppress.lnt)
 
 MODULES += \
 bal/module.mk \
-libbridge/module.mk \
 netconfd/module.mk \
 dbus/module.mk \
-bridgeconfig_dsa/module.mk \
-utility/module.mk
+utility/module.mk \
+common/module.mk \
+clientapi/module.mk
 
 MK_FILES += $(MODULES)
 
@@ -59,11 +59,20 @@ BUILDTARGETS += $(MAIN_BUILDTARGETS) $(TEST_BUILDTARGETS)
 
 OPTION_HIDE_SYMBOLS ?= -fvisibility=hidden
 
-netconfd.elf_INCLUDES = \
--I$(PROJECT_ROOT)/src/ \
--I$(PROJECT_ROOT)/extern/ \
+NETCONFD_SHARED_INCLUDES :=     \
+-I$(PROJECT_ROOT)/extern/       \
+-I$(PROJECT_ROOT)/common/extern \
+ 
+
+netconfd.elf_INCLUDES =           \
+  $(NETCONFD_SHARED_INCLUDES)     \
+-I$(PROJECT_ROOT)/src/            \
+-I$(PROJECT_ROOT)/extern/         \
+-I$(PROJECT_ROOT)/common/extern   \
 -I$(PROJECT_ROOT)/netconfd/extern/
 
+netonfd_common_sources = $(call fglob_r,$(PROJECT_ROOT)/common/src,$(SOURCE_FILE_EXTENSIONS))
+netonfd_common_includes = $(PROJECT_ROOT)/common/extern $(PROJECT_ROOT)common/src
 
 #######################################################################################################################
 # Settings for build target netconfd
@@ -73,8 +82,8 @@ netconfd.elf_VERSION = $(NETCONFD_VERSION)
 netconfd.elf_DISABLEDWARNINGS += packed
 netconfd.elf_CDISABLEDWARNINGS += $(netconfd.so_DISABLEDWARNINGS)  
 netconfd.elf_CXXDISABLEDWARNINGS += $(netconfd.so_DISABLEDWARNINGS) abi-tag useless-cast
-netconfd.elf_STATICALLYLINKED += netconfd bal utility bridge netconfddbus
-netconfd.elf_LIBS += netconfd bal boost_log utility bridge boost_thread boost_system boost_filesystem boost_serialization netconfddbus
+netconfd.elf_STATICALLYLINKED += netconfd bal utility netconfddbus
+netconfd.elf_LIBS += netconfd bal boost_log utility boost_thread boost_system boost_filesystem boost_serialization netconfddbus rt
 netconfd.elf_PKG_CONFIGS += $(call uniq,$(libbal.a_PKG_CONFIGS) $(libbridge.a_PKG_CONFIGS) $(libnetconfddbus.a_PKG_CONFIGS) $(libutility.a_PKG_CONFIGS))
 netconfd.elf_PKG_CONFIG_LIBS += $(call uniq,$(libbal.a_PKG_CONFIG_LIBS) $(libbridge.a_PKG_CONFIG_LIBS))
 netconfd.elf_PREREQUISITES += $(call lib_buildtarget_raw, $(netconfd.elf_LIBS) $(netconfd.elf_PKG_CONFIG_LIBS),$(netconfd.elf_STATICALLYLINKED))
@@ -107,6 +116,9 @@ netconfd.elf_CLANG_TIDY_CHECKS += -google-runtime-references
 
 include $(MODULES)
 
+-include $(PROJECT_ROOT)/license_install.mk
+MK_FILES += $(PROJECT_ROOT)/license_install.mk
+
 #######################################################################################################################
 # Build infrastructure
 
@@ -128,5 +140,5 @@ $(DESTDIR)/etc/% : $(PROJECT_ROOT)/etc/%
 
 $(SCRIPT_DIR)/%.mk :
 	$(error build scripts unavailable - set script dir (SCRIPT_DIR=$(SCRIPT_DIR)) or checkout ct-build)
-
+	
 	

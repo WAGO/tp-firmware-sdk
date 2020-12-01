@@ -1,0 +1,52 @@
+diff -Naur codesys-3_org/Platforms/Linux/visu/windowwidget.cpp codesys-3/Platforms/Linux/visu/windowwidget.cpp
+--- codesys-3_org/Platforms/Linux/visu/windowwidget.cpp	2020-08-03 16:49:55.744508650 +0200
++++ codesys-3/Platforms/Linux/visu/windowwidget.cpp	2020-08-04 08:56:49.968382991 +0200
+@@ -1,6 +1,10 @@
+ #include <iostream>
+ #include <math.h>
++#include <fcntl.h>
++#include <unistd.h>
+ #include <QTransform>
++#include <QMutex>
++#include <QMutexLocker>
+  
+ #include <pthread.h>
+ #include "windowwidget.h"
+@@ -3467,6 +3471,24 @@
+     setEnabled(false);
+ }
+ 
++static void openvk() {
++  //open virtual keyboard
++  int fd = open("/dev/virtualkeyboard", O_RDWR | O_NONBLOCK);
++  if (fd >= 0)
++  {
++    char * pCmd = "tvopen\n";
++    write(fd, pCmd, strlen(pCmd));
++    close(fd);
++  }
++}
++
++static QMutex vkmutex;
++void TVLineEdit::focusInEvent(QFocusEvent *event){
++  //open virtual keyboard
++  QMutexLocker locker(&vkmutex);
++  openvk();
++}
++
+ /* some helper functions for determine the border of fonts */
+ 
+ static void CutStringAfterFirstLine(void* pszString, int bUnicode, string_cut_data* pCutData) {
+diff -Naur codesys-3_org/Platforms/Linux/visu/windowwidget.h codesys-3/Platforms/Linux/visu/windowwidget.h
+--- codesys-3_org/Platforms/Linux/visu/windowwidget.h	2020-08-03 16:49:55.752508650 +0200
++++ codesys-3/Platforms/Linux/visu/windowwidget.h	2020-08-04 08:47:39.393232991 +0200
+@@ -261,6 +261,9 @@
+ 	QWidget* m_parent;
+ 	// Flag indicating, whether the edited value has to be returned as an unicode string or not.
+ 	bool m_bUnicode;
++  
++  protected:
++  void focusInEvent(QFocusEvent *event);
+ };
+ 
+ /*

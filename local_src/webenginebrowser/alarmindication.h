@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.h
 ///
-/// \version $Id: alarmindication.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: alarmindication.h 48355 2020-04-14 08:29:13Z wrueckl_elrest $
 ///
 /// \brief   show connection lost informations
 ///
@@ -102,14 +102,18 @@ signals:
 public slots:
   void OnShowWBM();
   void setNumber();
+  void ActivateX11Window();
 
 private:
   int m_iNumber;
   QTimer * m_pTimer;
   QString sUrlWbm;
+  int m_iWbmBtnState;
 
-//protected:
-  //void showEvent (QShowEvent * event);
+  void ReadWbmBtnState();
+
+protected:
+  void showEvent (QShowEvent * event);
   //void hideEvent (QHideEvent * event);
 
 };

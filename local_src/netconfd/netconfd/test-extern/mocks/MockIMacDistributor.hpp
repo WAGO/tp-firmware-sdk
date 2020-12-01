@@ -1,16 +1,16 @@
-#ifndef NETCONFD_TEST_EXTERN_MOCKS_MOCKIMACDISTRIBUTOR_HPP_
-#define NETCONFD_TEST_EXTERN_MOCKS_MOCKIMACDISTRIBUTOR_HPP_
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
 
 #include <gmock/gmock.h>
+
 #include "IMacDistributor.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class MockIMacDistributor : public IMacDistributor {
  public:
-  MOCK_METHOD1(SetMac, Status(Bridge const& interface) );
+  MOCK_METHOD1(AssignMacs,
+      void(NetDevs &net_devs));
 };
 
-}
-  // namespace netconfd
-#endif 
+}  // namespace netconf

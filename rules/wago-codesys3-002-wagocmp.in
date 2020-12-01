@@ -121,8 +121,8 @@ config CDS3_IODRVPN
   select GOOGLETEST
   select CDS3_INCLUDES
   select DBUS
-  select NLOHMANN_JSON
   select DAL
+  select NETCONFD
   help
     Builds and installs the Profinet Controller/Driver Cds driver
 
@@ -574,8 +574,9 @@ config CDS3_IODRVRLB
     select CDS3_INCLUDES
     select CODESYS3
     select LIBUIO
-    select LIBRLB
     select LIBCOMMONHEADER
+    select LED_SERVER_META
+    select WAGO_PFC_DIAGNOSTIC if !LED_SERVER_LEGACY
     help
         This component implements the process data communication between codesys3 and rocket local bus
 
@@ -595,6 +596,7 @@ config CDS3_TSCPAMIECINTERFACE
 	default n
 	select CODESYS3
 	select CDS3_INCLUDES
+	select LINUX_PAM
 	help
 		Builds and installs lib-interface for PAM library
 

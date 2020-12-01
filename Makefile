@@ -23,11 +23,15 @@ $(ESC_DOLLAR) := $$
 BUILDTYPE ?= development
 IMAGE_DIR ?= $(PLATFORMDIR)/images
 OUT_DIR ?= $(IMAGE_DIR)
+PLATFORM ?= $(shell echo $(PTXCONF_PLATFORM))
 SD_ACTIVATED = $(shell echo "$(PTXCONF_IMAGE_SD)$(PTXCONF_IMAGE_SRC_SD)" | grep --only-matching y)
+ifeq ($(PLATFORM),wago-pfc-adv)
+PRODUCTION_ACTIVATED = $(shell echo "$(PTXCONF_IMAGE_PRODUCTION)")
+else
 PRODUCTION_ACTIVATED = $(shell echo "$(PTXCONF_HOST_WAGO_CM_PRODUCTION)")
+endif
 DOWNGRADE_ACTIVATED = $(shell echo "$(PTXCONF_IMAGE_SD_DOWNGRADE)")
 RAUC_ACTIVATED = $(shell echo "$(PTXCONF_IMAGE_RAUC)")
-PLATFORM ?= $(shell echo $(PTXCONF_PLATFORM))
 PROJECT ?= $(shell echo $(PTXCONF_PROJECT))
 KERNEL_VERSION ?= $(shell echo $(PTXCONF_KERNEL_VERSION))
 PLATFORMDIR ?= platform-$(PLATFORM)
@@ -50,8 +54,8 @@ FIRMWARE_SVNREVISION := $(shell cat $(TARGETROOT)/etc/SVNREVISION | head -n1 | c
 # Map platform/project names to more user friendly target names
 ifeq ($(PLATFORM),wago-pfcXXX)
 FIRMWARE_PLATFORM ?= PFC-Linux
-else ifeq ($(PLATFORM),wago-pac100)
-FIRMWARE_PLATFORM ?= PAC-Linux
+else ifeq ($(PLATFORM),wago-pfc-adv)
+FIRMWARE_PLATFORM ?= PFC_ADV-Linux
 else ifeq ($(PLATFORM),wago-pfcXXX-hardened)
 FIRMWARE_PLATFORM ?= PFC-Linux
 else ifeq ($(PLATFORM),vtp-ctp)
@@ -97,6 +101,7 @@ RAUC_CERTIFICATE ?= $(shell echo $(PTXCONF_RAUC_DEVELOPMENT_CERT))
 endif
 RAUC_KEYRING ?= $(shell echo $(PTXCONF_RAUC_DEVELOPMENT_KEYRING))
 RAUC_CMD ?= $(PLATFORMDIR)/build-host/$(RAUC_HOST_FOLDER)/rauc
+RAUC_DISTINCT_KEYRING = $(RAUC_CERTIFICATE)
 
 # Downgrade images
 DOWNGRADE_IMAGES += $(OUT_DIR)/sd-downgrade-firmware-02-pfc200_$(IMAGE_ID).img
@@ -104,12 +109,16 @@ DOWNGRADE_IMAGES += $(OUT_DIR)/sd-downgrade-firmware-03-pfc200_$(IMAGE_ID).img
 DOWNGRADE_IMAGES += $(OUT_DIR)/sd-downgrade-firmware-04-pfc200_$(IMAGE_ID).img
 
 # Production images
+ifneq ($(PLATFORM),wago-pfc-adv)
 PRODUCTION_IMAGES += $(OUT_DIR)/nand-wago-production-pfc100_$(IMAGE_ID).ubi
 PRODUCTION_IMAGES += $(OUT_DIR)/nand-wago-production-pfc200_$(IMAGE_ID).img
 PRODUCTION_IMAGES += $(OUT_DIR)/nand-wago-production-pfc200v2_$(IMAGE_ID).ubi
 PRODUCTION_IMAGES += $(OUT_DIR)/emmc-wago-production-pfc200v3_$(IMAGE_ID).img
 PRODUCTION_IMAGES += $(OUT_DIR)/emmc-commission-pfc200v3_$(IMAGE_ID).img
 PRODUCTION_IMAGES += $(OUT_DIR)/firmware_$(IMAGE_ID).hex
+else
+PRODUCTION_IMAGES += $(OUT_DIR)/production_$(IMAGE_ID).zip
+endif
 
 ifeq ($(BUILDTYPE),release)
 PRODUCTION_IMAGES += $(OUT_DIR)/vmlinux_$(IMAGE_ID)
@@ -209,6 +218,10 @@ $(OUT_DIR)/vmlinux_$(IMAGE_ID): $(PLATFORMDIR)/build-target/linux-$(KERNEL_VERSI
 	@echo "Create versioned kernel image by copy: $<"
 	cp $< $@
 
+$(OUT_DIR)/production_$(IMAGE_ID).zip: $(IMAGE_DIR)/production.zip | $(OUT_DIR)
+	@echo "Create versioned production image by copy: $<"
+	cp $< $@
+
 $(IMAGES_ARCHIVE): $(OUT_DIR)/ptxdist.images.stage | $(OUT_DIR)
 	@echo "Create image archive"
 	tar -cvzf $@ -C $(IMAGE_DIR) .
@@ -230,7 +243,7 @@ ifeq ($(BUILDTYPE),release)
 $(RAUC_UPDATEFILE): $(RAUC_UPDATEFILE_ORIGINAL) $(RAUC_CERTIFICATE) $(RAUC_KEY) $(RAUC_KEYRING) Makefile | $(OUT_DIR)
 	@echo "Create RAUC update file \"$@\" for build type $(BUILDTYPE) by resign with key \"$(RAUC_KEY)\""
 	   rm -f $@ \
-	&& $(RAUC_CMD) resign --cert=$(RAUC_CERTIFICATE) --key=$(RAUC_KEY) --keyring=$(RAUC_KEYRING) $< $@
+	&& $(RAUC_CMD) resign --cert=$(RAUC_CERTIFICATE) --key=$(RAUC_KEY) --keyring=$(RAUC_KEYRING) --signing-keyring=$(RAUC_DISTINCT_KEYRING) $< $@
 else
 $(RAUC_UPDATEFILE): $(RAUC_UPDATEFILE_ORIGINAL) Makefile | $(OUT_DIR)
 	@echo "Create RAUC update file \"$@\" for build type $(BUILDTYPE) by copy"

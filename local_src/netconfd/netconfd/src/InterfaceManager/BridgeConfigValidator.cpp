@@ -1,108 +1,75 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "BridgeConfigValidator.hpp"
-#include "Logger.hpp"
-#include "Helper.hpp"
+
+#include <net/if.h>
 #include <algorithm>
-#include "net/if.h"
 
-namespace netconfd {
+#include "Helper.hpp"
+#include "Logger.hpp"
 
-BridgeConfigValidator::BridgeConfigValidator(
-    IBridgeController& bridge_controller)
+namespace netconf {
+
+BridgeConfigValidator::BridgeConfigValidator(IBridgeController &bridge_controller)
     : bridge_controller_(bridge_controller) {
-
 }
 
-static Status CheckBridgeName(const ::std::string& bridge_name) {
-
-  Status status;
-
+static Error CheckBridgeName(const ::std::string &bridge_name) {
   // Hint: A check for duplicated bridges is not required, because we use a map that
   // does not allow duplicate keys.
 
   // Check bridge name length
   if (bridge_name.size() > IFNAMSIZ - 1) {
-    status.Prepend(StatusCode::INVALID_PARAMETER,
-                   "Bridge name " + bridge_name + " is too long (>15)");
+    return Error { ErrorCode::BRIDGE_NAME_INVALID, bridge_name };
   }
   // Checks bridge contains blanks
   if (::std::string::npos != bridge_name.find(' ')) {
-    status.Prepend(StatusCode::INVALID_PARAMETER,
-                   "Bridge name " + bridge_name + " contains blanks");
+    return Error { ErrorCode::BRIDGE_NAME_INVALID, bridge_name };
   }
 
-  return status;
+  return Error::Ok();
 }
 
-static Status CheckMinimalInterfaceAssignmentPrecondition(
-    BridgeConfig const& config) {
+static Error CheckBridgeInterfaces(const Interfaces& bridge_interfaces, const Interfaces& available_interfaces, Interfaces& former_bridge_interfaces){
+  for (auto &interface : bridge_interfaces) {
+    // Check if interface is available in the system
+    if (IsNotIncluded(interface, available_interfaces)) {
+      if (interface.empty()) {
+        return Error{ErrorCode::NAME_EMPTY};
+      } else {
+        return Error{ErrorCode::INTERFACE_NOT_EXISTING ,interface};
+      }
+    }
 
-  if (config.find("br0") == config.end()
-      || config.find("br1") == config.end()) {
-
-    return Status(StatusCode::INVALID_CONFIG,
-                  "Bridge config has to contain br0 and br1.");
+    // Check if interfaces are uniquely assigned to bridge(s)
+    if (IsNotIncluded(interface, former_bridge_interfaces)) {
+      former_bridge_interfaces.push_back(interface);
+    } else {
+      return Error{ErrorCode::ENTRY_DUPLICATE, interface };
+    }
   }
-
-  auto const& br0_itfs = config.at("br0");
-  auto const& br1_itfs = config.at("br1");
-
-  if (IsNotIncluded("ethX1", br0_itfs)
-      || (IsNotIncluded("ethX2", br0_itfs) && IsNotIncluded("ethX2", br1_itfs))) {
-
-    return Status(StatusCode::INVALID_CONFIG,
-                  "Bridges br0 and br1 do not contain interfaces X1 and X2.");
-  }
-
-  return Status();
+  return Error::Ok();
 }
 
-Status BridgeConfigValidator::Validate(BridgeConfig const& config) const {
-
-  Status status;
+Error BridgeConfigValidator::Validate(BridgeConfig const &os_config) const {
+  Error error;
   Interfaces available_interfaces = bridge_controller_.GetInterfaces();
   Interfaces found_interfaces;
 
-  status = CheckMinimalInterfaceAssignmentPrecondition(config);
-
-  if (status.Ok()) {
-    // HINT: Do not exit loop on first invalidity to log all errors.
-    for (auto& bridge_pair : config) {
-
-      Status check_status = CheckBridgeName(bridge_pair.first);
-      if (check_status.NotOk()) {
-        status.Append(check_status.GetMessage());
-      }
-
-      for (auto& interface : bridge_pair.second) {
-
-        // Check if interface is available in the system
-        if (IsNotIncluded(interface, available_interfaces)) {
-
-          if (interface.empty()) {
-            status.Append("Interface unnamed");
-          } else {
-            status.Append("Interface " + interface + " is not available");
-          }
-        }
-
-        // Check if interfaces are uniquely assigned to bridge(s)
-        if (IsNotIncluded(interface, found_interfaces)) {
-          found_interfaces.push_back(interface);
-        } else {
-          status.Append(
-              "Interface " + interface + " is assigned several times");
-        }
-      }
+  // HINT: Do not exit loop on first invalidity to log all errors.
+  for (auto &[bridge_name, interfaces] : os_config) {
+    error = CheckBridgeName(bridge_name);
+    if (error.IsNotOk()) {
+      break;
+    }
+    error = CheckBridgeInterfaces(interfaces, available_interfaces, found_interfaces);
+    if( error.IsNotOk())
+    {
+      break;
     }
   }
 
-  if (status.NotOk()) {
-    status.Prepend("Bridge config validation failed: ");
-  }
-
-  return status;
+  return error;
 }
 
-} /* namespace netconfd */
+} /* namespace netconf */

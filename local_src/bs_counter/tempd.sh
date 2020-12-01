@@ -22,7 +22,7 @@ case $1 in
 		;;
 
 	stop)
-		echo "${PREFIX}stoppping"
+		echo "${PREFIX}stopping"
 
 		if start-stop-daemon --stop --quiet --oknodo --exec ${TEMPD}; then
 			echo "${PREFIX}done"

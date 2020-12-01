@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 #pragma once
 
-#include "Status.hpp"
+#include "Error.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class IControllable {
  public:
   virtual ~IControllable() = default;
 
-  virtual Status Start() = 0;
+  virtual void Start() = 0;
 
 };
 
-}  // namespace netconfd
+}  // namespace netconf
 
 //---- End of header file ------------------------------------------------------
 

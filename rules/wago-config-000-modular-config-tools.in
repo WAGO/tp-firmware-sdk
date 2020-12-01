@@ -4,11 +4,11 @@
 #   This file contains the main config tools target needed by ptxdist to
 #   process ${__THIS_FILENAME__}.make as well as the common configuration
 #   entries for the config tools meta package: the feature entries, the config
-#   file entries and the config tool entries.  
+#   file entries and the config tool entries.
 #
 #   The feature targets are visible in the ptxdist menu. They are used to
 #   enable or disable menu entries in all frontends (i.e. eth1 settings may be
-#   disabled if the feature "Ethernet Switch" is active).  
+#   disabled if the feature "Ethernet Switch" is active).
 #
 
 
@@ -21,10 +21,9 @@ menuconfig MODULAR_CONFIG_TOOLS
   prompt "Command-line tool suite of modular config tools"
   select GOOGLETEST
   select HOST_CT_BUILD
+  select CONFIG_TOOL_BASE
   select LIBCOMMONHEADER
   select GLIB
-  select LIBRLB if CT_CONFIG_RMD
-  select LIBUIO if CT_CONFIG_RMD
 
 # basic parts
   select CT_CONFIG_TOOL_UTILS_LIB_C
@@ -44,15 +43,20 @@ config CT_CONFIG_LINUX_USER
   select CT_CONFIG_TOOL_LIB_C
   prompt "config_linux_user"
   help
-  Change Linux user passwords.
+   "Change Linux user passwords."
 
-config CT_CONFIG_RMD
+###############################################################
+comment "System"
+  depends on MODULAR_CONFIG_TOOLS
+
+config CT_DETECT_FEATURE
   bool
   default n
   depends on MODULAR_CONFIG_TOOLS
-  prompt "config_rmd"
-   help
-     RMD-Rocket Master Device config tool.
+  depends on CT_CONFIG_TOOL_UTILS_LIB_C
+  prompt "detect_feature"
+  help
+   "Detect present system features."
 
 ###############################################################
 comment "Memory"
@@ -64,9 +68,12 @@ config CT_RESERVED_AREA
   depends on MODULAR_CONFIG_TOOLS
   prompt "reserved_area"
   help
-   Control reserved data area.
+   "Control reserved data area."
 
 ######################### BASIC PARTS #########################
+comment "Common"
+  depends on MODULAR_CONFIG_TOOLS
+
 config CT_CONFIG_TOOL_UTILS_LIB_C
   bool
   default n
@@ -74,5 +81,3 @@ config CT_CONFIG_TOOL_UTILS_LIB_C
   select GLIB
   help
    Shared C functions used across multiple binaries.
-
-

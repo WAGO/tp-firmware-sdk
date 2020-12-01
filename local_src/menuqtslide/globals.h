@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    globals.h
 ///
-/// \version $Id: globals.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: globals.h 46392 2020-02-07 11:11:46Z wrueckl_elrest $
 ///
 /// \brief   global settings / variables
 ///
@@ -80,7 +80,7 @@ enum TOOLBAR_ORIENTATION { TOOLBAR_TOP, TOOLBAR_BOTTOM, TOOLBAR_LEFT, TOOLBAR_RI
 // variable definitions
 //------------------------------------------------------------------------------
 extern bool g_bEventDetection;
-
+extern bool g_bWbmAllowed;
 
 //------------------------------------------------------------------------------
 // function implementation

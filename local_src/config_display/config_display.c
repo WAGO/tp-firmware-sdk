@@ -9,7 +9,7 @@
 ///
 /// \file    config_display.c
 ///
-/// \version $Id: config_display.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_display.c 51858 2020-09-08 11:48:37Z wrueckl_elrest $
 ///
 /// \brief   change display settings / config-tools
 ///
@@ -58,6 +58,7 @@
 static const char EepromDevice[] = "/sys/bus/i2c/devices/1-0054/eeprom";
 #define SYSFS_EEPROM_WP_PATH	"/sys/class/gpio/gpio23/value"
 #define DISPLAY_ROTATION_ADDR	0x01F8
+#define CT_MICROBROWSER   "/etc/config-tools/config_microbrowser"
 
 //------------------------------------------------------------------------------
 // Local variables
@@ -105,7 +106,7 @@ int main(int argc, char **argv)
   int iRetVal;
   char szArgv[256] = "";
   char cTempBuf[6];
-  int ret_systemcall = ERROR;
+  int ret_systemcall = ERROR;  
   
   int restart_brightness_control = 0;
  
@@ -218,6 +219,15 @@ int main(int argc, char **argv)
                   SetLastError(szErrTxt);
                   status = ERROR;
                 }
+                
+                //microbrowser
+                if (FileExists(CT_MICROBROWSER) == SUCCESS)
+                {
+                  char szCmd[256] = "";
+                  snprintf(szCmd, sizeof(szCmd), "%s MB_Config.Orientation=%d", CT_MICROBROWSER, 0);
+                  system(szCmd); 
+                }
+                
               }
               else if ((stricmp(pStr, "landscape180") == 0) && (status == SUCCESS))
               {
@@ -244,6 +254,14 @@ int main(int argc, char **argv)
                   setRgbLed(RGB_LED_STATE_RE_BLINK, szErrTxt);
                   SetLastError(szErrTxt);
                   status = ERROR;
+                }
+                
+                //microbrowser
+                if (FileExists(CT_MICROBROWSER) == SUCCESS)
+                {
+                  char szCmd[256] = "";
+                  snprintf(szCmd, sizeof(szCmd), "%s MB_Config.Orientation=%d", CT_MICROBROWSER, 2);
+                  system(szCmd); 
                 }
               }
               else if ((stricmp(pStr, "portrait") == 0) && (status == SUCCESS))
@@ -272,6 +290,15 @@ int main(int argc, char **argv)
                   SetLastError(szErrTxt);
                   status = ERROR;
                 }
+                
+                //microbrowser
+                if (FileExists(CT_MICROBROWSER) == SUCCESS)
+                {
+                  char szCmd[256] = "";
+                  snprintf(szCmd, sizeof(szCmd), "%s MB_Config.Orientation=%d", CT_MICROBROWSER, 3);
+                  system(szCmd); 
+                }
+                
               }
               else if ((stricmp(pStr, "portrait270") == 0) && (status == SUCCESS))
               {
@@ -298,6 +325,14 @@ int main(int argc, char **argv)
                   setRgbLed(RGB_LED_STATE_RE_BLINK, szErrTxt);
                   SetLastError(szErrTxt);
                   status = ERROR;
+                }
+                
+                //microbrowser
+                if (FileExists(CT_MICROBROWSER) == SUCCESS)
+                {
+                  char szCmd[256] = "";
+                  snprintf(szCmd, sizeof(szCmd), "%s MB_Config.Orientation=%d", CT_MICROBROWSER, 1);
+                  system(szCmd); 
                 }
                 
               }

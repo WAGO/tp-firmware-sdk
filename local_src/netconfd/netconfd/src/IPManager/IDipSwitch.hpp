@@ -3,8 +3,9 @@
 #pragma once
 
 #include <cstdint>
+#include "Types.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class IDipSwitch
 {
@@ -14,6 +15,7 @@ class IDipSwitch
 
   virtual std::uint8_t GetValue() const = 0;
   virtual bool HasReachedMaxValue() const = 0;
+  virtual DipSwitchMode GetMode() const = 0;
 };
 
-}  // namespace netconfd
+}  // namespace netconf

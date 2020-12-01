@@ -9,7 +9,7 @@
 ///
 /// \file    gesture_control.c
 ///
-/// \version $Id: gesture_control.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: gesture_control.c 51383 2020-08-24 13:44:28Z wrueckl_elrest $
 ///
 /// \brief   gesture control, show toolbarmenu on swipe
 ///
@@ -57,8 +57,14 @@
 //DEBUG
 //#define DEBUG_MSG
 
-//#define SWAP_XY_COORDINATES
-#define XORG_INVERT_Y
+
+//DISPLAY SETTINGS except 21.5 " device
+static char SWAP_XY_COORDINATES = 0;
+static char XORG_INVERT_Y = 1;
+static char XORG_INVERT_X = 0;
+static int TEST_ABS_X = ABS_X;
+static int TEST_ABS_Y = ABS_Y;
+
 
 #define BITS_PER_LONG (sizeof(long) * 8)
 #define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
@@ -68,13 +74,7 @@
 #define DEV_TOOLBARMENU   "/dev/toolbarmenu"
 #define PID_FILE          "/var/run/gesture_control.pid"
 
-#ifdef SWAP_XY_COORDINATES
-  #define TEST_ABS_X    ABS_Y
-  #define TEST_ABS_Y    ABS_X
-#else
-  #define TEST_ABS_X    ABS_X
-  #define TEST_ABS_Y    ABS_Y
-#endif
+
 
 //#define MIN(a,b) (((a)<(b))?(a):(b))
 //#define MAX(a,b) (((a)>(b))?(a):(b))
@@ -101,6 +101,7 @@ typedef struct GestureData
   int iOrientation;
   int xScreen, yScreen;
   unsigned char enabled;
+  char szDisplaysize[32]; //15.6 21.5 5.7 10.1
   //tMsg2Server msgDataWebkit;
 
 } tGestureData;
@@ -114,6 +115,7 @@ enum eDISPLAYTYPE
   DISPLAY_TYPE_800_480,
   DISPLAY_TYPE_800_600,
   DISPLAY_TYPE_1280_800,
+  DISPLAY_TYPE_1920x1080,
 
   DISPLAY_TYPE_END
 };
@@ -135,10 +137,12 @@ void AppendErrorText(int iStatusCode, char * pText);
 int InitGestureData();
 
 int SendOpenMenuCmd();
+void SetSwapXY();
 int SwapxyValue(int value, int axis);
 int CheckSwipePoints(int orientation);
 
 int GetOrientationValue();
+int GetDisplaySize(char * pbuffer, int len);
 int ReadScreenSize();
 int GetClearScreenActivity();
 
@@ -153,6 +157,7 @@ void EventListener();
 //------------------------------------------------------------------------------
 
 static tGestureData g_gestureData;
+static int g_displayType = DISPLAY_TYPE_1280_800;
 
 //------------------------------------------------------------------------------
 // function implementation
@@ -420,13 +425,16 @@ void EventListener()
               g_gestureData.xindex = 0;
               g_gestureData.yindex = 0;
 
-              #ifdef SWAP_XY_COORDINATES
+              if (SWAP_XY_COORDINATES)
+              {
                 g_gestureData.py[g_gestureData.xindex] = SwapxyValue(ev[1].value, AXIS_Y);
                 g_gestureData.px[g_gestureData.yindex] = SwapxyValue(ev[2].value, AXIS_X);
-              #else
+              }
+              else
+              {
                 g_gestureData.px[g_gestureData.xindex] = SwapxyValue(ev[1].value, AXIS_X);
                 g_gestureData.py[g_gestureData.yindex] = SwapxyValue(ev[2].value, AXIS_Y);
-              #endif
+              }
 
               #ifdef DEBUG_MSG
                 printf("STARTPOINT timediff: %d [ms], x: %d, y: %d\n", timeDiffMs, g_gestureData.px[g_gestureData.xindex], g_gestureData.py[g_gestureData.yindex]);
@@ -691,11 +699,8 @@ int main(int argc, char *argv[])
     setRgbLed(RGB_LED_STATE_RE_BLINK, "Gesture control: You are not root! This may not work.");
     SetLastError("gesture_control: you are not root! This may not work.");
   }
-
+ 
   InitGestureData();
-
-  // display orientation - rotation
-  g_gestureData.iOrientation = GetOrientationValue();
 
   if ((g_gestureData.iOrientation < 0)||(g_gestureData.iOrientation > 3))
     g_gestureData.iOrientation = 0; 
@@ -739,6 +744,13 @@ int ReplaceLine(tConfList * ptr, char * pNew)
 }
 
 
+void SetSwapXY()
+{
+  SWAP_XY_COORDINATES = 1;
+  TEST_ABS_X = ABS_Y;
+  TEST_ABS_Y = ABS_X;
+}
+
 /// \brief init gesture data
 ///
 /// \retval  0 SUCCESS
@@ -747,6 +759,7 @@ int InitGestureData()
 {
   char szOut[256] = "";
   int arraysize, ret;
+  int z21 = 0;
 
   tConfList * pListGesture = NULL;
   pListGesture = ConfCreateList();
@@ -760,9 +773,27 @@ int InitGestureData()
   }
 
   memset(&g_gestureData, 0x00, sizeof(g_gestureData));
-  //g_gestureData.server_id_webkit = -1;
+
+  // display orientation - rotation
+  g_gestureData.iOrientation = GetOrientationValue();
 
   ReadScreenSize();
+  if (GetDisplaySize(&g_gestureData.szDisplaysize[0], sizeof(g_gestureData.szDisplaysize)) == 0)
+  {    
+    if (strncmp(g_gestureData.szDisplaysize, "21.5", 3) == 0)
+    {
+      //21.5 zoll display
+      z21 = 1;
+      //SWAP_XY_COORDINATES
+      //OLDVERSION SetSwapXY();
+      //OLDVERSION XORG_INVERT_Y = 0;      
+      //OLDVERSION XORG_INVERT_X = 1;
+    }
+  }
+
+#ifdef DEBUG_MSG
+  printf("g_gestureData.szDisplaysize: %s\n", g_gestureData.szDisplaysize);
+#endif  
 
   //gesture data
   if (ConfGetValue(pListGesture, "state", szOut, sizeof(szOut)) == SUCCESS)
@@ -781,45 +812,84 @@ int InitGestureData()
   }
 
   //gesture start range 0..4095
-  if ((g_gestureData.xScreen == 1280) && (g_gestureData.yScreen == 800))
+  if ((g_gestureData.xScreen == 1920) && (g_gestureData.yScreen == 1080))
+  {
+    //landscape 15" / 21"
+    if (z21) {
+      switch (g_gestureData.iOrientation) {
+        case 2:
+            //landscape 180°
+            g_gestureData.iStartRange = 400; 
+            break;
+        default:
+            //landscape
+            g_gestureData.iStartRange = 340; 
+            break;
+      }
+    }
+    else {
+      g_gestureData.iStartRange = 360;  
+    }
+    g_displayType = DISPLAY_TYPE_1920x1080;
+  }
+  else if ((g_gestureData.xScreen == 1080) && (g_gestureData.yScreen == 1920))
+  {
+    //portrait  15" / 21"
+    if (z21) {
+      g_gestureData.iStartRange = 240;
+    }
+    else {
+      g_gestureData.iStartRange = 150;
+    }
+    g_displayType = DISPLAY_TYPE_1920x1080;
+  }
+  else if ((g_gestureData.xScreen == 1280) && (g_gestureData.yScreen == 800))
   {
     //landscape 10"
     g_gestureData.iStartRange = 380;
+    g_displayType = DISPLAY_TYPE_1280_800;
   }
   else if ((g_gestureData.xScreen == 800) && (g_gestureData.yScreen == 1280))
   {
     //portrait 10"
     g_gestureData.iStartRange = 200;
+    g_displayType = DISPLAY_TYPE_1280_800;
   }
   else if ((g_gestureData.xScreen == 800) && (g_gestureData.yScreen == 480))
   {
     //landscape 7"
     g_gestureData.iStartRange = 400;
+    g_displayType = DISPLAY_TYPE_800_480;
   }
   else if ((g_gestureData.xScreen == 480) && (g_gestureData.yScreen == 800))
   {
     //portrait 7"
     g_gestureData.iStartRange = 250;
+    g_displayType = DISPLAY_TYPE_800_480;
   }
   else if ((g_gestureData.xScreen == 640) && (g_gestureData.yScreen == 480))
   {
     //landscape 5"
     g_gestureData.iStartRange = 400;
+    g_displayType = DISPLAY_TYPE_640_480;
   }
   else if ((g_gestureData.xScreen == 480) && (g_gestureData.yScreen == 640))
   {
     //portrait 5"
     g_gestureData.iStartRange = 300;
+    g_displayType = DISPLAY_TYPE_640_480;
   }
   else if ((g_gestureData.xScreen == 480) && (g_gestureData.yScreen == 272))
   {
     //landscape 4"
     g_gestureData.iStartRange = 600;
+    g_displayType = DISPLAY_TYPE_480_272;
   }
   else if ((g_gestureData.xScreen == 272) && (g_gestureData.yScreen == 480))
   {
     //portrait 4"
     g_gestureData.iStartRange = 300;
+    g_displayType = DISPLAY_TYPE_480_272;
   }
   else if (ConfGetValue(pListGesture, "startrange", szOut, sizeof(szOut)) == SUCCESS)
   {
@@ -845,8 +915,6 @@ int InitGestureData()
       g_gestureData.iMoveLength = atoi(szOut);
     }
   }
-
-  //printf("g_gestureData.iMoveLength %d\n", g_gestureData.iMoveLength);
 
   g_gestureData.iGestureArraySize = GESTURE_ARRAY_SIZE;
   if (ConfGetValue(pListGesture, "arraysize", szOut, sizeof(szOut)) == SUCCESS)
@@ -884,6 +952,28 @@ int InitGestureData()
   //defaults
   g_gestureData.xMaxRaw = 4095;
   g_gestureData.yMaxRaw = 4095;
+    
+  if (g_displayType == DISPLAY_TYPE_1920x1080)
+  {
+    if (z21) {   
+      //21.5 zoll   
+      g_gestureData.iMoveLength = (int)(g_gestureData.iMoveLength / 2.5);
+    }
+    else {
+      //15.6 zoll
+      g_gestureData.iMoveLength = g_gestureData.iMoveLength / 2;
+      g_gestureData.xMaxRaw = 3896;
+      g_gestureData.yMaxRaw = 3896;
+    }
+
+    if (g_gestureData.iMoveLength > 5)
+      g_gestureData.iMoveLength -= 2;
+  }
+
+  
+#ifdef DEBUG_MSG
+  printf("g_gestureData.iMoveLength %d\n", g_gestureData.iMoveLength);
+#endif  
 
   openlog("gesture_control", LOG_NDELAY, LOG_DAEMON);
   syslog(LOG_INFO, "xMaxRaw %d yMaxRaw %d startrange %d\n", g_gestureData.xMaxRaw, g_gestureData.yMaxRaw, g_gestureData.iStartRange);
@@ -899,12 +989,15 @@ int SwapxyValue(int value, int axis)
 {
   int retval = value;
   
-#ifdef XORG_INVERT_Y  
-  if (axis == AXIS_Y)
+  if ((XORG_INVERT_Y)&&(axis == AXIS_Y))
   {
     retval = abs(value - g_gestureData.yMaxRaw);
   }
-#endif  
+  
+  if ((XORG_INVERT_X)&&(axis == AXIS_X))
+  {
+    retval = abs(value - g_gestureData.xMaxRaw);
+  }
 
   return retval;
 }
@@ -921,9 +1014,9 @@ int CheckSwipePoints(int orientation)
   int iMin;
   int iMax;
 
-  #ifdef DEBUG_MSG
-    printf("CheckSwipePoints %d\n", orientation);
-  #endif
+#ifdef DEBUG_MSG
+  printf("CheckSwipePoints %d\n", orientation);
+#endif
 
   switch (orientation)
   {
@@ -1117,6 +1210,27 @@ int GetOrientationValue()
   return ret;
 }
 
+int GetDisplaySize(char * pbuffer, int len)
+{
+  int iRet = -1;
+  FILE *fp;
+
+  fp = popen("/etc/config-tools/get_typelabel_value DISPLAYSIZE", "r");
+  if (fp == NULL) {
+    return iRet;
+  }
+  
+  if (fgets(pbuffer, len, fp) != NULL)
+  {
+    iRet = 0;
+  }
+
+  pclose(fp);
+
+  return iRet;
+}
+
+
 int ReadScreenSize()
 {
   struct fb_var_screeninfo var;
@@ -1143,7 +1257,7 @@ int ReadScreenSize()
     return -1;
   }
 
-  iOrientation = GetOrientationValue();
+  iOrientation = g_gestureData.iOrientation;
 
   if ((iOrientation < 0)||(iOrientation > 3))
     iOrientation = 0;
@@ -1164,7 +1278,9 @@ int ReadScreenSize()
     }
   }
 
-  //printf("x: %d y: %d\n", g_gestureData.xScreen, g_gestureData.yScreen);
+#ifdef DEBUG_MSG
+  printf("x: %d y: %d\n", g_gestureData.xScreen, g_gestureData.yScreen);
+#endif  
 
   close(fb_fd);
   

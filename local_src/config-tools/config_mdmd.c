@@ -11,7 +11,7 @@
 ///
 ///  \file     config_mdmd.c
 ///
-///  \version  $Revision: 38215 $
+///  \version  $Revision: 50237 $
 ///
 ///  \brief    Configuration tool for WAGO Modem Management Daemon. 
 ///
@@ -29,7 +29,7 @@
 #include <libgen.h>             // for basename()
 #include <glib.h>
 #include <gio/gio.h>
-#include "liblog/ct_liblog.h"
+#include "config_tool_lib.h"        // status codes, SetLastError function
 #include "ct_dbus.h"
 #include <typelabel_API.h>
 #include <diagnostic/diagnostic_API.h>
@@ -50,14 +50,14 @@ typedef struct MdmDBusClient
   gchar      *lastError;
 } tMdmDBusClient;
 
-static tMdmDBusClient _mdmDBusClient = {NULL,0,NULL};
+static tMdmDBusClient g_mdmDbusClient = {NULL,0,NULL};
 
 static void MdmDBusClientInit(const gchar     *name,
                               const gchar     *objectPath,
                               const gchar     *interfaceName,
                               guint32         timeout)
 {
-  _mdmDBusClient.gDBusProxy = g_dbus_proxy_new_for_bus_sync( G_BUS_TYPE_SYSTEM,
+  g_mdmDbusClient.gDBusProxy = g_dbus_proxy_new_for_bus_sync( G_BUS_TYPE_SYSTEM,
                                                              G_DBUS_PROXY_FLAGS_NONE,
                                                              0,
                                                              name,
@@ -65,16 +65,16 @@ static void MdmDBusClientInit(const gchar     *name,
                                                              interfaceName,
                                                              0,
                                                              0);
-  _mdmDBusClient.timeout = timeout;
+  g_mdmDbusClient.timeout = timeout;
 }
 
 static void MdmDBusClientSetLastError(const char *errmsg)
 {
-  if (_mdmDBusClient.lastError)
+  if (g_mdmDbusClient.lastError)
   {
-    g_free(_mdmDBusClient.lastError);
+    g_free(g_mdmDbusClient.lastError);
   }
-  _mdmDBusClient.lastError = g_strdup(errmsg);
+  g_mdmDbusClient.lastError = g_strdup(errmsg);
 }
 
 static gint MdmDBusClientCallSync(const char     *methodName,
@@ -82,11 +82,11 @@ static gint MdmDBusClientCallSync(const char     *methodName,
                                   GVariant       **result)
 {
   GError *err = NULL;
-  *result = g_dbus_proxy_call_sync(_mdmDBusClient.gDBusProxy,
+  *result = g_dbus_proxy_call_sync(g_mdmDbusClient.gDBusProxy,
                                    methodName,
                                    parameters,
                                    G_DBUS_CALL_FLAGS_NONE,
-                                   _mdmDBusClient.timeout,
+                                   g_mdmDbusClient.timeout,
                                    0,
                                    &err);
 
@@ -101,13 +101,13 @@ static gint MdmDBusClientCallSync(const char     *methodName,
 
 static void MdmDBusClientFree()
 {
-  if (_mdmDBusClient.gDBusProxy)
+  if (g_mdmDbusClient.gDBusProxy)
   {
-    g_object_unref(_mdmDBusClient.gDBusProxy);
+    g_object_unref(g_mdmDbusClient.gDBusProxy);
   }
-  if (_mdmDBusClient.lastError)
+  if (g_mdmDbusClient.lastError)
   {
-    g_free(_mdmDBusClient.lastError);
+    g_free(g_mdmDbusClient.lastError);
   }
 }
 
@@ -283,66 +283,27 @@ static void SmsEventReportingConfigInit(tSmsReportingConfig* reportingConfig)
   reportingConfig->bfr = 0;
 }
 
-static gchar *_programmName = NULL;
-
-// Table to convert error codes to text. TODO put into more general support module.
-static tCodeToErrorMessage _codeToMessage[] = {
-  { MISSING_PARAMETER, "MISSING_PARAMETER" },
-  { INVALID_PARAMETER, "INVALID_PARAMETER" },
-  { FILE_OPEN_ERROR, "FILE_OPEN_ERROR" },
-  { FILE_READ_ERROR, "FILE_READ_ERROR" },
-  { FILE_CLOSE_ERROR, "FILE_CLOSE_ERROR" },
-  { NOT_FOUND, "NOT_FOUND" },
-  { SYSTEM_CALL_ERROR, "SYSTEM_CALL_ERROR" },
-  { CONFIG_FILE_INCONSISTENT, "CONFIG_FILE_INCONSISTENT" },
-  { TIMEOUT, "TIMEOUT" },
-  { FILE_WRITE_ERROR, "FILE_WRITE_ERROR" },
-  { NARROW_SPACE_WARNING, "NARROW_SPACE_WARNING" },
-  { NOT_ENOUGH_SPACE_ERROR, "NOT_ENOUGH_SPACE_ERROR" },
-  { SUCCESS, "UNDEFINED" }                   // End marker, don't remove.
-};
-
-static void ExitProgramm(gint code)
+static void ExitProgramm(enum eStatusCode code, const char *msg)
 {
-  if (_programmName) 
+  if ((code != SUCCESS) && (msg != NULL))
   {
-    g_free(_programmName);
+    GString *err_msg = g_string_new("mdmd: ");
+    const char *gDBusErrorPrefix = "GDBus.Error:de.wago.mdmdError: ";
+    const size_t offset = g_str_has_prefix(msg, gDBusErrorPrefix) ? strlen(gDBusErrorPrefix) : 0;
+    g_string_append(err_msg, msg+offset);
+    SetLastError((const char *)err_msg->str);
+    g_string_free(err_msg, TRUE);
   }
+
   MdmDBusClientFree();
   exit(code);
-}
-
-static void ExitWithError(enum eStatusCode code, const char *msg)
-{
-  GString *message;
-  tCodeToErrorMessage *p = _codeToMessage;
-  while((p->code != SUCCESS) && (p->code != code))
-  {
-    p++;
-  }
-
-  message = g_string_new(_programmName);
-  
-  if (msg)
-  {
-    const char *gDBusErrorPrefix = "GDBus.Error:de.wago.mdmdError: ";
-    int offset = g_str_has_prefix(msg, gDBusErrorPrefix) ? strlen(gDBusErrorPrefix) : 0;
-    g_string_append_printf(message, ": %s", msg+offset);
-  }
-
-  ct_liblog_setLastError((const char *)message->str);
-  ct_liblog_reportError(code, (const char *)message->str);
-  fprintf(stderr, "%s: %s\n", p->text, message->str);
-
-  g_string_free(message, TRUE);
-  ExitProgramm(code);
 }
 
 static void AssertCondition(bool cond, enum eStatusCode code, const char *msg)
 {
   if(!cond)
   {
-    ExitWithError(code, msg);
+    ExitProgramm(code, msg);
   }
 }
 
@@ -527,6 +488,20 @@ static gint GetLogLevel(gint *loglevel)
   return retVal;
 }
 
+static gint GetSimAutoActivation(gchar **ppId, gchar **ppPin)
+{
+  GVariant *result = NULL;
+  gint retVal = MdmDBusClientCallSync("GetSimAutoActivation",
+                                      NULL, /* no method parameters */
+                                      &result);
+  if (result)
+  {
+    g_variant_get(result,"(ss)", ppId, ppPin);
+    g_variant_unref(result);
+  }
+  return retVal;
+}
+
 static gint GetSmsStorageConfig(tSmsStorageConfig* storageConfig)
 {
   GVariant *result = NULL;
@@ -690,6 +665,19 @@ static gint SetLogLevel(gint loglevel)
   return retVal;
 }
 
+static gint SetSimAutoActivation(const gchar* id, const gchar* pin)
+{
+  GVariant *result = NULL;
+  gint retVal = MdmDBusClientCallSync("SetSimAutoActivation",
+                                      g_variant_new("(ss)", id, pin),
+                                      &result);
+  if (result)
+  {
+    g_variant_unref(result);
+  }
+  return retVal;
+}
+
 //------------------------------------------------------------------------------
 // SECTION Main function, command line option handling.
 //------------------------------------------------------------------------------
@@ -708,27 +696,28 @@ static const gchar *usage_text =
   "  config_mdmd <command> [<option>] [<param>, ...]\n"
   "\n"
   "Commands:\n"
-  "  -h/--help                  Print this usage message.\n"
-  "  -g/--get                   Query parameters and print as name=value pairs, one per line.\n"
-  "  -j/--get-json              Query parameters and print as JSON format string.\n"
-  "  -s/--set [param] ...       Set parameters.\n"
-  "  -r/--reset                 Trigger a modem hard reset.\n"
-  "     --reset-all             Trigger a modem hard reset and restart modem software environment.\n"
+  "  -h/--help                  Print this usage message\n"
+  "  -g/--get                   Query parameters and print as name=value pairs, one per line\n"
+  "  -j/--get-json              Query parameters and print as JSON format string\n"
+  "  -s/--set [param] ...       Set parameters\n"
+  "  -r/--reset                 Trigger a modem hard reset\n"
+  "     --reset-all             Trigger a modem hard reset and restart modem software environment\n"
   "  -v/--version               Print version of modem manager daemon (mdmd)\n"
-  "  -c/--check                 Check the compatibility between the PFC firmware and the modem firmware.\n"
+  "  -c/--check                 Check the compatibility between the PFC firmware and the modem firmware\n"
   "\n"
   "Options:\n"
-  "  -d/--device                Modem device information.\n"
+  "  -d/--device                Modem device information\n"
   "  -i/--identity              Mobile equipment identity\n"
-  "  -n/--network               Configuration of mobile network.\n"
-  "  -l/--network-list          List of detected mobile networks.\n"
-  "  -G/--gprsaccess            Configuration of packet data service.\n"
-  "  -S/--SIM                   Subscriber identity authentication.\n"
+  "  -n/--network               Configuration of mobile network\n"
+  "  -l/--network-list          List of detected mobile networks\n"
+  "  -G/--gprsaccess            Configuration of packet data service\n"
+  "  -S/--SIM                   Subscriber identity authentication\n"
   "  -p/--port                  Configuration of modem control port\n"
   "  -L/--logging               Configuration of log output\n"
-  "  -q/--signal-quality        Get measured signal quality values.\n"
-  "  -T/--smsstorage            Configuration of sms storage.\n"
-  "  -R/--smseventreporting     Configuration of sms event reporting.\n"
+  "  -q/--signal-quality        Get measured signal quality values\n"
+  "  -T/--smsstorage            Configuration of sms storage\n"
+  "  -R/--smseventreporting     Configuration of sms event reporting\n"
+  "  -a/--simautoactivation     Configuration of automatic SIM activation, parameters: SimId, SimPin\n"
 
 /*
  * Added functionality to fetch message list from command line.
@@ -752,11 +741,12 @@ static const gchar *usage_text =
   "  GprsRegistrationState      type: enum\n"
   "                             access: read only\n"
   "                             - registration state:\n"
-  "                               STOPPED: not registered, the manually selected network is not available.\n"
-  "                               HOMENET: registered with home network.\n"
+  "                               STOPPED: not registered, the manually selected network is not available\n"
+  "                               HOMENET: registered with home network\n"
   "                               STARTED: not registered, automatic network selection ongoing or no network available\n"
-  "                               DENIED:  not registered, the manually selected network allows no registration.\n"
-  "                               ROAMING: registered with roaming network.\n"
+  "                               DENIED:  not registered, the manually selected network allows no registration\n"
+  "                               UNKNOWN: not registered, status not available, e.g. while modem initialization\n"
+  "                               ROAMING: registered with roaming network\n"
   "  GprsAccessPointName        type: string\n"
   "                             access: read/write\n"
   "                             - logical name of GGSN or provider specific data network\n"
@@ -837,20 +827,20 @@ static const gchar *usage_text =
   "  NetworkSelection           type: enum\n"
   "                             access: read/write\n"
   "                             - strategy of network selection:\n"
-  "                               MANUAL:      select the given network fix.\n"
-  "                               AUTOMATIC:   automatic network selection without priorisation.\n"
-  "                               ONLY_GSM:    automatic network selection with restriction to GSM networks.\n"
-  "                               ONLY_UMTS:   automatic network selection with restriction to UMTS networks.\n"
-  "                               PREFER_GSM:  automatic network selection with preference for GSM networks.\n"
-  "                               PREFER_UMTS: automatic network selection with preference for UMTS networks.\n"
+  "                               MANUAL:      select the given network fix\n"
+  "                               AUTOMATIC:   automatic network selection without priorisation\n"
+  "                               ONLY_GSM:    automatic network selection with restriction to GSM networks\n"
+  "                               ONLY_UMTS:   automatic network selection with restriction to UMTS networks\n"
   "  NetworkRegistrationState   type: enum\n"
   "                             access: read only\n"
   "                             - status of network registration:\n"
-  "                               STOPPED: not registered, the manually selected network is not available.\n"
-  "                               HOMENET: registered with home network.\n"
+  "                               STOPPED: not registered, the manually selected network is not available\n"
+  "                               HOMENET: registered with home network\n"
   "                               STARTED: not registered, automatic network selection ongoing or no network available\n"
-  "                               DENIED:  not registered, the manually selected network allows no registration.\n"
-  "                               ROAMING: registered with roaming network.\n"
+  "                               DENIED:  not registered, the manually selected network allows no registration\n"
+  "                               UNKNOWN: not registered, status not available, e.g. while modem initialization\n"
+  "                               ROAMING: registered with roaming network\n"
+  "                               NOSERVICE: network access is not available or emergency calls only\n"
   "  NetworkId                  type: numeric\n"
   "                             access: read/write\n"
   "                             - unique identifier of the mobile network as 5- or 6 digit number (MCC + MNC)\n"
@@ -867,8 +857,8 @@ static const gchar *usage_text =
   "  NetworkState               type: enum\n"
   "                             access: read only\n"
   "                             - availability of the the listed network:\n"
-  "                               AVAILABLE: registration is possible.\n"
-  "                               CURRENT:   currently registered network.\n"
+  "                               AVAILABLE: registration is possible\n"
+  "                               CURRENT:   currently registered network\n"
   "                               FORBIDDEN: registration is not allowed\n"
 
   "  SimPin                     type: numeric\n"
@@ -881,14 +871,20 @@ static const gchar *usage_text =
   "  SimState                   type: enum\n"
   "                             access: read only\n"
   "                             - sim card status\n"
-  "                               SIM_PIN:      authentication with PIN necessary.\n"
-  "                               SIM_PUK:      authentication with PUK necessary.\n"
-  "                               READY:        authentication successful.\n"
-  "                               ERROR:        sim card is not valid.\n"
-  "                               NOT_INSERTED: sim card is not inserted.\n"
+  "                               UNKNOWN:      status not available, e.g. while modem initialization\n"
+  "                               SIM_PIN:      authentication with PIN necessary\n"
+  "                               SIM_PUK:      authentication with PUK necessary\n"
+  "                               READY:        authentication successful\n"
+  "                               ERROR:        sim card is not valid\n"
+  "                               NOT_INSERTED: sim card is not inserted\n"
+  "                               NOT_READY:    sim card is not ready\n"
   "  SimAttempts                type: numeric\n"
   "                             access: read only\n"
   "                             - the remaining attempts for SIM authentication when SimState SIM_PIN or SIM_PUK\n"
+
+  "  SimId                      type: numeric\n"
+  "                             access: read/write\n"
+  "                             - sim card id for for automatic activation\n"
 
   "  RSSI                       type: integer\n"
   "                             access: read only\n"
@@ -941,17 +937,18 @@ static const gchar *usage_text =
   "\n"
   "";
 
-static tIntToStringMap _mapSimState[] = {
+static tIntToStringMap g_mapSimState[] = {
   { 0, "UNKNOWN" },
   { 1, "SIM_PIN" },
   { 2, "SIM_PUK" },
   { 3, "READY" },
   { 4, "NOT_INSERTED" },
   { 5, "ERROR" },
+  { 6, "NOT_READY" },
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapOperAct[] = {
+static tIntToStringMap g_mapOperAct[] = {
   { 0, "GSM" },
   { 1, "GSM_COMPACT" },
   { 2, "UMTS" },
@@ -963,17 +960,18 @@ static tIntToStringMap _mapOperAct[] = {
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapRegState[] = {
+static tIntToStringMap g_mapRegState[] = {
   { 0, "STOPPED" },
   { 1, "HOMENET" },
   { 2, "STARTED" },
   { 3, "DENIED" },
   { 4, "UNKNOWN" },
   { 5, "ROAMING" },
+  { 6, "NOSERVICE" },
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapOperState[] = {
+static tIntToStringMap g_mapOperState[] = {
   { 0, "UNKNOWN" },
   { 1, "AVAILABLE" },
   { 2, "CURRENT" },
@@ -981,17 +979,17 @@ static tIntToStringMap _mapOperState[] = {
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapSelectMode[] = {
+static tIntToStringMap g_mapSelectMode[] = {
   { 0, "AUTOMATIC" },
   { 1, "MANUAL" },
   { 2, "ONLY_GSM" },
   { 3, "ONLY_UMTS" },
-  { 4, "PREFER_GSM" },
-  { 5, "PREFER_UMTS" },
+  { 4, "PREFER_GSM" },  /*WAT26409: deprecated option, not removed for settings restore compatibility*/
+  { 5, "PREFER_UMTS" }, /*WAT26409: deprecated option, not removed for settings restore compatibility*/
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapAuthType[] = {
+static tIntToStringMap g_mapAuthType[] = {
   { 0, "NONE" },
   { 1, "PAP" },
   { 2, "CHAP" },
@@ -999,19 +997,19 @@ static tIntToStringMap _mapAuthType[] = {
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapState[] = {
+static tIntToStringMap g_mapState[] = {
   { 0, "DISABLED" },
   { 1, "ENABLED" },
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapBoolean[] = {
+static tIntToStringMap g_mapBoolean[] = {
   { 0, "FALSE" },
   { 1, "TRUE" },
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapLoglevel[] = {
+static tIntToStringMap g_mapLoglevel[] = {
   { 0, "DISABLED" },
   { 1, "ERROR" },
   { 2, "WARNING" },
@@ -1021,7 +1019,7 @@ static tIntToStringMap _mapLoglevel[] = {
   { -1, "INVALID" }        // End marker, don't remove.
 };
 
-static tIntToStringMap _mapMessageState[] = {
+static tIntToStringMap g_mapMessageState[] = {
   { 0, "RECV UNREAD" },
   { 1, "RECV READ" },
   { 2, "STOR UNSENT" },
@@ -1044,10 +1042,11 @@ typedef enum
   OPT_SMS_EVENT_REPORTING,
   OPT_MESSAGE_LIST,
   OPT_LOGGING,
+  OPT_SIM_AUTO_ACTIVATION,
   OPT_NONE,
 } tOption;
 
-static struct option _commandOptions[] =
+static struct option g_ct_command_options[] =
 {
   { "device", no_argument, NULL, 'd' },
   { "network", no_argument, NULL, 'n' },
@@ -1061,6 +1060,7 @@ static struct option _commandOptions[] =
   { "smseventreporting", no_argument, NULL, 'R' },
   { "message-list", no_argument, NULL, 'm' },
   { "logging", no_argument, NULL, 'L' },
+  { "simautoactivation", no_argument, NULL, 'a' },
   { NULL, 0, NULL, 0 }, // End marker, don't remove.
 };
 
@@ -1077,7 +1077,7 @@ typedef enum
   CMD_NONE,
 } tCommand;
 
-static struct option _commands[] =
+static struct option g_ct_commands[] =
 {
   { "get", no_argument, NULL, 'g' },
   { "get-json", no_argument, NULL, 'j' },
@@ -1091,7 +1091,7 @@ static struct option _commands[] =
 };
 
 
-static const gchar *_parameterNames[] =
+static const gchar *g_ct_parameter_names[] =
 {
   "SimPin",
   "SimPuk",
@@ -1134,8 +1134,8 @@ static gint GetOption(char *arg,
 {
   gint i = 0;
 
-  AssertCondition(arg[0] == '-', INVALID_PARAMETER, "");
-  AssertCondition(arg[1] != '\0', INVALID_PARAMETER, "");
+  AssertCondition(arg[0] == '-', INVALID_PARAMETER, NULL);
+  AssertCondition(arg[1] != '\0', INVALID_PARAMETER, NULL);
 
   if (arg[1] == '-') //long option
   {
@@ -1146,7 +1146,7 @@ static gint GetOption(char *arg,
   }
   else //short option
   {
-    AssertCondition(arg[2] == '\0', INVALID_PARAMETER, "");
+    AssertCondition(arg[2] == '\0', INVALID_PARAMETER, NULL);
     while((options[i].val != 0) && (options[i].val != (int)arg[1]))
     {
       i++;
@@ -1157,7 +1157,7 @@ static gint GetOption(char *arg,
 
 static bool IsValidParameter(const gchar *pname)
 {
-  const gchar **pp = _parameterNames;
+  const gchar **pp = g_ct_parameter_names;
   while((*pp != NULL) && (g_strcmp0(*pp, pname)))
   {
     pp++;
@@ -1218,8 +1218,8 @@ static void GetCommandParams(gint argc, char **argv, tNameValuePair *nvpairs)
       }
       c++;
     }
-    AssertCondition(IsValidParameter(nvpairs[i].name), INVALID_PARAMETER, nvpairs[i].name);
-    AssertCondition(nvpairs[i].value, INVALID_PARAMETER, nvpairs[i].name);
+    AssertCondition(IsValidParameter(nvpairs[i].name), INVALID_PARAMETER, NULL);
+    AssertCondition(nvpairs[i].value, INVALID_PARAMETER, NULL);
   }
 }
 
@@ -1230,50 +1230,47 @@ static void PrintDeviceParams(tPrintFormat format)
   gchar *firmware = NULL;
 
   gint result = GetModemInfo(&manufacturer, &type, &firmware);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   switch (format)
   {
     case FMT_JSON:
-      printf("{");
-      if ((manufacturer != NULL) && (type != NULL))
+      printf("{\"ModemDevice\": \"");
+      if ((manufacturer != NULL) && (strlen(manufacturer) > 0))
       {
-        printf("\"ModemDevice\": \"%s %s\"", manufacturer, type);
+        printf("%s ", manufacturer);
       }
-      else
+      if ((type != NULL) && (strlen(type) > 0))
       {
-        printf("\"ModemDevice\": \"unknown\"");
+        printf("%s", type);
       }
-      printf(", ");
+      printf("\", \"ModemFirmware\": \"");
       if (firmware != NULL)
       {
-        printf("\"ModemFirmware\": \"%s\"", firmware);
+        printf("%s", firmware);
       }
-      else
-      {
-        printf("\"ModemFirmware\": \"unknown\"");
-      }
-      printf("}");
+      printf("\"}");
       break;
     case FMT_DEFAULT:
       /*no break*/
     default:
-      if ((manufacturer != NULL) && (type != NULL))
+      printf("ModemDevice=");
+      if ((manufacturer != NULL) && (strlen(manufacturer) > 0))
       {
-        printf("ModemDevice=%s %s\n", manufacturer, type);
+        printf("%s ", manufacturer);
       }
-      else
+      if ((type != NULL) && (strlen(type) > 0))
       {
-        printf("ModemDevice=unknown\n");
+        printf("%s", type);
       }
+      printf("\n");
+
+      printf("ModemFirmware=");
       if (firmware != NULL)
       {
-        printf("ModemFirmware=%s\n", firmware);
+        printf("%s", firmware);
       }
-      else
-      {
-        printf("ModemFirmware=unknown\n");
-      }
+      printf("\n");
   }
   if (manufacturer != NULL)
   {
@@ -1312,7 +1309,7 @@ static void PrintMessageList(tPrintFormat format)
         gint msgLength = 0;
         gchar *msgPdu = NULL;
         g_variant_get_child( varMessage, i, "(iiis)", &msgIndex, &state, &msgLength, &msgPdu);
-        MapIntToString(_mapMessageState, state, msgState);
+        MapIntToString(g_mapMessageState, state, msgState);
         switch (format)
         {
           case FMT_JSON:
@@ -1347,7 +1344,7 @@ static void PrintMessageList(tPrintFormat format)
   {
     g_variant_unref(varResult);
   }
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 
@@ -1356,17 +1353,17 @@ static void PrintIdentity(tPrintFormat format)
   gchar *imei = NULL; //International Mobile Equipment Identity
 
   gint result = GetModemIdentity(&imei);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   switch (format)
   {
     case FMT_JSON:
-      printf("{\"IMEI\": \"%s\"}", (imei != NULL) ? imei : "unknown");
+      printf("{\"IMEI\": \"%s\"}", (imei != NULL) ? imei : "");
       break;
     case FMT_DEFAULT:
       /*no break*/
     default:
-      printf("IMEI=%s\n", (imei != NULL) ? imei : "unknown");
+      printf("IMEI=%s\n", (imei != NULL) ? imei : "");
   }
   if (imei != NULL) {
     g_free(imei);
@@ -1379,7 +1376,7 @@ static void PrintSignalQuality(tPrintFormat format)
   gint rssi = 0;
   gint ber = 0;
   gint result = GetSignalQuality(&rssi, &ber);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   switch (format)
   {
@@ -1409,13 +1406,13 @@ static void PrintNetworkParams(tPrintFormat format)
   tMdmOper oper;
   MdmOperInit(&oper);
   result = GetOperState(&oper);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   mode = g_string_new(NULL);
   type = g_string_new(NULL);
   regstate = g_string_new(NULL);
   name = g_string_new(NULL);
-  MapIntToString(_mapSelectMode, oper.selmode, mode);
+  MapIntToString(g_mapSelectMode, oper.selmode, mode);
   if (oper.id > 0)
   {
     if (oper.name)
@@ -1424,16 +1421,16 @@ static void PrintNetworkParams(tPrintFormat format)
     }
     else
     {
-      g_string_assign(name, "INVALID");
+      g_string_assign(name, "UNKNOWN");
     }
-    MapIntToString(_mapOperAct, oper.act, type);
+    MapIntToString(g_mapOperAct, oper.act, type);
   }
   else
   {
     g_string_assign(name, "NONE");
     g_string_assign(type, "---");
   }
-  MapIntToString(_mapRegState, oper.state, regstate);
+  MapIntToString(g_mapRegState, oper.state, regstate);
   switch (format)
   {
     case FMT_JSON:
@@ -1475,9 +1472,9 @@ static void PrintNetworkList(tPrintFormat format)
   gint i;
 
   gint result = GetOperList(&size, &operList);
-  //AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
-  if (result!=0)
-  { //print empty list when not available, e.g. when PIN must be set
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
+  if (operList==NULL)
+  { //print empty list when not available
     if (format==FMT_JSON) printf("[ ] ");
   }
   else
@@ -1491,8 +1488,8 @@ static void PrintNetworkList(tPrintFormat format)
         printf("[ ");
         for (i = 0; i < size; i++)
         {
-          MapIntToString(_mapOperState, operList[i].state, state);
-          MapIntToString(_mapOperAct, operList[i].act, type);
+          MapIntToString(g_mapOperState, operList[i].state, state);
+          MapIntToString(g_mapOperAct, operList[i].act, type);
 
           printf("%s{ \"state\": \"%s\", \"id\": \"%d\", \"name\": \"%s\", \"type\": \"%s\" }",
                  (0 == i) ? "" : ", ",
@@ -1510,8 +1507,8 @@ static void PrintNetworkList(tPrintFormat format)
       default:
         for (i = 0; i < size; i++)
         {
-            MapIntToString(_mapOperState, operList[i].state, state);
-            MapIntToString(_mapOperAct, operList[i].act, type);
+            MapIntToString(g_mapOperState, operList[i].state, state);
+            MapIntToString(g_mapOperAct, operList[i].act, type);
             printf("NetworkState=%s\n", state->str);
             printf("NetworkId=%d\n", operList[i].id);
             printf("NetworkName=%s\n", operList[i].name ? operList[i].name : "");
@@ -1521,12 +1518,12 @@ static void PrintNetworkList(tPrintFormat format)
     }
     g_string_free(state, TRUE);
     g_string_free(type, TRUE);
+    for (i = 0; i < size; i++)
+    {
+      MdmOperFree(&operList[i]);
+    }
+    free(operList);
   }
-  for (i = 0; i < size; i++)
-  {
-    MdmOperFree(&operList[i]);
-  }
-  free(operList);
 }
 
 static void PrintGprsAccessParams(tPrintFormat format)
@@ -1538,14 +1535,14 @@ static void PrintGprsAccessParams(tPrintFormat format)
   tMdmGprsAccess gprsAccess;
   MdmGprsAccessInit(&gprsAccess);
   result = GetGprsAccess(&gprsAccess);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   authtype = g_string_new(NULL);
   regstate = g_string_new(NULL);
   connectivity = g_string_new(NULL);
-  MapIntToString(_mapAuthType, gprsAccess.auth, authtype);
-  MapIntToString(_mapRegState, gprsAccess.state, regstate);
-  MapIntToString(_mapState, gprsAccess.connectivity, connectivity);
+  MapIntToString(g_mapAuthType, gprsAccess.auth, authtype);
+  MapIntToString(g_mapRegState, gprsAccess.state, regstate);
+  MapIntToString(g_mapState, gprsAccess.connectivity, connectivity);
   switch (format)
   {
     case FMT_JSON:
@@ -1589,7 +1586,7 @@ static void PrintSmsStorageConfig(tPrintFormat format)
   tSmsStorageConfig storageConfig;
   SmsStorageConfigInit(&storageConfig);
   result = GetSmsStorageConfig(&storageConfig);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   switch (format)
   {
@@ -1636,7 +1633,7 @@ static void PrintSmsEventReportingConfig(tPrintFormat format)
   tSmsReportingConfig reportingConfig;
   SmsEventReportingConfigInit(&reportingConfig);
   result = GetSmsEventReporting(&reportingConfig);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   switch (format)
   {
@@ -1671,10 +1668,10 @@ static void PrintSimParams(tPrintFormat format)
   gint attempts;
 
   gint result = GetSimState(&state, &attempts);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   statename = g_string_new(NULL);
-  MapIntToString(_mapSimState, state, statename);
+  MapIntToString(g_mapSimState, state, statename);
   switch (format)
   {
     case FMT_JSON:
@@ -1701,13 +1698,13 @@ static void PrintPortParams(tPrintFormat format)
   GString *openstr;
 
   gint result = GetPortState(&state, &open);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   statename = g_string_new(NULL);
   openstr = g_string_new(NULL);
   
-  MapIntToString(_mapState, state, statename);
-  MapIntToString(_mapBoolean, open, openstr);
+  MapIntToString(g_mapState, state, statename);
+  MapIntToString(g_mapBoolean, open, openstr);
 
   switch (format)
   {
@@ -1734,10 +1731,10 @@ static void PrintLogging(tPrintFormat format)
   GString *loglevelname;
 
   gint result = GetLogLevel(&loglevel);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   loglevelname = g_string_new(NULL);
-  MapIntToString(_mapLoglevel, loglevel, loglevelname);
+  MapIntToString(g_mapLoglevel, loglevel, loglevelname);
 
   switch (format)
   {
@@ -1755,23 +1752,70 @@ static void PrintLogging(tPrintFormat format)
 }
 
 
+static void PrintSimAutoActivation(tPrintFormat format)
+{
+  gchar *sim_id = NULL;
+  gchar *sim_pin = NULL;
+
+  gint result = GetSimAutoActivation(&sim_id, &sim_pin);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
+
+  switch (format)
+  {
+    case FMT_JSON:
+      printf("{\"SimId\": \"");
+      if (sim_id != NULL)
+      {
+        printf("%s", sim_id);
+      }
+      printf("\", \"SimPin\": \"");
+      if (sim_pin != NULL)
+      {
+        printf("%s", sim_pin);
+      }
+      printf("\"}");
+      break;
+    case FMT_DEFAULT:
+      /*no break*/
+    default:
+      printf("SimId=");
+      if (sim_id != NULL)
+      {
+        printf("%s", sim_id);
+      }
+      printf("\n");
+      printf("SimPin=");
+      if (sim_pin != NULL)
+      {
+        printf("%s", sim_pin);
+      }
+      printf("\n");
+  }
+  if (sim_id != NULL)
+  {
+    g_free(sim_id);
+  }
+  if (sim_pin != NULL)
+  {
+    g_free(sim_pin);
+  }
+}
+
+
 static void PrintVersion()
 {
   gchar *version = NULL;
 
   gint result = GetVersion(&version);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   printf("MdmdVersion=");
   if (version != NULL)
   {
-    printf("%s\n", version);
+    printf("%s", version);
     g_free(version);
   }
-  else
-  {
-    printf("unknown\n");
-  }
+  printf("\n");
 }
 
 /**
@@ -1795,30 +1839,31 @@ static void PrintCheck()
   char expectedModemFirmware[MODEM_VERSION_FROM_FILE_LENGTH];
 
   gint result = GetModemInfo(&manufacturer, &type, &currentModemFirmware);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   fp = fopen("/etc/specific/modem_version", "r");
-  AssertCondition(fp != NULL, SYSTEM_CALL_ERROR, "File /etc/specific/modem-version could not be opened");
+  AssertCondition(fp != NULL, FILE_READ_ERROR, "Could not read from file /etc/specific/modem-version");
 
   //Compare each line, more specifically each firmware version, in the modem-version file, with the current modem firmware
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    AssertCondition(read = MODEM_VERSION_FROM_FILE_LENGTH, SYSTEM_CALL_ERROR, "Buffer to small");
-
-    //The firmware version from the modem-version file is split by a comma, that must remove before comparing
-    strncpy(expectedModemFirmware,
-            line,
-            MODEM_VERSION_FIRST_PART_LENGTH);
-    strncpy(expectedModemFirmware + MODEM_VERSION_FIRST_PART_LENGTH,
-            line + MODEM_VERSION_FIRST_PART_LENGTH + sizeof(char),
-            MODEM_VERSION_SECOND_PART_LENGTH);
-
-    //The length of the firmware versions from the both sources is not equal.
-    //The version from the modem-version file is only a mask for the supported versions
-    if (strncmp(currentModemFirmware, expectedModemFirmware, MODEM_VERSION_COMPARE_LENGTH) == 0)
+    if (read >= MODEM_VERSION_FROM_FILE_LENGTH)
     {
-      compareResult = true;
-      break;
+      //The firmware version from the modem-version file is split by a comma, that must remove before comparing
+      strncpy(expectedModemFirmware,
+              line,
+              MODEM_VERSION_FIRST_PART_LENGTH);
+      strncpy(expectedModemFirmware + MODEM_VERSION_FIRST_PART_LENGTH,
+              line + MODEM_VERSION_FIRST_PART_LENGTH + sizeof(char),
+              MODEM_VERSION_SECOND_PART_LENGTH);
+
+      //The length of the firmware versions from the both sources is not equal.
+      //The version from the modem-version file is only a mask for the supported versions
+      if (strncmp(currentModemFirmware, expectedModemFirmware, MODEM_VERSION_COMPARE_LENGTH) == 0)
+      {
+        compareResult = true;
+        break;
+      }
     }
   }
 
@@ -1878,16 +1923,16 @@ static void ChangeNetworkParams(tNameValuePair *nvpairs, gint nparams)
     }
   }
 
-  AssertCondition(networkSelection != NULL, MISSING_PARAMETER, "NetworkSelection");
-  MapStringToInt(_mapSelectMode, networkSelection->value, &selmode);
-  AssertCondition(selmode != -1, INVALID_PARAMETER, "NetworkSelection");
+  AssertCondition(networkSelection != NULL, MISSING_PARAMETER, NULL);
+  MapStringToInt(g_mapSelectMode, networkSelection->value, &selmode);
+  AssertCondition(selmode != -1, INVALID_PARAMETER, NULL);
   if (selmode == 1 /*MANUAL*/)
   {
-    AssertCondition(networkId != NULL, MISSING_PARAMETER, "NetworkId");  
-    AssertCondition(networkType != NULL, MISSING_PARAMETER, "NetworkType");  
+    AssertCondition(networkId != NULL, MISSING_PARAMETER, NULL);
+    AssertCondition(networkType != NULL, MISSING_PARAMETER, NULL);
     id = (gint)g_ascii_strtoll(networkId->value, NULL, 0);
-    MapStringToInt(_mapOperAct, networkType->value, &act);
-    AssertCondition(act != -1, INVALID_PARAMETER, "NetworkType");
+    MapStringToInt(g_mapOperAct, networkType->value, &act);
+    AssertCondition(act != -1, INVALID_PARAMETER, NULL);
   }
   else
   {
@@ -1895,7 +1940,7 @@ static void ChangeNetworkParams(tNameValuePair *nvpairs, gint nparams)
     act = 0;
   }
   result = SetOper(selmode, id, act);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 static void ChangeGprsAccessParams(tNameValuePair *nvpairs, gint nparams)
@@ -1944,13 +1989,13 @@ static void ChangeGprsAccessParams(tNameValuePair *nvpairs, gint nparams)
 
   MdmGprsAccessInit(&gprsAccess);
   result = GetGprsAccess(&gprsAccess);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   apn = (gprsAccessPointName != NULL) ? gprsAccessPointName->value : gprsAccess.apn;
   if (gprsAuthType != NULL)
   {
-    MapStringToInt(_mapAuthType, gprsAuthType->value, &auth);
-    AssertCondition(auth != -1, INVALID_PARAMETER, "GprsAuthType");
+    MapStringToInt(g_mapAuthType, gprsAuthType->value, &auth);
+    AssertCondition(auth != -1, INVALID_PARAMETER, NULL);
   }
   else
   {
@@ -1960,8 +2005,8 @@ static void ChangeGprsAccessParams(tNameValuePair *nvpairs, gint nparams)
   pass = (gprsPassword != NULL) ? gprsPassword->value : gprsAccess.pass;
   if (gprsConnectivity != NULL)
   {
-    MapStringToInt(_mapState, gprsConnectivity->value, &connectivity);
-    AssertCondition(auth != -1, INVALID_PARAMETER, "GprsConnectivity");
+    MapStringToInt(g_mapState, gprsConnectivity->value, &connectivity);
+    AssertCondition(auth != -1, INVALID_PARAMETER, NULL);
   }
   else
   {
@@ -1975,7 +2020,7 @@ static void ChangeGprsAccessParams(tNameValuePair *nvpairs, gint nparams)
       || (gprsAccess.connectivity != connectivity))
   {
     result = SetGprsAccess( apn, auth, user, pass, connectivity);
-    AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+    AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
   }
 }
 
@@ -1997,7 +2042,7 @@ static void ChangeSimParams(tNameValuePair *nvpairs, gint nparams)
     }
   }
 
-  AssertCondition(simpin != NULL, MISSING_PARAMETER, "SimPin");
+  AssertCondition(simpin != NULL, MISSING_PARAMETER, NULL);
   if (simpuk != NULL)
   {
     result = SetSimPuk(simpuk->value, simpin->value);
@@ -2006,7 +2051,7 @@ static void ChangeSimParams(tNameValuePair *nvpairs, gint nparams)
   {
     result = SetSimPin(simpin->value);
   }
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 static void ChangeSmsStorageConfig(tNameValuePair *nvpairs, gint nparams)
@@ -2039,7 +2084,7 @@ static void ChangeSmsStorageConfig(tNameValuePair *nvpairs, gint nparams)
   // If some sms storage memory parameter are not set, the last configuration of the modem is used for this parameters.  
   SmsStorageConfigInit(&storageConfig);
   result = GetSmsStorageConfig(&storageConfig);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   const gchar* mem1 = (smsStorageMem1 != NULL) ? smsStorageMem1->value : storageConfig.mem1;
   const gchar* mem2 = (smsStorageMem2 != NULL) ? smsStorageMem2->value : storageConfig.mem2;
@@ -2051,7 +2096,7 @@ static void ChangeSmsStorageConfig(tNameValuePair *nvpairs, gint nparams)
       || (strcmp(storageConfig.mem3, mem3) != 0))
   {
     result = SetSmsStorageConfig(mem1, mem2, mem3);
-    AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+    AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
   }
 }
 
@@ -2095,7 +2140,7 @@ static void ChangeSmsEventReporting(tNameValuePair *nvpairs, gint nparams)
   // If some sms event reporting parameter are not set, the last configuration of the modem is used for this parameters.  
   SmsEventReportingConfigInit(&reportingConfig);
   result = GetSmsEventReporting(&reportingConfig);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 
   const gint mode = (smsEventReportingMode != NULL) ? atoi(smsEventReportingMode->value) : reportingConfig.mode;
   const gint mt = (smsEventReportingMT != NULL) ? atoi(smsEventReportingMT->value) : reportingConfig.mt;
@@ -2111,14 +2156,14 @@ static void ChangeSmsEventReporting(tNameValuePair *nvpairs, gint nparams)
       || (bfr != reportingConfig.bfr))
   {
     result = SetSmsEventReportingConfig(mode, mt, bm, ds, bfr);
-    AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+    AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
   }
 }
 
 static void TriggerModemReset(void)
 {
   gint result = ModemReset();
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 static void TriggerCompleteReset(void)
@@ -2142,13 +2187,13 @@ static void ChangePortParams(tNameValuePair *nvpairs, gint nparams)
       statename = &nvpairs[i];
     }
   }
-  AssertCondition(statename != NULL, MISSING_PARAMETER, "PortState");
+  AssertCondition(statename != NULL, MISSING_PARAMETER, NULL);
 
-  MapStringToInt(_mapState, statename->value, &state);
-  AssertCondition(state != -1, INVALID_PARAMETER, "PortState");
+  MapStringToInt(g_mapState, statename->value, &state);
+  AssertCondition(state != -1, INVALID_PARAMETER, NULL);
 
   result = SetPortState(state);
-  AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 
@@ -2167,11 +2212,33 @@ static void ChangeLogging(tNameValuePair *nvpairs, gint nparams)
   }
   if(loglevelparam != NULL)
   {
-    MapStringToInt(_mapLoglevel, loglevelparam->value, &loglevel);
-    AssertCondition(loglevel != -1, INVALID_PARAMETER, "LogLevel");
+    MapStringToInt(g_mapLoglevel, loglevelparam->value, &loglevel);
+    AssertCondition(loglevel != -1, INVALID_PARAMETER, NULL);
     result = SetLogLevel(loglevel);
-    AssertCondition(result == 0, SYSTEM_CALL_ERROR, _mdmDBusClient.lastError);
+    AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
   }
+}
+
+static void ChangeSimAutoActivation(tNameValuePair *nvpairs, gint nparams)
+{
+  gint result;
+  gint i;
+  tNameValuePair *sim_id= NULL;
+  tNameValuePair *sim_pin = NULL;
+  for (i = 0; i < nparams; i++)
+  {
+    if(0 == strcmp(nvpairs[i].name, "SimId"))
+    {
+      sim_id = &nvpairs[i];
+    }
+    else if(0 == strcmp(nvpairs[i].name, "SimPin"))
+    {
+      sim_pin = &nvpairs[i];
+    }
+  }
+  result = SetSimAutoActivation(sim_id != NULL ? sim_id->value : "",
+                                sim_pin != NULL ? sim_pin->value : "");
+  AssertCondition(result == 0, SYSTEM_CALL_ERROR, g_mdmDbusClient.lastError);
 }
 
 
@@ -2189,7 +2256,6 @@ int main(int argc, char **argv)
        The type system is now initialised automatically. */
     g_type_init ();
 #endif
-  _programmName = g_strdup(basename(argv[0]));
 
   AssertCondition((szDeviceConfig != NULL), SYSTEM_CALL_ERROR, "Get Typelabel DEVCONF failed");
   deviceConfig = g_ascii_strtoll(szDeviceConfig, NULL, 0);
@@ -2197,13 +2263,13 @@ int main(int argc, char **argv)
   //AssertCondition(((deviceConfig & maskModemDevice) != 0), SYSTEM_CALL_ERROR, "No modem device");
   if ((deviceConfig & maskModemDevice) == 0)
   { //no modem device
-    ExitProgramm(0);
+    ExitProgramm(SUCCESS, NULL);
   }
 
   if (argc <= 1)
   {
     printf(info_text);
-    ExitProgramm(0);
+    ExitProgramm(SUCCESS, NULL);
   }
 
   MdmDBusClientInit(CT_DBUS_MDMD_NAME,
@@ -2213,12 +2279,12 @@ int main(int argc, char **argv)
 
   log_EVENT_Init("config_mdmd");
 
-  command = (tCommand)GetOption(argv[1], _commands);
+  command = (tCommand)GetOption(argv[1], g_ct_commands);
   switch (command)
   {
     case CMD_GET:
-      AssertCondition(argc > 2, MISSING_PARAMETER, "Missing get-option");
-      option = (tOption)GetOption(argv[2], _commandOptions);
+      AssertCondition(argc > 2, MISSING_PARAMETER, NULL);
+      option = (tOption)GetOption(argv[2], g_ct_command_options);
       switch(option)
       {
         case OPT_DEVICE:
@@ -2257,13 +2323,16 @@ int main(int argc, char **argv)
         case OPT_LOGGING:
           PrintLogging(FMT_DEFAULT);
           break;
+        case OPT_SIM_AUTO_ACTIVATION:
+          PrintSimAutoActivation(FMT_DEFAULT);
+          break;
         default:
-          ExitWithError(INVALID_PARAMETER, "Illegal get-option");
+          ExitProgramm(INVALID_PARAMETER, NULL);
       }
       break;
     case CMD_GET_JSON:
-      AssertCondition(argc > 2, MISSING_PARAMETER, "Missing get-option");
-      option = (tOption)GetOption(argv[2], _commandOptions);
+      AssertCondition(argc > 2, MISSING_PARAMETER, NULL);
+      option = (tOption)GetOption(argv[2], g_ct_command_options);
       switch(option)
       {
         case OPT_DEVICE:
@@ -2302,15 +2371,18 @@ int main(int argc, char **argv)
         case OPT_LOGGING:
           PrintLogging(FMT_JSON);
           break;
+        case OPT_SIM_AUTO_ACTIVATION:
+          PrintSimAutoActivation(FMT_JSON);
+          break;
         default:
-          ExitWithError(INVALID_PARAMETER, "Illegal get-option");
+          ExitProgramm(INVALID_PARAMETER, NULL);
       }
       break;
     case CMD_SET:
     {
       tNameValuePair *nvpairs;
-      AssertCondition(argc > 2, MISSING_PARAMETER, "Missing set-option");
-      option = (tOption)GetOption(argv[2], _commandOptions);
+      AssertCondition(argc > 2, MISSING_PARAMETER, NULL);
+      option = (tOption)GetOption(argv[2], g_ct_command_options);
       nparams = argc-3;
       nvpairs = (tNameValuePair*)calloc(nparams, sizeof(tNameValuePair));
       AssertCondition(nvpairs != NULL, SYSTEM_CALL_ERROR, "No memory for parameter check");
@@ -2338,8 +2410,11 @@ int main(int argc, char **argv)
         case OPT_LOGGING:
           ChangeLogging(nvpairs, nparams);
           break;
+        case OPT_SIM_AUTO_ACTIVATION:
+          ChangeSimAutoActivation(nvpairs, nparams);
+          break;
         default:
-          ExitWithError(INVALID_PARAMETER, "Illegal set-option");
+          ExitProgramm(INVALID_PARAMETER, NULL);
       }
       free(nvpairs);
     } break;
@@ -2359,8 +2434,8 @@ int main(int argc, char **argv)
       PrintCheck();
       break;
     default:
-      ExitWithError(INVALID_PARAMETER, "Illegal command");
+      ExitProgramm(INVALID_PARAMETER, NULL);
   }
-  ExitProgramm(0);
+  ExitProgramm(SUCCESS, NULL);
 }
 

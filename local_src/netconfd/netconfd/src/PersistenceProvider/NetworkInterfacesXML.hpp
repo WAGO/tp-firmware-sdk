@@ -6,7 +6,7 @@
 #include "Types.hpp"
 #include "IFileEditor.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 #define NETWORKINTERFACESPATH "/etc/specific/network-interfaces.xml"
 
@@ -76,7 +76,7 @@ class State {
   Value value_;
 };
 
-Status WriteNetworkInterfacesXML(IFileEditor& file_editor_, const BridgeConfig& bridge_config, const IPConfigs& ip_configs,
-                            const InterfaceConfigs& port_configs);
+Error WriteNetworkInterfacesXML(IFileEditor &file_editor_, const BridgeConfig& bridge_config, const IPConfigs& ip_configs,
+                                 const InterfaceConfigs& port_configs);
 
-} /* namespace netconfd */
+} /* namespace netconf */

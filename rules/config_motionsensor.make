@@ -78,8 +78,6 @@ $(STATEDIR)/config_motionsensor.targetinstall:
 	@$(call install_fixup, config_motionsensor,AUTHOR,"<elrest>")
 	@$(call install_fixup, config_motionsensor,DESCRIPTION,missing)
 
-	@$(call install_copy, config_motionsensor, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

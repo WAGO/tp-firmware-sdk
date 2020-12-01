@@ -15,13 +15,11 @@
 /// \author Mariusz Podlesny : WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
 
+#ifndef WAGO_FIREWALL_BACKUP_HPP_
+#define WAGO_FIREWALL_BACKUP_HPP_
 
-#ifndef WAGO_BACKUP_HPP
-#define WAGO_BACKUP_HPP
-
-
-namespace wago
-{
+namespace wago {
+namespace firewall {
 
 
 //------------------------------------------------------------------------------
@@ -34,9 +32,7 @@ void perform_backup(void);
 //------------------------------------------------------------------------------
 void perform_restore(void);
 
-
+} // namespace firewall
 } // namespace wago
 
-
-#endif // WAGO_BACKUP_HPP
-
+#endif // WAGO_FIREWALL_BACKUP_HPP_

@@ -9,7 +9,7 @@
 ///
 /// \file    config_boot.c
 ///
-/// \version $Id: config_boot.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_boot.c 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   change boot settings / config-tools
 ///
@@ -58,7 +58,7 @@ static tConfValues aConfigValues[] =
   { "countdown", "3", "" },
 
   // this line must always be the last one - don't remove it!
-  { "", "" }
+  { "", "", "" }
 };
 
 //------------------------------------------------------------------------------

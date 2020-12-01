@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.cpp
 ///
-/// \version $Id: toolbarmenu.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: toolbarmenu.cpp 49196 2020-05-25 08:47:16Z wrueckl_elrest $
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///
@@ -88,7 +88,7 @@
 // variable definitions
 //------------------------------------------------------------------------------
 bool g_bEventDetection = true;
-
+bool g_bWbmAllowed = true;
 
 ToolbarButton::ToolbarButton(const QString & text, QWidget * parent) :
   QPushButton(text, parent), m_iLeftSpacing(DEFAULT_BTN_SPACE)
@@ -107,6 +107,7 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
   pCmdThread = NULL;
   m_pSender = NULL;
   m_iFadeHeight = 0;
+  m_iBtnCount = 0;
 
   m_DesktopRect = QApplication::desktop()->screenGeometry();
   m_WndRect = m_DesktopRect;
@@ -159,6 +160,7 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
 
   int xpos = 0;
   int ypos = 0;
+  bool bFirst = true;
 
   for (int i=0; i < m_menu.m_btnList.count(); i++)
   {
@@ -172,6 +174,8 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
       //skip this button
       continue;
     }
+
+    m_iBtnCount++;
 
     //WAT28648 DENIED
     //no VISU Button if no Bootproject found f.e. WP Panel
@@ -201,7 +205,6 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
     }
     
     pButton->setText(pButton->m_sText);
-    
 
     //To load values from Qt Stylesheet you should call this methods
     pButton->style()->unpolish(pButton);
@@ -243,8 +246,9 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
       }
     }
 
-    if (i == 0)
+    if (bFirst)
     {
+      bFirst = false;
       int wndHeight = iBtnHeight * 2;
       ypos += pButton->m_iLeftSpacing;
 
@@ -1003,6 +1007,26 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
       if (xml.tokenType() == QXmlStreamReader::Characters)
       {
         pItemButton->m_sText = xml.text().toString();
+        //ID_WBM
+        //ID_PLCLIST
+        //ID_TARGETVISU
+        //ID_DISPLAYCLEANING
+        if (g_bWbmAllowed == false)
+        {
+          if (pItemButton->m_sText.compare("ID_WBM", Qt::CaseInsensitive) == 0)
+          {
+            pItemButton->setEnabled(false);
+          }
+          else if (pItemButton->m_sText.compare("ID_PLCLIST", Qt::CaseInsensitive) == 0)
+          {
+            pItemButton->setEnabled(false);
+          }
+          else if (pItemButton->m_sText.compare("ID_TARGETVISU", Qt::CaseInsensitive) == 0)
+          {
+            pItemButton->setEnabled(false);
+          }
+        }
+
         //qDebug() << "m_sText: " << pItemButton->m_sText;
       }
     }
@@ -1445,7 +1469,7 @@ void ToolBarMenu::OnHide()
 void ToolBarMenu::ReadPlcList()
 {
   //defaults
-  m_sUrlWbm = "http://127.0.0.1/wbm-ng/index.html";
+  m_sUrlWbm = "http://127.0.0.1/wbm/index.html";
   m_sUrlPlc = "http://127.0.0.1/plclist/plclist.html";
   m_bVkbWbm = true;
 
@@ -1498,6 +1522,10 @@ void ToolBarMenu::OnAction()
       QString sAction;
       if (pButton->m_sAction.compare("ID_WBM", Qt::CaseInsensitive) == 0)
       {
+        //skip if not allowed
+        if (g_bWbmAllowed == false)
+          continue;
+
         if (FindProcess("webenginebrowser") == true)
         {
            if (m_bVkbWbm)
@@ -1511,7 +1539,7 @@ void ToolBarMenu::OnAction()
            //browser already running
            sprintf(szCmd, "load=%s\n", ba.data());
            Write2PipedFifo(DEV_WEBENGINEBROWSER, szCmd);
-           //old sAction = "echo \"load=http://127.0.0.1/wbm-ng/index.html\" > /dev/webenginebrowser";
+           //old sAction = "echo \"load=http://127.0.0.1/wbm/index.html\" > /dev/webenginebrowser";
         }
         else
         {

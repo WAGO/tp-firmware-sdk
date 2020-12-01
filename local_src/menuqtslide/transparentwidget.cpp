@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    transparentwidget.cpp
 ///
-/// \version $Id: transparentwidget.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: transparentwidget.cpp 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   Thread for receiving command f.e. open menu
 ///
@@ -64,7 +64,14 @@
 
 
 TransparentWidget::TransparentWidget(QWidget *parent) : QWidget(parent)
-{    
+{
+  if (m_toolBar.m_iBtnCount == 0)
+  {
+    //qDebug() << "debug: exit no buttons";
+    QTimer::singleShot(1000, this, SLOT(slotOnClose()));
+    return;
+  }
+
   //widget always on top and transparent
   if (g_bEventDetection)
   {
@@ -129,7 +136,7 @@ TransparentWidget::TransparentWidget(QWidget *parent) : QWidget(parent)
 
   connect(&m_toolBar, SIGNAL(signalMinimize()), this, SLOT(slotMinimize()));
   connect(&m_toolBar, SIGNAL(signalFocus()), this, SLOT(slotFocus()));
-  
+
 }
 
 TransparentWidget::~TransparentWidget()
@@ -286,3 +293,7 @@ void TransparentWidget::slotOnTimer()
   //only TEST this->activateWindow();
 }
 
+void TransparentWidget::slotOnClose()
+{
+  close();
+}

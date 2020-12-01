@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.cpp
 ///
-/// \version $Id: alarmindication.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: alarmindication.cpp 49196 2020-05-25 08:47:16Z wrueckl_elrest $
 ///
 /// \brief   show connection lost informations
 ///
@@ -39,7 +39,10 @@
 #include "alarmindication.h"
 #include "globals.h"
 #include "tools.h"
-//#include "msgtool.h"
+#include "msgtool.h"
+
+#include <QProcess>
+#include <QX11Info>
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions
@@ -62,15 +65,16 @@ AlarmIndication::AlarmIndication(QWidget *parent) : QWidget(parent)
 {
   setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
   bLEDEnabled = true;
+  m_iWbmBtnState = 1;
+  m_pBtnWBM = NULL;
 
   rScreen = QApplication::desktop()->screenGeometry();
   QSize newSize( rScreen.width(), rScreen.height() );
   setGeometry(QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,
                                    newSize, QApplication::desktop()->availableGeometry()) );
 
-  //if (!ReadWbmUrl())
+  ReadWbmBtnState();
   sUrlWbm = "http://127.0.0.1/wbm/index.html";
-
   m_iNumber = 10;
   int iButtonHeight = 40;
 
@@ -155,35 +159,38 @@ AlarmIndication::AlarmIndication(QWidget *parent) : QWidget(parent)
     //__ setRgbLed(RGB_LED_STATE_RE_BLINK, "webkit: not enough memory");
   }
 
-  //Button
-  m_pBtnWBM = new QPushButton(sBtnText, this);
-  if (m_pBtnWBM)
+  //WBM Button
+  if (m_iWbmBtnState)
   {
-    m_pBtnWBM->setStyleSheet(sQtStyleButton);
-    
-    m_pBtnWBM->style()->unpolish(m_pBtnWBM);
-    m_pBtnWBM->style()->polish(m_pBtnWBM);
-    m_pBtnWBM->update();
-    
-    //m_pBtnWBM->setFont(font);
-    m_pBtnWBM->setFocusPolicy(Qt::NoFocus);
+    m_pBtnWBM = new QPushButton(sBtnText, this);
+    if (m_pBtnWBM)
+    {
+      m_pBtnWBM->setStyleSheet(sQtStyleButton);
 
-    int iBtnWidth = CalculatePixelWidth(m_pBtnWBM->text(), m_pBtnWBM->font()) + 40;
-    int iBtnHeight = iButtonHeight; //qMax(iButtonHeight, CalculatePixelHeight(m_pBtnWBM->font()) * 2);
-    QSize btnSize(iBtnWidth, iBtnHeight);
+      m_pBtnWBM->style()->unpolish(m_pBtnWBM);
+      m_pBtnWBM->style()->polish(m_pBtnWBM);
+      m_pBtnWBM->update();
 
-    // set size and location of the button
-    m_pBtnWBM->setGeometry(QRect(QPoint(rScreen.width() - iBtnWidth - 30, rScreen.height() - iBtnHeight - 20), btnSize));
+      //m_pBtnWBM->setFont(font);
+      m_pBtnWBM->setFocusPolicy(Qt::NoFocus);
 
-    connect( m_pBtnWBM ,
-             SIGNAL(clicked()),
-             this,
-             SLOT(OnShowWBM())
-           );
-  }
-  else
-  {
-    //__ setRgbLed(RGB_LED_STATE_RE_BLINK, "webkit: not enough memory");
+      int iBtnWidth = CalculatePixelWidth(m_pBtnWBM->text(), m_pBtnWBM->font()) + 40;
+      int iBtnHeight = iButtonHeight; //qMax(iButtonHeight, CalculatePixelHeight(m_pBtnWBM->font()) * 2);
+      QSize btnSize(iBtnWidth, iBtnHeight);
+
+      // set size and location of the button
+      m_pBtnWBM->setGeometry(QRect(QPoint(rScreen.width() - iBtnWidth - 30, rScreen.height() - iBtnHeight - 20), btnSize));
+
+      connect( m_pBtnWBM ,
+               SIGNAL(clicked()),
+               this,
+               SLOT(OnShowWBM())
+             );
+    }
+    else
+    {
+      //__ setRgbLed(RGB_LED_STATE_RE_BLINK, "webkit: not enough memory");
+    }
   }
 
   //Set QTimer timeout to 1000 milliseconds (Update Number display each second)
@@ -337,3 +344,61 @@ void AlarmIndication::SetLabelText(QString sText)
     m_pPlainTextEdit->setPlainText(sText);
   }
 }
+
+void AlarmIndication::ReadWbmBtnState()
+{
+  tConfList * pList = NULL;
+  char szOut[256] = "";
+  int ret;
+
+  //create list
+  pList = ConfCreateList();
+  if (pList)
+  {
+    ret = ConfReadValues(pList, (char*) CONF_FILE_GESTURE);
+    if (ret != SUCCESS)
+    {
+      ConfDestroyList(pList);
+      return;
+    }
+
+    if (ConfGetValue(pList, (char*)"btn0", szOut, sizeof(szOut)) == SUCCESS)
+    {
+       if (strcmp(szOut, "0") == 0)
+       {
+         m_iWbmBtnState = 0;
+       }
+       else
+       {
+         m_iWbmBtnState = 1;
+       }
+    }
+
+    ConfDestroyList(pList);
+  }
+
+}
+
+void AlarmIndication::showEvent(QShowEvent *event)
+{
+  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+}
+
+/// \brief ensure X11 window to be shown in front
+/// \param[in]  X11 window id
+void AlarmIndication::ActivateX11Window()
+{
+  if (QX11Info::isPlatformX11())
+  {
+    int id = QWidget::winId ();
+    if (id > 0)
+    {
+      QProcess proc;
+      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
+      proc.waitForFinished(5000);
+      proc.close();
+      //qDebug() << "ActivateX11Window: " << id;
+    }
+  }
+}
+

@@ -9,7 +9,7 @@
 ///
 /// \file    config_plcselect.c
 ///
-/// \version $Id: config_plcselect.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_plcselect.c 45958 2020-01-21 12:26:20Z wrueckl_elrest $
 ///
 /// \brief   plc selection settings / config-tools
 ///
@@ -19,6 +19,7 @@
 //------------------------------------------------------------------------------
 // Include files
 //------------------------------------------------------------------------------
+#define _GNU_SOURCE 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,53 +72,65 @@ static tConfValues aConfigValues[] =
   { "txt00", "WBM", "" },
   { "vkb00", "enabled", "enabled,disabled" },  
   { "mon00", "0", "" },
+  { "mic00", "0", "" },
   { "url01", "http://127.0.0.1/plclist/plclist.html", "" },
   { "txt01", "PLC select list", "" },
   { "vkb01", "enabled", "enabled,disabled" },
   { "mon01", "0", "" },
+  { "mic01", "0", "" },
   { "url02", "", "" },
   { "txt02", "", "" },
   { "vkb02", "enabled", "enabled,disabled" },
   { "mon02", "1", "" },
+  { "mic02", "0", "" },
   { "url03", "", "" },
   { "txt03", "", "" },
   { "vkb03", "enabled", "enabled,disabled" },
   { "mon03", "1", "" },
+  { "mic03", "0", "" },
   { "url04", "", "" },
   { "txt04", "", "" },
   { "vkb04", "enabled", "enabled,disabled" },
   { "mon04", "1", "" },
+  { "mic04", "0", "" },
   { "url05", "", "" },
   { "txt05", "", "" },
   { "vkb05", "enabled", "enabled,disabled" },
   { "mon05", "1", "" },
+  { "mic05", "0", "" },
   { "url06", "", "" },
   { "txt06", "", "" },
   { "vkb06", "enabled", "enabled,disabled" },
   { "mon06", "1", "" },
+  { "mic06", "0", "" },
   { "url07", "", "" },
   { "txt07", "", "" },
   { "vkb07", "enabled", "enabled,disabled" },
   { "mon07", "1", "" },
+  { "mic07", "0", "" },
   { "url08", "", "" },
   { "txt08", "", "" },
   { "vkb08", "enabled", "enabled,disabled" },
   { "mon08", "1", "" },
+  { "mic08", "0", "" },
   { "url09", "", "" },
   { "txt09", "", "" },
   { "vkb09", "enabled", "enabled,disabled" },
   { "mon09", "1", "" },
+  { "mic09", "0", "" },
   { "url10", "", "" },
   { "txt10", "", "" },
   { "vkb10", "enabled", "enabled,disabled" },
   { "mon10", "1", "" },
+  { "mic10", "0", "" },
   { "url11", "", "" },
   { "txt11", "", "" },
   { "vkb11", "enabled", "enabled,disabled" },
   { "mon11", "1", "" },
+  { "mic11", "0", "" },
 
   // this line must always be the last one - don't remove it!
-  { "", "" }
+  { "", "", "" }
 };
 
 //------------------------------------------------------------------------------
@@ -134,6 +147,7 @@ int main(int argc, char **argv)
   int index = -1;
   int errorcounter = 0;
   char szArgv[256] = "";
+  char szOut[256] = "";
  
   if (argc >= 2)
   {
@@ -150,6 +164,8 @@ int main(int argc, char **argv)
     else
     {
       int i, ret;
+      int nFileElements = 0;
+      int nStructElements = 0;
       char * pStr;
       
       //create list
@@ -174,7 +190,8 @@ int main(int argc, char **argv)
         return ERROR;
       }
       
-      if (ConfGetCount(g_pList) == 0)
+      nFileElements = ConfGetCount(g_pList);
+      if (nFileElements == 0)
       {
         char szErrorTxt[256];
         sprintf(szErrorTxt, "File inconsistent error %s", CNF_FILE);
@@ -185,6 +202,31 @@ int main(int argc, char **argv)
         ConfDestroyList(g_pList);
         return ERROR;
       }    
+      
+      // count struct elements
+      nStructElements = 0;
+      while (aConfigValues[nStructElements].nameStr[0])
+      {
+        nStructElements++;
+      }
+      
+      //sanity check
+      if (nStructElements > nFileElements)
+      {
+        int iElements = 0;
+        //printf("nFileElements: %d StructElements: %d\n", nFileElements, nStructElements);
+        //add missing elements
+        while (aConfigValues[iElements].nameStr[0])
+        {
+          if (ConfGetValue(g_pList, aConfigValues[iElements].nameStr, &szOut[0], sizeof(szOut)) != SUCCESS)
+          {
+            //add missing element
+            //printf("missing: %s\n", aConfigValues[iElements].nameStr);
+            ConfAddValue(g_pList, aConfigValues[iElements].nameStr, aConfigValues[iElements].defaultStr);
+          }
+          iElements++;
+        }
+      }
       
       // URL decoding       
       strncpy(szArgv, g_uri_unescape_string(argv[1], ""), sizeof(szArgv));     
@@ -298,15 +340,15 @@ int main(int argc, char **argv)
         }
         else
         {
-          char szUrl[64] = "";
-          char szTxt[64] = "";
-          char szVkb[64] = "";
-          char szMon[64] = "";
+          char szUrl[64] = ""; //Browser URL
+          char szTxt[64] = ""; //description
+          char szVkb[64] = ""; //virtualkeyboard
+          char szMon[64] = ""; //monitoring, reconnect handling
+          char szMic[64] = ""; //microbrowser used for codesys V2 visu
           char tmp[64] = "";                              
                     
           if (index >= 0)
-          {
-            char szOut[256] = "";
+          {            
             int iPlcSelected = 0;
             
             if (ConfGetValue(g_pList, "plc_selected", &szOut[0], sizeof(szOut)) == SUCCESS)
@@ -323,7 +365,9 @@ int main(int argc, char **argv)
             sprintf(szTxt, "txt=");  
             sprintf(szVkb, "vkb=");  
             sprintf(szMon, "mon=");  
+            sprintf(szMic, "mic=");  
             
+            //Webbrowser URL used by Webenginebrowser or Microbrowser
             if (strstr(szArgv, szUrl) && (strlen(pStr) >= strlen(szUrl)))
             {
               char * s;
@@ -378,6 +422,7 @@ int main(int argc, char **argv)
               }
             }            
             
+            //Description of Visu or URL
             if (strstr(szArgv, szTxt) && (strlen(pStr) >= strlen(szTxt)))
             {
               pStr += strlen(szTxt);
@@ -397,6 +442,7 @@ int main(int argc, char **argv)
               }
             }
             
+            //Virtualkeyboard enabled / disabled
             if (strstr(szArgv, szVkb) && (strlen(pStr) >= strlen(szVkb)))
             {
               pStr += strlen(szVkb);
@@ -416,11 +462,35 @@ int main(int argc, char **argv)
               }
             }
             
+            //Monitoring means enable webvisu automatic reconnect 
             if (strstr(szArgv, szMon) && (strlen(pStr) >= strlen(szMon)))
             {
               pStr += strlen(szMon);
               szMon[strlen(szMon)-1] = '\0';
               sprintf(tmp, "%s%02d", szMon, index);
+              if (ConfIsNumber(pStr) == SUCCESS)
+              {
+                if (ConfSetValue(&aConfigValues[0], g_pList, tmp, pStr)==SUCCESS)
+                {                
+                  status = SUCCESS;
+                }
+                else
+                {
+                  char szErrorTxt[256];
+                  sprintf(szErrorTxt, "SetValue failed: %s", pStr);
+                  SetLastError(szErrorTxt); 
+                  status = ERROR;
+                  errorcounter++;
+                }
+              }
+            }
+
+            //Microbrowser (codesys v2 webvisu)
+            if (strstr(szArgv, szMic) && (strlen(pStr) >= strlen(szMic)))
+            {
+              pStr += strlen(szMic);
+              szMic[strlen(szMic)-1] = '\0';
+              sprintf(tmp, "%s%02d", szMic, index);
               if (ConfIsNumber(pStr) == SUCCESS)
               {
                 if (ConfSetValue(&aConfigValues[0], g_pList, tmp, pStr)==SUCCESS)
@@ -490,6 +560,7 @@ void ShowHelpText()
   printf("                                 [txt=txt-value]\n");
   printf("                                 [vkb=vkb-value]\n");
   printf("                                 [mon=mon-value]\n");
+  printf("                                 [mic=mic-value]\n");
   printf("\n");
   printf("statemonitor-value:       monitoring system enabled or disabled\n");
   printf("reconnect_interval-value: time in [s] to next reconnect\n");
@@ -500,12 +571,14 @@ void ShowHelpText()
   printf("txt-value:                Name or Description of the PLC\n");
   printf("vkb-value:                virtual keyboard enabled or disabled\n");
   printf("mon-value:                0=no monitoring, 1=Codesys Webvisu\n");
+  printf("mic-value:                0=non codesys v2 visu, 1=use microbrowser for codesys v2 visu\n");
   printf("\n");
   //printf("example: config_plcselect plc_count=2\n");
   printf("example: config_plcselect statemonitor=enabled\n");
   printf("example: config_plcselect 2 url=http://192.168.1.10/plc/webvisu.htm\n");
   printf("example: config_plcselect 4 vkb=disabled\n");
   printf("example: config_plcselect 4 mon=1\n");
+  printf("example: config_plcselect 5 mic=1\n");
   printf("\n");
 }
 

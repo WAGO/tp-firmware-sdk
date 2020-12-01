@@ -33,8 +33,21 @@ function update_emmc
     local dev_type="$2"
 
     local bb_img="${bb_path}.${dev_type}"
-    dd if="${bb_img}" of=/dev/mmcblk1 bs=1k seek=1 skip=1 
+    dd if="${bb_img}" of=/dev/mmcblk1 bs=1k seek=1 skip=1
    
+    local loader_mount_point="/tmp/bootloader"
+    local update_folder="$loader_mount_point/update"
+    mkdir -p "$loader_mount_point"
+    mount "/dev/mmcblk1p1" "$loader_mount_point"
+    mkdir -p "$update_folder"
+    cp "$bb_path"* "$update_folder/"
+    mv "$update_folder/"* "$loader_mount_point/"
+    sync
+    rmdir "$update_folder"
+    sync
+    umount "$loader_mount_point"
+    rmdir  "$loader_mount_point"
+    
     return $?
 }
 
@@ -90,6 +103,7 @@ function backup_bootloader
             fi
             sync
             umount "$mount_point"
+            rm -rf "/tmp/bootloader-update"
         fi
 
     fi
@@ -136,6 +150,11 @@ function __main
     local base_path="${2:-}"
     local barebox_compatible_versions="${2:-/etc}"
     local system_index=${3:-$(/etc/config-tools/get_systeminfo active-system-number)}
+
+    if [[ "$dev_type" == "EC752" ]]; then
+        #handle EDGE box as TP600 in case of fwupdate
+        dev_type="TP600"
+    fi
 
     if [[ -z "$system_index" ]]; then
         ReportError "Error: undefined system index."

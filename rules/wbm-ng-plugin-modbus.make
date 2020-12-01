@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_MODBUS) += wbm-ng-plugin-modbus
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_MODBUS_VERSION        := 1.0.0
+WBM_NG_PLUGIN_MODBUS_VERSION        := 1.0.2
 WBM_NG_PLUGIN_MODBUS                := wbm-modbus-$(WBM_NG_PLUGIN_MODBUS_VERSION)
 WBM_NG_PLUGIN_MODBUS_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_MODBUS)
 WBM_NG_PLUGIN_MODBUS_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_MODBUS_URL))

@@ -27,11 +27,32 @@
     }
   }
   $default = $plc_settings['plc_selected'];
+  
+  // first parse gesture.conf to an array
+  try {
+	$str_conf = file_get_contents('/etc/specific/gesture.conf');
+  }
+  catch (Exception $e) {
+    error_log('[PLC List]: error reading gesture.conf file');
+  }
+  $lines_conf = preg_split('/\\r\\n|\\r|\\n/', $str_conf);
+  $gesture_settings = array();
+  $gesture_listdata = array();
+  foreach($lines_conf as $elem) {
+    $data = explode('=', $elem, 2);
+    if($data[0]) {
+      $gesture_settings[$data[0]] = $data[1];
+    }
+  }
+  $wbm_allowed = $gesture_settings['btn0'];
+  
+  
 
   // 0: wbm, 
   $wbm_data = array(
           'url' => $plc_settings['url00'],
-		  'vkb' => $plc_settings['vkb00'],
+          'vkb' => $plc_settings['vkb00'],
+          'mic' => $plc_settings['mic00'],
           'text' => $plc_settings['txt00'],
           'default' => (0 == $default)
         );
@@ -45,22 +66,36 @@
 			$plc_settings['url' . $num_padded] &&
 			$plc_settings['txt' . $num_padded]
 		) {
-        $plc_listdata[] = array(
-          'url' => $plc_settings['url' . $num_padded],
-		      'vkb' => $plc_settings['vkb' . $num_padded],
-          'text' => $plc_settings['txt' . $num_padded],
-          'default' => ($i == $default)
-        );
+        $microbrowser = $plc_settings['mic' . $num_padded];
+        if ($microbrowser == 0)
+        {
+          //list without microbrowser entries
+          $plc_listdata[] = array(
+            'url' => $plc_settings['url' . $num_padded],
+            'vkb' => $plc_settings['vkb' . $num_padded],
+            'mic' => $plc_settings['mic' . $num_padded],
+            'text' => $plc_settings['txt' . $num_padded],
+            'default' => ($i == $default)
+          );
+        }
       }
-
     }
   }
 
-  $maindata = array(
-    'entries' => $plc_listdata,
-    'wbm' => $wbm_data
-  );
-
+  //hide wbm button if configured
+  if ($wbm_allowed == 0)
+  {
+    $maindata = array(
+      'entries' => $plc_listdata
+    );
+  }
+  else
+  {
+    $maindata = array(
+      'entries' => $plc_listdata,
+      'wbm' => $wbm_data
+    );
+  }
 
   // instanciating mustache and rendering of the final result
   $mustache = new Mustache_Engine(array(

@@ -52,15 +52,18 @@ show_bootscreen () {
 			devconf="1003"
 			xres="1280"
 		elif [ "$devconf" == "6" ] ; then
-			devconf="1004"
+			devconf="1008"
 			xres="1920"
 		elif [ "$devconf" == "7" ] ; then
-			devconf="1005"
+			devconf="1009"
+			xres="1920"
+		elif [ "$devconf" == "8" ] ; then
+			devconf="1010"
 			xres="1920"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
-			devconf="1000"
-			xres="480"
+			devconf="1002"
+			xres="800"
 		fi
 	else
 		# no systeminfo use eeprom, read devconf
@@ -73,9 +76,11 @@ show_bootscreen () {
 			xres="800"
 		elif [ "$devconf" = "1003" ]; then
 			xres="1280"
-		elif [ "$devconf" = "1004" ]; then
+		elif [ "$devconf" = "1008" ]; then
 			xres="1920"
-		elif [ "$devconf" = "1005" ]; then
+		elif [ "$devconf" = "1009" ]; then
+			xres="1920"
+		elif [ "$devconf" = "1010" ]; then
 			xres="1920"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
@@ -154,7 +159,7 @@ set_profile () {
 				cap="0"
 			fi
 		fi
-	elif [ "$devconf" = "1004" ]; then
+	elif [ "$devconf" = "1008" ]; then
 		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
 		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
 		if [ $? -eq 0 ]; then
@@ -162,14 +167,14 @@ set_profile () {
 			cap=$(echo ${cap#*systeminfo=0x00})
 			cap=$(echo ${cap:0:1})
 		else
-			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+			(cat /proc/bus/input/devices | grep "eGalaxTouch") &>/dev/null
 			if [ $? -eq 0 ]; then
 				cap="1"
 			else
 				cap="0"
 			fi
 		fi
-	elif [ "$devconf" = "1005" ]; then
+	elif [ "$devconf" = "1009" ]; then
 		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
 		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
 		if [ $? -eq 0 ]; then
@@ -177,13 +182,15 @@ set_profile () {
 			cap=$(echo ${cap#*systeminfo=0x00})
 			cap=$(echo ${cap:0:1})
 		else
-			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
+			(cat /proc/bus/input/devices | grep "eGalaxTouch") &>/dev/null
 			if [ $? -eq 0 ]; then
 				cap="1"
 			else
 				cap="0"
 			fi
 		fi
+	elif [ "$devconf" = "1010" ]; then
+		cap="0"
 	else
 		echo "no valid display resolution in eeprom found, use default resolution 800x480"
 		cap="0"

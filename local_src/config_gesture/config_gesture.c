@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file     config_gesture.c
 ///
-/// \version $Id: config_gesture.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_gesture.c 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief    set gesture settings
 ///
@@ -66,12 +66,16 @@ static tConfValues aConfigValues[] =
   { "menu-orientation", "top", "top,right,bottom,left" },
 
   { "btn0", "1", "" },
-  { "id0", "ID_PLCLIST", "" },  
+  { "id0", "ID_WBM", "" },
   { "btn1", "1", "" },
-  { "id1", "ID_DISPLAYCLEANING", "" },    
-    
+  { "id1", "ID_PLCLIST", "" },
+  { "btn2", "1", "" },
+  { "id2", "ID_TARGETVISU", "" },
+  { "btn3", "1", "" },
+  { "id3", "ID_DISPLAYCLEANING", "" },
+  
   // this line must always be the last one - don't remove it!
-  { "", "" }
+  { "", "", "" }
 };
 
 //------------------------------------------------------------------------------
@@ -109,6 +113,7 @@ int main(int argc, char **argv)
 {
   int status = ERROR;
   int restart_service = 0;
+  int wbmBtnChanged = 0;
   char szArgv[256] = "";
  
   if (argc >= 2)
@@ -181,6 +186,10 @@ int main(int argc, char **argv)
             pStr += len;
             if (ConfSetValue(&aConfigValues[0], g_pList, aConfigValues[k].nameStr, pStr)==SUCCESS)
             {
+              if (strcasecmp(aConfigValues[k].nameStr, "btn0") == 0)
+              {
+                wbmBtnChanged = 1;
+              }
               status = SUCCESS;
             }
             break;
@@ -196,6 +205,12 @@ int main(int argc, char **argv)
         if (ConfGetCount(g_pList) > 0)
         {
           ConfSaveValues(g_pList, CNF_FILE);
+          if (wbmBtnChanged)
+          {
+            //generate plclist.html file 
+            system("/usr/bin/php /etc/script/generate_plclist.php > /dev/null 2>&1");
+            system("/bin/sync");
+          }
         }
         else
         {

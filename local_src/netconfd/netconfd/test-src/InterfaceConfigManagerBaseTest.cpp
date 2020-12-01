@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * InterfaceConfigManagerBaseTest.cpp
  *
@@ -7,7 +8,7 @@
 
 #include "InterfaceConfigManagerBaseTest.h"
 
-namespace netconfd {
+namespace netconf {
 
 
-} /* namespace netconfd */
+} /* namespace netconf */

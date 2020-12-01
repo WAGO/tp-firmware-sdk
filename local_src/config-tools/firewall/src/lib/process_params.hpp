@@ -13,25 +13,13 @@
 ///
 ///  \author   WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
-#ifndef PROCESS_PARAMS_HPP_
-#define PROCESS_PARAMS_HPP_
+#ifndef WAGO_FIREWALL_PROCESS_PARAMS_HPP_
+#define WAGO_FIREWALL_PROCESS_PARAMS_HPP_
 
-//------------------------------------------------------------------------------
-// include files
-//------------------------------------------------------------------------------
+#include "file_accessor.hpp"
 
-#include "xmlhlp.hpp"
-
-namespace wago
-{
-
-//------------------------------------------------------------------------------
-// defines; structure, enumeration and type definitions
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// function prototypes
-//------------------------------------------------------------------------------
+namespace wago {
+namespace firewall {
 
 //------------------------------------------------------------------------------
 /// Update params_gen.xml file, defining network device name mappings, e.g. ethX1 <-> br0.
@@ -42,22 +30,9 @@ namespace wago
 /// they are added to params_gen.xml file.
 ///
 //------------------------------------------------------------------------------
-void update_network_interface_name_mapping();
+void update_network_interface_name_mapping(const FileAccessor& file_accessor);
 
-//------------------------------------------------------------------------------
-// macros
-//------------------------------------------------------------------------------
+} // namespace firewall
+} // namespace wago
 
-//------------------------------------------------------------------------------
-// variables' and constants' definitions
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// function implementation
-//------------------------------------------------------------------------------
-
-}
-
-#endif /* PROCESS_PARAMS_HPP_ */
-//---- End of source file ------------------------------------------------------
-
+#endif // WAGO_FIREWALL_PROCESS_PARAMS_HPP_

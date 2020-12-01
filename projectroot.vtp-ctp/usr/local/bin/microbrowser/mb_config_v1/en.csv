@@ -1,0 +1,84 @@
+﻿(1);(1)
+(2);(2)
++/-;+/-
+1+@COFF_cpr_index@;1+@COFF_cpr_index@
+13+@COFF_cpr_index@/ @CO_MB_copyright_files.size@;13+@COFF_cpr_index@/ @CO_MB_copyright_files.size@
+<--;<--
+@CO_MB_OS_NAME@ V.@CO_MB_OS_VERSION@;@CO_MB_OS_NAME@ V.@CO_MB_OS_VERSION@
+@CO_MB_SCREEN_WIDTH@ x @CO_MB_SCREEN_HEIGHT@, @CO_MB_SCREEN_BPP@ bpp;@CO_MB_SCREEN_WIDTH@ x @CO_MB_SCREEN_HEIGHT@, @CO_MB_SCREEN_BPP@ bpp
+ABC;ABC
+ALPHA;ALPHA
+Advanced Settings;Advanced Settings
+Advanced settings;Advanced settings
+Anisotropic;Anisotropic
+Apply Static IP Address on startup...;Apply Static IP Address on startup...
+Apply;Apply
+Auto scale view\non screen size:;Auto scale view\non screen size:
+Background Color;Background Color
+Brightness;Brightness
+Build:;Build:
+CL;CL
+CLEAR;CLEAR
+CPU:;CPU:
+Check for project update [min];Check for project update [min]
+Close;Close
+DEC_SYMB;.
+Date;Date
+Device Name:;Device Name:
+Disabled;Disabled
+Display;Display
+Display:;Display:
+EXIT;EXIT
+Firmware:;Firmware:
+Gateway;Gateway
+Go;Go
+Hardware:;Hardware:
+IP Address;IP Address
+Info;Info
+Isotropic;Isotropic
+LANG_SYMB;EN
+Load Default Settings;Load Default Settings
+Max:;Max:
+Min:;Min:
+Months;January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember\n
+NUM;NUM
+Netmask;Netmask
+Network Settings;Network Settings
+No;No
+OK;OK
+OS:;OS:
+Open Source Information;Open Source Information
+Open Source Licenses;Open Source Licenses
+Orientation:;Orientation:
+PM_AM;0
+Page\nDown;Page\nDown
+Page\nUp;Page\nUp
+Password;Password
+Platform:;Platform:
+Proxy-Auth.;Proxy-Auth.
+Reboot;Reboot
+Reset all parameters to default settings?;Reset all parameters to default settings?
+Restart eth0;Restart eth0
+Return to setup page\nafter touching screen for [s];Return to setup page\nafter touching screen for [s]
+Run;Run
+S7-Login;S7-Login
+Save;Save
+Serial Nr.:;Serial Nr.:
+Set Default;Set Default
+Settings...;Settings...
+Show analysis info;Show analysis info
+Software Update;Software Update
+Start URL;Start URL
+The current version is;The current version is
+Time to start URL in seconds...;Time to start URL in seconds...
+Turn off backlight [min];Turn off backlight [min]
+Username;Username
+Version found on SD-Card/USB-Stick?;Version found on SD-Card/USB-Stick?
+Version:;Version:
+WWW-Auth.;WWW-Auth.
+X;X
+Yes;Yes
+ifdown eth0;ifdown eth0
+ifup eth0;ifup eth0
+txt;txt
+

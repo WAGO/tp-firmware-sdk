@@ -15,10 +15,8 @@
 /// \author Mariusz Podlesny : WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
 
-
-#ifndef WAGO_ERROR_HPP
-#define WAGO_ERROR_HPP
-
+#ifndef WAGO_FIREWALL_ERROR_HPP_
+#define WAGO_FIREWALL_ERROR_HPP_
 
 //
 //  BEFORE YOU START
@@ -47,8 +45,8 @@ extern "C" {
 #include <string>
 
 
-namespace wago
-{
+namespace wago {
+namespace firewall {
 
 
 //
@@ -58,6 +56,7 @@ extern const std::string error_msg_unknown;
 extern const std::string error_msg_missing_param;
 extern const std::string error_msg_invalid_param;
 extern const std::string error_msg_file_open_error;
+extern const std::string error_msg_file_write_error;
 extern const std::string error_msg_file_read_error;
 extern const std::string error_msg_file_close_error;
 extern const std::string error_msg_system_call_error;
@@ -142,6 +141,15 @@ public:
 };
 
 
+class file_write_error : public execution_error
+{
+public:
+    file_write_error(const std::string& _what = std::string(),
+                           const std::string& _msg = error_msg_file_write_error);
+    ~file_write_error() override;
+};
+
+
 class file_read_error : public execution_error
 {
 public:
@@ -178,8 +186,7 @@ public:
 };
 
 
+} // namespace firewall
 } // namespace wago
 
-
-#endif // WAGO_ERROR_HPP
-
+#endif // WAGO_FIREWALL_ERROR_HPP_

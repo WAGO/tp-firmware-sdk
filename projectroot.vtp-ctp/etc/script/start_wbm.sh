@@ -22,7 +22,7 @@ HOME=/root
 URL=`/etc/config-tools/get_plcselect 0 url`
 VKB=`/etc/config-tools/get_plcselect 0 vkb`
 if [ -z "$URL" ]; then
-  URL="http://127.0.0.1/wbm-ng/index.html"
+  URL="http://127.0.0.1/wbm/index.html"
 fi
 
 CONF_ZOOM=`getconfvalue /etc/specific/webengine/webengine.conf zoom`

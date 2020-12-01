@@ -20,7 +20,7 @@
 
 using namespace testing;
 
-namespace netconfd {
+namespace netconf {
 
 class ADeviceInterfaceProvider : public Test {
  public:
@@ -51,7 +51,7 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificProductPortInterfaceL
   interface_provider_ = ::std::make_unique < DeviceInterfaceProvider
       > (mock_bridge_controller_);
 
-  Interfaces product_interfaces = interface_provider_->GetProductInterfaces();
+  Interfaces product_interfaces = interface_provider_->GetProductPortNames();
 
   EXPECT_TRUE(IsIncluded("X1", product_interfaces));
   EXPECT_TRUE(IsIncluded("X2", product_interfaces));
@@ -67,7 +67,7 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificOSPortInterfaceList) 
   interface_provider_ = ::std::make_unique < DeviceInterfaceProvider
       > (mock_bridge_controller_);
 
-  Interfaces os_interfaces = interface_provider_->GetOSInterfaces();
+  Interfaces os_interfaces = interface_provider_->GetOSInterfaceNames();
 
   EXPECT_TRUE(IsIncluded("ethX1", os_interfaces));
   EXPECT_TRUE(IsIncluded("ethX2", os_interfaces));
@@ -87,6 +87,7 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificInterfaceNameMapping)
 
   EXPECT_EQ("ethX1", name_mapping.at("X1"));
   EXPECT_EQ("ethX2", name_mapping.at("X2"));
+
   EXPECT_EQ(2, name_mapping.size());
 }
 
@@ -100,7 +101,7 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificProductPortInterfaceL
   interface_provider_ = ::std::make_unique < DeviceInterfaceProvider
       > (mock_bridge_controller_);
 
-  Interfaces product_interfaces = interface_provider_->GetProductInterfaces();
+  Interfaces product_interfaces = interface_provider_->GetProductPortNames();
 
   EXPECT_TRUE(IsIncluded("X1", product_interfaces));
   EXPECT_TRUE(IsIncluded("X2", product_interfaces));
@@ -119,7 +120,7 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificOSPortInterfaceListIg
   interface_provider_ = ::std::make_unique < DeviceInterfaceProvider
       > (mock_bridge_controller_);
 
-  Interfaces os_interfaces = interface_provider_->GetOSInterfaces();
+  Interfaces os_interfaces = interface_provider_->GetOSPortNames();
 
   EXPECT_TRUE(IsIncluded("ethX1", os_interfaces));
   EXPECT_TRUE(IsIncluded("ethX2", os_interfaces));
@@ -144,7 +145,8 @@ TEST_F(ADeviceInterfaceProvider, GeneratesTheDeviceSpecificInterfaceNameMappingI
   EXPECT_EQ("ethX2", name_mapping.at("X2"));
   EXPECT_EQ("ethX110", name_mapping.at("X110"));
   EXPECT_EQ("ethXabc", name_mapping.at("Xabc"));
+
   EXPECT_EQ(4, name_mapping.size());
 }
 
-} /* namespace netconfd */
+} /* namespace netconf */

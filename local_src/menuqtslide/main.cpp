@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 /// \file main.cpp
 ///
-/// \version $Id: main.cpp 43411 2019-10-08 11:14:03Z wrueckl_elrest $
+/// \version $Id: main.cpp 46392 2020-02-07 11:11:46Z wrueckl_elrest $
 ///
 /// \brief Thread for receiving command f.e. open menu
 ///
@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
   
   g_bEventDetection = true;
+  g_bWbmAllowed = true;
   //parse cmdline arguments
   int i=1;
   while (i < QApplication::arguments().count())
@@ -66,6 +67,11 @@ int main(int argc, char *argv[])
       //write "open" to /dev/toolbarmenu in this case from external application
       //slide mode disabled here
       g_bEventDetection = false;
+    }
+    else if (QString::compare(sTxt, "-nowbm", Qt::CaseInsensitive)==0)
+    {
+      //user is not allowed to show WBM not even login dialog
+      g_bWbmAllowed = false;
     }
     i++;
   }

@@ -17,6 +17,7 @@
 
 
 eeprom_device="/sys/bus/i2c/devices/1-0054/eeprom"
+hdmi=0
 
 # set xorg.conf
 set_xorg_conf () {
@@ -40,15 +41,19 @@ set_xorg_conf () {
 			devconf="1003"
 			addchar_xres="_1280_800"
 		elif [ "$xres" == "6" ] ; then
-			devconf="1004"
+			devconf="1008"
 			addchar_xres="_1920_1080"
 		elif [ "$xres" == "7" ] ; then
-			devconf="1004"
+			devconf="1009"
+			addchar_xres="_1920_1080"
+		elif [ "$xres" == "8" ] ; then
+			devconf="1010"
+			hdmi="1"
 			addchar_xres="_1920_1080"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
 			addchar_xres="_800_480"
-			devconf="1004"
+			devconf="1002"
 		fi
 	else
 		# no systeminfo use eeprom, read devconf
@@ -61,9 +66,12 @@ set_xorg_conf () {
 			addchar_xres="_800_480"
 		elif [ "$devconf" == "1003" ] ; then
 			addchar_xres="_1280_800"
-		elif [ "$devconf" == "1004" ] ; then
+		elif [ "$devconf" == "1008" ] ; then
 			addchar_xres="_1920_1080"
-		elif [ "$devconf" == "1005" ] ; then
+		elif [ "$devconf" == "1009" ] ; then
+			addchar_xres="_1920_1080"
+		elif [ "$devconf" == "1010" ] ; then
+			hdmi="1"
 			addchar_xres="_1920_1080"
 		else
 			echo "screen resolution touch not recognized set default 800x480"
@@ -80,65 +88,37 @@ set_xorg_conf () {
 	elif [ "$devconf" = "1001" ]; then
 		cap="0"
 	elif [ "$devconf" = "1002" ]; then
-		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
-		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+		(cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
 		if [ $? -eq 0 ]; then
-			cap=$(cat /proc/cmdline)
-			cap=$(echo ${cap#*systeminfo=0x00})
-			cap=$(echo ${cap:0:1})
+			cap="1"
 		else
-			(cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
-			if [ $? -eq 0 ]; then
-				cap="1"
-			else
-				cap="0"
-			fi
+			cap="0"
 		fi
 	elif [ "$devconf" = "1003" ]; then
-		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
-		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+		(cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
 		if [ $? -eq 0 ]; then
-			cap=$(cat /proc/cmdline)
-			cap=$(echo ${cap#*systeminfo=0x00})
-			cap=$(echo ${cap:0:1})
+			cap="1"
 		else
-			(cat /proc/bus/input/devices | grep "PIXCIR HID Touch Panel") &>/dev/null
-			if [ $? -eq 0 ]; then
-				cap="1"
-			else
-				cap="0"
-			fi
+			cap="0"
 		fi
-	elif [ "$devconf" = "1004" ]; then
-		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
-		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+	elif [ "$devconf" = "1008" ]; then
+		(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
 		if [ $? -eq 0 ]; then
-			cap=$(cat /proc/cmdline)
-			cap=$(echo ${cap#*systeminfo=0x00})
-			cap=$(echo ${cap:0:1})
+			cap="1"
+			#echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 		else
-			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
-			if [ $? -eq 0 ]; then
-				cap="1"
-			else
-				cap="0"
-			fi
+			cap="0"
 		fi
-	elif [ "$devconf" = "1005" ]; then
-		#if systeminfo is provided by cmdline use it, otherwise read eeprom 
-		(cat /proc/cmdline | grep "systeminfo=" ) &>/dev/null
+	elif [ "$devconf" = "1009" ]; then
+		(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
 		if [ $? -eq 0 ]; then
-			cap=$(cat /proc/cmdline)
-			cap=$(echo ${cap#*systeminfo=0x00})
-			cap=$(echo ${cap:0:1})
+			cap="1"
+			echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 		else
-			(cat /proc/bus/input/devices | grep "ILITEK ILITEK-TP") &>/dev/null
-			if [ $? -eq 0 ]; then
-				cap="1"
-			else
-				cap="0"
-			fi
+			cap="0"
 		fi
+	elif [ "$devconf" = "1010" ]; then
+		hdmi="1"
 	else
 		echo "no valid display resolution in eeprom found, use default resolution 800x480"
 		cap="0"
@@ -151,6 +131,11 @@ set_xorg_conf () {
 		#echo 15 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 	elif [ "$cap" == "0" ] ; then
 		echo "res touch found"
+		#echo 10 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+	elif [ "$hdmi" == "1" ] ; then
+		echo "hdmi found"
+		addchar="_hdmi"
+		xorg_conf_file=$xorg_conf_file$addchar
 		#echo 10 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 	else
 		echo "cap/res touch not recognized"
@@ -197,7 +182,10 @@ mkdir /tmp/.java/deployment/cache
 chmod 755 /tmp/.java/deployment/cache
 
 # allow user www to read brightness
-chmod 666 /sys/class/backlight/backlight/brightness
+brightness_file=/sys/class/backlight/backlight/brightness
+if [ -e "$brightness_file" ]; then
+chmod 666 "$brightness_file"
+fi
 
 # allow user www to set / read display orientation
 chmod 666 $eeprom_device
@@ -205,13 +193,45 @@ echo 23 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio23/direction
 chmod 666 /sys/class/gpio/gpio23/value
 
-# start X
-export DISPLAY=:0
-echo "STARTING Xorg"
-# look for usb mouse pugged in
-grep -w "EV=17" /proc/bus/input/devices
-if [ "$?" == "0" ]; then
-/usr/bin/startx &
+
+# decide start mode Xorg or framebuffer
+MICROBROWSER="0"
+URL=""
+BOOTAPP="$(/etc/config-tools/get_eruntime bootapp)"
+if [ "$BOOTAPP" == "no" ]; then
+  # no bootproject found - check if microbrowser is configured
+  PLCSELECTED=`/etc/config-tools/get_plcselect plc_selected`
+  URL=`/etc/config-tools/get_plcselect $PLCSELECTED url`
+  MICROBROWSER=`/etc/config-tools/get_plcselect $PLCSELECTED mic`
+fi
+
+ORDER="$(/etc/config-tools/get_typelabel_value ORDER)"
+if [ "${ORDER:0:5}" == "752-8" ]; then
+  #EDGE Controller
+  if [ "$MICROBROWSER" == "1" ]; then
+    #No MicroBrowser on EDGE Box possible
+    MICROBROWSER="0"
+    #set startpage to WBM
+    /etc/config-tools/config_plcselect plc_selected=0
+    #show notification
+    /usr/bin/dialogbox "EC752 does not support the MicroBrowser." Ok -s 10 -platform linuxfb
+    # blank framebuffer to black background
+    dd if=/dev/zero of=/dev/fb0
+  fi
+fi
+
+if [ "$MICROBROWSER" == "1" ]; then
+  # without Xorg except EDGE-BOX
+  /etc/script/start_framebuffer.sh "$URL" &
 else
-/usr/bin/startx -- -nocursor &
+  # start X
+  export DISPLAY=:0
+  echo "STARTING Xorg"
+  # look for usb mouse pugged in
+  grep -w "EV=17" /proc/bus/input/devices
+  if [ "$?" == "0" ]; then
+  /usr/bin/startx &
+  else
+  /usr/bin/startx -- -nocursor &
+  fi
 fi

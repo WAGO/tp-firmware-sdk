@@ -78,8 +78,6 @@ $(STATEDIR)/get_display.targetinstall:
 	@$(call install_fixup, get_display,AUTHOR,"<elrest>")
 	@$(call install_fixup, get_display,DESCRIPTION,missing)
 
-	@$(call install_copy, get_display, 0, 0, 0755, /etc/config-tools);
-
 #
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish

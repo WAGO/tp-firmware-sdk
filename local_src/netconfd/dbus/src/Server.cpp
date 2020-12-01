@@ -1,13 +1,9 @@
-/*
- * DBusServer.cpp
- *
- *  Created on: 04.06.2019
- *      Author: u014487
- */
+// SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <IDBusHandlerRegistry.h>
+#include "IDBusHandlerRegistry.h"
 #include "Server.h"
-namespace netconfd {
+
+namespace netconf {
 namespace dbus {
 
 Server::Server()
@@ -28,6 +24,7 @@ void Server::AddInterface(IDBusHandlerRegistry& interface)
 {
   g_dbus_object_manager_server_export (manager, interface.GetInterfaceObject());
   g_dbus_object_manager_server_export (manager, interface.GetIPObject());
+  g_dbus_object_manager_server_export (manager, interface.GetBackupObject());
 
 }
 
@@ -37,10 +34,11 @@ void Server::OnBusAcquired(GDBusConnection *connection, const gchar *name, gpoin
   g_dbus_object_manager_server_set_connection(self->manager, connection);
   self->connection = connection;
 }
+
 void Server::OnNameAcquired(GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
 }
 
 
 } /* namespace dbus */
-} /* namespace netconfd */
+} /* namespace netconf */

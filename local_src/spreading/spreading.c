@@ -18,7 +18,7 @@
 ///
 /// \file    spreading.c
 ///
-/// \version $Id: spreading.c 44733 2019-11-19 13:15:22Z wrueckl_elrest $
+/// \version $Id: spreading.c 44644 2019-11-14 15:47:13Z wrueckl_elrest $
 ///
 /// \brief   spreading module sets spread spectrum mode for PLL2
 ///

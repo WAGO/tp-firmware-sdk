@@ -39,7 +39,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_WBM</text>
     <icon></icon>
@@ -48,7 +48,7 @@
   <item>
     <width>100</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_PLCLIST</text>
     <icon></icon>
@@ -57,7 +57,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_TARGETVISU</text>
     <icon></icon>
@@ -66,7 +66,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_DISPLAYCLEANING</text>
     <icon></icon>
@@ -82,7 +82,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>10</leftspacing>
     <text>ID_WBM</text>
     <icon></icon>
@@ -91,7 +91,7 @@
   <item>
     <width>100</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>10</leftspacing>
     <text>ID_PLCLIST</text>
     <icon></icon>
@@ -100,7 +100,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>10</leftspacing>
     <text>ID_TARGETVISU</text>
     <icon></icon>
@@ -109,7 +109,7 @@
   <item>
     <width>80</width>
     <height>30</height>
-    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:12pt; font-weight: bold; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>10</leftspacing>
     <text>ID_DISPLAYCLEANING</text>
     <icon></icon>
@@ -126,7 +126,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_WBM</text>
     <icon></icon>
@@ -135,7 +135,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_PLCLIST</text>
     <icon></icon>
@@ -144,7 +144,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_TARGETVISU</text>
     <icon></icon>
@@ -153,7 +153,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_DISPLAYCLEANING</text>
     <icon></icon>
@@ -168,7 +168,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_WBM</text>
     <icon></icon>
@@ -177,7 +177,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_PLCLIST</text>
     <icon></icon>
@@ -186,7 +186,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_TARGETVISU</text>
     <icon></icon>
@@ -195,7 +195,7 @@
   <item>
     <width></width>
     <height>40</height>
-    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;}</style>
+    <style>QPushButton{font-size:16pt; color:#004494; background-color:#FFFFFF; border:solid; border-width:2px; border-color:#004494; text-align:center;} QPushButton:pressed{background-color:#ccdaea;} QPushButton:disabled {color:#dcdcdc;border-color:#dcdcdc;}</style>
     <leftspacing>20</leftspacing>
     <text>ID_DISPLAYCLEANING</text>
     <icon></icon>

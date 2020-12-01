@@ -6,7 +6,7 @@
 #include "IBridgeController.hpp"
 
 
-namespace netconfd {
+namespace netconf {
 
 class BridgeConfigValidator : public IBridgeConfigValidator {
  public:
@@ -18,11 +18,11 @@ class BridgeConfigValidator : public IBridgeConfigValidator {
   BridgeConfigValidator(const BridgeConfigValidator&&) = delete;
   BridgeConfigValidator& operator=(const BridgeConfigValidator&&) = delete;
 
-  Status Validate(BridgeConfig const& config) const override;
+  Error Validate(BridgeConfig const& config) const override;
 
  private:
   IBridgeController& bridge_controller_;
 
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */

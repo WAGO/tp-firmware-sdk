@@ -4,24 +4,24 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2020 WAGO Kontakttechnik GmbH & Co. KG
 
 #-----------------------------------------------------------------------------#
 # Script-name: update_config
 #
-# Updates networking configuration of default gateways, hostname and dns
-# domainname.
+# Updates networking configuration of hostname and dns domainname.
 # Typically called when configuration data changed by config tools or by
-# DHCP/BOOTP. Writes multiple default gateways into the routing table and sets their
-# metric. Gateways with lowest metric come first. Default metric for DHCP/BOOTP
-# data is 10. Default metric for static configured interfaces is 20.
+# DHCP/BOOTP.
 #
-# $Revision$
 # Author: WAGO Kontakttechnik GmbH & Co. KG.
 #-----------------------------------------------------------------------------#
 
 set -u      # error exit on undefined shell variables
 
+dnsmasq_config_changed=false
+
+ETC_HOSTS_FILE=/etc/hosts
+ETC_HOSTS_TMPFILE=/tmp/hosts
 
 function DomainToResolvConf()
 {
@@ -52,13 +52,13 @@ function DomainToDNSMASQ()
 
     #get actual domain
     local act_domain=""
-    IFS== read -r dummy act_domain <<< "$(egrep \"^domain=\" $dnsmasq_conf)"
-
-    #check if act_domain differs from new_domain
-    local domain_search="/^\(#\)\?domain=.*"
+    IFS="=" read -r dummy act_domain <<< "$(grep -E '^domain=' $dnsmasq_conf)"
 
     if [ "$act_domain" != "$domain" ]; then
         if [ "$domain" ]; then
+            #check if act_domain differs from new_domain
+            local domain_search="/^\(#\)\?domain=.*"
+
             #search for the first '#domain=' or 'domain=' at the beginning of the line
             #replace it with 'domain=$domain'
             sed -i -e "1,$domain_search/{$domain_search/s//domain=$domain/}" $dnsmasq_conf
@@ -67,8 +67,8 @@ function DomainToDNSMASQ()
             #otherwise dmasq will fail during startup
             sed -i -e "/^domain=/c#domain=" $dnsmasq_conf
         fi
-        #now we have to restart dnsmasq there is no other way to re-read the configuration.
-        /etc/init.d/dnsmasq restart
+        # We have to restart dnsmasq to re-read the configuration.
+        dnsmasq_config_changed=true
     fi
 }
 
@@ -77,26 +77,21 @@ function UpdateLocalDNSResolve()
    local hostname=$1
    local FQDN="$hostname.$2"
 
-   local x1ip=$(/etc/config-tools/get_eth_config X1 ip-address)
-   local x2ip=$(/etc/config-tools/get_eth_config X2 ip-address)
+   local ips=$(ip addr ls | grep inet.*global | awk '{ print $2}' | sed 's+/.*++g')
 
    local marker_text_1="#SYSTEM HOST ENTRY -- DO NOT REMOVE -- WILL BE CREATED BY CONFIG-TOOLS"
    local marker_text_2="#END SYSTEM HOST -- DO NOT REMOVE"
 
    # create Marker if not present
-   grep -q "^$marker_text_1" /etc/hosts || echo "$marker_text_1" >> /etc/hosts
-   grep -q "^$marker_text_2" /etc/hosts || echo "$marker_text_2" >> /etc/hosts
+   grep -q "^$marker_text_1" $ETC_HOSTS_TMPFILE || echo "$marker_text_1" >> $ETC_HOSTS_TMPFILE
+   grep -q "^$marker_text_2" $ETC_HOSTS_TMPFILE || echo "$marker_text_2" >> $ETC_HOSTS_TMPFILE
 
    #remove everything between marker1 and marker2
-   sed -i -e "/$marker_text_1/,/$marker_text_2/{/$marker_text_1/b;/$marker_text_2/b;d}" /etc/hosts
+   sed -i -e "/$marker_text_1/,/$marker_text_2/{/$marker_text_1/b;/$marker_text_2/b;d}" $ETC_HOSTS_TMPFILE
 
-   if [ "$x2ip" ]; then
-       sed -i -e "/^$marker_text_1/a$x2ip\t$FQDN\t$hostname" /etc/hosts
-   fi
-
-   if [ "$x1ip" ]; then
-       sed -i -e "/^$marker_text_1/a$x1ip\t$FQDN\t$hostname" /etc/hosts
-   fi
+   for ip in $ips; do
+     sed -i -e "/^$marker_text_1/a$ip\t$FQDN\t$hostname" $ETC_HOSTS_TMPFILE
+   done
 }
 
 function UpdateHostConf()
@@ -104,10 +99,13 @@ function UpdateHostConf()
     local validhost
     local validdomain
     local defaulthost
+    # check existence of localhost entry
+    # WAT32141: Precautionary action to ensure localhost is always present.
+    grep -q "^127\.0\.0\.1" $ETC_HOSTS_TMPFILE || echo -e "127.0.0.1\tlocalhost" > $ETC_HOSTS_TMPFILE
 
     # set default hostname
     defaulthost=$(/etc/config-tools/determine_hostname --default)
-    grep -q "^127\.0\.1\.1" /etc/hosts || sed -i -e "/^127\.0\.0\.1/a127.0.1.1\t$defaulthost\t$defaulthost" /etc/hosts
+    grep -q "^127\.0\.1\.1" $ETC_HOSTS_TMPFILE || sed -i -e "/^127\.0\.0\.1/a127.0.1.1\t$defaulthost\t$defaulthost" $ETC_HOSTS_TMPFILE
 
     # load static names
     . "$HOSTCONFFILE"
@@ -115,7 +113,7 @@ function UpdateHostConf()
     [ "$DNSDOMAIN" ] && validdomain=$DNSDOMAIN
 
     # now load dynamic dhcp names of newest file
-    if [ "$(find /tmp -name "dhcp-bootp-data-"* -type f -printf . | wc -c)" -gt 0 ]; then
+    if [ "$(find /tmp -maxdepth 1 -name 'dhcp-bootp-data-*' -type f -printf . | wc -c)" -gt 0 ]; then
         cfgfile=$(ls -rt "$DHCP_DATA_FILE_TEMPLATE"* | tail -1)
         DHCPHOSTNAME=
         DHCPDOMAIN=
@@ -124,7 +122,7 @@ function UpdateHostConf()
         [ "$DHCPDOMAIN" ] && validdomain=$DHCPDOMAIN
     fi
 
-    if [ "${validhost-}" != "$(</proc/sys/kernel/hostname)" -o "${validdomain-}" != "$(dnsdomainname)" ]; then
+    if [ "${validhost-}" != "$(</proc/sys/kernel/hostname)" ] || [ "${validdomain-}" != "$(dnsdomainname)" ]; then
         # write /etc/hosts, set /etc/hostname, and kernel hostname
         if [ "${validhost-}" ]; then
             if [ "${validdomain-}" ]; then
@@ -132,19 +130,19 @@ function UpdateHostConf()
             else
                 FQDN=$validhost
             fi
-            if grep -q "^127.0.1.1" /etc/hosts; then
-                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$FQDN\t$validhost" /etc/hosts
+            if grep -q "^127.0.1.1" $ETC_HOSTS_TMPFILE; then
+                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$FQDN\t$validhost" $ETC_HOSTS_TMPFILE
             else
-                echo -e "127.0.1.1\t$FQDN\t$validhost" >> /etc/hosts
+                echo -e "127.0.1.1\t$FQDN\t$validhost" >> $ETC_HOSTS_TMPFILE
             fi
             echo "$validhost" > /etc/hostname
             echo "$validhost" > /proc/sys/kernel/hostname
         else
             # empty hostname, clear hostname files and set default hostname in kernel
             if [ "${validdomain-}" ]; then
-                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$defaulthost.$validdomain\t$defaulthost" /etc/hosts
+                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$defaulthost.$validdomain\t$defaulthost" $ETC_HOSTS_TMPFILE
             else
-                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$defaulthost\t$defaulthost" /etc/hosts
+                sed -i -e "/^127\.0\.1\.1/c127.0.1.1\t$defaulthost\t$defaulthost" $ETC_HOSTS_TMPFILE
             fi
             rm -f /etc/hostname
             echo "$defaulthost" > /proc/sys/kernel/hostname
@@ -159,9 +157,27 @@ function UpdateHostConf()
     fi
 }
 
-function DoUpdates()
+function UpdateDnsmasqConfig()
 {
-    UpdateHostConf
+    local DNSMASQ_CONFIG="/etc/dnsmasq.conf"
+    local DNSMASQ_CONFIG_TMP="/tmp/dnsmasq.conf"
+    local NET_PARAMS=""
+
+    if [[ -n ${NETCONF_BRIDGE_CONFIG+x} && -n ${NETCONF_IP_CONFIG+x} && -n ${NETCONF_INTERFACE_CONFIG+x} ]]; then
+        NET_PARAMS="--bridge-config $NETCONF_BRIDGE_CONFIG --ip-config $NETCONF_IP_CONFIG --interface-config $NETCONF_INTERFACE_CONFIG"
+    fi
+
+    /etc/config-tools/config_dnsmasq_c --gen-config --no-dnsmasq-restart --dnsmasq-config $DNSMASQ_CONFIG_TMP $NET_PARAMS
+
+    if ! diff -q $DNSMASQ_CONFIG $DNSMASQ_CONFIG_TMP ; then
+        mv $DNSMASQ_CONFIG_TMP $DNSMASQ_CONFIG
+        sync
+	    dnsmasq_config_changed=true
+    fi
+
+    if [[ -e $DNSMASQ_CONFIG_TMP ]]; then
+        rm -f $DNSMASQ_CONFIG_TMP &> /dev/null
+    fi
 }
 
 # main: set global variables
@@ -170,7 +186,26 @@ DHCP_DATA_FILE_PREFIX=dhcp-bootp-data-
 DHCP_DATA_FILE_TEMPLATE=/tmp/$DHCP_DATA_FILE_PREFIX
 HOSTCONFFILE=/etc/specific/host.conf
 
-# Use advisory lock to avoid race with config_dnsmasq_c and this script on more then one 
+# Use advisory lock to avoid race with config_dnsmasq_c and this script on more then one
 # interface with dhcp
-( flock 9; DoUpdates; ) 9< /etc/hosts
+
+/usr/bin/cp $ETC_HOSTS_FILE $ETC_HOSTS_TMPFILE
+
+( flock 9; UpdateHostConf; ) 9< $ETC_HOSTS_TMPFILE
+
+/usr/bin/mv $ETC_HOSTS_TMPFILE $ETC_HOSTS_FILE
 sync
+
+# dnsmasq update relies on /etc/hosts too. Therefore, run dnsmasq update after UpdateHostConf part.
+shift
+UpdateDnsmasqConfig "$@"
+
+if [[ "$dnsmasq_config_changed" == true ]]; then
+    # We have to restart dnsmasq to re-read the configuration.
+    # Use the "update" option to avoid regenerating the file /etc/dnsmasq.conf .
+    # The generation was already done during UpdateDnsmasqConfig execution.
+    /etc/init.d/dnsmasq update
+else
+    # just sighup to reload hosts
+    /etc/init.d/dnsmasq reload
+fi

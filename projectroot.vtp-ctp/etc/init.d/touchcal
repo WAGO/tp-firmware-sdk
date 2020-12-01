@@ -27,7 +27,12 @@ case $1 in
 			if [ $? -eq 0 ]; then
 				cap="1"
 			else
-				cap="0"
+				(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
+				if [ $? -eq 0 ]; then
+					cap="1"
+				else
+					cap="0"
+				fi
 			fi
 		fi
 

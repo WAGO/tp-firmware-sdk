@@ -4,13 +4,12 @@
 
 #include "Types.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class IpAddressManipulator {
  public:
 
-  static IPConfig ChangeHost(IPConfig const& current, uint32_t new_host);
-
+  static IPConfig ChangeLastAddressOctet(IPConfig const& current, uint32_t new_oktett);
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */

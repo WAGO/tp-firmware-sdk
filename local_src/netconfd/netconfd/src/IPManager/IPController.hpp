@@ -4,7 +4,7 @@
 
 #include "IIPController.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class IPController : public IIPController {
  public:
@@ -16,9 +16,8 @@ class IPController : public IIPController {
   IPController(const IPController&&) = delete;
   IPController& operator=(const IPController&&) = delete;
 
-  Status GetIPConfig(const Interface& interface, IPConfig& config) const override;
-  Status SetIPConfig(const IPConfig& config) const override;
+  Error SetIPConfig(const IPConfig& config) const override;
 
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */

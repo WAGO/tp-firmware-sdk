@@ -21,7 +21,7 @@ HOME=/root
 
 URL=`/etc/config-tools/get_plcselect 0 url`
 if [ -z "$URL" ]; then
-  URL="http://127.0.0.1/wbm-ng/index.html"
+  URL="http://127.0.0.1/wbm/index.html"
 fi
 
 CONF_ZOOM=`getconfvalue /etc/specific/webengine/webengine.conf zoom`
@@ -59,7 +59,12 @@ PLCSELECTED=`/etc/config-tools/get_plcselect plc_selected`
 #echo "plcselected $PLCSELECTED" 
 if [ $PLCSELECTED -lt 0 ]; then
   echo "plcselected < 0"
-  PLCSELECTED=0 
+  PLCSELECTED=0
+fi
+
+if [ -e "/var/run/framebuffer.done" ]; then
+  #start WBM in case of framebuffer / microbrowser mode ends
+  PLCSELECTED=0
 fi
 
 #show configured website 

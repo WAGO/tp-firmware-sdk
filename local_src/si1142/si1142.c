@@ -59,6 +59,8 @@ enum probe_index {
 #define SOCK_NAME      "/var/run/si1142"
 
 #define PROXIMITY_THRESHOLD 600
+//#define INTENSITY_THRESHOLD 100
+#define INTENSITY_THRESHOLD  1
 
 static const char *const probes[no_of_probes] = {
 	"intensity", "intensity_ir", "proximity0", "proximity1"
@@ -294,9 +296,9 @@ static int handle_motion_sampling(int fd, uint16_t *data)
 			break;
 		case intensity:
 		case intensity_ir:
-			/* Only change if |delta| > 100 */
+			/* Only change if |delta| > INTENSITY_THRESHOLD */
 			delta = old_sane[i] - data[i];
-			sane[i] = (delta < -100 || delta > 100) ?
+			sane[i] = (delta < -INTENSITY_THRESHOLD || delta > INTENSITY_THRESHOLD) ?
 					data[i] : old_sane[i];
 			break;
 		default:
@@ -323,6 +325,7 @@ static int handle_motion_sampling(int fd, uint16_t *data)
 		sane[intensity], sane[intensity_ir], proximation_strings[old_prox],
 		proximation_strings[proximation],
 		data[proximity_left], data[proximity_right]);
+
 	memcpy(old_sane, sane, sizeof sane);
 	old_prox = old_sane[proximity_left] + 2 * old_sane[proximity_right];
 	return 1;

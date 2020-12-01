@@ -6,14 +6,14 @@
 ///
 ///  \author   <author> : WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
-#include "../src/NetworkConfigBrain.hpp"
+#include "NetworkConfigBrain.hpp"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 using namespace testing;
 
-namespace netconfd {
+namespace netconf {
 
 class ANetworkConfigBrain : public Test {
  public:
@@ -34,4 +34,4 @@ TEST_F(ANetworkConfigBrain, TestName) {
 
 }
 
-} /* namespace netconfd */
+} /* namespace netconf */

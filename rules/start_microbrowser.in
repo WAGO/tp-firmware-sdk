@@ -1,0 +1,10 @@
+## SECTION=elrest_specific_commandline_tools
+
+config START_MICROBROWSER
+	tristate
+	select LIBMSGTOOL
+	select LIBWAGODRM
+	select UDEV
+    prompt "start_microbrowser"
+	help
+	  FIXME

@@ -9,7 +9,7 @@
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: brightness_control.c 51858 2020-09-08 11:48:37Z wrueckl_elrest $
 ///
 /// \brief   brightness control, display backlight settings
 ///
@@ -1468,23 +1468,25 @@ int InitBrightnessControl()
   {
     g_brightnessData.lastRangeIndex = g_brightnessData.rangeCounter -1;
   }
- 
- 
-  //screensaver data
-  
-  if (ConfGetValue(pListScreen, "state", szOut, sizeof(szOut)) == SUCCESS)
-  {
-    if ((stricmp(szOut, "enabled") == 0))
-    {     
-      g_screensaverData.state = 1;
-    }
-    else 
-    {     
-      g_screensaverData.state = 0;
-    }
 
+  //screensaver data
+  if (FileExistsWithoutSizeCheck("/var/run/frambuffer.mode") != 0)
+  {
+    //no qt5 screensaver in framebuffer mode
+    if (ConfGetValue(pListScreen, "state", szOut, sizeof(szOut)) == SUCCESS)
+    {
+      if ((stricmp(szOut, "enabled") == 0))
+      {
+        g_screensaverData.state = 1;
+      }
+      else 
+      {
+        g_screensaverData.state = 0;
+      }
+    }
   }
-  
+
+  //Xorg
   if (ConfGetValue(pListScreen, "mode", szOut, sizeof(szOut)) == SUCCESS)
   {
     if ((stricmp(szOut, "theme") == 0))
@@ -1495,7 +1497,6 @@ int InitBrightnessControl()
     { 
       threadDataScreenSaver.mode = SCREENSAVER_BACKLIGHT;          
     }
-
   }
   
   if (ConfGetValue(pListScreen, "theme", szOut, sizeof(szOut)) == SUCCESS)

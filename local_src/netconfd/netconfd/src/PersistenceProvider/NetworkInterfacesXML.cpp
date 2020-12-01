@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <NetworkInterfacesXML.hpp>
-
 #include <string>
-#include <arpa/inet.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -14,13 +12,16 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/serialization.hpp>
+#include "NetworkHelper.hpp"
+#include "NetworkHelper.hpp"
+#include "TypesHelper.hpp"
 
 #include "Types.hpp"
-#include "TypesHelper.hpp"
 #include "TypeUtils.hpp"
 #include "Helper.hpp"
 #include "Types.hpp"
 #include "Logger.hpp"
+
 
 class EthernetSettingsXml {
  private:
@@ -43,14 +44,16 @@ class EthernetSettingsXml {
  public:
   EthernetSettingsXml() = default;
 
-  explicit EthernetSettingsXml(netconfd::InterfaceConfig port_config)
+  explicit EthernetSettingsXml(netconf::InterfaceConfig port_config)
       : port_name { port_config.device_name_ },
-        autoneg { port_config.autoneg_ == netconfd::Autonegotiation::ON ? "enabled" : "disbaled" },
+        autoneg { port_config.autoneg_ == netconf::Autonegotiation::ON ? "enabled" : "disabled" },
         speed { ::std::to_string(port_config.speed_).append("M") },
-        duplex { DuplexToString(port_config.duplex_) },
+        duplex { netconf::DuplexToString(port_config.duplex_) },
         mac { "" } {
   }
 };
+
+
 
 class IpSettingsXml {
  private:
@@ -74,32 +77,25 @@ class IpSettingsXml {
   ::std::string static_netmask_long;
   ::std::string static_broadcast;
 
-  ::std::string GetPrefix(const ::std::string& mask) {
-    std::uint32_t netmask = 0;
-    auto status = inet_pton(AF_INET, mask.c_str(), &netmask);
-    auto cidr = 0;
-
-    if (status == 1 && netmask > 0) {
-      cidr = __builtin_popcount(netmask);
-    }
-
-    return ::std::to_string(cidr);
-  }
-
  public:
   IpSettingsXml() = default;
 
-  IpSettingsXml(netconfd::BridgeConfig bridge_config, netconfd::IPConfig ip_config)
-      : type { IPSourceToString(ip_config.source_) },
+  IpSettingsXml(netconf::BridgeConfig bridge_config, netconf::IPConfig ip_config)
+      : type { netconf::IPSourceToString(ip_config.source_) },
         static_ipaddr { ip_config.address_ },
-        static_netmask { GetPrefix(ip_config.netmask_) },
+        static_netmask { netconf::GetPrefix(ip_config.netmask_) },
         static_netmask_long { ip_config.netmask_ },
-        static_broadcast { ip_config.broadcast_ } {
+        static_broadcast { netconf::GetBroadcast(ip_config.address_,ip_config.netmask_) } {
 
     show_in_wbm = "0";
-    auto br1_interfaces = bridge_config.at("br1");
-    if ("br0" == ip_config.interface_ || IsIncluded("X2", br1_interfaces)) {
-      show_in_wbm = "1";
+
+    if (bridge_config.count(ip_config.interface_) > 0) {
+      if("br0" == ip_config.interface_){
+        show_in_wbm = "1";
+      }
+      else if (("br1" == ip_config.interface_) && IsIncluded("X2", bridge_config.at("br1"))) {
+      	show_in_wbm = "1";
+    	}
     }
 
     if (ip_config.interface_ == "br0") {
@@ -156,14 +152,14 @@ class IFaceEthernetXml {
  public:
   IFaceEthernetXml() = default;
 
-  explicit IFaceEthernetXml(netconfd::InterfaceConfig port_config)
+  explicit IFaceEthernetXml(netconf::InterfaceConfig port_config)
       : device_name { "eth" + port_config.device_name_ },
         no_dsa_disable { "no" },
         ethernet_settings { port_config } {
 
-    if (port_config.state_ == netconfd::InterfaceState::UP) {
+    if (port_config.state_ == netconf::InterfaceState::UP) {
       state = "enabled";
-    } else if (port_config.state_ == netconfd::InterfaceState::DOWN) {
+    } else if (port_config.state_ == netconf::InterfaceState::DOWN) {
       state = "disabled";
     } else {
       state = "unknown";
@@ -186,7 +182,7 @@ class BridgeXml {
  public:
   BridgeXml() = default;
 
-  explicit BridgeXml(netconfd::InterfaceConfig port_config)
+  explicit BridgeXml(netconf::InterfaceConfig port_config)
       : dsa_slave { "eth" + port_config.device_name_ } {
 
     if (port_config.device_name_ == "X1") {
@@ -219,15 +215,15 @@ class IFaceIpXml {
 
  public:
   IFaceIpXml() = default;
-  IFaceIpXml(const netconfd::BridgeConfig& bridge_config, const netconfd::IPConfig& ip_config,
-             const netconfd::InterfaceConfig& port_config)
+  IFaceIpXml(const netconf::BridgeConfig& bridge_config, const netconf::IPConfig& ip_config,
+             const netconf::InterfaceConfig& port_config)
       : device_name { ip_config.interface_ },
         bridge { port_config },
         ip_settings { bridge_config, ip_config } {
 
-    if (port_config.state_ == netconfd::InterfaceState::UP) {
+    if (port_config.state_ == netconf::InterfaceState::UP) {
       state = "enabled";
-    } else if (port_config.state_ == netconfd::InterfaceState::DOWN) {
+    } else if (port_config.state_ == netconf::InterfaceState::DOWN) {
       state = "disabled";
     } else {
       state = "unknown";
@@ -271,8 +267,11 @@ class InterfacesXml {
     }
   }
 
-  bool IsSwitched(const netconfd::BridgeConfig& bridgeConfig) {
-
+  bool IsSwitched(const netconf::BridgeConfig& bridgeConfig) {
+    if((bridgeConfig.count("br1") == 0) || (bridgeConfig.count("br0") == 0))
+    {
+      return true;
+    }
     auto interfaces_br0 = bridgeConfig.at("br0");
     auto interfaces_br1 = bridgeConfig.at("br1");
     return IsIncluded("X1", interfaces_br0) && IsIncluded("X2", interfaces_br0);
@@ -286,26 +285,30 @@ class InterfacesXml {
   IFaceIpXml iface_ip_X2;
 
  public:
-  InterfacesXml(const netconfd::BridgeConfig& bridge_config, const netconfd::IPConfigs& ip_configs,
-                const netconfd::InterfaceConfigs& port_configs) {
+  InterfacesXml(const netconf::BridgeConfig& bridge_config, const netconf::IPConfigs& ip_configs,
+                const netconf::InterfaceConfigs& port_configs) {
 
     dsa_mode = IsSwitched(bridge_config) ? 0 : 1;
 
-    auto ip_config_br0 = ::std::find_if(ip_configs.begin(), ip_configs.end(),
-                                        [](const netconfd::IPConfig& c) {return c.interface_ == "br0";});
-    auto br0_ip = (ip_config_br0 == ip_configs.end()) ? netconfd::IPConfig::CreateDefault("br0") : *ip_config_br0;
+    auto ip_config_br0 = ::std::find_if(ip_configs.begin(), ip_configs.end(), [](const netconf::IPConfig &c) {
+      return c.interface_ == "br0";
+    });
+    auto br0_ip = (ip_config_br0 == ip_configs.end()) ? netconf::IPConfig::CreateDefault("br0") : *ip_config_br0;
 
-    auto ip_config_br1 = ::std::find_if(ip_configs.begin(), ip_configs.end(),
-                                        [](const auto& c) {return c.interface_ == "br1";});
-    auto br1_ip = (ip_config_br1 == ip_configs.end()) ? netconfd::IPConfig::CreateDefault("br1") : *ip_config_br1;
+    auto ip_config_br1 = ::std::find_if(ip_configs.begin(), ip_configs.end(), [](const auto &c) {
+      return c.interface_ == "br1";
+    });
+    auto br1_ip = (ip_config_br1 == ip_configs.end()) ? netconf::IPConfig::CreateDefault("br1") : *ip_config_br1;
 
-    auto port_config_X1 = ::std::find_if(port_configs.begin(), port_configs.end(),
-                                         [](const auto& c) {return c.device_name_ == "X1";});
-    auto x1 = port_config_X1 == port_configs.end() ? netconfd::InterfaceConfig::DefaultConfig("X1") : *port_config_X1;
+    auto port_config_X1 = ::std::find_if(port_configs.begin(), port_configs.end(), [](const auto &c) {
+      return c.device_name_ == "X1";
+    });
+    auto x1 = port_config_X1 == port_configs.end() ? netconf::InterfaceConfig::DefaultConfig("X1") : *port_config_X1;
 
-    auto port_config_X2 = ::std::find_if(port_configs.begin(), port_configs.end(),
-                                         [](const auto& c) {return c.device_name_ == "X2";});
-    auto x2 = port_config_X2 == port_configs.end() ? netconfd::InterfaceConfig::DefaultConfig("X2") : *port_config_X2;
+    auto port_config_X2 = ::std::find_if(port_configs.begin(), port_configs.end(), [](const auto &c) {
+      return c.device_name_ == "X2";
+    });
+    auto x2 = port_config_X2 == port_configs.end() ? netconf::InterfaceConfig::DefaultConfig("X2") : *port_config_X2;
 
     x1.FillUpDefaults();
     x2.FillUpDefaults();
@@ -325,27 +328,10 @@ BOOST_CLASS_IMPLEMENTATION(IFaceIpXml, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(IFaceEthernetXml, object_serializable);
 BOOST_CLASS_IMPLEMENTATION(BridgeXml, object_serializable);
 
-namespace netconfd {
+namespace netconf {
 
-Status WriteNetworkInterfacesXML(IFileEditor& file_editor_, const BridgeConfig& bridge_config, const IPConfigs& ip_configs,
-                            const InterfaceConfigs& port_configs) {
-
-  // Preconditions:
-  if (bridge_config.empty() || ip_configs.empty() || port_configs.empty()) {
-    return Status { StatusCode::ERROR, "Cannot write XML file, at least one config is empty" };
-  }
-
-  if (bridge_config.find("br0") == bridge_config.end() || bridge_config.find("br1") == bridge_config.end()) {
-    return Status { StatusCode::ERROR, "Cannot write XML file, bridge config must contain br0 and br1" };
-  }
-
-  auto const& br0_itfs = bridge_config.at("br0");
-  auto const& br1_itfs = bridge_config.at("br1");
-
-  if (IsNotIncluded("X1", br0_itfs) || (IsNotIncluded("X2", br0_itfs) && IsNotIncluded("X2", br1_itfs))) {
-    LogError("Failed to write network-interfaces.xml. Bridges br0 and br1 do not contain interfaces X1 and X2.");
-    return Status { StatusCode::ERROR, "Cannot write XML file, neither br0 nor br1 contain interfaces X1 and X2." };
-  }
+Error WriteNetworkInterfacesXML(IFileEditor &file_editor_, const BridgeConfig& bridge_config, const IPConfigs& ip_configs,
+                                 const InterfaceConfigs& port_configs) {
 
   auto interfaces = InterfacesXml { bridge_config, ip_configs, port_configs };
 
@@ -358,8 +344,7 @@ Status WriteNetworkInterfacesXML(IFileEditor& file_editor_, const BridgeConfig& 
   boost::archive::xml_oarchive oa(xml_content, flags);
   oa << BOOST_SERIALIZATION_NVP(interfaces);
 
-  auto status = file_editor_.Write(NETWORKINTERFACESPATH, xml_content.str());
-  return status;
+  return file_editor_.Write(NETWORKINTERFACESPATH, xml_content.str());
 }
 
-} /* namespace netconfd */
+} /* namespace netconf */

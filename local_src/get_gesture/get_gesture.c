@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    get_gesture.c
 ///
-/// \version $Id: get_gesture.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: get_gesture.c 46481 2020-02-11 12:33:17Z wrueckl_elrest $
 ///
 /// \brief   read gesture settings
 ///
@@ -173,6 +173,24 @@ int main(int argc, char **argv)
             }
           }
           else if (stricmp(pStr, "menu") == 0) 
+          {
+            if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
+            {
+              //printf("%s=%s\n", pStr, szOut);
+              printf("%s", szOut);
+              status = SUCCESS;
+            }
+          }
+          else if ( (stricmp(pStr, "btn0") == 0)  || (stricmp(pStr, "btn1") == 0) || (stricmp(pStr, "btn2") == 0) || (stricmp(pStr, "btn3") == 0) )
+          {
+            if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
+            {
+              //printf("%s=%s\n", pStr, szOut);
+              printf("%s", szOut);
+              status = SUCCESS;
+            }
+          }
+          else if ( (stricmp(pStr, "id0") == 0)  || (stricmp(pStr, "id1") == 0) || (stricmp(pStr, "id2") == 0) || (stricmp(pStr, "id3") == 0) )
           {
             if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
             {

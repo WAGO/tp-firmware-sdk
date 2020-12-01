@@ -14,9 +14,10 @@
 /// \author Mariusz Podlesny : WAGO Kontakttechnik GmbH & Co. KG
 //------------------------------------------------------------------------------
 
+#include "file_accessor.hpp"
+#include "interface_mapping_provider.hpp"
 #include "backup.hpp"
 #include "error.hpp"
-#include "file_access.hpp"
 #include "process_ebtables.hpp"
 #include "process_iptables.hpp"
 #include "process_params.hpp"
@@ -26,12 +27,12 @@
 #include "system.hpp"
 #include "xmlhlp.hpp"
 #include "process.hpp"
+#include "libxml/parser.h"
+#include "rule_file_editor.hpp"
 
-#include <libxml/parser.h>
 #include <syslog.h>
 #include <unistd.h>
 #include <cassert>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <chrono>
@@ -53,17 +54,20 @@
 //
 
 
-namespace wago
-{
+namespace wago {
+namespace firewall {
 
+namespace {
   const std::string  FW_IPR = "/sbin/iptables-restore";
   const std::string  FW_XST = "/usr/bin/xmlstarlet";
   const std::string  GENERAL_CONF = "/etc/firewall/firewall.conf";
   const std::string  FIREWALL_INIT = "/etc/init.d/firewall";
+
+  const FileAccessor file_accessor;
 //------------------------------------------------------------------------------
 /// Prints help description.
 //------------------------------------------------------------------------------
-static void print_help(void)
+void print_help(void)
 {
     std::cout << 
 "\
@@ -101,7 +105,10 @@ Usage: firewall -h|--help\n\
  - *-PORT    -> port\n\
 \n\
  Common command:\n\
-  --get-xml                 returns chosen configuration in xml form\n\
+  --get-xml                 returns chosen configuration in legacy xml form\n\
+  --get-xml-ng              returns chosen configuration in wbn-ng xml form\n\
+                            This command is preliminary. It may be changed or\n\
+                            removed in future versions.\n\
   --apply [up|down]         applies current configuration. Please note that\n\
                             setting values doesn't mean their immediate application.\n\
                             Several changes can be done to the configuration before\n\
@@ -197,7 +204,7 @@ Usage: firewall -h|--help\n\
                             add/update a fully openned interface entry\n\
   --rem-open-if INTERFACE   remove a fully openned interface entry\n\
 \n\
-  --add-filter STATE INTERFACE|- PROTOCOL SRC-IP|- SRC-MASK|- SRC-PORT|- DEST-IP|- DEST-MASK|- DEST-PORT|-\n\
+  --add-filter STATE INTERFACE|- PROTOCOL SRC-IP|- SRC-MASK|- SRC-PORT|- DEST-IP|- DEST-MASK|- DEST-PORT|- POLICY\n\
                             adds a filtering rule. At least one of the optional\n\
                             parameters must be present. If SRC-PORT or DST-PORT\n\
                             is given PROTOCOL also must be set. *-MASK can be\n\
@@ -207,9 +214,14 @@ Usage: firewall -h|--help\n\
   --rem-filter INDEX        removes an existing filtering rule\n\
 \n\
  CONF: services:\n\
-  --get-ifs-status FORMAT   returns a summary of statuses of all services on\n\
+  --get-ifs-status FORMAT   returns a summary of status of all services on\n\
                             all interfaces. FORMAT denotes requested output format\n\
                             and may take one of the two values: xml or json.\n\
+  --get-ifs-status-ng FORMAT returns a summary of status of all services on\n\
+                            all bridges and interfaces. FORMAT denotes requested output format\n\
+                            and may take one of the two values: xml or json.\n\
+                            This command is preliminary. It may be changed or\n\
+                            removed in future versions.\n\
 \n\
  CONF: SERVICE:\n\
   --set-if STATE INTERFACE  enables/disables application of service filtering\n\
@@ -234,7 +246,7 @@ Usage: firewall -h|--help\n\
 /// \param updown (up|down) or empty value
 /// \return true if parameters are valid
 //------------------------------------------------------------------------------
-static bool are_apply_options_valid(const std::string& name, const std::string& updown)
+bool are_apply_options_valid(const std::string& name, const std::string& updown)
 {
     if ("ebtables" == name || "iptables" == name)
     {
@@ -251,7 +263,7 @@ static bool are_apply_options_valid(const std::string& name, const std::string& 
 /// \param name name of type of configuration, e.g. ebtables, iptables, wbm, etc.
 /// \return command to execute
 //------------------------------------------------------------------------------
-static std::string get_apply_cmd(const std::string& name)
+std::string get_apply_cmd(const std::string& name)
 {
     // 'are_apply_options_valid' must check the parameters first.
     std::string cmd = "";
@@ -274,13 +286,13 @@ static std::string get_apply_cmd(const std::string& name)
 /// \param xmlfile  name of XML document file.
 /// \param dest name of iptable rule to be changed
 //------------------------------------------------------------------------------
-static void transform_xmldoc (const std::string& xmlshema,
+void transform_xmldoc (const std::string& xmlshema,
                               const std::string& xmlfile,
                               const std::string& dest)
 {
-    if (   check_file(xmlshema)
-        && check_file(xmlfile)
-        && check_file(FW_XST))
+    if (   file_accessor.check_file(xmlshema)
+        && file_accessor.check_file(xmlfile)
+        && file_accessor.check_file(FW_XST))
     {
         std::ostringstream oss;
 
@@ -304,13 +316,17 @@ static void transform_xmldoc (const std::string& xmlshema,
 /// Processes applying of iptables rule.
 /// \param rule name of iptables rule to be applied
 //------------------------------------------------------------------------------
-static void apply_rule (const std::string& rule)
+void apply_rule (const std::string& rule)
 {
-    if (check_file(rule) && check_file(FW_IPR))
+    if (file_accessor.check_file(rule) && file_accessor.check_file(FW_IPR))
     {
         std::ostringstream oss;
         const int RESOURCE_PROBLEM = 4;
         int ret = 0;
+
+        // Remove duplicate rules
+        RuleFileEditor rule_file_editor;
+        rule_file_editor.remove_duplicate_lines(rule);
 
         oss << FW_IPR + " -n > /dev/null 2>&1 < " << rule;
         const std::string cmd(oss.str());
@@ -348,7 +364,7 @@ static void apply_rule (const std::string& rule)
 /// \param argc number of parameters (as in main function)
 /// \param argv parameters of processed command
 //------------------------------------------------------------------------------
-static void process_configuration(const std::string& conf,
+void process_configuration(const std::string& conf,
                                   const std::string& cmd,
                                   xmldoc& doc,
                                   int argc, char** argv)
@@ -359,11 +375,11 @@ static void process_configuration(const std::string& conf,
         args.push_back(nullptr != argv[i] ? argv[i] : std::string());
 
     if ("ebtables" == conf)
-        process_ebtables(doc, cmd, args);
+      ebtables::process(doc, cmd, args);
     else if ("iptables" == conf)
-        process_iptables(doc, cmd, args);
+      iptables::process(doc, cmd, args);
     else
-        process_service(doc, cmd, args);
+      service::process(doc, cmd, args);
 }
 
 //----
@@ -372,13 +388,13 @@ static void process_configuration(const std::string& conf,
 /// \param conf  configuration to be applied
 /// \param updown (up|down) kind of configuration
 //------------------------------------------------------------------------------
-static void apply_conf(const std::string& conf, const std::string& updown)
+void apply_conf(const std::string& conf, const std::string& updown)
 {
     if (!are_apply_options_valid(conf, updown))
     {
         throw invalid_param_error("apply_conf");
     }
-    update_network_interface_name_mapping();
+    update_network_interface_name_mapping(file_accessor);
 
     if (conf == "iptables" || conf == "ebtables")
     {
@@ -422,7 +438,7 @@ static void apply_conf(const std::string& conf, const std::string& updown)
 /// \params  none
 /// \return configurations value
 //------------------------------------------------------------------------------
-static std::string get_config_value()
+std::string get_config_value()
 {
     std::string value = "";
     std::ifstream config_file(GENERAL_CONF, std::ifstream::in);
@@ -455,7 +471,7 @@ static std::string get_config_value()
 /// Set configuration value from general configuration file.
 /// \params  configuration value
 //------------------------------------------------------------------------------
-static void set_config_value(const std::string& value)
+void set_config_value(const std::string& value)
 {
     std::ofstream config_file (GENERAL_CONF);
 
@@ -474,7 +490,7 @@ static void set_config_value(const std::string& value)
 /// Check if firewall enabled on general configuration file.
 /// \return true if firewall enabled, otherwise false
 //------------------------------------------------------------------------------
-static bool is_enabled (void)
+bool is_enabled (void)
 {
     return (get_config_value() == "enabled");
 }
@@ -484,10 +500,10 @@ static bool is_enabled (void)
 /// Request, backup, restore and change firewall configuration.
 /// \param  command (--is-enabled | --enable | --disable | --backup | --restore)
 //------------------------------------------------------------------------------
-static void firewall_change(const std::string& command)
+void firewall_change(const std::string& command)
 {
     int ret;
-    if (check_file(FIREWALL_INIT))
+    if (file_accessor.check_file(FIREWALL_INIT))
     {
         if ("--is-enabled" == command)
         {
@@ -497,7 +513,7 @@ static void firewall_change(const std::string& command)
         {
             if (false == is_enabled())
             {
-                update_network_interface_name_mapping();
+                update_network_interface_name_mapping(file_accessor);
                 set_config_value("enabled");
                 sync();
                 (void)exe_cmd("sh "+ FIREWALL_INIT + " restart", ret);
@@ -507,7 +523,7 @@ static void firewall_change(const std::string& command)
         {
             if (true == is_enabled())
             {
-                update_network_interface_name_mapping();
+                update_network_interface_name_mapping(file_accessor);
                 set_config_value("disabled");
                 sync();
                 (void)exe_cmd("sh "+ FIREWALL_INIT + " stop", ret);
@@ -537,7 +553,7 @@ static void firewall_change(const std::string& command)
 /// \param argc number of parameters
 /// \param argv parameters of main function call
 //------------------------------------------------------------------------------
-static void execute(int argc, char** argv)
+void execute(int argc, char** argv)
 {
     // TODO This is a one really ugly function - refactore it!
 
@@ -566,7 +582,7 @@ static void execute(int argc, char** argv)
             throw invalid_param_error("Invalid number of arguments.");
 
         const std::string cmd(argv[2]);
-        const std::string dir(get_config_fname("services"));
+        const std::string dir(file_accessor.get_config_fname("services"));
         std::vector<std::string> av;
 
         av.push_back(argv[3]);
@@ -588,7 +604,14 @@ static void execute(int argc, char** argv)
             if (3 < argc)
                 throw invalid_param_error("To many arguments.");
 
-            print_file(get_config_fname(conf));
+            file_accessor.print_file(file_accessor.get_config_fname(conf));
+        }
+        else if ("--get-xml-ng" == cmd)
+        {
+            if (3 < argc)
+                throw invalid_param_error("To many arguments.");
+
+            file_accessor.print_file_ng(file_accessor.get_config_fname(conf));
         }
         else if ("--apply" == cmd)
         {
@@ -638,11 +661,11 @@ static void execute(int argc, char** argv)
                 }
             }
 
-            xmldoc doc = read_configuration(conf, stdio);
+            xmldoc doc = file_accessor.read_configuration(conf, stdio);
             if (!doc.is_empty())
             {
                 process_configuration(conf, cmd, doc, optc, optv);
-                store_configuration(conf, stdio, doc);
+                file_accessor.store_configuration(conf, stdio, doc);
             }
 
             if (apply)
@@ -659,7 +682,7 @@ static void execute(int argc, char** argv)
 /// \param argc number of parameters
 /// \param argv parameters of main function call
 //------------------------------------------------------------------------------
-static void log_args(int argc, char** argv)
+void log_args(int argc, char** argv)
 {
     try
     {
@@ -700,7 +723,7 @@ static void log_args(int argc, char** argv)
 /// Log program exit value.
 /// \param result program exit value.
 //------------------------------------------------------------------------------
-static void log_exit(int const result)
+void log_exit(int const result)
 {
     try
     {
@@ -722,7 +745,7 @@ static void log_exit(int const result)
 //--------------------------------------------------------------------------
 /// Open syslog.
 //------------------------------------------------------------------------------
-static void openlog(void)
+void openlog(void)
 {
     static char prefix[30];
 
@@ -730,14 +753,15 @@ static void openlog(void)
     ::openlog(prefix, LOG_ODELAY, LOG_USER);
 }
 
-
+} // namespace anonymous
+} // namespace firewall
 } // namespace wago
 
 
 int main(int argc, char** argv)
 {
-    wago::openlog();
-    wago::log_args(argc, argv);
+    wago::firewall::openlog();
+    wago::firewall::log_args(argc, argv);
 
     LIBXML_TEST_VERSION
 
@@ -749,9 +773,9 @@ int main(int argc, char** argv)
 
     try
     {
-        wago::execute(argc, argv);
+        wago::firewall::execute(argc, argv);
     }
-    catch (const wago::execution_error& ex)
+    catch (const wago::firewall::execution_error& ex)
     {
         result = ex.code();
         result_msg = ex.msg();
@@ -765,7 +789,7 @@ int main(int argc, char** argv)
     catch (const std::exception& ex)
     {
         result = SYSTEM_CALL_ERROR;
-        result_msg = wago::error_msg_system_call_error;
+        result_msg = wago::firewall::error_msg_system_call_error;
         #ifdef SHOW_ERRORS
         std::cout << "Excecution failed." << std::endl
                   << "Exception: " << ex.what() << std::endl;
@@ -774,7 +798,7 @@ int main(int argc, char** argv)
     catch (...)
     {
         result = SYSTEM_CALL_ERROR;
-        result_msg = wago::error_msg_unknown;
+        result_msg = wago::firewall::error_msg_unknown;
         #ifdef SHOW_ERRORS
         std::cout << "Excecution failed." << std::endl
                   << "Unrecognized type of exception has been thrown." << std::endl;
@@ -787,10 +811,10 @@ int main(int argc, char** argv)
     if (0 != result && 0 != result_msg.size())
     {
         syslog(LOG_ERR, "log_error_message: %s %s", result_msg.c_str(), result_what.c_str());
-        wago::log_error_message(result_msg);
+        wago::firewall::log_error_message(result_msg);
     }
 
-    wago::log_exit(result);
+    wago::firewall::log_exit(result);
 
     return result;
 }

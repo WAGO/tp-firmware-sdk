@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    config_screensaver.c
 ///
-/// \version $Id: config_screensaver.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_screensaver.c 49277 2020-05-26 12:14:44Z wrueckl_elrest $
 ///
 /// \brief   screensaver change settings / config-tools
 ///
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <glib.h>
 
 #include "msgtool.h"
@@ -60,6 +61,8 @@ static tConfValues aConfigValues[] =
   { "image", "/home/user/logo.png", "" },
   { "text", "screensaver example text", "" },
   { "time", "600", "" },
+  { "png_src_dir", "/tmp/png_uploads", "" },
+  { "png_dest_dir", "/home/user", "" },
 
   // this line must always be the last one - don't remove it!
   { "", "" }
@@ -75,6 +78,8 @@ static tConfValues aConfigValues[] =
 
 void ShowHelpText();
 void AppendErrorText(int iStatusCode, char * pText);
+int GetPngDirs(char * src_buf, int src_buflen, char * dest_buf, int dest_buflen);
+int IsPngFile(char * pPngStr);
 
 /// \brief main function
 /// \param[in]  argc number of arguments
@@ -85,6 +90,9 @@ int main (int argc, char **argv)
   int status = ERROR;
   int restart_service = 0;
   char szArgv[256] = "";
+  char szPngSrc[256] = "";
+  char szPngDest[256] = "";
+  int skipBCrestart = 0;
  
   if (argc >= 2)
   {
@@ -104,6 +112,11 @@ int main (int argc, char **argv)
       char * pStr;
       char szSearchStr[128] = "";
       int len = 0;
+      
+      if (GetPngDirs(szPngSrc, sizeof(szPngSrc), szPngDest, sizeof(szPngDest)) != SUCCESS)
+      {
+        return ERROR;
+      }
       
       //create list
       g_pList = ConfCreateList();
@@ -187,6 +200,25 @@ int main (int argc, char **argv)
                 }
               }
             }   
+            else if (stricmp(aConfigValues[k].nameStr, "image") == 0)
+            {
+              char szImageFileName[256] = "";
+              if (strchr(pStr, '/') == NULL)
+              {
+                snprintf(szImageFileName, sizeof(szImageFileName), "%s%s", szPngDest, pStr);
+              }
+              else
+              {
+                snprintf(szImageFileName, sizeof(szImageFileName), "%s", pStr);
+              }
+              if (FileExists(szImageFileName) == SUCCESS)
+              {
+                if (ConfSetValue(NULL, g_pList, aConfigValues[k].nameStr, szImageFileName)==SUCCESS)
+                {
+                  status = SUCCESS;
+                }
+              }
+            }
             else if (ConfSetValue(&aConfigValues[0], g_pList, aConfigValues[k].nameStr, pStr)==SUCCESS)
             {
               status = SUCCESS;
@@ -196,7 +228,172 @@ int main (int argc, char **argv)
           k++;
         }        
 
+    }
+
+    //add / remove png file
+    if (status != SUCCESS)
+    {
+      if (stricmp(argv[1], "add") == 0) 
+      {
+        // install a new userdefined png file
+        if (argc >= 3)
+        {
+          char * pSub;
+          char szPngFile[256] = "";
+          char * pFile = szPngFile;
+          // URL decoding       
+          strncpy(szPngFile, g_uri_unescape_string(argv[2], ""), sizeof(szPngFile));                       
+                                          
+          pSub = strrchr(pFile, '/');
+          if (pSub)
+          {
+            pSub++;
+            strcat(szPngSrc, pSub);
+          }
+          else
+          {
+            strcat(szPngSrc, pFile);
+          }
+                              
+          if (FileExists(szPngSrc) == SUCCESS)
+          {                        
+            char szCmd[512] = "";
+            
+            if (IsPngFile(szPngSrc) != SUCCESS)
+            {
+              //file not found
+              char szTxt[512];
+              sprintf(szTxt, "config_screensaver add: no png file %s", szPngSrc);
+              SetLastError(szTxt);  
+              status = ERROR;
+              setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+            }
+            else
+            {            
+            
+              //change file mode
+              sprintf(szCmd, "/bin/chmod a+rw \'%s\'", szPngSrc);
+              system(szCmd);
+              
+              //copy png to userdefined png directory
+              sprintf(szCmd, "/usr/bin/cp -p \'%s\' \'%s\'", szPngSrc, szPngDest);
+              //printf("call: %s\n", szCmd);
+              if (system(szCmd) == 0)
+              {
+                //sync filesystem
+                system("sync");
+                status = SUCCESS;
+                skipBCrestart = 1;
+              }
+              else
+              {
+                //cp failed
+                char szTxt[512];
+                sprintf(szTxt, "config_screensaver add: copy png file failed %s", szPngSrc);
+                SetLastError(szTxt);  
+                status = ERROR;
+                setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+              }            
+            }
+          }
+          else
+          {
+            //file not found
+            char szTxt[512];
+            sprintf(szTxt, "config_screensaver add: File not found %s", szPngSrc);
+            SetLastError(szTxt);  
+            status = ERROR;
+            setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+          }
+          
+        }
+        else
+        {
+          //not enough parameter
+          char szTxt[256];
+          sprintf(szTxt, "config_screensaver add png: not enough parameters");
+          SetLastError(szTxt);  
+          status = ERROR;
+          setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+        }
       }
+      else if (stricmp(argv[1], "remove") == 0) 
+      {
+        // remove userdefined png file from the system
+        if (argc >= 3)
+        {
+          char szFileToRemove[256] = "";
+          char * pSub;
+          char szPngFile[256] = "";
+          char * pFile = szPngFile;
+          // URL decoding       
+          strncpy(szPngFile, g_uri_unescape_string(argv[2], ""), sizeof(szPngFile)); 
+
+          pSub = strrchr(pFile, '/');
+          if (pSub)
+          {
+            pSub++;
+            strncpy(szFileToRemove, szPngDest, sizeof(szFileToRemove));
+            strcat(szFileToRemove, pSub);  
+          }
+          else
+          {
+            strncpy(szFileToRemove, szPngDest, sizeof(szFileToRemove));
+            strcat(szFileToRemove, pFile);  
+          }
+          
+          if (FileExists(szFileToRemove) == SUCCESS)
+          {
+            char szCmd[512] = "";
+            
+            if (IsPngFile(szFileToRemove) != SUCCESS)
+            {
+              //file not found
+              char szTxt[512];
+              sprintf(szTxt, "config_screensaver remove: no ttf file %s", szFileToRemove);
+              SetLastError(szTxt);  
+              status = ERROR;
+              setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+            }
+            else
+            {
+            
+              //remove png from userdefined directory
+              sprintf(szCmd, "/bin/rm -f \'%s\'", szFileToRemove);
+              //printf("call: %s\n", szCmd);
+              if (system(szCmd) == 0)
+              {
+                //sync filesystem
+                system("sync");
+                status = SUCCESS;
+                skipBCrestart = 1; 
+              }
+              else
+              {
+                //rm failed
+                char szTxt[512];
+                sprintf(szTxt, "config_screensaver remove: rm png file failed %s", szFileToRemove);
+                SetLastError(szTxt);  
+                status = ERROR;
+                setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+              }            
+            }
+          }
+          else
+          {
+            //file not found
+            char szTxt[512];
+            sprintf(szTxt, "config_screensaver remove: file not found %s", szFileToRemove);
+            SetLastError(szTxt);  
+            status = ERROR;
+            setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+          }
+          
+        }
+
+      }
+    }
+
 
       //save values to file
       if (status == SUCCESS)
@@ -205,7 +402,10 @@ int main (int argc, char **argv)
         {
           ConfSaveValues(g_pList, CNF_FILE);
           //restart brightness_control
-          system("/etc/config-tools/brightnesscontrol restart > /dev/null 2>&1");                
+          if (!skipBCrestart)
+          {
+            system("/etc/config-tools/brightnesscontrol restart > /dev/null 2>&1");
+          }
         }
         else
         {
@@ -253,3 +453,81 @@ void AppendErrorText(int iStatusCode, char * pText)
   SetLastError(szError);
 }
 
+int GetPngDirs(char * src_buf, int src_buflen, char * dest_buf, int dest_buflen)
+{
+  tConfList * pList = NULL;
+  int ret = ERROR;       
+  if (FileExists(CNF_FILE) != SUCCESS)
+  {
+    //file not found  
+    char szTxt[256];
+    sprintf(szTxt, "File open error %s", CNF_FILE);
+    setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);   
+    AppendErrorText(FILE_OPEN_ERROR, CNF_FILE);    
+    
+    return ERROR;
+  }
+  
+  //create list
+  pList = ConfCreateList();
+
+  ret = ConfReadValues(pList, CNF_FILE);
+  if (ret != SUCCESS)
+  {
+    char szTxt[256];
+    sprintf(szTxt, "File open error %s", CNF_FILE);
+    setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+
+    AppendErrorText(FILE_OPEN_ERROR, CNF_FILE);
+    //terminate
+    ConfDestroyList(pList);
+    return ERROR;
+  }
+  
+  if (ConfGetCount(pList) == 0)
+  {
+    char szTxt[256];
+    sprintf(szTxt, "File inconsistent error %s", CNF_FILE);
+    setRgbLed(RGB_LED_STATE_RE_BLINK, szTxt);
+
+    AppendErrorText(CONFIG_FILE_INCONSISTENT, CNF_FILE);
+    //terminate
+    ConfDestroyList(pList);
+    return ERROR;
+  }
+    
+  if (ConfGetValue(pList, "png_dest_dir", &dest_buf[0], dest_buflen) == SUCCESS)
+  {
+    if (ConfGetValue(pList, "png_src_dir", &src_buf[0], src_buflen) == SUCCESS)
+    {
+      AppendSlash(src_buf);
+      AppendSlash(dest_buf);
+      ret = SUCCESS;      
+    }  
+  }
+  
+  ConfDestroyList(pList);  
+  return ret;
+}
+
+int IsPngFile(char * pPngStr)
+{
+  int ret = ERROR;  
+  
+  if (pPngStr)
+  {
+    char * pStr = pPngStr;
+    int len = strlen(pPngStr);
+    
+    if (len > 4)
+    {
+      pStr += (len -4);
+      if (strcasecmp(pStr, ".png") == 0)
+      {
+        ret = SUCCESS;
+      }
+    }
+  }
+  
+  return ret;
+}

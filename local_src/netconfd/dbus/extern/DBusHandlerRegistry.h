@@ -1,26 +1,19 @@
-/*
- * BrideInterface.h
- *
- *  Created on: 04.06.2019
- *      Author: u014487
- */
-
-#ifndef DBUS_SRC_BRIDEINTERFACE_H_
-#define DBUS_SRC_BRIDEINTERFACE_H_
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
 
 #include <netconfd_dbus.h>
 
 #include <functional>
 #include "IDBusHandlerRegistry.h"
 
-namespace netconfd {
+namespace netconf {
 namespace dbus {
 
 class DBusHandlerRegistry : public IDBusHandlerRegistry {
  public:
-  using Getter = ::std::function<::std::string(void)>;
-  using GetterStringKey = ::std::function<::std::string(::std::string)>;
-  using Setter = ::std::function<int(::std::string)>;
+  using Getter = ::std::function<::std::string(::std::string&)>;
+  using GetterStringKey = ::std::function<::std::string(::std::string, ::std::string&)>;
+  using Setter = ::std::function<::std::string(::std::string)>;
 
   DBusHandlerRegistry();
   ~DBusHandlerRegistry() override;
@@ -32,53 +25,70 @@ class DBusHandlerRegistry : public IDBusHandlerRegistry {
 
   GDBusObjectSkeleton* GetInterfaceObject() const override;
   GDBusObjectSkeleton* GetIPObject() const override;
+  GDBusObjectSkeleton* GetBackupObject() const override;
 
   void RegisterSetBridgeConfigHandler(Setter&& handler) {
-    set_bridge_config_handler_ = std::move(handler);
+    set_bridge_config_handler_ = ::std::forward<Setter>(handler);
   }
 
   void RegisterGetBridgeConfigHandler(Getter&& handler) {
-    get_bridge_config_handler_ = std::move(handler);
+    get_bridge_config_handler_ = std::forward<Getter>(handler);
   }
 
   void RegisterGetDeviceInterfacesHandler(Getter&& handler) {
-    get_device_interfaces_handler_ = ::std::move(handler);
+    get_device_interfaces_handler_ = ::std::forward<Getter>(handler);
   }
 
   void RegisterSetInterfaceConfigHandler(Setter&& handler) {
-    set_interface_config_handler_ = ::std::move(handler);
+    set_interface_config_handler_ = ::std::forward<Setter>(handler);
   }
 
   void RegisterGetInterfaceConfigHandler(Getter&& handler) {
-    get_interface_config_handler_ = ::std::move(handler);
+    get_interface_config_handler_ = ::std::forward<Getter>(handler);
   }
 
-  void RegisterGetBackupParamCountHandler(Getter&& handler) {
-    get_backup_param_count_handler_ = ::std::move(handler);
+  void RegisterGetBackupParamCountHandler(::std::function<::std::string(void)>&& handler) {
+    get_backup_param_count_handler_ = ::std::forward<::std::function<::std::string(void)>>(handler);
   }
 
-  void RegisterBackupHandler(Setter&& handler) {
-    backup_handler_ = std::move(handler);
+  void RegisterBackupHandler(::std::function<::std::string(::std::string, ::std::string)>&& handler) {
+    backup_handler_ = std::forward<::std::function<::std::string(::std::string, ::std::string)>>(handler);
   }
 
   void RegisterRestoreHandler(Setter&& handler) {
-    restore_handler_ = std::move(handler);
+    restore_handler_ = std::forward<Setter>(handler);
   }
 
   void RegisterSetAllIPConfigsHandler(Setter&& handler) {
-    set_all_ip_config_handler_ = std::move(handler);
+    set_all_ip_config_handler_ = std::forward<Setter>(handler);
   }
 
   void RegisterSetIPConfigHandler(Setter&& handler) {
-    set_ip_config_handler_ = std::move(handler);
+    set_ip_config_handler_ = std::forward<Setter>(handler);
   }
 
   void RegisterGetAllIPConfigsHandler(Getter&& handler) {
-    get_all_ip_config_handler_ = std::move(handler);
+    get_all_ip_config_handler_ = std::forward<Getter>(handler);
+  }
+
+  void RegisterGetAllCurrentIPConfigsHandler(Getter&& handler) {
+    get_all_current_ip_config_handler_ = std::forward<Getter>(handler);
   }
 
   void RegisterGetIPConfigHandler(GetterStringKey&& handler) {
-    get_ip_config_handler_ = std::move(handler);
+    get_ip_config_handler_ = std::forward<GetterStringKey>(handler);
+  }
+
+  void RegisterTempFixIpHandler(::std::function<::std::string(void)>&& handler) {
+    tempfixip_handler_ = std::forward<::std::function<::std::string(void)>>(handler);
+  }
+
+  void RegisterGetDipSwitchConfigHandler(Getter&& handler) {
+    get_dip_switch_config_handler_ = std::forward<Getter>(handler);
+  }
+
+  void RegisterSetDipSwitchConfigHandler(Setter&& handler) {
+    set_dip_switch_config_handler_ = std::forward<Setter>(handler);
   }
 
  private:
@@ -104,17 +114,7 @@ class DBusHandlerRegistry : public IDBusHandlerRegistry {
                                      gpointer user_data);
 
 
-  static gboolean GetBackupParamCount(netconfdInterface_config *object,
-                                      GDBusMethodInvocation *invocation,
-                                      gpointer user_data);
 
-  static gboolean Backup(netconfdInterface_config *object,
-                         GDBusMethodInvocation *invocation,
-                         const gchar *arg_config, gpointer user_data);
-
-  static gboolean Restore(netconfdInterface_config *object,
-                          GDBusMethodInvocation *invocation,
-                          const gchar *arg_config, gpointer user_data);
 
   static gboolean SetAllIPConfig(netconfdIp_config *object,
                                  GDBusMethodInvocation *invocation,
@@ -128,9 +128,39 @@ class DBusHandlerRegistry : public IDBusHandlerRegistry {
                                  GDBusMethodInvocation *invocation,
                                  gpointer user_data);
 
+  static gboolean GetAllCurrentIPConfig(netconfdIp_config *object,
+                                       GDBusMethodInvocation *invocation,
+                                       gpointer user_data);
+
   static gboolean GetIPConfig(netconfdIp_config *object,
                               GDBusMethodInvocation *invocation,
                               const gchar *arg_config, gpointer user_data);
+
+  static gboolean TemporaryFixIP(netconfdIp_config *object,
+                              GDBusMethodInvocation *invocation,
+                              gpointer user_data);
+
+  static gboolean GetDipSwitchConfig(netconfdIp_config *object,
+                              GDBusMethodInvocation *invocation,
+                              gpointer user_data);
+
+  static gboolean SetDipSwitchConfig(netconfdIp_config *object,
+                                 GDBusMethodInvocation *invocation,
+                                 const gchar *arg_config, gpointer user_data);
+
+
+  static gboolean GetBackupParamCount(netconfdBackup *object,
+                                      GDBusMethodInvocation *invocation,
+                                      gpointer user_data);
+
+  static gboolean Backup(netconfdBackup *object,
+                         GDBusMethodInvocation *invocation,
+                         const gchar *arg_content, const gchar *arg_targetversion , gpointer user_data);
+
+  static gboolean Restore(netconfdBackup *object,
+                          GDBusMethodInvocation *invocation,
+                          const gchar *arg_config, gpointer user_data);
+
 
   //interface_config
   netconfdObjectSkeleton *interface_object_;
@@ -141,9 +171,8 @@ class DBusHandlerRegistry : public IDBusHandlerRegistry {
   Getter get_device_interfaces_handler_;
   Setter set_interface_config_handler_;
   Getter get_interface_config_handler_;
-  Getter get_backup_param_count_handler_;
-  Setter backup_handler_;
-  Setter restore_handler_;
+  ::std::function<::std::string(void)> get_backup_param_count_handler_;
+
 
   //ip_config
   netconfdObjectSkeleton *ip_object_;
@@ -152,11 +181,21 @@ class DBusHandlerRegistry : public IDBusHandlerRegistry {
   Setter set_all_ip_config_handler_;
   Setter set_ip_config_handler_;
   Getter get_all_ip_config_handler_;
+  Getter get_all_current_ip_config_handler_;
+  Getter get_dip_switch_config_handler_;
+  Setter set_dip_switch_config_handler_;
   GetterStringKey get_ip_config_handler_;
+  ::std::function<::std::string(void)> tempfixip_handler_;
+
+  //backup & restore
+  netconfdObjectSkeleton *backup_object_;
+  netconfdBackup* backup_;
+  ::std::function<::std::string(::std::string, ::std::string)> backup_handler_;
+  Setter restore_handler_;
+
+
 
 };
 
 } /* namespace dbus */
-} /* namespace netconfd */
-
-#endif /* DBUS_SRC_BRIDEINTERFACE_H_ */
+} /* namespace netconf */

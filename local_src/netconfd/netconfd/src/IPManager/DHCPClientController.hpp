@@ -2,18 +2,16 @@
 
 #pragma once
 
+#include "IDeviceProperties.hpp"
 #include "IDHCPClientController.hpp"
-#include "ICommandExecutor.hpp"
-#include "IDevicePropertiesProvider.hpp"
 #include "IFileEditor.hpp"
 
-namespace netconfd {
+namespace netconf {
 
 class DHCPClientController : public IDHCPClientController{
  public:
 
-  DHCPClientController(const ICommandExecutor& command_executor,
-                       const IDevicePropertiesProvider& properties_provider,
+  DHCPClientController(const IDeviceProperties& properties_provider,
                        const IFileEditor& file_editor);
   virtual ~DHCPClientController() = default;
 
@@ -22,16 +20,16 @@ class DHCPClientController : public IDHCPClientController{
   DHCPClientController(const DHCPClientController&&) = delete;
   DHCPClientController& operator=(const DHCPClientController&&) = delete;
 
-  Status StartClient(const Bridge& bridge) const override;
-  Status StopClient(const Bridge& bridge) const override;
+  Error StartClient(const Bridge& bridge) const override;
+  void StopClient(const Bridge& bridge) const override;
   DHCPClientStatus GetStatus(const Bridge& bridge) const override;
 
  private:
-  const ICommandExecutor& command_executor_;
-  const IDevicePropertiesProvider& properties_provider_;
+  void WaitUntilClientIsStopped(const Bridge& bridge) const;
+  const IDeviceProperties& properties_provider_;
   const IFileEditor& file_editor_;
-
   const ::std::string DHCP_CLIENT_PATH = "/sbin/udhcpc";
+
 };
 
-} /* namespace netconfd */
+} /* namespace netconf */
