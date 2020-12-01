@@ -1,3 +1,20 @@
+Firmware Release 03.06.09 (99)
+
+Devices:
+[New] Support of Edge Controller
+
+System:
+[NEW] Integration of additional MicroBrowser for CS2.3 support (License required, TP600 only)
+[NEW] Front LED can be disabled via WBM
+[NEW] WBM: Brightness & Automatically Day/Night Control
+[NEW] WBM: Font Upload
+[NEW] WBM: Acoustic Signal
+
+Runtime System:
+[NEW] e!RUNTIME Upgrade to Version 3.5.15.4
+
+################################################################################
+
 Firmware Release 03.03.11 (99)
 System:
 [FIXED] Improved robustness by heavy ethernet traffic.
