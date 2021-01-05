@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screencare.cpp
 ///
-/// \version $Id: screencare.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: screencare.cpp 54500 2020-12-14 14:31:55Z wrueckl_elrest $
 ///
 /// \brief   Application main window implementation
 ///
@@ -33,7 +33,7 @@
 ///------------------------------------------------------------------------------
 
 #include "screencare.h"
-//#include <QDebug>
+#include <QDebug>
 #include <QPainter>
 #include <QTime>
 #include <QPaintEvent>
@@ -46,6 +46,8 @@ ScreenCare::ScreenCare(long l_numberOfColorChanges, QWidget *parent) :
 {
   idxNumberOfColorChanges = 0;
   numberOfColorChanges = l_numberOfColorChanges;
+  bXdoDone = false;
+  iCounter = 0;
 }
 
 ScreenCare::~ ScreenCare()
@@ -74,13 +76,13 @@ void ScreenCare::paintEvent(QPaintEvent *event)
   idxNumberOfColorChanges++;
   if (idxNumberOfColorChanges >=numberOfColorChanges)
   {
-      //this->close();
-      QTimer::singleShot(100, this, SLOT(close()));
+      //200ms black
+      QTimer::singleShot(200, this, SLOT(OnCloseScreenCare()));
   }
   else
   {
-      QTimer::singleShot(100, this, SLOT(update()));
-      //this->update();
+      //200ms white
+      QTimer::singleShot(200, this, SLOT(update()));
   }
 
 }
@@ -104,6 +106,30 @@ void ScreenCare::ActivateX11Window()
       proc.waitForFinished(5000);
       proc.close();
       //qDebug() << "ActivateX11Window: " << id;
+    }
+  }
+  bXdoDone = true;
+}
+
+void ScreenCare::OnCloseScreenCare()
+{
+  hide();
+  if (bXdoDone)
+  {
+    close();
+  }
+  else
+  {
+    iCounter++;
+    if (iCounter > 10)
+    {
+      //timeout
+      close();
+    }
+    else
+    {
+      qDebug() << "RETRY";
+      QTimer::singleShot(1000, this, SLOT(OnCloseScreenCare()));
     }
   }
 }

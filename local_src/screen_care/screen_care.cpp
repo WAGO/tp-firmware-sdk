@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screen_care.cpp
 ///
-/// \version $Id: screen_care.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: screen_care.cpp 54500 2020-12-14 14:31:55Z wrueckl_elrest $
 ///
 /// \brief   main file
 ///
@@ -84,8 +84,6 @@ int main(int argc, char **argv)
               qDebug() << "Start -n " << window->numberOfColorChanges << "=>" << QTime::currentTime().toString("hh:mm:ss.zzz");
           }
 
-          window->setFocus();
-          window->raise();
           window->show();
           
           app.setOverrideCursor(Qt::BlankCursor);

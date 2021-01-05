@@ -105,7 +105,7 @@ set_xorg_conf () {
 		(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
 		if [ $? -eq 0 ]; then
 			cap="1"
-			#echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+			echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
 		else
 			cap="0"
 		fi

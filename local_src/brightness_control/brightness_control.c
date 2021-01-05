@@ -9,7 +9,7 @@
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 51858 2020-09-08 11:48:37Z wrueckl_elrest $
+/// \version $Id: brightness_control.c 54500 2020-12-14 14:31:55Z wrueckl_elrest $
 ///
 /// \brief   brightness control, display backlight settings
 ///
@@ -252,6 +252,7 @@ int TurnScreensaverBacklightOn();
 int IsNightTime();
 int GetSensorBrightnessValue();
 int GetScreensaverActivity();
+int GetScreenCareActivity();
 int ReadAIn(unsigned short * pAdcVal);
 int GetClearScreenActivity();
 int GetUsbKeyboardDeviceName(char * pInputDeviceName, int maxlen);
@@ -2191,6 +2192,23 @@ int GetScreensaverActivity()
   return status;
 }
 
+/// \brief Read if screen care is active at this moment 
+///
+/// The function returns the current screen care activity
+///
+/// \retval  1 screen care is just active on screen
+/// \retval  0 screen care is not active on screen
+///
+int GetScreenCareActivity()
+{
+  int status = 0;  
+  if (system("pidof screen_care > /dev/null 2>&1") == 0)
+  {
+    status = 1;  
+  }
+  return status;
+}
+
 /// \brief Read analog input value 
 ///
 /// The function reads the AIN value (10 bit value)
@@ -2296,9 +2314,13 @@ void CallScreenCare()
       {  
         //do not start display care if someone is using the panel
         //if ((tnow - g_displayData.tLastEventReceived) > 60)
-        //{    
-          g_displayData.called = 1;
-          system("/usr/bin/screen_care");
+        //{
+          //start if not already running and no screensaver is active
+          if ((GetScreensaverActivity() == 0) && (GetScreenCareActivity() == 0))
+          {
+            g_displayData.called = 1;
+            system("/usr/bin/screen_care");
+          }
         //}        
       }
     }
