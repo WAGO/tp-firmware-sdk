@@ -54,7 +54,7 @@ https://ubuntu.com/16-04
 
 **Make sure if you like to use the precompiled toolchain that you use the Ubuntu-64bit variant.**
 
-A minimal disk space of 25GB is required. We recommend 50GB.
+A minimal disk space of 25GB is required. We recommend 50GB and also 4GB of RAM.
 > For virtual machines on windows x64 hosts:
 You may enable virtualization support(Intel VT-x or AMD-V), typical turned on in BIOS or UEFI.
 
@@ -136,6 +136,9 @@ http://www.github.com/wago/gcc-toolchain-2019.12
     >sudo apt install python-dev
     >sudo apt install g++
     >sudo apt install dialog
+    >sudo apt install make
+    >sudo apt install gettext
+    >sudo apt install bc
     >sudo apt install lzop              #used to build kernel image, ./configure did not check if installed
     >sudo apt install autoconf          #used to build kernel image, ./configure did not check if installed
     >sudo apt install libtool           #used to build kernel image, ./configure did not check if installed
@@ -153,7 +156,7 @@ http://www.github.com/wago/gcc-toolchain-2019.12
 or in one-shot:
 
 ```
-    >sudo apt install libncurses5-dev gawk flex bison texinfo python-dev g++ dialog lzop autoconf \
+    >sudo apt install libncurses5-dev gawk flex bison texinfo python-dev g++ dialog make bc gettext lzop autoconf \
     libtool xmlstarlet xsltproc doxygen autopoint libx11-dev python-libxml2 python-mako \
     gcc-multilib g++-multilib
 ```
@@ -287,9 +290,7 @@ In case you have a internet connection skip this section.
 Otherwise follow along.
 
 The source files can be found at:
-
 https://download.qt.io/archive/qt/5.9/5.9.7/single/qt-everywhere-opensource-src-5.9.7.tar.xz
-Store it to an exchangable storage device of your choise.
 
 Also download:
 https://download.docker.com/linux/static/stable/armhf/docker-19.03.8.tgz
