@@ -55,8 +55,7 @@
 ///
 //-----------------------------------------------------------------------
 
-int
-main(int argc, char *argv[])
+int main(void)
 {
   // vars for ADI-interface
   tDeviceInfo deviceList[10]; // the list of devices given by the ADI
@@ -76,7 +75,7 @@ main(int argc, char *argv[])
   // process data
   uint8_t pd_in[4096];
   uint8_t pd_out[4096];
-  uint8_t emc_msg[5];
+  //uint8_t emc_msg[5];
 
   // generic vars
   time_t last_t = 0, new_t;
@@ -110,9 +109,9 @@ main(int argc, char *argv[])
   can_slave_config.Serial_number   = 0; // Use electronic product label
 
 
-  sprintf((char*) can_slave_config.DevName, "WAGO");      // max. 12 Bytes
+  sprintf((char*) can_slave_config.DevName,"WAGO");       // max. 12 Bytes
   sprintf((char*) can_slave_config.HW_Ver, "HW Ver. 01"); // max. 12 Bytes
-  sprintf((char*) can_slave_config.SW_Ver, "03.01.17");    // max. 8 Bytes
+  memcpy((char*)  can_slave_config.SW_Ver, "03.01.17",8); // max. 8 Bytes
 
   // connect to ADI-Interface
   adi = adi_GetApplicationInterface();
@@ -125,18 +124,18 @@ main(int argc, char *argv[])
   adi->GetDeviceList(sizeof(deviceList), deviceList, &nrDevicesFound);
 
   // find canopen slave
-  nrCANSlaveFound = -1;
+  nrCANSlaveFound = (size_t) -1;
   for (i = 0; i < nrDevicesFound; i++)
   {
     if (strcmp(deviceList[i].DeviceName, "libcanopens") == 0)
     {
       nrCANSlaveFound = i;
-      printf("CANopen slave device found as device %i\n", i);
+      printf("CANopen slave device found as device %li\n", (long) i);
     }
   }
 
   // no canopen master found > exit
-  if (nrCANSlaveFound == -1)
+  if (nrCANSlaveFound == (size_t) -1)
   {
     printf("No CANopen slave device found \n");
 
@@ -162,16 +161,22 @@ main(int argc, char *argv[])
 
       // set Watchdog to 100ms
       if (adi->WatchdogSetTime(1000, 100) != DAL_SUCCESS)
-         printf("Watchdog failed\n");
+      {
+        printf("Watchdog failed\n");
+      }
 
       // set application state running
       event.State = ApplicationState_Running;
       if (adi->ApplicationStateChanged(event) != DAL_SUCCESS)
+      {
         printf("Appication State Run failed\n");
+      }
 
       // start watchdog
       if (adi->WatchdogStart() != DAL_SUCCESS)
-         printf("Watchdog Start failed\n");
+      {
+        printf("Watchdog Start failed\n");
+      }
 
       // run main loop for data exchange for 60s or forever
       while (1) //(runtime < 60)
@@ -269,33 +274,32 @@ main(int argc, char *argv[])
             
         } // 1s ..
       } // while ..
-
     }
-
     else  //  if (adi->ConfigureDevice(canDeviceId, &can_slave_config) == DAL_SUCCESS) ..
-
+    {
       printf("CANopen slave configure device failed\n");
+    }
 
     // Stop Watchdog
     if (adi->WatchdogStop() != DAL_SUCCESS)
-        printf("Watchdog Stop failed\n");
+    {
+      printf("Watchdog Stop failed\n");
+    }
 
 
     // close canopen slave
     adi->CloseDevice(canDeviceId);
     printf("CANopen slave device closed\n");
   }
-
   else  // if (adi->OpenDevice(canDeviceId) == DAL_SUCCESS) ..
-
+  {
     printf("CANopen slave device open failed\n");
-
+  }
 
   // close DAL
   adi->Exit();
 
   // exit programm
   return 0;
-
 }
 

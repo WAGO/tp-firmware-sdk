@@ -1,7 +1,7 @@
 ! If you're looking for settings to configure, they won't be saved here until
 ! you change something in the fluxbox configuration menu.
 
-session.menuFile:	~/.fluxbox/menu
+session.menuFile: ~/.fluxbox/my-menu
 session.keyFile: ~/.fluxbox/keys
 session.appsFile: ~/.fluxbox/apps
 session.slitlistFile: ~/.fluxbox/slitlist

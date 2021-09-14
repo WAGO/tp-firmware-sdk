@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#
+# setup_hw
+#
+PATH=/usr/bin:/usr/sbin:/bin:/sbin
+
+EFIX="setup_hw: "
+
+case $1 in
+
+	start)
+		echo "${PREFIX}starting"
+		/etc/script/setup_hw.sh
+	;;
+
+	stop)
+		echo "${PREFIX}stopping not implemented"
+	;;
+
+	*)
+		echo "${PREFIX}usage: ${0} [start | stop]"
+		exit 1
+	;;
+
+esac

@@ -11,6 +11,13 @@ menuconfig ELREST_CUSTOM_INSTALL
 
 if ELREST_CUSTOM_INSTALL
 
+config ELREST_CUSTOM_CDS3_LIBS_INSTALL
+	bool
+	default n
+	prompt "installs elrest specific cds3-libs"
+	help
+	  This installs f.e. libCmpSQLite.so
+
 config ELREST_CUSTOM_INIT_FILES_INSTALL
 	bool
 	default n
@@ -68,6 +75,13 @@ config ELREST_CUSTOM_FLUXBOX_CONFIG_INSTALL
 	help
 	  This installs elrest custom fluxbox configuration to /root.
 
+config ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
+	bool
+	default n
+	prompt "install custom icewm configuration"
+	help
+	  This installs elrest custom icewm configuration.
+
 config ELREST_CUSTOM_WEBKIT_CONFIG_INSTALL
 	bool
 	default n
@@ -118,5 +132,10 @@ config ELREST_CUSTOM_ROOT_DIRECTORIES_INSTALL
 	bool
 	default n
 	prompt "add directories /log and /settings to root file system"
+
+config ELREST_CUSTOM_U_BOOT_FILES_INSTALL
+	bool
+	default n
+	prompt "add U-Boot files to root file system"
 
 endif

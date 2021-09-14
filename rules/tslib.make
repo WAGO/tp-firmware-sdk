@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Sascha Hauer
 #               2007-2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,33 +15,59 @@ PACKAGES-$(PTXCONF_TSLIB) += tslib
 #
 # Paths and names
 #
-TSLIB_VERSION	:= 1.16
-TSLIB_MD5	:= 22adf05cb3f828889bbb329a505b3847
+TSLIB_VERSION	:= 1.21
+TSLIB_MD5	:= 96ada1cf6c69fbd87f3dd1f316c8e140
 TSLIB		:= tslib-$(TSLIB_VERSION)
 TSLIB_SUFFIX	:= tar.bz2
-TSLIB_URL	:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(TSLIB).$(TSLIB_SUFFIX)
+TSLIB_URL	:= https://github.com/libts/tslib/releases/download/$(TSLIB_VERSION)/$(TSLIB).$(TSLIB_SUFFIX)
 TSLIB_SOURCE	:= $(SRCDIR)/$(TSLIB).$(TSLIB_SUFFIX)
 TSLIB_DIR	:= $(BUILDDIR)/$(TSLIB)
-
-# ----------------------------------------------------------------------------
-# Get
-# ----------------------------------------------------------------------------
-
-$(TSLIB_SOURCE):
-	@$(call targetinfo)
-	@$(call get, TSLIB)
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-TSLIB_PATH	:= PATH=$(CROSS_PATH)
-TSLIB_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-TSLIB_AUTOCONF := $(CROSS_AUTOCONF_USR)
+
+TSLIB_CONF_TOOL	:= autoconf
+TSLIB_CONF_OPT	:= \
+	$(CROSS_AUTOCONF_USR) \
+	--disable-static \
+	--disable-tools \
+	--enable-arctic2 \
+	--enable-collie \
+	--enable-corgi \
+	--enable-cy8mrln-palmpre \
+	--enable-debounce \
+	--enable-shared \
+	--enable-linear \
+	--enable-dejitter \
+	--enable-dmc \
+	--enable-dmc_dus3000 \
+	--enable-evthres \
+	--enable-galax \
+	--enable-h3600 \
+	--enable-iir \
+	--enable-input \
+	--disable-input-evdev \
+	--enable-invert \
+	--enable-linear-h2200 \
+	--enable-lowpass \
+	--enable-median \
+	--enable-mk712 \
+	--enable-one-wire-ts-input \
+	--enable-variance \
+	--enable-pthres \
+	--enable-skip \
+	--enable-tatung \
+	--enable-touchkit \
+	--enable-ucb1x00 \
+	--enable-waveshare \
+	--with-hidden_visibility=yes \
+	--without-sdl2 \
+	--disable-debug
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -61,24 +85,13 @@ $(STATEDIR)/tslib.targetinstall:
 	@$(call install_alternative, tslib, 0, 0, 0644, \
 		/etc/ts.conf)
 
-	@$(call install_copy, tslib, 0, 0, 0644, -, /usr/lib/libts.so.0.9.1)
-	@$(call install_link, tslib, /usr/lib/libts.so.0.9.1, /usr/lib/libts-0.0.so.0)
-	@$(call install_link, tslib, /usr/lib/libts.so.0.9.1, /usr/lib/libts.so)
-	@$(call install_link, tslib, /usr/lib/libts.so.0.9.1, /usr/lib/libts.so.0)
-	
+	@$(call install_lib, tslib, 0, 0, 0644, libts)
+
 ifdef PTXCONF_TSLIB_TS_CALIBRATE
 	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_calibrate)
 endif
 ifdef PTXCONF_TSLIB_TS_TEST
 	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_test)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_test_mt)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_print)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_print_mt)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_print_raw)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_finddev)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_harvest)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_uinput)
-	@$(call install_copy, tslib, 0, 0, 0755, -, /usr/bin/ts_verify)
 endif
 
 	@cd $(TSLIB_PKGDIR) && for plugin in `find usr/lib/ts -name "*.so"`; do \

@@ -103,6 +103,15 @@ startup_cc_controller()
 	echo "1" > /sys/class/gpio/gpio"$GPIO"/value
 }
 
+replug()
+{
+	test -d "${GADGET}" || exit 0
+	cd "${GADGET}"
+	echo > UDC
+	sleep 3
+	ls /sys/class/udc | head -n1 > UDC
+}
+
 case "$1" in
   start)
 	set -e
@@ -141,11 +150,7 @@ case "$1" in
 	rmdir "${GADGET}" 2>&1
 	;;
   replug)
-	test -d "${GADGET}" || exit 0
-	cd "${GADGET}"
-	echo > UDC
-	sleep 3
-	ls /sys/class/udc | head -n1 > UDC
+	replug
 	;;
   event)
 	start_stop_gadget

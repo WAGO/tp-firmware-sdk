@@ -1,0 +1,11 @@
+## SECTION=multimedia_xorg_driver_input
+
+config XORG_DRIVER_INPUT_KEYBOARD
+	tristate
+	prompt "Keyboard"
+	depends on XORG_DRIVER_INPUT
+	select XORGPROTO
+	select XORG_SERVER
+	select XORG_SERVER_XORG
+	help
+	  kbd is an Xorg input driver for keyboards.

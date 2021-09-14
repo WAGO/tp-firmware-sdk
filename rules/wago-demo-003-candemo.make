@@ -94,7 +94,7 @@ $(STATEDIR)/candemo.targetinstall:
 	@$(call install_fixup,candemo,PRIORITY,optional)
 	@$(call install_fixup,candemo,VERSION,$(CANDEMO_VERSION))	
 	@$(call install_fixup,candemo,SECTION,base)
-	@$(call install_fixup,candemo,AUTHOR,"Axel Wueste")
+	@$(call install_fixup,candemo,AUTHOR,"Charline Wueste")
 	@$(call install_fixup,candemo,DESCRIPTION,missing)
 	
 #

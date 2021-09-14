@@ -120,6 +120,7 @@ show_bootscreen () {
 	else
 		echo "bootscreen not found ${bootscreenfile}"
 	fi
+	echo 0 > /sys/class/graphics/fb0/blank
 }
 
 set_profile () {

@@ -32,7 +32,7 @@ others may or may not.
 
 # PREREQUISITES
 You need a internet connection on your development host. Because during image creation the source file
-"qt-everywhere-opensource-src-5.9.7.tar.xz" and "nlohmann-json-v3.7.0.tar.gz" will be downloaded automatically.
+"qt-everywhere-opensource-src-5.9.7.tar.xz" and "docker-19.03.8.tgz" will be downloaded automatically.
 In case you do not have a internet connetion on your development host. Please refer to section
 [ 4.6) Download packages ].
 
@@ -288,18 +288,17 @@ Otherwise follow along.
 
 The source files can be found at:
 
-https://download.qt.io/official_releases/qt/5.9/5.9.7/single/qt-everywhere-opensource-src-5.9.7.tar.xz.mirrorlist
-
-Choose you mirror and download it. Store it to an exchangable storage device of your choise.
+https://download.qt.io/archive/qt/5.9/5.9.7/single/qt-everywhere-opensource-src-5.9.7.tar.xz
+Store it to an exchangable storage device of your choise.
 
 Also download:
-https://github.com/nlohmann/json/archive/v3.7.0.tar.gz
+https://download.docker.com/linux/static/stable/armhf/docker-19.03.8.tgz
 
 After you have downloaded the source file and copied it for example to a USB thumb drive.
 
 On development host:
  * On Ubuntu 16.04 USB drives are mounted automatically.
- * copy the files: qt-everywhere-opensource-src-5.9.7.tar.xz and nlohmann-json-v3.7.0.tar.gz to the following location
+ * copy the files: qt-everywhere-opensource-src-5.9.7.tar.xz and docker-19.03.8.tgz to the following location
  ```
     ~/<tp-firmware-sdk-directory/src
  ```

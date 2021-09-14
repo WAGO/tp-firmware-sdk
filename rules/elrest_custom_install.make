@@ -14,7 +14,7 @@
 PACKAGES-$(PTXCONF_ELREST_CUSTOM_INSTALL) += elrest-custom-install
  
 # dummy to make ipkg happy
-ELREST_CUSTOM_INSTALL_VERSION	:= 1.0.2
+ELREST_CUSTOM_INSTALL_VERSION	:= 1.0.4
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -38,6 +38,8 @@ ifdef PTXCONF_ELREST_CUSTOM_INIT_FILES_INSTALL
 	@$(call install_link, elrest-custom-install, ../init.d/wait4xorg, /etc/rc.d/S97_wait4xorg)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/can-networking)
 	@$(call install_link, elrest-custom-install, ../init.d/can-networking, /etc/rc.d/S60_can-networking)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/setup_hw)
+	@$(call install_link, elrest-custom-install, ../init.d/setup_hw, /etc/rc.d/S98_setup_hw)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_PROFILE_FILES_INSTALL
@@ -56,7 +58,7 @@ endif
 ifdef PTXCONF_ELREST_CUSTOM_TS_CONF_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/ts.conf)
 endif
-  
+
 ifdef PTXCONF_ELREST_CUSTOM_UDEV_RULES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/udev/udev.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/60-touchscreen.rules)
@@ -68,9 +70,11 @@ ifdef PTXCONF_ELREST_CUSTOM_UDEV_RULES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/64-captouch-egalax-ph80h84-133.rules)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/64-captouch-egalax-ph80h84-134.rules)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/96-change-ttymxc-permissions.rules)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/97-change-hdmi-settings.rules)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/X11/emptyCursor.xbm)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272_CCW.conf)
@@ -135,6 +139,10 @@ ifdef PTXCONF_ELREST_CUSTOM_FLUXBOX_CONFIG_INSTALL
 	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.fluxbox)
 endif
 
+ifdef PTXCONF_ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/icewm.conf)
+endif
+
 ifdef PTXCONF_ELREST_CUSTOM_WEBKIT_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/webview_style.css)
 	@$(call install_link, elrest-custom-install, /home/webview_style.css, /root/webview_style.css)
@@ -148,9 +156,17 @@ ifdef PTXCONF_CDS3_RTS_FEATURE_TARGETVISU
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/codesys3.d/CmpTargetvisu.cfg)
 endif
 
+ifdef PTXCONF_ELREST_CUSTOM_CDS3_LIBS_INSTALL
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0750, /usr/lib/libCmpSQLite.so.2.0.1)
+	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.1, /usr/lib/libCmpSQLite.so.2)
+	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.1, /usr/lib/libCmpSQLite.so)
+	@$(call install_link, elrest-custom-install, ../libCmpSQLite.so.2.0.1, /usr/lib/cds3-custom-components/libCmpSQLite.so)
+endif
+
 ifdef PTXCONF_START_MICROBROWSER
 	@$(call install_link, elrest-custom-install, /usr/lib/libssl.so, /usr/lib/libssl.so.1.0.2)
 	@$(call install_link, elrest-custom-install, /usr/lib/libcrypto.so, /usr/lib/libcrypto.so.1.0.2)
+	@$(call install_link, elrest-custom-install, /usr/lib/libts.so, /usr/lib/libts-0.0.so.0)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /usr/local/bin/microbrowser/mb)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /usr/local/bin/microbrowser/close_mb.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0664, /usr/local/bin/microbrowser/mb_config.ini)
@@ -160,67 +176,71 @@ ifdef PTXCONF_START_MICROBROWSER
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_USER_FILES_INSTALL
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /home/user/logo.png)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/user/logo.png)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_CONFIG_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_application.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_framebuffer.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_x_wbm.sh)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/brightnesscontrol)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/start_displaycleaning)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/start_touchcalib)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/start_screensaver)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/get_pointercal)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/config_pointercal)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/config-tools/testbacklight)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/script/wndactivate.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/brightnesscontrol)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/start_displaycleaning)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/start_touchcalib)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/start_screensaver)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/get_pointercal)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/config_pointercal)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/config-tools/testbacklight)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/wndactivate.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_calibration.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_panel.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_wbm.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_webbrowser.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/activate_browser_wnd.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/rc.once.d/initial_webbrowser_focus)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_plclist.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_codesys3.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_targetvisu.sh)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/audio.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/autostart.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/backlight.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/bootsettings.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/display.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/motionsensor.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/plcselect.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/screen.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/touchbeeper.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/gesture.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/qtstyle.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/menuqt.xml)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/fonts.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/isconfigured.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/eruntime.conf)
-#	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/rtsversion)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/testability.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/virtualkeyboard.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/retain_pio2.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/setup_hw.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/audio.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/autostart.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/backlight.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/bootsettings.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/display.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/motionsensor.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/plcselect.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/screen.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/touchbeeper.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/gesture.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/qtstyle.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/menuqt.xml)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/fonts.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/isconfigured.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/eruntime.conf)
+#	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/rtsversion)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/testability.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/virtualkeyboard.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/virtualkeyboard.xml)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/virtualkeyboard_272x480.xml)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/browsersecurity.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/browsersecurity.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/enter.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/bksp.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/ico-up.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/ico-down.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/ico-right.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/ico-left.png)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/dipvalue-on-reset)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/dipvalue-on-reset)
 	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /etc/specific/webengine)
 	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.config)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0640, /etc/pio2_wretain_direct.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/script/setup_hdmi.sh)
+
   
 # only temporarily   TODO remove later
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/network-interfaces-with-modem.xml)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/network-interfaces-default.xml)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/network-interfaces-with-modem.xml)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/network-interfaces-default.xml)
 
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/directfbrc)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0777, /etc/config-tools/brightnesscontrol)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0777, /etc/config-tools/start_displaycleaning)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0777, /etc/config-tools/start_touchcalib)
 
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_480.png)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/bootscreen/bootscreen_0_640.png)
@@ -265,18 +285,28 @@ endif
 
 ifdef PTXCONF_ELREST_CUSTOM_PTE_INSTALL
 
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0666, /etc/specific/typelabel)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/typelabel)
 
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_HEADER_FILES_INSTALL
+ifeq ($(PTXCONF_PLATFORM), vtp-ctp)
 	@install -D -m644 $(BUILDDIR)/../../projectroot.vtp-ctp/usr/include/pfc-startup.h $(PTXCONF_SYSROOT_TARGET)/usr/include
 	@install -D -m644 $(BUILDDIR)/../../projectroot.vtp-ctp/usr/include/pfc_boot_table.h $(PTXCONF_SYSROOT_TARGET)/usr/include
+endif
+ifeq ($(PTXCONF_PLATFORM), cc100)
+	@install -D -m644 $(BUILDDIR)/../../projectroot.cc100/usr/include/pfc-startup.h $(PTXCONF_SYSROOT_TARGET)/usr/include
+	@install -D -m644 $(BUILDDIR)/../../projectroot.cc100/usr/include/pfc_boot_table.h $(PTXCONF_SYSROOT_TARGET)/usr/include
+endif
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_ROOT_DIRECTORIES_INSTALL
 	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /log)
 	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /settings)
+endif
+
+ifdef PTXCONF_ELREST_CUSTOM_U_BOOT_FILES_INSTALL
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /boot/uEnv.txt)
 endif
 
 # not clear if this feature is finally needed

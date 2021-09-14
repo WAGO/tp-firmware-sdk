@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,42 +14,40 @@ PACKAGES-$(PTXCONF_LIBEPOXY) += libepoxy
 #
 # Paths and names
 #
-LIBEPOXY_VERSION	:= 1.2
-LIBEPOXY_MD5		:= 6524c86e1ad297881024748634089a6e
+LIBEPOXY_VERSION	:= 1.5.3
+LIBEPOXY_MD5		:= e2845de8d2782b2d31c01ae8d7cd4cbb
 LIBEPOXY		:= libepoxy-$(LIBEPOXY_VERSION)
-LIBEPOXY_SUFFIX		:= tar.bz2
-LIBEPOXY_URL		:= https://github.com/anholt/libepoxy.git;tags/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
+LIBEPOXY_SUFFIX		:= tar.xz
+LIBEPOXY_URL		:= https://github.com/anholt/libepoxy/releases/download/$(LIBEPOXY_VERSION)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_SOURCE		:= $(SRCDIR)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_DIR		:= $(BUILDDIR)/$(LIBEPOXY)
 LIBEPOXY_LICENSE	:= MIT
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBEPOXY_CONF_ENV	:= \
-	$(CROSS_ENV) \
-	ac_cv_prog_PYTHON=python \
-	PKG_CONFIG_PATH=$(PTXDIST_SYSROOT_TARGET)/usr/lib/pkgconfig
 #
 # autoconf
 #
-LIBEPOXY_CONF_TOOL	:= autoconf
+LIBEPOXY_CONF_TOOL	:= meson
+ifeq ($(PTXCONF_CONFIGFILE_VERSION), "2020.08.0")
 LIBEPOXY_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-strict-compilation \
-	$(GLOBAL_LARGE_FILE_OPTION)
-	
-$(STATEDIR)/libepoxy.prepare: $(bootpc_prepare_deps_default)
-	@$(call targetinfo)
-	cd $(LIBEPOXY_DIR) && autoreconf -v --install && \
-	$(LIBEPOXY_CONF_ENV) CC=$(CROSS_CC) ./configure $(LIBEPOXY_CONF_OPT) \
-	PKG_CONFIG=$(PTXDIST_SYSROOT_CROSS)/bin \
-	PKG_CONFIG_PATH=$(PTXDIST_SYSROOT_TARGET)/usr/lib/pkgconfig \
-	--with-sysroot=$(PTXDIST_SYSROOT_TARGET) \
-	X11_CFLAGS="-I$(PTXDIST_SYSROOT_TARGET)/usr/include -I$(PTXDIST_SYSROOT_TARGET)/usr/include/xorg -I$(PTXDIST_SYSROOT_TARGET)/usr/include/X11" \
-	X11_LIBS="-L$(PTXDIST_SYSROOT_TARGET)/usr/lib "
-	@$(call touch)
+	$(CROSS_MESON_USR) \
+	-Ddocs=false \
+	-Degl=$(call ptx/yesno,PTXCONF_LIBEPOXY_EGL) \
+	-Dglx=$(call ptx/yesno,PTXCONF_LIBEPOXY_GLX) \
+	-Dtests=false \
+	-Dx11=$(call ptx/truefalse,PTXCONF_LIBEPOXY_GLX)
+else
+LIBEPOXY_CONF_OPT	:= \
+	$(CROSS_MESON_USR) \
+	-Ddocs=false \
+	-Degl=$(call ptx/ifdef,PTXCONF_LIBEPOXY_EGL, yes, no) \
+	-Dglx=$(call ptx/ifdef,PTXCONF_LIBEPOXY_GLX, yes, no) \
+	-Dtests=false \
+	-Dx11=$(call ptx/truefalse,PTXCONF_LIBEPOXY_GLX)
+endif
 
 # ----------------------------------------------------------------------------
 # Target-Install

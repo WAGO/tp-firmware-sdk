@@ -1,0 +1,15 @@
+## SECTION=multimedia_xorg_app
+
+config XORG_APP_XKBCOMP
+	tristate
+	prompt "xorg xkbcomp"
+	select XORG_LIB_X11
+	select XORG_LIB_X11_XKB
+	select XORG_LIB_XKBFILE
+	select HOST_XORG_APP_XKBCOMP
+	help
+	  Compiles XKB keyboard descriptions. This tool is needed
+	  to load new keyboard mappings into a running X server.
+	  If you have trouble to configure a special keyboard mapping, enable
+	  this tool for your target.
+

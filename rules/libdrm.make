@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,10 +15,10 @@ PACKAGES-$(PTXCONF_LIBDRM) += libdrm
 #
 # Paths and names
 #
-LIBDRM_VERSION	:= 2.4.98
-LIBDRM_MD5	:= 0d3ba6c7196e0e14fb2c5426141cd5fc
+LIBDRM_VERSION	:= 2.4.102
+LIBDRM_MD5	:= 586f1e0c324dd372841922089a04417c
 LIBDRM		:= libdrm-$(LIBDRM_VERSION)
-LIBDRM_SUFFIX	:= tar.gz
+LIBDRM_SUFFIX	:= tar.xz
 LIBDRM_URL	:= http://dri.freedesktop.org/libdrm/$(LIBDRM).$(LIBDRM_SUFFIX)
 LIBDRM_SOURCE	:= $(SRCDIR)/$(LIBDRM).$(LIBDRM_SUFFIX)
 LIBDRM_DIR	:= $(BUILDDIR)/$(LIBDRM)
@@ -34,42 +32,40 @@ LIBDRM_LICENSE_FILES	:= \
 
 ifdef PTXCONF_ARCH_X86
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_INTEL) += intel
+else
+LIBDRM_BACKENDS- += intel
 endif
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_RADEON) += radeon
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_AMDGPU) += amdgpu
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_NOUVEAU) += nouveau
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_FREEDRENO) += freedreno
+LIBDRM_BACKENDS- += freedreno-kgsl
 LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_VMWGFX) += vmwgfx
-LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_OMAP) += omap-experimental-api
-LIBDRM_BACKENDSL-$(PTXCONF_LIBDRM_OMAP) += omap
-LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_EXYNOS) += exynos-experimental-api
-LIBDRM_BACKENDSL-$(PTXCONF_LIBDRM_EXYNOS) += exynos
-LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_TEGRA) += tegra-experimental-api
-LIBDRM_BACKENDSL-$(PTXCONF_LIBDRM_TEGRA) += tegra
+LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_OMAP) += omap
+LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_EXYNOS) += exynos
+LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_TEGRA) += tegra
 LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_VC4) += vc4
 # vc4 is a headers only backend
-LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_ETNAVIV) += etnaviv-experimental-api
-LIBDRM_BACKENDSL-$(PTXCONF_LIBDRM_ETNAVIV) += etnaviv
+LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_ETNAVIV) += etnaviv
 
 LIBDRM_BACKENDSC-y += $(LIBDRM_BACKENDS-y)
 LIBDRM_BACKENDSC- += $(LIBDRM_BACKENDS-)
 LIBDRM_BACKENDSL-y += $(LIBDRM_BACKENDS-y)
 
 #
-# autoconf
+# meson
 #
-LIBDRM_CONF_TOOL := autoconf
+LIBDRM_CONF_TOOL := meson
 LIBDRM_CONF_OPT := \
-	$(CROSS_AUTOCONF_USR) \
-	--enable-udev \
-	--$(call ptx/endis, PTXCONF_LIBDRM_LIBKMS)-libkms \
-	$(addprefix --enable-,$(LIBDRM_BACKENDSC-y)) \
-	$(addprefix --disable-,$(LIBDRM_BACKENDSC-)) \
-	--$(call ptx/endis, PTXCONF_LIBDRM_TESTS)-install-test-programs \
-	--disable-cairo-tests \
-	--disable-manpages \
-	--disable-valgrind \
-	--without-xsltproc
+	$(CROSS_MESON_USR) \
+	-Dlibkms=$(call ptx/truefalse, PTXCONF_LIBDRM_LIBKMS) \
+	$(patsubst %,-D%=true,$(LIBDRM_BACKENDSC-y)) \
+	$(patsubst %,-D%=false,$(LIBDRM_BACKENDSC-)) \
+	-Dcairo-tests=false \
+	-Dman-pages=false \
+	-Dvalgrind=false \
+	-Dinstall-test-programs=$(call ptx/truefalse, PTXCONF_LIBDRM_TESTS) \
+	-Dudev=true
 
 
 # ----------------------------------------------------------------------------
@@ -105,6 +101,9 @@ ifdef PTXCONF_LIBDRM_ETNAVIV
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/etnaviv_cmd_stream_test)
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/etnaviv_bo_cache_test)
 endif
+endif
+ifdef PTXCONF_LIBDRM_AMDGPU
+	@$(call install_copy, libdrm, 0, 0, 0644, -, /usr/share/libdrm/amdgpu.ids)
 endif
 	@$(call install_finish, libdrm)
 

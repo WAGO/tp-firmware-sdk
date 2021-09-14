@@ -1,0 +1,29 @@
+From: Philipp Zabel <p.zabel@pengutronix.de>
+Date: Tue, 3 Dec 2019 11:36:07 +0100
+Subject: [PATCH] qmlglsink: fix build on EGL platform without X11 headers
+
+If Mesa is built without X11 headers, building against Mesa EGL headers
+requires a dependency on egl.pc, to define MESA_EGL_NO_X11_HEADERS.
+This fixes a build error when compiling ext/qt/gstqtglutility.cc:
+
+  In file included from /usr/include/EGL/egl.h:39,
+                   from /usr/include/gstreamer-1.0/gst/gl/egl/gstegl.h:44,
+                   from ../gst-plugins-good-1.16.1/ext/qt/gstqtglutility.cc:43:
+  /usr/include/EGL/eglplatform.h:124:10: fatal error: X11/Xlib.h: No such file or directory
+---
+ ext/qt/meson.build | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ext/qt/meson.build b/ext/qt/meson.build
+index 5f040c844174..43ddc6092b21 100644
+--- a/ext/qt/meson.build
++++ b/ext/qt/meson.build
+@@ -89,6 +89,8 @@ if have_cxx and build_gstgl
+     if gst_gl_have_platform_egl
+       # Embedded linux (e.g. i.MX6) with or without windowing support
+       qt_defines += ['-DHAVE_QT_EGLFS']
++      egl_dep = dependency('egl', required : false)
++      optional_deps += egl_dep
+       have_qt_windowing = true
+       if have_qpa_include
+         # Wayland windowing

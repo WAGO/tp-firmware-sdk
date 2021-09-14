@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_GLU) += glu
 #
 # Paths and names
 #
-GLU_VERSION	:= 9.0.0
-GLU_MD5		:= be9249132ff49275461cf92039083030
+GLU_VERSION	:= 9.0.1
+GLU_MD5		:= 151aef599b8259efe9acd599c96ea2a3
 GLU		:= glu-$(GLU_VERSION)
-GLU_SUFFIX	:= tar.bz2
+GLU_SUFFIX	:= tar.xz
 GLU_URL		:= ftp://ftp.freedesktop.org/pub/mesa/glu/$(GLU).$(GLU_SUFFIX)
 GLU_SOURCE	:= $(SRCDIR)/$(GLU).$(GLU_SUFFIX)
 GLU_DIR		:= $(BUILDDIR)/$(GLU)
-GLU_LICENSE	:= SGI-B-2.0, SGI-B-1.1
+GLU_LICENSE	:= SGI-B-2.0 AND SGI-B-1.1
 GLU_LICENSE_FILES := \
 	file://src/libutil/glue.c;startline=2;endline=28;md5=76832a1e3b436747980ebbc1cd89bfac \
 	file://src/libnurbs/internals/bin.cc;startline=2;endline=32;md5=f2807b3ac0a293c6faaac74d8933bb1f

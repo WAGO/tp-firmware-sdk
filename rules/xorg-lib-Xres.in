@@ -1,0 +1,10 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_XRES
+	tristate
+	prompt "libXres"
+	select XORGPROTO
+	select XORG_LIB_X11
+	select XORG_LIB_XEXT
+	help
+	  X-Resource extension client library

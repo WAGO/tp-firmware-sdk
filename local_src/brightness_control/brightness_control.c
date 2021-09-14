@@ -9,7 +9,7 @@
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 54500 2020-12-14 14:31:55Z wrueckl_elrest $
+/// \version $Id: brightness_control.c 57114 2021-04-07 16:55:53Z rgliese_elrest $
 ///
 /// \brief   brightness control, display backlight settings
 ///
@@ -512,8 +512,8 @@ void ThreadFctEventListener(void * ptr)
   
   data->thread_running = 1;
 
-  WriteSysFs("/sys/class/leds/bright-plus/",  "trigger", "oneshot");
-  WriteSysFs("/sys/class/leds/bright-minus/", "trigger", "oneshot");
+  WriteSysFs("/sys/class/leds/pca955x:bright-plus/",  "trigger", "oneshot");
+  WriteSysFs("/sys/class/leds/pca955x:bright-minus/", "trigger", "oneshot");
   //thread loop
   while (!data->quit)
   {
@@ -752,7 +752,7 @@ void ThreadFctEventListener(void * ptr)
               {
                 if (ev[0].code == KEY_BRIGHTNESSUP)
                 {
-                  WriteSysFs("/sys/class/leds/bright-plus/", "shot", "1");
+                  WriteSysFs("/sys/class/leds/pca955x:bright-plus/", "shot", "1");
                   if (GetClearScreenActivity() != SUCCESS)
                   {
                     //plus key 
@@ -764,7 +764,7 @@ void ThreadFctEventListener(void * ptr)
                 }
                 else if (ev[0].code == KEY_BRIGHTNESSDOWN)
                 {
-                  WriteSysFs("/sys/class/leds/bright-minus/", "shot", "1");
+                  WriteSysFs("/sys/class/leds/pca955x:bright-minus/", "shot", "1");
                   if (GetClearScreenActivity() != SUCCESS)
                   {
                     //minus key

@@ -19,6 +19,9 @@
 eeprom_device="/sys/bus/i2c/devices/1-0054/eeprom"
 hdmi=0
 
+#pio1 pio2 retain fix
+/etc/script/retain_pio2.sh
+
 # set xorg.conf
 set_xorg_conf () {
 	### get devconf
@@ -105,7 +108,7 @@ set_xorg_conf () {
 		(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
 		if [ $? -eq 0 ]; then
 			cap="1"
-			echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+			echo 6 > /sys/bus/i2c/devices/2-001b/nthr_value
 		else
 			cap="0"
 		fi
@@ -113,7 +116,7 @@ set_xorg_conf () {
 		(cat /proc/bus/input/devices | grep "eGalax Inc. eGalaxTouch P80H84") &>/dev/null
 		if [ $? -eq 0 ]; then
 			cap="1"
-			echo 6 > /sys/bus/i2c/devices/2-001b/NTHR_VALUE
+			echo 6 > /sys/bus/i2c/devices/2-001b/nthr_value
 		else
 			cap="0"
 		fi
@@ -197,13 +200,9 @@ chmod 666 /sys/class/gpio/gpio23/value
 # decide start mode Xorg or framebuffer
 MICROBROWSER="0"
 URL=""
-BOOTAPP="$(/etc/config-tools/get_eruntime bootapp)"
-if [ "$BOOTAPP" == "no" ]; then
-  # no bootproject found - check if microbrowser is configured
-  PLCSELECTED=`/etc/config-tools/get_plcselect plc_selected`
-  URL=`/etc/config-tools/get_plcselect $PLCSELECTED url`
-  MICROBROWSER=`/etc/config-tools/get_plcselect $PLCSELECTED mic`
-fi
+PLCSELECTED=`/etc/config-tools/get_plcselect plc_selected`
+URL=`/etc/config-tools/get_plcselect $PLCSELECTED url`
+MICROBROWSER=`/etc/config-tools/get_plcselect $PLCSELECTED mic`
 
 ORDER="$(/etc/config-tools/get_typelabel_value ORDER)"
 if [ "${ORDER:0:5}" == "752-8" ]; then

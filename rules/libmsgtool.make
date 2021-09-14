@@ -82,9 +82,9 @@ $(STATEDIR)/libmsgtool.targetinstall:
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish
 #
-	@$(call install_copy, libmsgtool, 0, 0, 0644, $(LIBMSGTOOL_DIR)/libmsgtool.so, /usr/lib/libmsgtool.so.0.0.0)
-	@$(call install_link, libmsgtool, libmsgtool.so.0.0.0, /usr/lib/libmsgtool.so)
-	@$(call install_link, libmsgtool, libmsgtool.so.0.0.0, /usr/lib/libmsgtool.so.0)
+	@$(call install_copy, libmsgtool, 0, 0, 0644, $(LIBMSGTOOL_DIR)/libmsgtool.so, /usr/lib/libmsgtool.so.$(LIBMSGTOOL_VERSION))
+	@$(call install_link, libmsgtool, libmsgtool.so.$(LIBMSGTOOL_VERSION), /usr/lib/libmsgtool.so)
+	@$(call install_link, libmsgtool, libmsgtool.so.$(LIBMSGTOOL_VERSION), /usr/lib/libmsgtool.so.0)
 	@$(call install_finish, libmsgtool)
 	@$(call touch)
 

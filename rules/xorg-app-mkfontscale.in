@@ -1,0 +1,10 @@
+## SECTION=multimedia_xorg_app
+
+config XORG_APP_MKFONTSCALE
+	tristate
+	select XORG_LIB_FONTENC
+	select FREETYPE
+	select HOST_XORG_APP_MKFONTSCALE
+	prompt "xorg mkfontscale"
+	help
+	  Create an index of scalable font files for X

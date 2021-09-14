@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file tempd.c
 ///
-/// \version $Id: tempd.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: tempd.c 53993 2020-11-26 11:29:41Z wrueckl_elrest $
 ///
 /// \brief operating hours counter
 ///
@@ -212,6 +212,7 @@ int main(int argc, char **argv)
   char *szInVal;
   int fd;
 
+  umask(022); // Change the file mode to 0644
   memset(&bs_counter, 0x00, sizeof(bs_counter));
 
   if (argc > 1)
@@ -359,7 +360,7 @@ int main(int argc, char **argv)
     exit(EXIT_SUCCESS); /* got a valid pid, parent exits */
 	/* now child (daemon) continues */
   
-  umask(0); /* Change the file mode mask, full access for created files */
+  
   
 	sid = setsid(); /* obtain a new process group */
   if (sid<0)

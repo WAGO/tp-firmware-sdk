@@ -157,7 +157,7 @@ menuconfig CONFIG_TOOLS
   select SWCONFIG if CT_FEATURE_ETH_SWITCH_DSA
   select CT_URLENCODE
   select WAGO_DBUS
-  select EEPROM_XSECTION if CDS3_RTS_PRODUCT_VTPCTP
+  select EEPROM_XSECTION if (CDS3_RTS_PRODUCT_VTPCTP || CDS3_RTS_PRODUCT_CC100)
   select LICENSE_INFO
 
 
@@ -178,8 +178,7 @@ menuconfig CONFIG_TOOLS
   select UMKIMAGE if CT_GET_UIMAGE_SIZE
   select LIBNL3 if CT_LIBCTNETWORK
   select LIBMODBUSCONFIG if CT_MODBUS_CONFIG
-  select LIBBACNETCONFIG if CT_BACNET_CONFIG
-  select LIBBACNETCONFIG if CT_BACNET_BACKUP_RESTORE
+  select LIBBACNETCONFIG if CT_BACNET_CONFIG || CT_BACNET_BACKUP_RESTORE || CT_BACNET_WBM_DIAGLIST
 
   select NETCONFD if CT_GET_ACTUAL_ETH_CONFIG
 
@@ -409,8 +408,8 @@ comment "AIDE related config-tools"
 config CT_WBM_MANAGE_AIDE
   bool
   default n
+  depends on AIDE
   depends on CONFIG_TOOLS
-  select AIDE
   prompt "manage_integrity"
   help
     Manage AIDE via WBM.
@@ -689,6 +688,14 @@ config CT_SWITCH_BOOTLOADER
   prompt "switch_bootloader"
   help
    Switch the default boot option btw. CF card an internal flash.
+
+config CT_INOTIFY
+  bool
+  default n
+  depends on CONFIG_TOOLS
+  prompt "inotify kernel parameters"
+  help
+   Get/set inotify limits.
 
 #################################################################
 comment "NTP-related config-tools"
@@ -1202,12 +1209,12 @@ config CT_BACNET_BACKUP_RESTORE
   bool
   default n
   depends on CONFIG_TOOLS
-  prompt "bacnet_backup_restore"
+ prompt "bacnet_backup_restore"
   help
    Backup and restore BACnet settings
 
 config CT_BACNET_WBM_DIAGLIST
-  bool
+ bool
   default n
   depends on CONFIG_TOOLS
   prompt "bacnet_wbm_diaglist"
@@ -1294,6 +1301,18 @@ config CT_CONF_INTERNAL_BOOT
   prompt "config_boot_mode"
   help
    Configure internal boot mode   
+
+###############################################################
+comment "Docker related config-tools"
+depends on CONFIG_TOOLS
+
+config CT_DOCKER
+	bool
+	default n
+	depends on CONFIG_TOOLS
+	prompt "config_docker"
+	help
+		Install/Remove and Activate/Deactivate Docker and get information on the current state of docker
 
 #################################################################
 #

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screencare.h
 ///
-/// \version $Id: screencare.h 54500 2020-12-14 14:31:55Z wrueckl_elrest $
+/// \version $Id: screencare.h 54497 2020-12-14 14:27:11Z wrueckl_elrest $
 ///
 /// \brief   Application main window - header
 ///

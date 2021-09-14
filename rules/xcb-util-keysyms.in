@@ -2,11 +2,7 @@
 
 config XCB_UTIL_KEYSYMS
 	tristate
-	select LIBC_PTHREAD
-	select XORG_PROTO_X
-	select XCB_PROTO
 	select LIBXCB
-	select HOST_GPERF
 	prompt "xcb-util-keysyms"
 	help
-	  FIXME
+	  utility libraries for X C Binding -- keysyms

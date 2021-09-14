@@ -9,7 +9,7 @@
 ///
 /// \file    config_backlight.c
 ///
-/// \version $Id: config_backlight.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_backlight.c 53179 2020-10-30 09:38:53Z wrueckl_elrest $
 ///
 /// \brief   change backlight settings / config-tools
 ///
@@ -69,7 +69,7 @@ static tConfValues aConfigValues[] =
   { "plusminusstep", "10", "" },  
   { "hysteresisdiff", "15", "" },  
   // this line must always be the last one - don't remove it!
-  { "", "" }
+  { "", "", "" }
 };
 
 //------------------------------------------------------------------------------
@@ -86,6 +86,7 @@ int GetBacklightValue();
 void AppendErrorText(int iStatusCode, char * pText);
 int GetBrightnessControlActivity();
 int IsTimeStringValid(char * pTimeStr);
+int IsBacklightValid(char * pStr);
 
 /// \brief main function
 /// \param[in]  argc number of arguments
@@ -184,6 +185,23 @@ int main(int argc, char **argv)
             else if (stricmp(aConfigValues[k].nameStr, "nighttime") == 0)
             { 
               if (IsTimeStringValid(pStr) == SUCCESS)
+              {
+                if (ConfSetValue(&aConfigValues[0], g_pList, aConfigValues[k].nameStr, pStr)==SUCCESS)
+                {
+                  status = SUCCESS;
+                }                
+              }
+              else
+              {
+                status = ERROR;
+              }
+            }
+            else if ((stricmp(aConfigValues[k].nameStr, "backlighton") == 0) || \
+                     (stricmp(aConfigValues[k].nameStr, "backlightoff") == 0) || \
+                     (stricmp(aConfigValues[k].nameStr, "backlightonnight") == 0) || \
+                     (stricmp(aConfigValues[k].nameStr, "backlightoffnight") == 0))
+            { 
+              if (IsBacklightValid(pStr) == SUCCESS)
               {
                 if (ConfSetValue(&aConfigValues[0], g_pList, aConfigValues[k].nameStr, pStr)==SUCCESS)
                 {
@@ -398,4 +416,24 @@ int IsTimeStringValid(char * pTimeStr)
   return status;    
 }
 
-
+/// \brief Check if backlight value is valid
+///
+/// The function checks the current backlight value,
+/// if an error occurs the function returns -1
+///
+/// \param[in]  pStr        backlight value 0..255
+/// \retval  0 SUCCESS
+/// \retval -1 ERROR
+int IsBacklightValid(char * pStr)
+{
+  int iRet = ERROR;
+  if (ConfIsNumber(pStr) == SUCCESS)
+  {
+    long int iValue = strtol(pStr, NULL, 10);
+    if ((iValue >= 0) && (iValue <=255))
+    {
+      iRet = SUCCESS;
+    }
+  }
+  return iRet;
+}

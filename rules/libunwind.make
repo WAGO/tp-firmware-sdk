@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LIBUNWIND) += libunwind
 #
 # Paths and names
 #
-LIBUNWIND_VERSION	:= 1.2
-LIBUNWIND_MD5		:= eefcb5d7f78fdc8f1ed172a26ea4202f
+LIBUNWIND_VERSION	:= 1.4.0
+LIBUNWIND_MD5		:= 5114504c74ac3992ac06aa551cd55678
 LIBUNWIND		:= libunwind-$(LIBUNWIND_VERSION)
 LIBUNWIND_SUFFIX	:= tar.gz
 LIBUNWIND_URL		:= http://download.savannah.gnu.org/releases/libunwind/$(LIBUNWIND).$(LIBUNWIND_SUFFIX)
 LIBUNWIND_SOURCE	:= $(SRCDIR)/$(LIBUNWIND).$(LIBUNWIND_SUFFIX)
 LIBUNWIND_DIR		:= $(BUILDDIR)/$(LIBUNWIND)
-LIBUNWIND_LICENSE	:= unknown
+LIBUNWIND_LICENSE	:= MIT
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,16 +33,20 @@ LIBUNWIND_LICENSE	:= unknown
 LIBUNWIND_CONF_TOOL	:= autoconf
 LIBUNWIND_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--includedir=/usr/include/libunwind \
 	--$(call ptx/disen, PTXCONF_ARCH_PPC)-coredump \
 	--enable-ptrace \
 	--enable-setjmp \
 	--disable-documentation \
+	--disable-tests \
 	--disable-debug \
+	--disable-cxx-exceptions \
 	--enable-debug-frame \
 	--enable-block-signals \
 	--enable-conservative-checks \
 	--disable-msabi-support \
-	--disable-minidebuginfo
+	--disable-minidebuginfo \
+	--disable-per-thread-cache
 
 # ----------------------------------------------------------------------------
 # Target-Install

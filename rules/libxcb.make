@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2007 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBXCB) += libxcb
 #
 # Paths and names
 #
-LIBXCB_VERSION		:= 1.13
-LIBXCB_MD5		:= c2b6cf928afa16b0047c974e7aaa783f
+LIBXCB_VERSION		:= 1.13.1
+LIBXCB_MD5		:= f33cdfc67346f7217a9326c0d8679975
 LIBXCB			:= libxcb-$(LIBXCB_VERSION)
 LIBXCB_SUFFIX		:= tar.bz2
 LIBXCB_URL		:= http://xcb.freedesktop.org/dist/$(LIBXCB).$(LIBXCB_SUFFIX)
@@ -42,11 +40,15 @@ LIBXCB_CONF_TOOL	:= autoconf
 LIBXCB_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-static \
+	--disable-selective-werror \
+	--disable-strict-compilation \
+	--disable-devel-docs \
 	--enable-composite \
 	--enable-damage \
 	--enable-dpms \
 	--enable-dri2 \
 	--enable-dri3 \
+	--enable-ge \
 	--enable-glx \
 	--enable-present \
 	--enable-randr \
@@ -68,7 +70,8 @@ LIBXCB_CONF_OPT		:= \
 	--enable-xtest \
 	--enable-xv \
 	--enable-xvmc \
-	--without-doxygen
+	--without-doxygen \
+	--without-launchd
 
 # ----------------------------------------------------------------------------
 # Target-Install

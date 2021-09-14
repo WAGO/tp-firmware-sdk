@@ -111,7 +111,7 @@ $(STATEDIR)/cansdidemo.targetinstall:
 	@$(call install_fixup,cansdidemo,PRIORITY,optional)
 	@$(call install_fixup,cansdidemo,VERSION,$(CANSDIDEMO_VERSION))	
 	@$(call install_fixup,cansdidemo,SECTION,base)
-	@$(call install_fixup,cansdidemo,AUTHOR,"Axel Wueste")
+	@$(call install_fixup,cansdidemo,AUTHOR,"Charline Wueste")
 	@$(call install_fixup,cansdidemo,DESCRIPTION,missing)
 	
 ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES 

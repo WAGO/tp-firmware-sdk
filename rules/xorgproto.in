@@ -1,0 +1,6 @@
+## SECTION=multimedia_xorg_proto
+
+config XORGPROTO
+	tristate
+	select HOST_XORGPROTO
+	default y if ALLYES

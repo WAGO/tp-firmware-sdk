@@ -15,7 +15,7 @@ PACKAGES-$(PTXCONF_LIBBACNET) += libbacnet
 #
 #--- paths and names --------------------------------------------------------- 
 #
-LIBBACNET_VERSION           := 0.0.1
+LIBBACNET_VERSION           := 1.5.0
 LIBBACNET_MD5               :=
 LIBBACNET                   := libbacnet
 LIBBACNET_URL               := file://$(PTXDIST_WORKSPACE)/wago_intern/device/bacnet/$(LIBBACNET)
@@ -78,6 +78,12 @@ endif
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
+
+ifdef PTXCONF_LIBBACNETSTACK_SOURCE_LEGACY
+LIBBACNET_MAKE_OPT += "LIBBACNETSTACK_REVISION=14"
+else
+LIBBACNET_MAKE_OPT += "LIBBACNETSTACK_REVISION=22"
+endif
 
 $(STATEDIR)/libbacnet.compile:
 	@$(call targetinfo)

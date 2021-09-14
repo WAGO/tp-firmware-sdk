@@ -1,0 +1,15 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_XXF86VM
+	tristate
+	prompt "libXxf86vm"
+	select XORGPROTO
+	select XORG_LIB_X11
+	select XORG_LIB_XEXT
+	help
+	  libXxf86vm provides an interface to the
+	  XFree86-VidModeExtension extension, which
+	  allows client applications to get and set
+	  video mode timings in extensive detail.
+	  It is used by the xvidtune program in
+	  particular.

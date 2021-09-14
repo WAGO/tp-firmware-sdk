@@ -1,8 +1,0 @@
-#!/bin/bash
-# Update network configuration possibly provided by dhcp.
-
-DHCP_DATA_FILE=/tmp/dhcp-bootp-data-$IFACE
-EVENTDIR=/etc/config-tools/events/networking
-
-rm -f $DHCP_DATA_FILE
-[ -e $EVENTDIR ] && run-parts -a config $EVENTDIR

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,15 @@ PACKAGES-$(PTXCONF_LIBEVDEV) += libevdev
 #
 # Paths and names
 #
-LIBEVDEV_VERSION	:= 1.5.9
-LIBEVDEV_MD5		:= a1ca11e961c1efed720fac4130881904
+LIBEVDEV_VERSION	:= 1.8.0
+LIBEVDEV_MD5		:= 879631080be18526737e33b63d848039
 LIBEVDEV		:= libevdev-$(LIBEVDEV_VERSION)
 LIBEVDEV_SUFFIX		:= tar.xz
 LIBEVDEV_URL		:= http://www.freedesktop.org/software/libevdev/$(LIBEVDEV).$(LIBEVDEV_SUFFIX)
 LIBEVDEV_SOURCE		:= $(SRCDIR)/$(LIBEVDEV).$(LIBEVDEV_SUFFIX)
 LIBEVDEV_DIR		:= $(BUILDDIR)/$(LIBEVDEV)
 LIBEVDEV_LICENSE	:= MIT
+LIBEVDEV_LICENSE_FILES	:= file://COPYING;md5=75aae0d38feea6fda97ca381cb9132eb
 
 # ----------------------------------------------------------------------------
 # Prepare

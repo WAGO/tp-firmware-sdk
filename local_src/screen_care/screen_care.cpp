@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screen_care.cpp
 ///
-/// \version $Id: screen_care.cpp 54500 2020-12-14 14:31:55Z wrueckl_elrest $
+/// \version $Id: screen_care.cpp 54497 2020-12-14 14:27:11Z wrueckl_elrest $
 ///
 /// \brief   main file
 ///

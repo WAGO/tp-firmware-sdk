@@ -44,14 +44,12 @@
 // defines and test setup
 //-----------------------------------------------------------------------------
 
-#define CAN_TESTPRIO 0   // no custom priority for can background loop
 #define CAN_MAINPRIO 20  // priority for main loop
 #define CAN_MAX_IDS  16  // maximum 11 bit ids for echo
 #define CAN_MAX_IDS2 16  // maximum 29 bit ids for echo
 //#define CAN_ECHO         // echo layer data for ibw endurance test
 #define CAN_RXBASE  0x6A0
 #define CAN_RXBASE2 0x80000000 + 0x6C0
-
 
 //-----------------------------------------------------------------------
 ///
@@ -102,32 +100,43 @@ int main(int argc, char *argv[])
   // scan command line options
   if (argc > 1)
   {
-	runtime = (unsigned long) atol(argv[1]);
+    runtime = (unsigned long) atol(argv[1]);
     if ((runtime < 10) && (runtime > 0))
-	  runtime = 10;
+    {
+      runtime = 10;
+    }
 
     if (argc > 2)
     {
       can_baudrate = (unsigned long) atol(argv[2]);
       if (can_baudrate < 20000)
-    	  can_baudrate = 20000;
+      {
+        can_baudrate = 20000;
+      }
     }
 
     if (argc > 3)
     {
       delay = (unsigned) atoi(argv[3]);
       if (delay < 200)
-      	  delay = 200;
+      {
+        delay = 200;
+      }
     }
   }
 
   // print setting
   if (runtime == 0)
+  {
     printf("unlimited runtime\r\n");
+  }
   else
+  {
     printf("runtime = %is\r\n",(int) runtime);
+  }
+
   printf("baudrate = %li\r\n",(long) can_baudrate);
-  printf("delay between loops %i\r\n",delay);
+  printf("delay between loops %ui\r\n",delay);
 
   // connect to ADI-Interface
   adi = adi_GetApplicationInterface();
@@ -169,7 +178,9 @@ int main(int argc, char *argv[])
     printf("CANopen layer2 device open OK\n");
 
     if (adi->ConfigureDevice(can_device_id, NULL) == DAL_SUCCESS)
+    {
       printf("CANopen layer2 configure device OK\n");
+    }
 
     // switch to RT priority
     s_param.sched_priority = CAN_MAINPRIO;
@@ -177,26 +188,36 @@ int main(int argc, char *argv[])
 
     // set watchdog to 100ms
     if (adi->WatchdogSetTime(1000, 100) != DAL_SUCCESS)
-       printf("Watchdog failed\n");
+    {
+      printf("Watchdog failed\n");
+    }
 
     // set application state running
     event.State = ApplicationState_Running;
     if (adi->ApplicationStateChanged(event) != DAL_SUCCESS)
+    {
       printf("Appication State Run failed\n");
+    }
 
     // start watchdog
     if (adi->WatchdogStart() != DAL_SUCCESS)
-         printf("Watchdog Start failed\n");
+    {
+      printf("Watchdog Start failed\n");
+    }
 
     // open CAN interface
     if (adi->CallDeviceSpecificFunction("CANOPEN_L2OPEN", (void*) &result, can_baudrate) == DAL_SUCCESS)
     {
       for (can_id = CAN_RXBASE ; can_id < (CAN_RXBASE + CAN_MAX_IDS) ; can_id++)
         if (adi->CallDeviceSpecificFunction("CANOPEN_REGISTER_ID", (void*) &result, (uint32_t) 1, can_id) != DAL_SUCCESS)
-           printf("register id failed\n");
+        {
+          printf("register id failed\n");
+        }
       for (can_id = CAN_RXBASE2 ; can_id < (CAN_RXBASE2 + CAN_MAX_IDS2) ; can_id++)
         if (adi->CallDeviceSpecificFunction("CANOPEN_REGISTER_ID", (void*) &result, (uint32_t) 1, can_id) != DAL_SUCCESS)
-           printf("register id failed\n");
+        {
+          printf("register id failed\n");
+        }
 
       // loop
       while ( ((runtime > 0) && (runtime > uptime)) || (runtime == 0))
@@ -218,7 +239,9 @@ int main(int argc, char *argv[])
             {
               if (adi->CallDeviceSpecificFunction("CANOPEN_SENDFRAME",(void*)&result,(uint32_t)can_id + 0x10 ,can_data,can_dlc,1000)
                 != DAL_SUCCESS)
-                  printf("Send Message fail for ID %x\n",can_id + 0x80 );
+              {
+                printf("Send Message fail for ID %x\n",can_id + 0x80 );
+              }
               messages++;
             }
           }
@@ -235,7 +258,9 @@ int main(int argc, char *argv[])
             {
               if (adi->CallDeviceSpecificFunction("CANOPEN_SENDFRAME",(void*)&result,(uint32_t)can_id + 0x10 ,can_data,can_dlc,1000)
                 != DAL_SUCCESS)
-                  printf("Send Message fail for ID %x\n",can_id + 0x80 );
+              {
+                printf("Send Message fail for ID %x\n",can_id + 0x80 );
+              }
               messages++;
             }
           }
@@ -249,7 +274,9 @@ int main(int argc, char *argv[])
           uptime++;
 
           if (messages > 0)
+          {
             cantime++;
+          }
 
           // print info
           printf("up %lu:%02lu:%02lu ", uptime / 3600ul, (uptime / 60ul) % 60ul,uptime % 60ul);
@@ -263,7 +290,7 @@ int main(int argc, char *argv[])
             if (result == DAL_SUCCESS)
             {
               // function result is valid
-              printf(" errorinfo: %X tx overflows: %i messages/s: %li",
+              printf(" errorinfo: %X tx overflows: %i messages/s: %lu",
                   (int) can_com_state.bus_diag,
                   (int) can_com_state.tx_l2_overflows,messages);
             }
@@ -276,30 +303,32 @@ int main(int argc, char *argv[])
       } // while ..
 
       // stop watchdog
-       if (adi->WatchdogStop() != DAL_SUCCESS)
-           printf("Watchdog Stop failed\n");
+      if (adi->WatchdogStop() != DAL_SUCCESS)
+      {
+        printf("Watchdog Stop failed\n");
+      }
 
       // close CAN interface
       adi->CallDeviceSpecificFunction("CANOPEN_L2CLOSE", (void*) &result);
 
-    } // if if (adi->CallDeviceSpecificFunction("CANOPEN_L2OPEN"
+    } // if (adi->CallDeviceSpecificFunction("CANOPEN_L2OPEN" ..
     else
+    {
       printf("CAN layer2 open failed \n");
+    }
 
     // close can layer2 device
     adi->CloseDevice(can_device_id);
     printf("CAN layer2 device closed\n");
   }
-
   else  // if (adi->OpenDevice(can_device_id) == DAL_SUCCESS) ..
-
+  {
     printf("CAN layer2 device open failed\n");
+  }
 
   // close DAL
   adi->Exit();
 
   // exit programm
   return 0;
-
 }
-

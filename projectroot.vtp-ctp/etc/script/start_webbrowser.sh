@@ -19,6 +19,23 @@
 . /etc/profile > /dev/null 2>&1
 HOME=/root
 
+#avoid black screen after WUP
+#codesys SP16 runtime shows a black window only on first startup which overlays the browser window
+function BringToFront
+{
+  if [ ! -e /home/codesys/eRUNTIME.cfg ]; then
+    LINE=$(head -n 1 /etc/specific/rtsversion)
+    RTSVER=${LINE:0:1}
+    if [ "$RTSVER" == "3" ]; then
+       PID_SCRIPT=$(pidof activate_browser_wnd.sh)
+       if [ -z "$PID_SCRIPT" ]; then
+         /etc/script/activate_browser_wnd.sh > /dev/null 2>&1 &
+       fi
+    fi
+  fi
+}
+BringToFront
+
 URL=`/etc/config-tools/get_plcselect 0 url`
 if [ -z "$URL" ]; then
   URL="http://127.0.0.1/wbm/index.html"

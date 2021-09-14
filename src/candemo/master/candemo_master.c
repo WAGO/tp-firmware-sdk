@@ -41,22 +41,24 @@
 // defines and test setup
 //-----------------------------------------------------------------------------
 
-// mandantory slave 750-337 on node NodeID 3 at 1MBit with Modules 430,530,600
+// mandantory slave 750-337 on node NodeID 3 at 1MBit with Modules 430,530,430,530,600
 // optional   slave PFC200 with candemo_slave programm running
 
-//#define CAN_SLAVE_COUNT 1   // 1 slave 750-337 ID 3
-#define CAN_SLAVE_COUNT 2   // + slave PFC200 ID 2
+#define CAN_SLAVE_COUNT 1   // 1 slave 750-337 ID 3
+//#define CAN_SLAVE_COUNT 2   // + slave PFC200 ID 2
 
 // list length for slave configuration
 #define CAN_SLAVE_MAX_SDOS 16
 
 // priorities
-#define CAN_TESTPRIO 0        // can background loop 0 = default
-#define CAN_MAINPRIO 40       // main loop
-// runtime of the test
+#define CAN_TESTPRIO 0    // can background loop 0 = default
+#define CAN_MAINPRIO 40   // main loop
+
+// runtime of the test in s
 #define CAN_TESTTIME 60*60*24
 
-#define LOOPTIME 10     // speed for data exchange
+// speed limit for data exchange
+#define LOOPTIME 10
 
 // print status on console
 //#define PRINT_INFO
@@ -65,10 +67,8 @@
 //#define TEST_ADISTATE
 //#define TEST_ADINODESTATE
 //#define TEST_ADIFUNCTION
-//#define TEST_ADIFUNCTION_SDO // perform sdo performance test in sync mode (blocking until answer or timeout )
-//#define CAN_SDO_ASYNC   // perform sdo performance test in async mode (non blocking)
-
-// #define TEST_MAXTIME  // perform delay test
+//#define TEST_ADIFUNCTION_SDO // perform sdo performance test in sync mode  (blocking until answer or timeout )
+//#define CAN_SDO_ASYNC        // perform sdo performance test in async mode (non blocking)
 
 //-----------------------------------------------------------------------------
 // global structures
@@ -138,9 +138,9 @@ canopen_pdo can_slave_pdo_list[CAN_SLAVE_COUNT][2] =
   // config for slave 1 node ID 3 : 750-337
   {
     // 1. slave RPDO for module 530
-    { 1, 1, 0x203, 0xFF, 0, 0, 0, 0},
+    { 1, 2, 0x203, 0xFF, 0, 0, 0, 0},
     // 1. slave TPDO for module 430
-    { 2, 1, 0x183, 0xFF, 0, 0, 0, 0}
+    { 2, 2, 0x183, 0xFF, 0, 0, 0, 0}
   },
 
 #if (CAN_SLAVE_COUNT == 2)
@@ -154,9 +154,6 @@ canopen_pdo can_slave_pdo_list[CAN_SLAVE_COUNT][2] =
   },
 
 #endif
-
-
-
 };
 
 //-----------------------------------------------------------------------
@@ -175,22 +172,25 @@ int main(void)
   size_t nrCANMasterFound;             // position of the CANopen master in the list
   tDeviceId canDeviceId;               // device ID from the ADI
   tApplicationDeviceInterface * adi;   // pointer to the application interface
-  tBusState canBusState;               // var for the ADI generic bus state
   uint32_t taskId = 0;                 // task Id not used in this program
   tApplicationStateChangedEvent event; // var for the event interface of the ADI
-  tDiagnoseState canDiagState;         // var for the ADI generic diagnostic state
 
   // vars for canopen interface
   canopen_bus_config can_master_config;                 // struct for the canopen master parameter
   canopen_node_config can_node_config[CAN_SLAVE_COUNT]; // struct for the node parameter
   canopen_sdo * can_node_sdos;                          // pointer to the nodes config for the master
-  canopen_cstatus can_cstate;                           // compact canbus state info
-  canopen_com_status can_com_state;                     // communication info of the can bus
 
-  uint32_t slave;              // loop counter for setup
-  uint32_t sdo_size_slave;     // size of the sdo config of the slave
+#ifdef TEST_ADISTATE
+  tDiagnoseState canDiagState;         // var for the ADI generic diagnostic state
+  tBusState canBusState;               // var for the ADI generic bus state
+  canopen_cstatus can_cstate;          // compact canbus state info
+  canopen_com_status can_com_state;    // communication info of the can bus
+  uint16_t can_slave_flags;            // bitlist for subdevice state
+#endif
+
+  int slave;              // loop counter for setup
+  int sdo_size_slave;     // size of the sdo config of the slave
   uint8_t * sdo_data_p = NULL; // pointer to the next sdo
-  uint16_t can_slave_flags;    // bitlist for subdevice state
 
   // process data
   uint8_t pd_in[4096];    // slave to master
@@ -202,7 +202,10 @@ int main(void)
   long unsigned runtime = 0;
   struct sched_param s_param;
   int32_t result;
+#ifdef TEST_ADIFUNCTION_SDO
   int16_t param16;
+#endif
+
 
   struct timeval  timerval1;
   struct timespec timerval2;
@@ -218,7 +221,7 @@ int main(void)
 
   // startup info */
   printf("**************************************************\n");
-  printf("*** DAL CANopen Master ADI Demo Application V1.13 \n");
+  printf("*** DAL CANopen Master ADI Demo Application V1.14 \n");
   printf("**************************************************\n");
 
   // clear process memory
@@ -236,18 +239,18 @@ int main(void)
   adi->GetDeviceList(sizeof(deviceList), deviceList, &nrDevicesFound);
 
   // find canopen master
-  nrCANMasterFound = -1;
-  for (i = 0; i < nrDevicesFound; ++i)
+  nrCANMasterFound = (size_t) -1;
+  for (i = 0; i < (int) nrDevicesFound; ++i)
   {
     if (strcmp(deviceList[i].DeviceName, "libcanopenm") == 0)
     {
-      nrCANMasterFound = i;
+      nrCANMasterFound = (size_t) i;
       printf("CANopen master device found as device %i\n", i);
     }
   }
 
   // no canopen master found > exit
-  if (nrCANMasterFound == -1)
+  if (nrCANMasterFound == (size_t) -1)
   {
     printf("No CANopen master device found \n");
 
@@ -288,7 +291,7 @@ int main(void)
 
     sprintf((char*) can_master_config.DevName,"WAGO");       // max. 12 Bytes
     sprintf((char*) can_master_config.HW_Ver, "HW Ver. 01"); // max. 12 Bytes
-    sprintf((char*) can_master_config.SW_Ver, "03.01.17");    // max. 8 Bytes
+    memcpy((char*) can_master_config.SW_Ver, "03.01.17",8);  // max. 8 Bytes
 
     // clear node config buffer
     memset(can_node_config, 0, sizeof(can_node_config));
@@ -320,19 +323,19 @@ int main(void)
         printf("CANopen master configure subdevice %i ", (int) slave + 1);
 
         // point slave pdo config to master subdevice configuration
-        can_node_config[slave].pdo_cfg.len  = can_node_config[slave].tab.PDOCount * sizeof(canopen_pdo);
+        can_node_config[slave].pdo_cfg.len  = (uint16_t) (can_node_config[slave].tab.PDOCount * sizeof(canopen_pdo));
         can_node_config[slave].pdo_cfg.pdos = &can_slave_pdo_list[slave][0];
 
         // scan slave node sdos for size
         sdo_size_slave = 0;
         for (i = 0; i < can_node_config[slave].tab.SDOCount; i++)
         {
-          sdo_size_slave += 2 + 1 + 2; /* Index + Sub + Size */
-          sdo_size_slave += can_slave_sdo_list[slave][i].len;
+          sdo_size_slave += (uint16_t) 5u; /* 2 Index + 1 Sub + 2 Size */
+          sdo_size_slave += (uint16_t) (can_slave_sdo_list[slave][i].len);
         }
 
         // allocate memory for SDO config
-        can_node_sdos = malloc(sdo_size_slave);
+        can_node_sdos = malloc((size_t) sdo_size_slave);
         if (can_node_sdos == NULL)
         {
           printf("no memory! \n");
@@ -341,7 +344,7 @@ int main(void)
 
         // copy SDOs from list to masters slave configuration
         can_node_config[slave].sdo_cfg.sdos = can_node_sdos;
-        can_node_config[slave].sdo_cfg.len = sdo_size_slave;
+        can_node_config[slave].sdo_cfg.len = (uint16_t) sdo_size_slave;
         sdo_data_p = (uint8_t *) can_node_sdos;
         for (i = 0; i < can_node_config[slave].tab.SDOCount; i++)
         {
@@ -353,23 +356,27 @@ int main(void)
           memcpy(sdo_data_p, &can_slave_sdo_list[slave][i].len, 2);
           sdo_data_p += 2;
           memcpy(sdo_data_p, &can_slave_sdo_list[slave][i].value,
-              can_slave_sdo_list[slave][i].len);
+                 can_slave_sdo_list[slave][i].len);
           sdo_data_p += can_slave_sdo_list[slave][i].len;
         }
 
         // send slave config to master
-        if (adi->ConfigureSubdevice(canDeviceId, slave, &can_node_config[slave])
+        if (adi->ConfigureSubdevice(canDeviceId, (uint16_t) slave, &can_node_config[slave])
             != DAL_SUCCESS)
+        {
           printf("failed\n");
+        }
         else
+        {
           printf("OK\n");
+        }
 
         // free config memory
         free(can_node_sdos);
       } // for (slave = 0; slave < can_master_config.NumOfNodes; slave++)
 
       printf("CANopen master configure %i subdevices done \n",
-          (int) can_master_config.NumOfNodes);
+             (int) can_master_config.NumOfNodes);
 
       // switch to RT Priority
       s_param.sched_priority = CAN_MAINPRIO;
@@ -377,16 +384,22 @@ int main(void)
 
       // set watchdog to 100ms
       if (adi->WatchdogSetTime(1000, 100) != DAL_SUCCESS)
-          printf("Watchdog failed\n");
+      {
+        printf("Watchdog failed\n");
+      }
 
       // Start Watchdog
       if (adi->WatchdogStart() != DAL_SUCCESS)
-          printf("Watchdog Start failed\n");
+      {
+        printf("Watchdog Start failed\n");
+      }
 
       // set application state running to set master to operational
       event.State = ApplicationState_Running;
       if (adi->ApplicationStateChanged(event) != DAL_SUCCESS)
+      {
         printf("Appication State Run failed\n");
+      }
 
       // run main loop for CAN_TESTTIME in s
       while (runtime < CAN_TESTTIME)
@@ -453,10 +466,14 @@ int main(void)
 
           // test can status flags
           if (can_cstate.Flags.BusOff)
-          printf("Bus off  ");
+          {
+            printf("Bus off  ");
+          }
 
           if (can_cstate.Flags.BusWarn)
-          printf("Bus error  ");
+          {
+            printf("Bus error  ");
+          }
 
          #endif //  #ifdef TEST_ADISTATE
 
@@ -479,7 +496,9 @@ int main(void)
 
           // show process data
           if (can_cstate.BusState == CANOPEN_STATE_RUN)
-          printf(" Input Data = %02X Output data = %02X ",(int) pd_in[0],(int) pd_out[0]);
+          {
+            printf(" Input Data = %02X Output data = %02X ",(int) pd_in[0],(int) pd_out[0]);
+          }
 
           // get extended status via ADI-device specific function
          #ifdef TEST_ADIFUNCTION
@@ -505,10 +524,11 @@ int main(void)
           // test end > slaves to preoperational
           if (runtime == CAN_TESTTIME - 2)
           {
-        	printf("\nPLC Time Max = %i ",timer_max1);
-        	printf("CAN Time 337 Max = %i\n",timer_max2);
-        	printf("CAN Time PFC Max = %i\n",timer_max3);
-
+            printf("\nPLC Time Max = %i ",timer_max1);
+            printf("CAN Time 337 Max = %i\n",timer_max2);
+           #if (CAN_SLAVE_COUNT == 2)
+            printf("CAN Time PFC Max = %i\n",timer_max3);
+           #endif
             // send goto preoperational to all slaves via ADI-device specific function
             adi->CallDeviceSpecificFunction("CANOPEN_CHANGE_STATE",
                 (void*) &result, (uint32_t) 0, (uint32_t) 0x7F);
@@ -699,19 +719,19 @@ int main(void)
 
             // update process data input
             adi->ReadStart(canDeviceId, taskId);
-		   #if (CAN_SLAVE_COUNT == 1)
-            adi->ReadBytes(canDeviceId, taskId, 0, 1, (uint8_t *) &pd_in[0]);
+           #if (CAN_SLAVE_COUNT == 1)
+            adi->ReadBytes(canDeviceId, taskId, 0, 2, (uint8_t *) &pd_in[0]);
            #else
             adi->ReadBytes(canDeviceId, taskId, 0, 9, (uint8_t *) &pd_in[0]);
            #endif
             /* unlock PD-In data */
             adi->ReadEnd(canDeviceId, taskId);
 
-
             // 750-337 Data  ID 3
             if (pd_in[0] == pd_out[0]) // Data test
             {
                pd_out[0] =  (uint8_t) (pd_out[0] + 1);
+               pd_out[1] =  (uint8_t) (0xAF);
                timerval_old2 = timerval1.tv_usec;
             }
 
@@ -729,7 +749,7 @@ int main(void)
 
             // lock an write PD-out data
             adi->WriteStart(canDeviceId, taskId);
-            adi->WriteBytes(canDeviceId,taskId,0,1,(uint8_t *) &pd_out[0]); // 750-337 ID 3
+            adi->WriteBytes(canDeviceId,taskId,0,2,(uint8_t *) &pd_out[0]); // 750-337 ID 3
 
             #if (CAN_SLAVE_COUNT == 2)
              adi->WriteBytes(canDeviceId, taskId, 1, 8, (uint8_t *) &pd_out[1]); // PFC200 ID 2
@@ -745,14 +765,16 @@ int main(void)
 
     }
 
-    else
-      // if (adi->ConfigureDevice(canDeviceId,&can_master_config) == DAL_SUCCESS)
-
-      printf("CANopen master configure device failed\n");
+    else // if (adi->ConfigureDevice(canDeviceId,&can_master_config) == DAL_SUCCESS)
+    {
+       printf("CANopen master configure device failed\n");
+    }
 
     // stop Watchdog
     if (adi->WatchdogStop() != DAL_SUCCESS)
-        printf("Watchdog Stop failed\n");
+    {
+      printf("Watchdog Stop failed\n");
+    }
 
     // stop bus
     event.State = ApplicationState_Unconfigured;
@@ -763,8 +785,9 @@ int main(void)
   }
 
   else // if (adi->OpenDevice(canDeviceId) == DAL_SUCCESS) ...
-
+  {
     printf("CANopen master device open failed\n");
+  }
 
   // close DAL
   adi->Exit();

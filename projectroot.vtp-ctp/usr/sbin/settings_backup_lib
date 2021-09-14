@@ -198,7 +198,7 @@ configParam+=(
   "gprs-username;             /etc/config-tools/settings_backup_mdmd backup gprs-username;      /etc/config-tools/settings_backup_mdmd restore dummy " 
   "gprs-apn;                  /etc/config-tools/settings_backup_mdmd backup gprs-apn;           /etc/config-tools/settings_backup_mdmd restore dummy "
   "gprs-connectivity;         /etc/config-tools/settings_backup_mdmd backup gprs-connectivity;  /etc/config-tools/settings_backup_mdmd restore gprs-connectivity "
-  "net-selection-mode;        /etc/config-tools/settings_backup_mdmd backup net-selection;      /etc/config-tools/settings_backup_mdmd restore net-selection " 
+  "net-selection-mode;        /etc/config-tools/settings_backup_mdmd backup net-selection-mode; /etc/config-tools/settings_backup_mdmd restore net-selection-mode "
   
 # backlight
   "backlight-backlighton;       /etc/config-tools/get_backlight backlighton;                    /etc/config-tools/config_backlight backlighton="
@@ -356,13 +356,13 @@ ProcessErrRestoreOperation ()
   local lastError=""
   if [[ "$errorCode" != "$SUCCESS" ]]; then
      if [[ -f "$LAST_ERROR_FILENAME" ]]; then
-     	 read lastError < "$LAST_ERROR_FILENAME"
+       read lastError < "$LAST_ERROR_FILENAME"
      fi
      if [ -n "$lastError" ]; then
-     		ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
+        ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
      else
-     	  ReportError $errorCode "$errorText  \"$errorParam\""
-     fi	  
+        ReportError $errorCode "$errorText  \"$errorParam\""
+     fi   
      restore_error_count=$((restore_error_count+1))
   fi
   return 0
@@ -389,13 +389,13 @@ ProcessErrBackupOperation ()
   
   if [[ "$errorCode" != "$SUCCESS" ]]; then 
      if [[ -f "$LAST_ERROR_FILENAME" ]]; then
-     		read lastError < "$LAST_ERROR_FILENAME"
+        read lastError < "$LAST_ERROR_FILENAME"
      fi
      if [ -n "$lastError" ]; then
-     		ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
+        ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
      else
-     	  ReportError $errorCode "$errorText  \"$errorParam\""
-     fi	 
+        ReportError $errorCode "$errorText  \"$errorParam\""
+     fi  
      backup_error_count=$((backup_error_count+1))
   fi
   return 0

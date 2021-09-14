@@ -1,0 +1,12 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_XEXT
+	tristate
+	prompt "libXext"
+	select XORGPROTO
+	select XORG_LIB_X11
+	select XORG_LIB_XAU
+	help
+	  The X Extensions library provides mechanisms that
+	  were not provided in the core protocol in Xlib.
+

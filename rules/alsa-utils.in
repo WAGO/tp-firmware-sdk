@@ -1,0 +1,107 @@
+## SECTION=multimedia_sound
+
+menuconfig ALSA_UTILS
+	tristate
+	prompt "alsa utils                    "
+	select ALSA_LIB
+	select ALSA_LIB_UCM	if ALSA_UTILS_USE_CASE_MANAGER
+	select ALSA_LIB_RAWMIDI if ALSA_UTILS_RAW_MIDI
+	select ALSA_LIB_MIXER	if ALSA_UTILS_AMIXER || ALSA_UTILS_ALSAMIXER
+	select ALSA_LIB_PCM	if ALSA_UTILS_APLAYRECORD || ALSA_UTILS_IECSET || ALSA_UTILS_MIDI || ALSA_UTILS_ALSALOOP
+	select ALSA_LIB_SEQ	if ALSA_UTILS_SEQTOOLS || ALSA_UTILS_ACONNECT || ALSA_UTILS_MIDI
+	select LIBC_M		if ALSA_UTILS_ALSALOOP
+	select LIBC_PTHREAD
+	select NCURSES		if ALSA_UTILS_ALSAMIXER
+	select SYSTEMD		if ALSA_UTILS_SYSTEMD_UNIT
+	# to detect where to install its udev rules
+	select UDEV
+	help
+	  Some utils to handle the Advanced Linux Sound Architecture.
+	  With these utils you can control your sound device, for
+	  playback and recording of sounds.
+
+if ALSA_UTILS
+
+config ALSA_UTILS_STARTSCRIPT
+	bool
+	default y
+	prompt "install /etc/init.d/alsa-utils"
+
+config ALSA_UTILS_SYSTEMD_UNIT
+	bool
+	default y
+	depends on INITMETHOD_SYSTEMD
+	prompt "install systemd unit files"
+
+config ALSA_UTILS_ASOUND_STATE
+	bool
+	prompt "install /etc/asound.state from projectroot"
+	help
+	  install a default asound.state file from the projectroot
+
+config ALSA_UTILS_ALSAMIXER
+	bool
+	prompt "alsamixer"
+	select NCURSES_FORM
+	select NCURSES_MENU
+	select NCURSES_PANEL
+	help
+	  Build the console and ncurses based 'alsamixer' tool.
+
+config ALSA_UTILS_ALSALOOP
+	bool
+	prompt "alsaloop"
+	help
+	  alsaloop allows create a PCM loopback between a PCM capture
+	  device and a PCM playback device.
+
+config ALSA_UTILS_USE_CASE_MANAGER
+	bool
+	prompt "alsaucm"
+	help
+	  Command-line tool to use the 'ALSA Use Case Interface'.
+
+config ALSA_UTILS_RAW_MIDI
+	bool
+	prompt "amidi"
+	help
+	   Command-line tool to read from and write to ALSA RawMIDI ports.
+
+config ALSA_UTILS_MIDI
+	bool
+	prompt "aplaymidi/arecordmidi"
+	help
+	   FIXME
+
+config ALSA_UTILS_AMIXER
+	bool
+	prompt "amixer"
+	help
+	   Command-line mixer for ALSA soundcard driver.
+
+config ALSA_UTILS_APLAYRECORD
+	bool
+	prompt "aplay/arecord"
+	help
+	   Command-line player and recorder for ALSA soundcard driver.
+
+config ALSA_UTILS_IECSET
+	bool
+	prompt "iecset"
+	help
+	   Command-line tool to set or dump IEC958 status bits
+
+config ALSA_UTILS_SEQTOOLS
+	bool
+	prompt "aseqdump/aseqnet"
+	help
+	  Installs 'aseqdump' to show events received at an ALSA sequencer port
+	  and 'aseqnet' to connect an ALSA sequencer connector over network.
+
+config ALSA_UTILS_ACONNECT
+	bool
+	prompt "aconnect"
+	help
+	  ALSA sequencer connection manager
+
+endif

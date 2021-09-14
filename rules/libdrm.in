@@ -3,10 +3,10 @@
 menuconfig LIBDRM
 	tristate
 	prompt "libdrm                        "
+	select HOST_MESON
 	select LIBC_RT
-	select UDEV
-	select UDEV_LIBUDEV
 	select LIBPTHREAD_STUBS
+	select HOST_XORG_UTIL_MACROS
 	select LIBPCIACCESS	if LIBDRM_INTEL
 	help
 	  This library provides an user-level interface to the DRM

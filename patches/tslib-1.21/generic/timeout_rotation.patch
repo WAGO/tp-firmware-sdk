@@ -1,0 +1,901 @@
+diff -Naur tslib-1.21_orig/tests/fbutils.h tslib-1.21/tests/fbutils.h
+--- tslib-1.21_orig/tests/fbutils.h	2019-05-18 22:23:11.000000000 +0200
++++ tslib-1.21/tests/fbutils.h	2020-11-05 10:12:15.569000000 +0100
+@@ -33,6 +33,12 @@
+ void put_cross(int x, int y, unsigned colidx);
+ void put_string(int x, int y, char *s, unsigned colidx);
+ void put_string_center(int x, int y, char *s, unsigned colidx);
++void put_string_1(int orientation, int x, int y, char *s, unsigned colidx);
++void put_string_center_1(int orientation, int x, int y, char *s, unsigned colidx);
++void rotate_ud(const char *in, char *out, int width, int height);
++void rotate_cw(const char *in, char *out, int width, int height);
++void rotate_ccw(const char *in, char *out, int width, int height);
++void rotate(int orientation);
+ void pixel(int x, int y, unsigned colidx);
+ void line(int x1, int y1, int x2, int y2, unsigned colidx);
+ void rect(int x1, int y1, int x2, int y2, unsigned colidx);
+diff -Naur tslib-1.21_orig/tests/fbutils-linux.c tslib-1.21/tests/fbutils-linux.c
+--- tslib-1.21_orig/tests/fbutils-linux.c	2019-05-18 22:23:11.000000000 +0200
++++ tslib-1.21/tests/fbutils-linux.c	2020-11-05 10:12:11.669000000 +0100
+@@ -45,7 +45,6 @@
+ static uint32_t transp_mask;
+ static uint32_t colormap[256];
+ uint32_t xres, yres;
+-uint32_t xres_orig, yres_orig;
+ int8_t rotation;
+ int8_t alternative_cross;
+ 
+@@ -137,10 +136,6 @@
+ 		close(fb_fd);
+ 		return -1;
+ 	}
+-
+-	xres_orig = var.xres;
+-	yres_orig = var.yres;
+-
+ 	if (rotation & 1) {
+ 		/* 1 or 3 */
+ 		y = var.yres;
+@@ -207,21 +202,21 @@
+ 	line(x, y - 10, x, y - 2, colidx);
+ 	line(x, y + 2, x, y + 10, colidx);
+ 
+-	if (!alternative_cross) {
+-		line(x - 6, y - 9, x - 9, y - 9, colidx + 1);
+-		line(x - 9, y - 8, x - 9, y - 6, colidx + 1);
+-		line(x - 9, y + 6, x - 9, y + 9, colidx + 1);
+-		line(x - 8, y + 9, x - 6, y + 9, colidx + 1);
+-		line(x + 6, y + 9, x + 9, y + 9, colidx + 1);
+-		line(x + 9, y + 8, x + 9, y + 6, colidx + 1);
+-		line(x + 9, y - 6, x + 9, y - 9, colidx + 1);
+-		line(x + 8, y - 9, x + 6, y - 9, colidx + 1);
+-	} else if (alternative_cross == 1) {
+-		line(x - 7, y - 7, x - 4, y - 4, colidx + 1);
+-		line(x - 7, y + 7, x - 4, y + 4, colidx + 1);
+-		line(x + 4, y - 4, x + 7, y - 7, colidx + 1);
+-		line(x + 4, y + 4, x + 7, y + 7, colidx + 1);
+-	}
++#if 1
++	line(x - 6, y - 9, x - 9, y - 9, colidx + 1);
++	line(x - 9, y - 8, x - 9, y - 6, colidx + 1);
++	line(x - 9, y + 6, x - 9, y + 9, colidx + 1);
++	line(x - 8, y + 9, x - 6, y + 9, colidx + 1);
++	line(x + 6, y + 9, x + 9, y + 9, colidx + 1);
++	line(x + 9, y + 8, x + 9, y + 6, colidx + 1);
++	line(x + 9, y - 6, x + 9, y - 9, colidx + 1);
++	line(x + 8, y - 9, x + 6, y - 9, colidx + 1);
++#else
++	line(x - 7, y - 7, x - 4, y - 4, colidx + 1);
++	line(x - 7, y + 7, x - 4, y + 4, colidx + 1);
++	line(x + 4, y - 4, x + 7, y - 7, colidx + 1);
++	line(x + 4, y + 4, x + 7, y + 7, colidx + 1);
++#endif
+ }
+ 
+ static void put_char(int32_t x, int32_t y, int32_t c, int32_t colidx)
+@@ -252,6 +247,66 @@
+ 		   y - font_vga_8x8.height / 2, s, colidx);
+ }
+ 
++void put_string_1(int orientation, int x, int y, char *s, unsigned colidx)
++{
++	int i;
++
++  switch (orientation)
++  { 
++    case 1: //portrait90
++    case 3: //portrait270
++  
++      for (i = 0; *s; i++, x -= font_vga_8x8.width, s++)
++      {
++        put_char (y, x, *s, colidx);
++      }
++  
++    break;
++    
++    default:
++      for (i = 0; *s; i++, x += font_vga_8x8.width, s++)
++      {
++        put_char (x, y, *s, colidx);              
++      } 
++    break;
++  }
++  
++}
++
++void put_string_center_1(int orientation, int x, int y, char *s, unsigned colidx)
++{
++  
++  size_t sl = strlen (s);
++  
++  switch (orientation)
++  { 
++    case 1: //portrait
++        put_string_1 (orientation, 
++                    y + (sl / 2) * font_vga_8x8.width, 
++                    x - font_vga_8x8.height / 2, 
++                    s, 
++                    colidx);
++    break;
++              
++    case 3: //portrait270           
++        put_string_1 (orientation, 
++                    y + (sl / 2) * font_vga_8x8.width, 
++                    x - font_vga_8x8.height / 2, 
++                    s, 
++                    colidx);
++    break;
++    
++    default:
++        put_string_1 (orientation, 
++                    x - (sl / 2) * font_vga_8x8.width, 
++                    y - font_vga_8x8.height / 2, 
++                    s, 
++                    colidx);
++    break;
++  }
++    
++}
++
+ void setcolor(uint32_t colidx, uint32_t value)
+ {
+ 	uint32_t res;
+@@ -477,3 +532,121 @@
+ 		}
+ 	}
+ }
++
++int pattern_test_bit(int x, int y, int pitch, const char *pat)
++{
++	int tmp = (y * pitch) + x, index = tmp / 8,  bit = tmp % 8;
++
++	pat +=index;
++	return (*pat) & (0x80 >> bit);
++}
++
++void pattern_set_bit(int x, int y, int pitch, char *pat)
++{
++	int tmp = (y * pitch) + x, index = tmp / 8, bit = tmp % 8;
++
++	pat += index;
++
++	(*pat) |= 0x80 >> bit;
++}
++
++void rotate_ud(const char *in, char *out, int width, int height)
++{
++	int i, j;
++	int shift = (8 - (width % 8)) & 7;
++
++	width = (width + 7) & ~7;
++
++	for (i = 0; i < height; i++) {
++		for (j = 0; j < width - shift; j++) {
++			if (pattern_test_bit(j, i, width, in))
++				pattern_set_bit(width - (1 + j + shift),
++						height - (1 + i),
++						width, out);
++		}
++
++	}
++}
++
++void rotate_cw(const char *in, char *out, int width, int height)
++{
++	int i, j, h = height, w = width;
++	int shift = (8 - (height % 8)) & 7;
++
++	width = (width + 7) & ~7;
++	height = (height + 7) & ~7;
++
++	for (i = 0; i < h; i++) {
++		for (j = 0; j < w; j++) {
++			if (pattern_test_bit(j, i, width, in))
++				pattern_set_bit(height - 1 - i - shift, j,
++						height, out);
++
++		}
++	}
++}
++
++void rotate_ccw(const char *in, char *out, int width, int height)
++{
++	int i, j, h = height, w = width;
++	int shift = (8 - (width % 8)) & 7;
++
++	width = (width + 7) & ~7;
++	height = (height + 7) & ~7;
++
++	for (i = 0; i < h; i++) {
++		for (j = 0; j < w; j++) {
++			if (pattern_test_bit(j, i, width, in))
++				pattern_set_bit(i, width - 1 - j - shift,
++						height, out);
++		}
++	}
++}
++
++void rotate(int orientation)
++{
++  int i;
++  int k=0;
++  
++  switch (orientation)
++  {
++    case 3:
++      //portrait270
++      for (i=0; i < 255; i++)
++      {
++        unsigned char dst[8] = {0,0,0,0,0,0,0,0};
++        rotate_ccw(&font_vga_8x8.data[k], &dst[0], 8, 8);
++        memcpy(&font_vga_8x8.data[k], &dst[0], 8);
++        
++        k+=8;
++      }
++    
++      break;
++      
++    case 2:
++      //landscape180
++      for (i=0; i < 255; i++)
++      {
++        unsigned char dst[8] = {0,0,0,0,0,0,0,0};
++        rotate_ud(&font_vga_8x8.data[k], &dst[0], 8, 8);
++        memcpy(&font_vga_8x8.data[k], &dst[0], 8);
++        
++        k+=8;
++      }
++      break;  
++      
++    case 1:
++      //portrait90
++      for (i=0; i < 255; i++)
++      {
++        unsigned char dst[8] = {0,0,0,0,0,0,0,0};
++        rotate_cw(&font_vga_8x8.data[k], &dst[0], 8, 8);
++        memcpy(&font_vga_8x8.data[k], &dst[0], 8);
++        
++        k+=8;
++      }
++    
++      break;  
++  }
++  
++}
+diff -Naur tslib-1.21_orig/tests/Makefile.am tslib-1.21/tests/Makefile.am
+--- tslib-1.21_orig/tests/Makefile.am	2019-05-18 22:23:11.000000000 +0200
++++ tslib-1.21/tests/Makefile.am	2020-11-05 09:15:10.122246000 +0100
+@@ -80,10 +80,10 @@
+ 
+ if SDL
+ ts_calibrate_SOURCES	= ts_calibrate_sdl.c ts_calibrate.h ts_calibrate_common.c sdlutils.c sdlutils.h
+-ts_calibrate_LDADD	= $(top_builddir)/src/libts.la -lSDL2 $(LIBEVDEV_LIBS)
++ts_calibrate_LDADD	= $(top_builddir)/src/libts.la -lSDL2 $(LIBEVDEV_LIBS) -lpthread -lmsgtool
+ else
+ ts_calibrate_SOURCES	= ts_calibrate.c ts_calibrate.h ts_calibrate_common.c fbutils.h testutils.c testutils.h font_8x8.c font_8x16.c font.h
+-ts_calibrate_LDADD	= $(top_builddir)/src/libts.la $(LIBEVDEV_LIBS)
++ts_calibrate_LDADD	= $(top_builddir)/src/libts.la $(LIBEVDEV_LIBS) -lpthread -lmsgtool
+ if FREEBSD
+ ts_calibrate_SOURCES	+= fbutils-bsd.c
+ else
+diff -Naur tslib-1.21_orig/tests/ts_calibrate.c tslib-1.21/tests/ts_calibrate.c
+--- tslib-1.21_orig/tests/ts_calibrate.c	2019-05-18 22:23:11.000000000 +0200
++++ tslib-1.21/tests/ts_calibrate.c	2020-11-05 10:22:02.945000000 +0100
+@@ -25,22 +25,51 @@
+ #include <fcntl.h>
+ #include <getopt.h>
+ #include <errno.h>
++#include <pthread.h>
+ 
+ #include "tslib.h"
+ 
+ #include "fbutils.h"
+ #include "testutils.h"
+ #include "ts_calibrate.h"
++#include "msgtool.h"
++
++#define CALIB_TIMEOUT       30
++#define CALIB_TIMEOUT_MIN    5
++#define CNF_FILE            DISPLAY_CONF_FILE
++int arrX[3];
++int arrY[3];
+ 
+ #define CROSS_BOUND_DIST	50
+ #define VALIDATE_BOUNDARY_MIN	10
+ #define VALIDATE_LOOPS_DEFAULT	3
+ 
+ static int palette[] = {
+-	0x000000, 0xffe080, 0xffffff, 0xe0c0a0, 0xff0000, 0x00ff00
++	0x000000, 0x00ff00, 0xffffff, 0x00ff00, 0xff0000, 0x00ff00
+ };
++
+ #define NR_COLORS (sizeof(palette) / sizeof(palette[0]))
+ 
++/* calib timeout thread */
++typedef struct tagSampleThreadStruct
++{
++  unsigned char thread_ended;
++  unsigned char timeout;
++  struct tsdev *pTs;
++	calibration  *pCal;
++  int index;
++  int x;
++  int y;
++  char szName[64];
++} sampleThreadData;
++
++int g_iTimeoutValue = CALIB_TIMEOUT;
++int g_iDisplayOrientation = 0;
++void sample_thread_function ( void *ptr );
++int get_sample_use_thread(sampleThreadData * pData);
++int ReadTimeoutValue();
++int ReadDisplayOrientation();
++
+ static void sig(int sig)
+ {
+ 	close_framebuffer();
+@@ -50,18 +79,6 @@
+ 	exit(1);
+ }
+ 
+-static unsigned int getticks()
+-{
+-	static struct timeval ticks = {0};
+-	static unsigned int val = 0;
+-
+-	gettimeofday(&ticks, NULL);
+-	val = ticks.tv_sec * 1000;
+-	val += ticks.tv_usec / 1000;
+-
+-	return val;
+-}
+-
+ static void get_sample(struct tsdev *ts, calibration *cal,
+ 		       int index, int x, int y, char *name, short redo)
+ {
+@@ -246,15 +263,6 @@
+ 	printf("                       1 ... clockwise orientation; 90 degrees\n");
+ 	printf("                       2 ... upside down orientation; 180 degrees\n");
+ 	printf("                       3 ... counterclockwise orientation; 270 degrees\n");
+-	printf("-t --min_interval\n");
+-	printf("                       minimum time in ms between touch presses\n");
+-	printf("-c --validate\n");
+-	printf("                       validate the current calibration\n");
+-	printf("-b --boundary\n");
+-	printf("                       boundary criteria in validation mode\n");
+-	printf("-l --loops\n");
+-	printf("                       number of crosses to touch in validation mode\n");
+-	printf("-s --timeout\n");
+ 	printf("                       result screen timeout in seconds in validation mode\n");
+ 	printf("                       -1 ... no timeout\n");
+ 	printf("                        0 ... no result screen (quit immediately)\n");
+@@ -268,6 +276,21 @@
+ 	printf("\n");
+ }
+ 
++char *strrev(char *str)
++{
++      char *p1, *p2;
++
++      if (! str || ! *str)
++            return str;
++      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
++      {
++            *p1 ^= *p2;
++            *p2 ^= *p1;
++            *p1 ^= *p2;
++      }
++      return str;
++}
++
+ int main(int argc, char **argv)
+ {
+ 	struct tsdev *ts;
+@@ -279,13 +302,18 @@
+ 	char cal_buffer[256];
+ 	char *calfile = NULL;
+ 	unsigned int i, len;
+-	unsigned int tick = 0;
+ 	unsigned int min_interval = 0;
+ 	int boundary = VALIDATE_BOUNDARY_MIN;
+ 	int validate_timeout = 5;
+ 	unsigned int validate_loops = 0;
+ 	short validate_only = 0;
+ 
++  char szInstruction[128] = "";
++  char szTitle[] = "Touch calibration utility";
++  char szSuccess [] = "Touch calibration successful";
++  char szTimeout [] = "Touch calibration timeout";
++  sampleThreadData thread_data;
++
+ 	signal(SIGSEGV, sig);
+ 	signal(SIGINT, sig);
+ 	signal(SIGTERM, sig);
+@@ -394,135 +422,374 @@
+ 		exit(1);
+ 	}
+ 
++  //calibration timeout and rotation (display orientation)
++  ReadTimeoutValue();
++  ReadDisplayOrientation();
++  rotate(g_iDisplayOrientation);  
++
++  sprintf(szInstruction, "Touch crosshair within %d [s]", g_iTimeoutValue);
++
++  //default landscape
++  arrX[0] = xres / 2;
++  arrY[0] = yres / 4 - 20;  
++  arrX[1] = xres / 2;
++  arrY[1] = yres / 4;  
++  arrX[2] = xres / 2;
++  arrY[2] = yres / 4 + 20;    
++
++  switch (g_iDisplayOrientation)
++  { 
++    case 1: //portrait
++     
++      strrev(szTitle);
++      strrev(szInstruction);
++      strrev(szSuccess);
++      strrev(szTimeout);
++           
++      arrX[0] = xres * 3/ 4 + 20;  
++      arrY[0] = yres / 2;
++      
++      arrX[1] = xres * 3/ 4;  
++      arrY[1] = yres / 2;
++            
++      arrX[2] = xres * 3/ 4 - 20;   
++      arrY[2] = yres / 2;
++      
++      break;
++         
++    case 2: //landscape180
++      strrev(szTitle);
++      strrev(szInstruction);
++      strrev(szSuccess);
++      strrev(szTimeout);
++      
++      arrX[2] = xres / 2;
++      arrY[2] = yres * 3/ 4 - 20;  
++      arrX[1] = xres / 2;
++      arrY[1] = yres * 3/ 4;  
++      arrX[0] = xres / 2;
++      arrY[0] = yres * 3/ 4 + 20;    
++      
++      break;
++      
++    case 3: //portrait270
++      
++     arrX[2] = xres / 4 + 20;  
++     arrY[2] = yres / 2;
++      
++     arrX[1] = xres / 4;  
++     arrY[1] = yres / 2;
++            
++     arrX[0] = xres / 4 - 20;   
++     arrY[0] = yres / 2;   
++      
++    break;
++  }
++
+ 	for (i = 0; i < NR_COLORS; i++)
+ 		setcolor(i, palette[i]);
+ 
+ 	if (validate_only)
+ 		return ts_validate(ts, boundary, validate_loops, validate_timeout);
+ 
+-	put_string_center(xres / 2, yres / 4,
+-			  "Touchscreen calibration utility", 1);
+-	put_string_center(xres / 2, yres / 4 + 20,
+-			  "Touch crosshair to calibrate", 2);
+-
+-	printf("xres = %d, yres = %d\n", xres, yres);
++  put_string_center_1 (g_iDisplayOrientation, arrX[0], arrY[0], szTitle, 1);
++  //Touch crosshair to calibrate         
++  put_string_center_1 (g_iDisplayOrientation, arrX[1], arrY[1] , szInstruction, 2);
+ 
+ 	/* Clear the buffer */
+ 	clearbuf(ts);
+ 
+-	/* ignore rotation for calibration. only save it.*/
+-	int rotation_temp = rotation;
+-	int xres_temp = xres;
+-	int yres_temp = yres;
+-	rotation = 0;
+-	xres = xres_orig;
+-	yres = yres_orig;
+-
+ 	short redo = 0;
+ 
+-redocalibration:
+-	tick = getticks();
+-	get_sample(ts, &cal, 0, CROSS_BOUND_DIST,        CROSS_BOUND_DIST,        "Top left", redo);
+-	redo = 0;
+-	if (getticks() - tick < min_interval) {
+-		redo = 1;
+-	#ifdef DEBUG
+-		printf("ts_calibrate: time before touch press < %dms. restarting.\n",
+-			min_interval);
+-	#endif
+-		goto redocalibration;
+-	}
+-	clearbuf(ts);
++  memset(&thread_data, 0x0, sizeof(thread_data));
++  thread_data.pCal = &cal;
++  thread_data.pTs = ts;
++  thread_data.timeout = 0;
++  
++  //Top left
++  //old get_sample (ts, &cal, 0, 50,        50,        "Top left");    
++  thread_data.thread_ended = 0;
++  thread_data.index = 0;
++  thread_data.x = 50;
++  thread_data.y = 50;
++  strncpy(thread_data.szName, "Top left", sizeof(thread_data.szName));  
++  get_sample_use_thread(&thread_data); 
++  
++	//Top right
++  if (!thread_data.timeout)
++  {
++	  //old get_sample (ts, &cal, 1, xres - 50, 50,        "Top right");
++    thread_data.thread_ended = 0; 
++    thread_data.index = 1;
++    thread_data.x = xres - 50;
++    thread_data.y = 50;
++    strncpy(thread_data.szName, "Top right", sizeof(thread_data.szName)); 
++    get_sample_use_thread(&thread_data); 
++  }
++  
++  //Bot right
++  if (!thread_data.timeout)
++  {  
++	  //old get_sample (ts, &cal, 2, xres - 50, yres - 50, "Bot right");
++    thread_data.thread_ended = 0;
++    thread_data.index = 2;
++    thread_data.x = xres - 50;
++    thread_data.y = yres - 50;
++    strncpy(thread_data.szName, "Bot right", sizeof(thread_data.szName));
++    get_sample_use_thread(&thread_data);
++  }  
++  
++  //Bot left
++  if (!thread_data.timeout)
++  {  
++	  //old get_sample (ts, &cal, 3, 50,        yres - 50, "Bot left");
++    thread_data.thread_ended = 0;
++    thread_data.index = 3;
++    thread_data.x = 50;
++    thread_data.y = yres - 50;
++    strncpy(thread_data.szName, "Bot left", sizeof(thread_data.szName));
++    get_sample_use_thread(&thread_data);
++  }
++    
++  //Center
++  if (!thread_data.timeout)
++  {  
++	  //old get_sample (ts, &cal, 4, xres / 2,  yres / 2,  "Center");
++    thread_data.thread_ended = 0;
++    thread_data.index = 4;
++    thread_data.x = xres / 2;
++    thread_data.y = yres / 2;
++    strncpy(thread_data.szName, "Center", sizeof(thread_data.szName));
++    get_sample_use_thread(&thread_data);
++  }
++  
++  if (!thread_data.timeout)
++  {
++    //write file pointercal 
++    if (perform_calibration (&cal)) {
++      printf ("Calibration constants: ");
++      for (i = 0; i < 7; i++) printf("%d ", cal.a [i]);
++      printf("\n");
++      if ((calfile = getenv("TSLIB_CALIBFILE")) != NULL) {
++        cal_fd = open (calfile, O_CREAT | O_RDWR, 0644);
++      } else {
++        cal_fd = open ("/etc/pointercal", O_CREAT | O_RDWR, 0644);
++      }
++      sprintf (cal_buffer,"%d %d %d %d %d %d %d %d %d",
++         cal.a[1], cal.a[2], cal.a[0],
++         cal.a[4], cal.a[5], cal.a[3], cal.a[6], xres, yres);
++      write (cal_fd, cal_buffer, strlen (cal_buffer) + 1);
++      close (cal_fd);
++                  i = 0;
++    } else {
++      printf("Calibration failed.\n");
++      i = -1;
++    }
++  
++    put_string_center_1 (g_iDisplayOrientation, arrX[2], arrY[2],  szSuccess, 2);
++  }
++  else
++  {
++    put_string_center_1 (g_iDisplayOrientation, arrX[2], arrY[2] , szTimeout, 2);
++  }
+ 
+-	tick = getticks();
+-	get_sample(ts, &cal, 1, xres - CROSS_BOUND_DIST, CROSS_BOUND_DIST,        "Top right", redo);
+-	if (getticks() - tick < min_interval) {
+-		redo = 1;
+-	#ifdef DEBUG
+-		printf("ts_calibrate: time before touch press < %dms. restarting.\n",
+-			min_interval);
+-	#endif
+-		goto redocalibration;
+-	}
+-	clearbuf(ts);
++  fillrect(0, 0, xres - 1, yres - 1, 0);
+ 
+-	tick = getticks();
+-	get_sample(ts, &cal, 2, xres - CROSS_BOUND_DIST, yres - CROSS_BOUND_DIST, "Bot right", redo);
+-	if (getticks() - tick < min_interval) {
+-		redo = 1;
+-	#ifdef DEBUG
+-		printf("ts_calibrate: time before touch press < %dms. restarting.\n",
+-			min_interval);
+-	#endif
+-		goto redocalibration;
+-	}
+-	clearbuf(ts);
++	close_framebuffer();
++	ts_close(ts);
++	return i;
++}
+ 
+-	tick = getticks();
+-	get_sample(ts, &cal, 3, CROSS_BOUND_DIST,        yres - CROSS_BOUND_DIST, "Bot left", redo);
+-	if (getticks() - tick < min_interval) {
+-		redo = 1;
+-	#ifdef DEBUG
+-		printf("ts_calibrate: time before touch press < %dms. restarting.\n",
+-			min_interval);
+-	#endif
+-		goto redocalibration;
+-	}
+-	clearbuf(ts);
++void sample_thread_function ( void *ptr )
++{
++  sampleThreadData *data;            
++  data = (sampleThreadData *) ptr;  
+ 
+-	tick = getticks();
+-	get_sample(ts, &cal, 4, xres_orig / 2,  yres_orig / 2,  "Center", redo);
+-	if (getticks() - tick < min_interval) {
+-		redo = 1;
+-	#ifdef DEBUG
+-		printf("ts_calibrate: time before touch press < %dms. restarting.\n",
+-			min_interval);
+-	#endif
+-		goto redocalibration;
+-	}
+-
+-	rotation = rotation_temp;
+-	xres = xres_temp;
+-	yres = yres_temp;
+-
+-	if (perform_calibration (&cal)) {
+-		printf("Calibration constants: ");
+-		for (i = 0; i < 7; i++)
+-			printf("%d ", cal.a[i]);
+-		printf("\n");
+-		if ((calfile = getenv("TSLIB_CALIBFILE")) != NULL) {
+-			cal_fd = open(calfile, O_CREAT | O_TRUNC | O_RDWR,
+-				      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-		} else {
+-			cal_fd = open(TS_POINTERCAL, O_CREAT | O_TRUNC | O_RDWR,
+-				      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-		}
+-		if (cal_fd < 0) {
+-			perror("open");
+-			close_framebuffer();
+-			ts_close(ts);
+-			exit(1);
+-		}
++  //printf("enter thread index %d \n", data->index);          
++  
++  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++  
++  if (data)
++  {
++    //printf("get_sample index %d \n", data->index);
++    //get_sample (ts, &cal, 0, 50,        50,        "Top left");      
++    get_sample (data->pTs, data->pCal, data->index, data->x, data->y, &data->szName[0], 0);
++  }
++      
++  //printf("exit thread index %d \n", data->index);
++  
++  data->thread_ended = 1;
++  pthread_exit(0); /* exit */        
++} 
+ 
+-		len = sprintf(cal_buffer, "%d %d %d %d %d %d %d %d %d %d",
+-			      cal.a[1], cal.a[2], cal.a[0],
+-			      cal.a[4], cal.a[5], cal.a[3], cal.a[6],
+-			      xres_orig, yres_orig, rotation);
+-		if (write(cal_fd, cal_buffer, len) == -1) {
+-			perror("write");
+-			close_framebuffer();
+-			ts_close(ts);
+-			exit(1);
+-		}
+-		close(cal_fd);
+-		i = 0;
+-	} else {
+-		printf("Calibration failed.\n");
+-		i = -1;
+-	}
+ 
+-	fillrect(0, 0, xres - 1, yres - 1, 0);
+-	close_framebuffer();
+-	ts_close(ts);
+-	return i;
++int get_sample_use_thread(sampleThreadData * pData)
++{
++  pthread_t threadSample;
++  int iCounter, iRet, x, y, color ;  
++  char szText[128]="";
++  
++  color = 2;
++  x = xres / 2;
++  y = yres / 4 + 20;
++  
++  iRet = pthread_create (&threadSample, NULL, (void *) &sample_thread_function, (void *) pData);   
++  if (iRet == 0)
++  {        
++    //wait until thread is finished or timeout is expired
++    for (iCounter=0; iCounter < g_iTimeoutValue; iCounter++)
++    {
++      int k;             
++      sprintf(szText, "%02d", g_iTimeoutValue - iCounter);
++      
++      switch (g_iDisplayOrientation)
++      {    
++        case 1:
++        case 2:
++          strrev(szText);
++        break;                
++      }
++      
++      //show text
++      put_string_center_1 (g_iDisplayOrientation, arrX[2], arrY[2] , szText, color | XORMODE );
++      
++      //wait one second
++      for (k=0; k < 20; k++)
++      {
++        usleep(50*1000);     
++        if (pData->thread_ended)
++        {
++          break;
++        }
++      }
++                   
++      //remove text  
++      put_string_center_1 (g_iDisplayOrientation, arrX[2], arrY[2], szText, color | XORMODE );
++      if (pData->thread_ended)
++      {
++        break;
++      }
++    }
++    
++    if (iCounter >= g_iTimeoutValue)
++    {
++      pData->timeout = 1;           
++      iRet = pthread_cancel(threadSample);      
++      //printf("pthread_cancel returns %d \n", iRet);
++      usleep(50*1000);
++    }
++    else
++    {    
++      /* wait thread finished */
++      if(pthread_join(threadSample, NULL)) 
++      {
++        printf("Error joining thread\n");
++      }
++    }
++    //printf("timeout %d iCounter %d\n", pData->timeout, iCounter);
++  }
++  else
++  {
++    printf("pthread_create index %d FAILED\n", pData->index);  
++  }
++  
++  return 0; 
+ }
++
++int ReadTimeoutValue()
++{
++  int status = -1;
++  tConfList * pHead = NULL;
++  char szOut[256] = "";
++   
++  pHead = ConfCreateList();
++  
++  if ((pHead)&&(ConfReadValues(pHead, CNF_FILE) == 0))
++  {
++    if (ConfGetValue(pHead, "calibtimeout", &szOut[0], sizeof(szOut)) == 0)
++    {
++      if (ConfIsNumber(szOut) == 0)
++      {
++        g_iTimeoutValue = atoi(szOut); 
++        
++        if (g_iTimeoutValue < CALIB_TIMEOUT_MIN)
++          g_iTimeoutValue = CALIB_TIMEOUT_MIN;
++        
++        status = 0;
++      }
++    }
++  }
++  
++  ConfDestroyList(pHead);
++  
++  return status;
++}
++
++/// \brief trim string on the right side
++///
++/// remove line feed, carriage return, spaces from the right
++/// 
++/// \param[in] pStr  pointer to string  
++///
++/// \retval pointer to string
++///
++char * TrimRight(char *pStr)
++{
++  if (pStr)
++  {  
++    int n = strlen(pStr);
++    if (n > 0)
++    {
++      //remove lf cr sp
++      while ((pStr[n-1] == 10)||(pStr[n-1] == 13)||(pStr[n-1] == 32))
++      {
++        pStr[n-1] = 0;
++        n = strlen(pStr);
++      }
++    }
++  }
++  return pStr;
++}
++
++int ReadDisplayOrientation()
++{
++  int ret = -1;
++  char buffer[256];
++  char * pLine = NULL;
++  char szCmd1[128] = "/etc/config-tools/get_display orientation";
++  
++  FILE * pFile = popen(szCmd1, "r");
++
++  if (!pFile)
++  {
++    return ret;
++  }  
++  pLine = fgets(buffer, sizeof(buffer), pFile);
++  
++  if (pLine)
++  {
++    TrimRight(pLine);
++   
++    if (strcmp(pLine, "landscape")==0)
++    {
++      ret = 0;
++    }
++    else if (strcmp(pLine, "portrait")==0)
++    {
++      ret = 1;
++    }
++    else if (strcmp(pLine, "landscape180")==0)
++    {
++      ret = 2;
++    }
++    else if (strcmp(pLine, "portrait270")==0)
++    {
++      ret = 3;
++    }    
++  }  
++  pclose(pFile);
++  //printf("orientation=%d\n", ret);
++  g_iDisplayOrientation = ret;
++  return ret;
++}
++

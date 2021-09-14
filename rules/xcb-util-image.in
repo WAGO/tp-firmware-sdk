@@ -2,12 +2,8 @@
 
 config XCB_UTIL_IMAGE
 	tristate
-	select LIBC_PTHREAD
-	select XORG_PROTO_X
-	select XCB_PROTO
-	select XCB_UTIL
 	select LIBXCB
-	select HOST_GPERF
+	select XCB_UTIL
 	prompt "xcb-util-image"
 	help
-	  FIXME
+	  utility libraries for X C Binding -- image

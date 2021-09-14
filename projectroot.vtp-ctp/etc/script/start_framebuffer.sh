@@ -103,6 +103,5 @@ fi
 
 #Start Microbrowser
 if [ ! -z "$URL" ]; then
-  sleep 5
   /etc/config-tools/start_microbrowser $URL > /dev/null 2>&1 &
 fi

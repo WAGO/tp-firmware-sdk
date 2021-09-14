@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    config_touchbeeper.c
 ///
-/// \version $Id: config_touchbeeper.c 43946 2019-10-23 11:10:18Z wrueckl_elrest $
+/// \version $Id: config_touchbeeper.c 57121 2021-04-08 07:30:49Z rgliese_elrest $
 ///
 /// \brief   touchbeeper change settings / config-tools
 ///
@@ -240,10 +240,13 @@ int EnableTouchBeeper(int enable)
   int ret;
 
   WriteSysFs(SYS_PATH_BEEPER, "trigger", "oneshot");
-  if (enable)
+  if (enable) {
     ret = WriteSysFs(SYS_PATH_BEEPER, "delay_on", "100");
-  else
+    ret = WriteSysFs(SYS_PATH_BEEPER, "delay_off", "100");
+  } else {
     ret = WriteSysFs(SYS_PATH_BEEPER, "delay_on", "0");
+    ret = WriteSysFs(SYS_PATH_BEEPER, "delay_off", "100");
+  }
 
   return ret;
 }

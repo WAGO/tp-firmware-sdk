@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBVA) += libva
 #
 # Paths and names
 #
-LIBVA_VERSION	:= 1.7.3
-LIBVA_MD5	:= dafb1d7d6449e850e9eb1a099895c683
+LIBVA_VERSION	:= 2.8.0
+LIBVA_MD5	:= 6f56739bb46406d2e0a0a3a62b3bf5a5
 LIBVA		:= libva-$(LIBVA_VERSION)
 LIBVA_SUFFIX	:= tar.bz2
-LIBVA_URL	:= http://www.freedesktop.org/software/vaapi/releases/libva/$(LIBVA).$(LIBVA_SUFFIX)
+LIBVA_URL	:= https://github.com/intel/libva/releases/download/$(LIBVA_VERSION)/$(LIBVA).$(LIBVA_SUFFIX)
 LIBVA_SOURCE	:= $(SRCDIR)/$(LIBVA).$(LIBVA_SUFFIX)
 LIBVA_DIR	:= $(BUILDDIR)/$(LIBVA)
 LIBVA_LICENSE	:= MIT
@@ -32,28 +30,30 @@ LIBVA_LICENSE	:= MIT
 LIBVA_ENABLE-y				:= drm
 LIBVA_ENABLE-$(PTXCONF_LIBVA_X11)	+= x11
 LIBVA_ENABLE-$(PTXCONF_LIBVA_GLX)	+= glx
-LIBVA_ENABLE-$(PTXCONF_LIBVA_EGL)	+= egl
 LIBVA_ENABLE-$(PTXCONF_LIBVA_WAYLAND)	+= wayland
 
-#
-# autoconf
-#
-LIBVA_CONF_TOOL	:= autoconf
+LIBVA_CONF_TOOL	:= meson
+ifeq ($(PTXCONF_CONFIGFILE_VERSION), "2020.08.0")
 LIBVA_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-docs \
-	$(addprefix --enable-,$(LIBVA_ENABLE-y)) \
-	$(addprefix --disable-,$(LIBVA_ENABLE-)) \
-	--disable-dummy-driver \
-	$(GLOBAL_LARGE_FILE_OPTION)
-
-LIBVA_TOOLS := \
-	avcenc \
-	h264encode \
-	loadjpeg \
-	mpeg2vaenc \
-	mpeg2vldemo \
-	vainfo
+	$(CROSS_MESON_USR) \
+	-Ddisable_drm=false \
+	-Ddriverdir='' \
+	-Denable_docs=false \
+	-Denable_va_messaging=true \
+	-Dwith_glx=$(call ptx/yesno, PTXCONF_LIBVA_GLX) \
+	-Dwith_wayland=$(call ptx/yesno, PTXCONF_LIBVA_WAYLAND) \
+	-Dwith_x11=$(call ptx/yesno, PTXCONF_LIBVA_X11)
+else
+LIBVA_CONF_OPT	:= \
+	$(CROSS_MESON_USR) \
+	-Ddisable_drm=false \
+	-Ddriverdir='' \
+	-Denable_docs=false \
+	-Denable_va_messaging=true \
+	-Dwith_glx=$(call ptx/ifdef, PTXCONF_LIBVA_GLX, yes, no) \
+	-Dwith_wayland=$(call ptx/ifdef, PTXCONF_LIBVA_WAYLAND, yes, no) \
+	-Dwith_x11=$(call ptx/ifdef, PTXCONF_LIBVA_X11, yes, no)
+endif
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -69,15 +69,9 @@ $(STATEDIR)/libva.targetinstall:
 	@$(call install_fixup, libva,DESCRIPTION,missing)
 
 	@$(call install_lib, libva, 0, 0, 0644, libva)
-	@$(call install_lib, libva, 0, 0, 0644, libva-tpi)
 
 	@$(foreach api, $(LIBVA_ENABLE-y), \
 		$(call install_lib, libva, 0, 0, 0644, libva-$(api));)
-
-ifdef PTXCONF_LIBVA_TOOLS
-	@$(foreach tool, $(LIBVA_TOOLS), \
-		$(call install_copy, libva, 0, 0, 0755, -, /usr/bin/$(tool));)
-endif
 
 	@$(call install_finish, libva)
 

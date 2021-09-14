@@ -62,7 +62,7 @@ function do_mount
 function cleanup
 {
     # disable "errexit" to continue cleaning up even after
-    # errors 
+    # errors
     set +e
 
     local save_ifs=$IFS
@@ -156,7 +156,7 @@ function mount_target_nand
 }
 
 function create_static_nodes
-{ 
+{
     print_dbg "Creating basic device nodes..."
     local prefix="$1"
     mknod ${prefix}/dev/null c 1 3
@@ -185,6 +185,12 @@ function update_partition_info
         return 112
     else
         udevadm settle
+        if [ "$?" -ne "0" ]; then
+           # workaournd for udev issues with kernel 5.9
+           # the udev events seem to be stuck -> after a trigger the pending events are processed again
+           udevadm trigger
+           udevadm settle
+        fi
         return $?
     fi
 }
@@ -202,11 +208,11 @@ function copy_rootfs
     local dst_root="$2"
     print_dbg "copying rootfs files from $src_root to $dst_root..."
     shopt -s dotglob
-    
+
     for dir in ${src_root}/*; do
         print_dbg "    processing $dir..."
         case ${dir} in
-            *dev|*sys|*proc|*tmp|*home|*mnt|*media|*run|*boot)
+            *dev|*sys|*proc|*tmp|*home|*mnt|*media|*run|*boot|*config)
                 mkdir -p "${dst_root}/${dir}"
                 ;;
             *var)
@@ -224,7 +230,7 @@ function copy_rootfs
 function copy_source_to_sd
 {
     local source="${1}"
-    
+
     case $source in
         ${INTERNAL_FLASH_NAND})
             copy_nand_to_sd
@@ -243,7 +249,7 @@ function copy_nand_to_sd
     local DEST_ROOT="/tmp/sd/root"
     local DEST_HOME="/tmp/sd/root/home"
     local DEST_BOOT="/tmp/sd/boot/"
-    
+
     copy_rootfs "/" "$DEST_ROOT"
 
     print_dbg "    processing /boot..."
@@ -309,7 +315,7 @@ function reformat_nand
 
     ubiformat -y -q /dev/mtd${G_UBIFS_MTD_DEV_NR}
 
-    ubiattach /dev/ubi_ctrl -m ${G_UBIFS_MTD_DEV_NR} 
+    ubiattach /dev/ubi_ctrl -m ${G_UBIFS_MTD_DEV_NR}
 
     for vol_nr in ${ubifs_volume_numbers[@]}; do
 
@@ -321,7 +327,7 @@ function reformat_nand
         else
             ubimkvol /dev/${G_UBIFS_ROOT_ID} \
                 --name ${ubifs_volume_labels[${vol_nr}]} \
-                --lebs ${ubifs_volume_sizes[${vol_nr}]} 
+                --lebs ${ubifs_volume_sizes[${vol_nr}]}
         fi
     done
 
@@ -343,8 +349,8 @@ function reformat_sd
 
         # Disable udev sd card automount.
         #
-        # Otherwise, if the sd card contained a vfat partition, right after the 
-        # new partitions are created, udev will recognize the rests of the 
+        # Otherwise, if the sd card contained a vfat partition, right after the
+        # new partitions are created, udev will recognize the rests of the
         # old vfat metadata on the new partition and mount it :(
 
         udevadm control --env __SD_AUTOMOUNT="0"
@@ -353,7 +359,7 @@ function reformat_sd
         dd if=/dev/zero of=${sd_card_device} bs=446 count=1
 
         # Create 2 $G_PART_ALIGNMENT_MB aligned partitions: 1st one is $G_BOOT_PART_SIZE_MB large.
-        # 2nd one is ${image_size} - $G_BOOT_PART_SIZE_MB large, aligned at $G_PART_ALIGNMENT_MB 
+        # 2nd one is ${image_size} - $G_BOOT_PART_SIZE_MB large, aligned at $G_PART_ALIGNMENT_MB
 
         if [[ "${sd_card_size}" != "" ]]; then
 
@@ -425,14 +431,14 @@ function umount_all_sd
 
     # does codesys use one of the mountpoints?
     lsof $mountpoints | grep -E -q '^(plclinux_|codesys3)' && \
-    { 
+    {
         CODESYS_PAUSED=yes
         /etc/init.d/runtime stop || true
     }
 
     # handle the rest
     for mntpoint in $mountpoints; do
-        # Create a temp file on the partition in question; 
+        # Create a temp file on the partition in question;
         # then find processes that use the same filesystem and kill them
         # (fuser -mk)
         #    # FIXME: is SIGKILL not an overkill here?
@@ -456,7 +462,7 @@ function check_size
     local sd_card_size=$(/etc/config-tools/get_device_data size ${sd_card_dev_node}) #size in KB
     sd_card_size=$((sd_card_size/1024))
 
-    local space_needed=${size_in_use_by_rootfs} 
+    local space_needed=${size_in_use_by_rootfs}
 
     if [[ ${size_arg} -lt ${space_needed} ]] || [[ ${size_arg} -gt ${sd_card_size} ]]; then
         false
@@ -467,7 +473,7 @@ function check_size
 }
 
 function print_usage
-{ 
+{
     echo "Usage: copy_firmware_image <source-device=value | source-medium=value > <destination-device=value | destination-medium=value> <action=check-in-use|nand-check-size|stop-codesys> <size=[size in MB]>"
     echo
     echo "Devices can be given as names or medium, for example:"
@@ -519,7 +525,7 @@ case ${target} in
         reformat_nand
         # Always use 1st root partition
         mount_target_nand ${G_UBIFS_ROOT1_LABEL}
-        copy_sd_to_nand 
+        copy_sd_to_nand
         set_boot_partition_to_first
         ;;
     ${INTERNAL_FLASH_EMMC})
@@ -529,16 +535,16 @@ case ${target} in
         set_boot_partition_to_first
         status=$?
         ;;
-        
+
     ${SD_CARD})
         if ! check_size ${image_size} ${destination_device}; then
             SetLastError "Cannot create SD card image of ${image_size} MB: illegal size."
             exit $LAST_ERROR_SET
         fi
 
-        force_umount=${FORCE_UMOUNT:-"no"} 
+        force_umount=${FORCE_UMOUNT:-"no"}
         if [[ "$force_umount" == "yes" ]]; then
-            umount_all_sd 
+            umount_all_sd
         fi
 
         reformat_sd ${image_size}

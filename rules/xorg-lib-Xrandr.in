@@ -1,0 +1,12 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_XRANDR
+	tristate
+	prompt "libXrandr"
+	select XORG_LIB_X11
+	select XORG_LIB_XEXT
+	select XORG_LIB_XRENDER
+	select XORGPROTO
+	help
+	  X Resize, Rotate and Reflection extension. This extension library lets
+	  you change resolution and colour depth at the X-server's runtime.

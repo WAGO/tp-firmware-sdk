@@ -1,0 +1,11 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_XFIXES
+	tristate
+	prompt "libXfixes"
+	select XORGPROTO
+	select XORG_LIB_X11
+	help
+	  The X Fixes extension was created to address a number of shortcomings in the
+	  core X window system that prevented applications from doing some things
+	  efficiently.

@@ -1,6 +1,6 @@
---- qt-everywhere-opensource-src-5.9.2_org/qtwebengine/src/3rdparty/chromium/content/browser/renderer_host/input/touch_action_filter.cc	2017-09-19 18:15:15.000000000 +0200
-+++ qt-everywhere-opensource-src-5.9.2/qtwebengine/src/3rdparty/chromium/content/browser/renderer_host/input/touch_action_filter.cc	2018-01-19 14:37:56.860913610 +0100
-@@ -6,12 +6,33 @@
+--- qt-everywhere-opensource-src-5.9.7_org/qtwebengine/src/3rdparty/chromium/content/browser/renderer_host/input/touch_action_filter.cc	2018-09-28 19:02:20.000000000 +0200
++++ qt-everywhere-opensource-src-5.9.7/qtwebengine/src/3rdparty/chromium/content/browser/renderer_host/input/touch_action_filter.cc	2021-01-19 13:44:02.549429744 +0100
+@@ -6,12 +6,32 @@
  
  #include <math.h>
  
@@ -16,7 +16,6 @@
  using blink::WebGestureEvent;
  
 +static bool bDropPinch = false;
-+
 +int fileexists(char * pFilename)
 +// Check if file is available
 +{
@@ -34,7 +33,7 @@
  namespace content {
  namespace {
  
-@@ -29,10 +50,15 @@
+@@ -29,10 +49,14 @@
  
  TouchActionFilter::TouchActionFilter() :
    drop_scroll_gesture_events_(false),
@@ -42,7 +41,6 @@
    drop_current_tap_ending_event_(false),
    allow_current_double_tap_event_(true),
    allowed_touch_action_(TOUCH_ACTION_AUTO) {
-+    
 +  char * pFile = "/tmp/custom_disable_pinch.txt";
 +  if (fileexists(pFile) == 0){
 +    bDropPinch = true;
@@ -51,7 +49,7 @@
  }
  
  bool TouchActionFilter::FilterGestureEvent(WebGestureEvent* gesture_event) {
-@@ -45,8 +71,15 @@
+@@ -45,8 +69,15 @@
      case WebInputEvent::GestureScrollBegin:
        DCHECK(!drop_scroll_gesture_events_);
        DCHECK(!drop_pinch_gesture_events_);
@@ -69,7 +67,7 @@
        drop_scroll_gesture_events_ = ShouldSuppressScroll(*gesture_event);
        return drop_scroll_gesture_events_;
  
-@@ -97,7 +130,7 @@
+@@ -97,7 +128,7 @@
  
      case WebInputEvent::GesturePinchEnd:
        if (drop_pinch_gesture_events_) {
@@ -78,7 +76,7 @@
          return true;
        }
        break;
-@@ -147,7 +180,7 @@
+@@ -147,7 +178,7 @@
  }
  
  bool TouchActionFilter::FilterScrollEndingGesture() {

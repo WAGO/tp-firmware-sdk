@@ -1,0 +1,18 @@
+## SECTION=multimedia_xorg_lib
+
+# xv.pc says:
+# Requires: xproto videoproto
+# Requires.private: x11 xext
+#
+config XORG_LIB_XV
+	tristate
+	prompt "libXv"
+	select XORG_LIB_X11
+	select XORG_LIB_XEXT
+	select XORGPROTO
+	help
+	  The Xv extension provides support for video adaptors attached to an X
+	  display. It takes the approach that a display may have one or more video
+	  adaptors, each of which has one or more ports through which independent
+	  video streams pass.
+
