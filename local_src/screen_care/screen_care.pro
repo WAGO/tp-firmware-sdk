@@ -7,7 +7,7 @@ TARGET = screen_care
 DEPENDPATH += .
 INCLUDEPATH += .
 
-QT += core gui widgets x11extras
+QT += core gui widgets
 
 # Input
 SOURCES += screen_care.cpp \

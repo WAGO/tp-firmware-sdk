@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.cpp
 ///
-/// \version $Id: alarmindication.cpp 49196 2020-05-25 08:47:16Z wrueckl_elrest $
+/// \version $Id: alarmindication.cpp 63391 2021-12-03 08:40:35Z wrueckl_elrest $
 ///
 /// \brief   show connection lost informations
 ///
@@ -63,7 +63,8 @@
 
 AlarmIndication::AlarmIndication(QWidget *parent) : QWidget(parent)
 {
-  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+
   bLEDEnabled = true;
   m_iWbmBtnState = 1;
   m_pBtnWBM = NULL;
@@ -296,14 +297,14 @@ void AlarmIndication::Show()
 /// \brief hide widget
 ///
 void AlarmIndication::Hide()
-{
+{  
   if (isVisible())
   {
     hide();
     m_iNumber = 0;
     if (m_pTimer)
       m_pTimer->stop();
-  }
+  }  
 }
 
 /*
@@ -381,24 +382,5 @@ void AlarmIndication::ReadWbmBtnState()
 
 void AlarmIndication::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+  //DEPRECATED QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
 }
-
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void AlarmIndication::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
-}
-

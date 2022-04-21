@@ -144,8 +144,13 @@ int WebPage::showSslError(QString sTxt, bool bShowCheckbox)
   ba.append(sTxt); // = sTxt.toLatin1();
   int sysret;
 
-  //avoid gray rectangle
-  //webview->repaint();
+  WebView * pView = qobject_cast<WebView*>(this->view());
+  if (pView)
+  {
+    pView->reconnectPage.Hide();
+    pView->reconnectPage.update();
+    pView->update();
+  }
 
   if (bShowCheckbox)
   {
@@ -155,20 +160,20 @@ int WebPage::showSslError(QString sTxt, bool bShowCheckbox)
     }
     QByteArray cb = sslInfo.cbText.toLatin1();
 
-    sprintf(szCmd, "dialogbox \"%s\" %s %s -c \"%s\"", ba.data(), "CONTINUE", "CANCEL", cb.data() );
+    sprintf(szCmd, "dialogbox \"%s\" %s %s -c \"%s\" -d 2 -s 30", ba.data(), "CONTINUE", "CANCEL", cb.data() );
     sysret = system(szCmd);
     sysret = WEXITSTATUS(sysret);
 
     if ((sysret == 255) || (sysret < 0))
     {
-      sprintf(szCmd, "dialogbox \"%s\" %s %s", ba.data(), "CONTINUE", "CANCEL");
+      sprintf(szCmd, "dialogbox \"%s\" %s %s -d 2 -s 10", ba.data(), "CONTINUE", "CANCEL");
       sysret = system(szCmd);
       sysret = WEXITSTATUS(sysret);
     }
   }
   else
   {
-    sprintf(szCmd, "dialogbox \"%s\" %s", ba.data(), "OK" );
+    sprintf(szCmd, "dialogbox \"%s\" %s -s 10", ba.data(), "OK" );
     sysret = system(szCmd);
     sysret = WEXITSTATUS(sysret);
   }
@@ -1120,7 +1125,7 @@ void WebView::loadFinished(bool success)
       if (IsCurrentWebView())
       {
         m_iTcpRxTimestamp = 0;
-        if ((g_webengine.bReconnect) && (! IsLocalhost()))
+        if (g_webengine.bReconnect)
         {
           //do a continuous connection check every 10 s
           if (m_pTimerCommCheck)
@@ -1145,7 +1150,7 @@ void WebView::loadFinished(bool success)
         //do not reconnect in case of certificate error
         pPage->bCertificateError = false;
     }
-    else if ((g_webengine.bReconnect) && (! IsLocalhost()))
+    else if (g_webengine.bReconnect)
     {
 
       //todo Alarmhandling

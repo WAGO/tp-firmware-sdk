@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screencare.cpp
 ///
-/// \version $Id: screencare.cpp 54497 2020-12-14 14:27:11Z wrueckl_elrest $
+/// \version $Id: screencare.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   Application main window implementation
 ///
@@ -38,15 +38,18 @@
 #include <QTime>
 #include <QPaintEvent>
 #include <QTimer>
-#include <QProcess>
-#include <QX11Info>
+//#include <QProcess>
+//#include <QX11Info>
 
 ScreenCare::ScreenCare(long l_numberOfColorChanges, QWidget *parent) :
     QMainWindow(parent)
 {
+  //setWindowState(Qt::WindowFullScreen);
+  //setWindowModality(Qt::ApplicationModal);
+  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+
   idxNumberOfColorChanges = 0;
   numberOfColorChanges = l_numberOfColorChanges;
-  bXdoDone = false;
   iCounter = 0;
 }
 
@@ -89,47 +92,10 @@ void ScreenCare::paintEvent(QPaintEvent *event)
 
 void ScreenCare::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(20, this, SLOT(ActivateX11Window()));
-}
-
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void ScreenCare::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
-  bXdoDone = true;
+  //DEPRECATED QTimer::singleShot(20, this, SLOT(ActivateX11Window()));
 }
 
 void ScreenCare::OnCloseScreenCare()
 {
-  hide();
-  if (bXdoDone)
-  {
-    close();
-  }
-  else
-  {
-    iCounter++;
-    if (iCounter > 10)
-    {
-      //timeout
-      close();
-    }
-    else
-    {
-      qDebug() << "RETRY";
-      QTimer::singleShot(1000, this, SLOT(OnCloseScreenCare()));
-    }
-  }
+  close();
 }

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.cpp
 ///
-/// \version $Id: toolbarmenu.cpp 49196 2020-05-25 08:47:16Z wrueckl_elrest $
+/// \version $Id: toolbarmenu.cpp 66399 2022-04-07 11:59:58Z wrueckl_elrest $
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///
@@ -1372,7 +1372,7 @@ void ToolBarMenu::cmdSlotReceived(QString s)
       m_iFadeHeight = 0;
       QTimer::singleShot(15, this, SLOT(OnFadeIn()));
     }
-    QTimer::singleShot(150, this, SLOT(ActivateX11Window()));
+    //QTimer::singleShot(150, this, SLOT(ActivateX11Window()));
   }
 }
 
@@ -1539,7 +1539,7 @@ void ToolBarMenu::OnAction()
            //browser already running
            sprintf(szCmd, "load=%s\n", ba.data());
            Write2PipedFifo(DEV_WEBENGINEBROWSER, szCmd);
-           //old sAction = "echo \"load=http://127.0.0.1/wbm/index.html\" > /dev/webenginebrowser";
+           sAction = "/etc/script/show_webbrowser.sh";
         }
         else
         {
@@ -1555,7 +1555,7 @@ void ToolBarMenu::OnAction()
           //browser already running
           sprintf(szCmd, "load=%s\n", ba.data());
           Write2PipedFifo(DEV_WEBENGINEBROWSER, szCmd);
-          //old sAction = "echo \"load=http://127.0.0.1/plclist/plclist.html\" > /dev/webenginebrowser";
+          sAction = "/etc/script/show_webbrowser.sh";
         }
         else
         {
@@ -1590,23 +1590,4 @@ void ToolBarMenu::OnAction()
 
 void ToolBarMenu::showEvent(QShowEvent *event)
 {
-  //
-}
-
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void ToolBarMenu::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
 }

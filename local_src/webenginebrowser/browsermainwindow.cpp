@@ -129,7 +129,7 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
   //remove this to avoid black rectangle behind cursor
   //removed setWindowFlags(Qt::FramelessWindowHint);
   //calling setFixedSize makes the fullscreen
-  
+
   //QTextCodec *codec = QTextCodec::codecForLocale();  
   //if (codec)
   //{
@@ -1419,7 +1419,6 @@ void BrowserMainWindow::slotCmdReceived(QString s)
     WebPage * pPage = qobject_cast<WebPage *>(m_tabWidget->currentWebView()->page());
     if (pPage)
       pPage->slotClearScrollbarLists();
-    QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
   }
   
 }
@@ -1863,23 +1862,6 @@ void BrowserMainWindow::scrollSlotVDown(QPoint pos)
 
 void BrowserMainWindow::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+  //DEPRECATED QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
 }
 
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void BrowserMainWindow::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
-}

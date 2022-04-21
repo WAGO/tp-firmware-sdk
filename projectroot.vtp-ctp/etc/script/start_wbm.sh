@@ -67,3 +67,4 @@ if [ "$STATEMONITOR" == "enabled" ]; then
 fi
 
 ShowUrl
+/etc/script/show_webbrowser.sh

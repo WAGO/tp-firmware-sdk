@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file clear_screen.cpp
 ///
-/// \version $Id: clear_screen.cpp 43411 2019-10-08 11:14:03Z wrueckl_elrest $
+/// \version $Id: clear_screen.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief touchscreen cleaning tool
 ///
@@ -41,8 +41,8 @@
 #include <QDesktopWidget>
 #include <QRect>
 #include <QSettings>
-#include <QProcess>
-#include <QX11Info>
+//#include <QProcess>
+//#include <QX11Info>
 #include <QDebug>
 
 #include <unistd.h>
@@ -161,7 +161,10 @@ int main(int argc, char **argv)
       window->m_iScreenHeight = rDesk.height();
       //qDebug("width %d height %d\n",window->m_iScreenWidth, window->m_iScreenHeight );
 
-      window->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+      //window->setWindowState(Qt::WindowFullScreen);
+      //window->setWindowModality(Qt::ApplicationModal);
+      window->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+
       window->setWindowTitle(QString::fromUtf8("MainWindow"));
 
       QObject::connect(window, SIGNAL(finished()), &app, SLOT(quit()));
@@ -209,26 +212,7 @@ int ClearScreen::ReadTimeoutFromConfigTool()
 
 void ClearScreen::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+  //DEPRECATED QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
 }
-
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void ClearScreen::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
-}
-
 
 

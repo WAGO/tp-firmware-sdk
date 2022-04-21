@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_DIALOGBOX) += dialogbox
 #
 # Paths and names
 #
-DIALOGBOX_VERSION	:= 1
+DIALOGBOX_VERSION	:= 1.0.1
 DIALOGBOX_MD5		:=
 DIALOGBOX		:= dialogbox
 DIALOGBOX_URL		:= file://$(PTXDIST_WORKSPACE)/local_src/$(DIALOGBOX)

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screensaver.h
 ///
-/// \version $Id: screensaver.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: screensaver.h 63534 2021-12-07 14:27:03Z wrueckl_elrest $
 ///
 /// \brief   screensaver Qt tool
 ///
@@ -75,7 +75,6 @@ signals:
 public slots:
     //bool event(QEvent *event);
     void setPosition();
-    void ActivateX11Window();
 
 protected:
     void paintEvent(QPaintEvent*);        

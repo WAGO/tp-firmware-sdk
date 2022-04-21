@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screen_care.cpp
 ///
-/// \version $Id: screen_care.cpp 54497 2020-12-14 14:27:11Z wrueckl_elrest $
+/// \version $Id: screen_care.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   main file
 ///
@@ -76,7 +76,6 @@ int main(int argc, char **argv)
       window = new ScreenCare(numberOfColorChanges);
       if (window)
       {
-          window->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
           window->resize(rDesk.width(),rDesk.height());
 
           if (bDebug)

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.h
 ///
-/// \version $Id: mainwindow.h 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: mainwindow.h 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   WaitHitTouch tool
 ///
@@ -68,7 +68,6 @@ public:
 public slots:
 
     void setNumber();
-    void ActivateX11Window();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screencare.h
 ///
-/// \version $Id: screencare.h 54497 2020-12-14 14:27:11Z wrueckl_elrest $
+/// \version $Id: screencare.h 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   Application main window - header
 ///
@@ -50,12 +50,10 @@ public:
     ~ ScreenCare();
 
     long numberOfColorChanges;
-    bool bXdoDone;
     int iCounter;
 
 signals:
 public slots:
-    void ActivateX11Window();
     void OnCloseScreenCare();
 
 protected:

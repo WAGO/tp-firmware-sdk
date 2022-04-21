@@ -1,3 +1,16 @@
+Firmware Release 03.07.20 (99)
+System:
+[FIXED] “Dirty Pipe” enables root privileges CVE-2022-0847
+[FIXED] 21.5” devices: flickering and stripes on the display
+[FIXED] Edge Controller: Sporadically no USB-C connection
+
+Fieldbus Interface & Libraries:
+[FIXED] When using BACnet, there is no longer an increase in open 
+        file discreptors
+[FIXED] When using WriteMapping of Binary Object Property Present 
+        Value, the device does not send cyclic the value "active".
+
+################################################################################
 Firmware Release 03.07.14 (99)
 System:
 [NEW] Changed startup behavior: Web pages can be set as start page even if PLC

@@ -31,7 +31,7 @@ ifdef PTXCONF_LIBBACNETSTACK_SOURCE_LEGACY
 BACNETSTACK_REVISION := 14
 endif
 
-LIBBACNETCONFIG_VERSION           := 1.5.0
+LIBBACNETCONFIG_VERSION           := 1.5.1
 LIBBACNETCONFIG_MD5               :=
 LIBBACNETCONFIG                   := libbacnetconfig
 LIBBACNETCONFIG_URL               := file://$(PTXDIST_WORKSPACE)/wago_intern/device/bacnet/$(LIBBACNETCONFIG)

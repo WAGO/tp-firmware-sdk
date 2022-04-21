@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.h
 ///
-/// \version $Id: alarmindication.h 48355 2020-04-14 08:29:13Z wrueckl_elrest $
+/// \version $Id: alarmindication.h 63391 2021-12-03 08:40:35Z wrueckl_elrest $
 ///
 /// \brief   show connection lost informations
 ///
@@ -102,7 +102,6 @@ signals:
 public slots:
   void OnShowWBM();
   void setNumber();
-  void ActivateX11Window();
 
 private:
   int m_iNumber;

@@ -6,7 +6,7 @@
 
 include(../../sysroot-target/usr/lib/qt5/mkspecs/linux-ptx-g++/qmake.conf)
 
-QT       += core gui x11extras
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

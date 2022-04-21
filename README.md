@@ -19,7 +19,6 @@ Therefore WAGO recommends familiarity with the following topics for the future e
 Helpful when heard about:
 - Realtime operating systems
 - PTXdist,
-- Eclipse-CDT
 - ARM architecture
 - Bootloader
 
@@ -476,40 +475,36 @@ As usual, you can:
     >opkg install <pkg-name>.ipk
 ```
 - Utilize Web-Based-Management(WBM) feature "Software-Upload" to upload and apply "<pkg-name>.ipk".
-- Use Eclipse-CDT for remote debugging
 
 **CAUTION:\
 Every binary or installation package(.ipk) is generated for a specific firmware version,
 do not mix up different versions.**
 
-### 10.1) For larger projects/packages we recommend using an Integrated-Development-Environment(IDE)
-We recommend ECLIPSE-CDT, see "HowTo_UtilizeEclipseCDT".
-
-### 10.2) Small projects/packages can be managed from command line interface as follows:
+### 10.1) Projects/packages can be managed from command line interface as follows:
 Open 4 shell sessions on your development host(Ubuntu16.04).
 - First shell used to open source code files within an editor like vim or gedit
 ```
-    >cd /wago/ptxproj/src/kbusdemo
-    >gedit kbusdemo1.c
+    >cd /wago/ptxproj/src/demo
+    >gedit demo1.c
 ```
 - Second shell used for “clean” and “build” the ptxdist package
 ```
     >cd /wago/ptxproj/
-    >ptxdist clean kbusdemo
+    >ptxdist clean demo
 
-    >ptxdist targetinstall kbusdemo
+    >ptxdist targetinstall demo
 ```
 - Third shell used to transfer executable to TP.
 ```
-    >scp kbusdemo1 root@<ip or hostname>:/usr/bin/kbusdemo1
+    >scp demo1 root@<ip or hostname>:/usr/bin/demo1
 ```
 - Fourth shell used to manage and control the TP via ssh
 ```
     >ssh root@<ip or hostname>
 
     >cd /usr/bin
-    >chmod +x kbusdemo1
-    >./kbusdemo1
+    >chmod +x demo1
+    >./demo1
 ```
 For the next round trip:
         1. Switch to the first shell and use the cursor-up-key to call the last command…
@@ -534,7 +529,7 @@ Login as "admin" with password "wago" (default)
 ```
 #### 10.3.3) Click on button [Browse...] and open the local file dialog.
 Browse to folder "~/wago/ptxproj/platform-vtp-ctp/packages/"\
-Select package to install or update, here "kbusdemo_0.3_arm.ipk".
+Select package to install or update, here "demo_0.3_arm.ipk".
 
 #### 10.3.4) Click on button [Start Upload].
 Transfers selected file into TP file system and show button [Activate].
@@ -543,7 +538,7 @@ Transfers selected file into TP file system and show button [Activate].
 Internally WBM just calls:
 ```
     >cd /home/
-    >opkg install kbusdemo_0.3_arm.ipk
+    >opkg install demo_0.3_arm.ipk
 ```
 Depending on type of package a restart of TP may required.
 

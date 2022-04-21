@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.h
 ///
-/// \version $Id: toolbarmenu.h 46481 2020-02-11 12:33:17Z wrueckl_elrest $
+/// \version $Id: toolbarmenu.h 63534 2021-12-07 14:27:03Z wrueckl_elrest $
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///
@@ -172,7 +172,6 @@ signals:
 public slots:
   void slotTimeout();
   void slotTimeoutCursorPos();
-  void ActivateX11Window();
   void OnButtonPressed();  
   void cmdSlotReceived(QString s);  
 

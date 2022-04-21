@@ -166,8 +166,6 @@ private slots:
   void updateToolbarActionText(bool visible);
   void updateBookmarksToolbarActionText(bool visible);
 
-  void ActivateX11Window();
-  
 private:
   void loadDefaultState();
   void setupMenu();

@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file clear_screen.h
 ///
-/// \version $Id: clear_screen.h 43411 2019-10-08 11:14:03Z wrueckl_elrest $
+/// \version $Id: clear_screen.h 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief touchscreen cleaning tool
 ///
@@ -119,7 +119,6 @@ public:
   }
 
   public slots:
-    void ActivateX11Window();
 
     void setNumber()
     {

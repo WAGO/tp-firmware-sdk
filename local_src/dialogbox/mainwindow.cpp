@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.cpp
 ///
-/// \version $Id: mainwindow.cpp 43411 2019-10-08 11:14:03Z wrueckl_elrest $
+/// \version $Id: mainwindow.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   dialogbox tool
 ///
@@ -41,7 +41,7 @@
 #include <QSettings>
 #include <QProcess>
 #include <QX11Info>
-
+#include <stdlib.h>
 #include "globals.h"
 #include "tools.h"
 #include "mainwindow.h"
@@ -405,6 +405,7 @@ void MainWindow::Initialize()
       m_pCheckBox = new QCheckBox(m_sCbTxt, this);
       if (m_pCheckBox)
       {
+        m_pCheckBox->setCheckState(Qt::Checked);
         m_pCheckBox->setStyleSheet(sQtStyleButton);
 
 /* works not - no QLabel found in Checkbox
@@ -553,11 +554,15 @@ void MainWindow::ActivateX11Window()
     int id = QWidget::winId ();
     if (id > 0)
     {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
+      QString sAction = "/usr/bin/xdotool windowactivate ";
+      sAction += QString::number(id);
+      //call to action
+      if (sAction.right(1) != "&")
+      {
+        sAction.append(" &");
+      }
+      QByteArray ba = sAction.toLatin1();
+      system(ba.data());
     }
   }
 }

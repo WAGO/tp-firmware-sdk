@@ -38,3 +38,4 @@ function ShowUrl
 }
 
 ShowUrl
+/etc/script/show_webbrowser.sh

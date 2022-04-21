@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.cpp
 ///
-/// \version $Id: mainwindow.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: mainwindow.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
 ///
 /// \brief   WaitHitTouch tool
 ///
@@ -40,8 +40,8 @@
 #include <QMainWindow>
 #include <QDesktopWidget>
 #include <QSettings>
-#include <QProcess>
-#include <QX11Info>
+//#include <QProcess>
+//#include <QX11Info>
 
 #include "globals.h"
 #include "tools.h"
@@ -62,6 +62,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+  //setWindowState(Qt::WindowFullScreen);
+  //setWindowModality(Qt::ApplicationModal);
+  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
+
   m_iNumber = 10;
   m_iReturnValue = 0;
 
@@ -69,8 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
   QRect r = QApplication::desktop()->screenGeometry();
   m_iScreenWidth = r.width();
   m_iScreenHeight = r.height();
-
-  setWindowFlags(Qt::FramelessWindowHint);  
 
   setGeometry(QRect(QPoint(0,0), QSize(m_iScreenWidth, m_iScreenHeight)));
 }
@@ -189,23 +191,6 @@ void MainWindow::setNumber()
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+  //DEPRECATED QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
 }
 
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void MainWindow::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
-}

@@ -195,6 +195,7 @@ ifdef PTXCONF_ELREST_CUSTOM_CONFIG_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_panel.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_wbm.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_webbrowser.sh)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/show_webbrowser.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/activate_browser_wnd.sh)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/rc.once.d/initial_webbrowser_focus)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0754, /etc/script/start_plclist.sh)

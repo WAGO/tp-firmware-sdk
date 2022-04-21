@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screensaver.cpp
 ///
-/// \version $Id: screensaver.cpp 43460 2019-10-09 13:25:56Z wrueckl_elrest $
+/// \version $Id: screensaver.cpp 63534 2021-12-07 14:27:03Z wrueckl_elrest $
 ///
 /// \brief   screensaver Qt tool
 ///
@@ -66,9 +66,9 @@ ScreenSaver::ScreenSaver(QWidget *parent) :
 
   setAutoFillBackground(false);
 
-  setWindowState(Qt::WindowFullScreen);
-  setWindowModality(Qt::ApplicationModal);
-  setWindowFlags(Qt::FramelessWindowHint);
+  //setWindowState(Qt::WindowFullScreen);
+  //setWindowModality(Qt::ApplicationModal);
+  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
 
   setMouseTracking(true);
 
@@ -341,23 +341,4 @@ bool ScreenSaver::ReadImageFileNameFromConfigTool(QString & sImageFileName)
 
 void ScreenSaver::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
-}
-
-/// \brief ensure X11 window to be shown in front
-/// \param[in]  X11 window id
-void ScreenSaver::ActivateX11Window()
-{
-  if (QX11Info::isPlatformX11())
-  {
-    int id = QWidget::winId ();
-    if (id > 0)
-    {
-      QProcess proc;
-      proc.start("/usr/bin/xdotool", QStringList() << "windowactivate" << QString::number(id) );
-      proc.waitForFinished(5000);
-      proc.close();
-      //qDebug() << "ActivateX11Window: " << id;
-    }
-  }
 }
