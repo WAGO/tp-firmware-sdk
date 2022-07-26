@@ -1,0 +1,71 @@
+## SECTION=multimedia_xorg_lib
+
+# These are always required:
+# Requires: xproto fontsproto
+# Requires.private: fontenc
+# Libs.private: -lz -lm
+
+menuconfig XORG_LIB_XFONT
+	tristate
+	select LIBC_M
+	select XORGPROTO
+	select XORG_LIB_FONTENC
+	select XORG_LIB_XTRANS
+	select ZLIB			if XORG_LIB_XFONT_BUILTIN_FONTS
+	select FREETYPE			if XORG_LIB_XFONT_FREETYPE
+	# disabling builtins is currently broken
+	select XORG_LIB_XFONT_BUILTIN_FONTS
+	default y if XORG_LIB_X11
+	prompt "libXfont                      "
+	help
+	  X font Library. At least one file based font support must be enabled
+	  to make the xorg server (part dix) happy.
+
+config XORG_LIB_XFONT_FREETYPE
+	depends on XORG_LIB_XFONT
+	select FREETYPE
+	bool
+	prompt "Use freetype as rendering library"
+	help
+	  This will enable freetype 2.x library.
+
+config XORG_LIB_XFONT_FONTSERVER
+	depends on XORG_LIB_XFONT
+	bool
+	prompt "Support font server connections"
+	help
+	  This will support connections to font server.
+	  FIXME: xorg server fails when font server connections are disabled.
+
+config XORG_LIB_XFONT_PCF_FONTS
+	depends on XORG_LIB_XFONT
+	bool
+	prompt "Support pcf format fonts"
+	help
+	  Enable pcf format fonts in this X server.
+
+config XORG_LIB_XFONT_BDF_FONTS
+	depends on XORG_LIB_XFONT
+	bool
+	default y
+	prompt "Support bdf format fonts"
+	help
+	  Enable bdf format fonts in this X server.
+
+config XORG_LIB_XFONT_SNF_FONTS
+	depends on XORG_LIB_XFONT
+	bool
+	prompt "Support snf format fonts"
+	help
+	  Enable snf format fonts in this X server.
+
+config XORG_LIB_XFONT_BUILTIN_FONTS
+	depends on XORG_LIB_XFONT
+	bool
+	prompt "Support builtin fonts"
+	default y
+	help
+	  Builtins (gzipped pcf format in .text segment). Enable this font type
+	  if you don't have any fonts on you target nor a font server in your
+	  network.
+	  FIXME: xorg server fails to build when this entry is disabled.

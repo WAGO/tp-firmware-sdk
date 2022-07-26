@@ -1,6 +1,6 @@
 # -*-makefile-*-
 #
-# Copyright (C) 2017 by Marius Hellmeier (marius.hellmeier@wago.com), WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (C) 2017-2022 by Marius Hellmeier (marius.hellmeier@wago.com), WAGO GmbH & Co. KG
 #
 # See CREDITS for details about who has contributed to this project.
 #
@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_BROWSER_SETTINGS) += wbm-ng-plugin-browser-sett
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_BROWSER_SETTINGS_VERSION        := 1.5.0
+WBM_NG_PLUGIN_BROWSER_SETTINGS_VERSION        := 1.5.2
 WBM_NG_PLUGIN_BROWSER_SETTINGS                := wbm-browser-settings-$(WBM_NG_PLUGIN_BROWSER_SETTINGS_VERSION)
 WBM_NG_PLUGIN_BROWSER_SETTINGS_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_BROWSER_SETTINGS)
 WBM_NG_PLUGIN_BROWSER_SETTINGS_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_BROWSER_SETTINGS_URL))
@@ -83,7 +83,7 @@ $(STATEDIR)/wbm-ng-plugin-browser-settings.targetinstall:
 	@$(call install_init, wbm-ng-plugin-browser-settings)
 	@$(call install_fixup, wbm-ng-plugin-browser-settings, PRIORITY, optional)
 	@$(call install_fixup, wbm-ng-plugin-browser-settings, SECTION, base)
-	@$(call install_fixup, wbm-ng-plugin-browser-settings, AUTHOR,"Marius Hellmeier, WAGO Kontakttechnik GmbH & Co. KG")
+	@$(call install_fixup, wbm-ng-plugin-browser-settings, AUTHOR,"Marius Hellmeier, WAGO GmbH & Co. KG")
 	@$(call install_fixup, wbm-ng-plugin-browser-settings, DESCRIPTION, missing)
 
 	# create target directory itself

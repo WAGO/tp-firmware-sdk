@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_OPENSSH) += openssh
 #
 # Paths and names
 #
-OPENSSH_VERSION	:= 8.3p1
-OPENSSH_MD5	:= 68d7527bf2672153ca47402f6489a1af
+OPENSSH_VERSION	:= 8.9p1
+OPENSSH_MD5	:= f33910174f0af52491277211e2b105bb
 OPENSSH		:= openssh-$(OPENSSH_VERSION)
 OPENSSH_SUFFIX	:= tar.gz
 OPENSSH_URL	:= \
@@ -25,8 +25,8 @@ OPENSSH_URL	:= \
 
 OPENSSH_SOURCE	:= $(SRCDIR)/$(OPENSSH).$(OPENSSH_SUFFIX)
 OPENSSH_DIR	:= $(BUILDDIR)/$(OPENSSH)
-OPENSSH_LICENSE	:= BSD AND BSD-2-Clause AND BSD-3-Clause AND MIT AND Beerware AND ISC
-OPENSSH_LICENSE_FILES := file://LICENCE;encoding=ISO-8859-1;md5=18d9e5a8b3dd1790d73502f50426d4d3
+OPENSSH_LICENSE	:= BSD AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND MIT AND Beerware AND ISC
+OPENSSH_LICENSE_FILES := file://LICENCE;md5=d9d2753bdef9f19466dc7bc959114b11
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,6 +34,7 @@ OPENSSH_LICENSE_FILES := file://LICENCE;encoding=ISO-8859-1;md5=18d9e5a8b3dd1790
 
 OPENSSH_CONF_ENV	:= \
 	$(CROSS_ENV) \
+	ac_cv_search_SHA256Update=no \
 	select_works_with_rlimit=yes \
 	LD=$(COMPILER_PREFIX)gcc
 
@@ -78,7 +79,6 @@ OPENSSH_CONF_OPT	:= \
 	--with-sandbox=$(OPENSSH_SANDBOX-y) \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_SELINUX)-selinux \
 	--with-privsep-path=/var/run/sshd \
-	--without-md5-passwords
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -105,10 +105,11 @@ ifdef PTXCONF_OPENSSH_SSHD
 		/etc/ssh/moduli)
 	@$(call install_copy, openssh, 0, 0, 0755, -, \
 		/usr/sbin/sshd)
+ifdef PTXCONF_OPENSSH_SSHD_GENKEYS
 	@$(call install_alternative, openssh, 0, 0, 0755, /etc/rc.once.d/openssh)
 endif
+endif
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_OPENSSH_SSHD_STARTSCRIPT
 	@$(call install_alternative, openssh, 0, 0, 0755, /etc/init.d/openssh)
 
@@ -116,7 +117,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_OPENSSH_BBINIT_LINK)),)
 	@$(call install_link, openssh, \
 		../init.d/openssh, \
 		/etc/rc.d/$(PTXCONF_OPENSSH_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_INITMETHOD_SYSTEMD
@@ -127,8 +127,6 @@ ifdef PTXCONF_OPENSSH_SSHD_SYSTEMD_UNIT
 		/usr/lib/systemd/system/sshd@.service)
 	@$(call install_link, openssh, ../sshd.socket, \
 		/usr/lib/systemd/system/sockets.target.wants/sshd.socket)
-	@$(call install_alternative, openssh, 0, 0, 0644, \
-		/usr/lib/tmpfiles.d/ssh.conf)
 endif
 endif
 

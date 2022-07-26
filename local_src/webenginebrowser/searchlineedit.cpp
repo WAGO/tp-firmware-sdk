@@ -51,6 +51,7 @@
 #include "searchlineedit.h"
 
 #include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyle>

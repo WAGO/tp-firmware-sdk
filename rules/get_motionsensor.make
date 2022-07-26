@@ -94,7 +94,7 @@ $(STATEDIR)/get_motionsensor.targetinstall:
 
 $(STATEDIR)/get_motionsensor.clean:
 	@$(call targetinfo)
-	cd $(GET_MOTIONSENSOR_DIR) && rm -f *.o $(GET_MOTIONSENSOR)	
+	-cd $(GET_MOTIONSENSOR_DIR) && rm -f *.o $(GET_MOTIONSENSOR)	
 	@-cd $(GET_MOTIONSENSOR_DIR) && \
 		$(GET_MOTIONSENSOR_MAKE_ENV) $(GET_MOTIONSENSOR_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_MOTIONSENSOR)

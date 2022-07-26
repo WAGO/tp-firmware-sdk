@@ -94,7 +94,7 @@ $(STATEDIR)/config_eruntime.targetinstall:
 
 $(STATEDIR)/config_eruntime.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_ERUNTIME_DIR) && rm -f *.o $(CONFIG_ERUNTIME)	
+	-cd $(CONFIG_ERUNTIME_DIR) && rm -f *.o $(CONFIG_ERUNTIME)	
 	@-cd $(CONFIG_ERUNTIME_DIR) && \
 		$(CONFIG_ERUNTIME_MAKE_ENV) $(CONFIG_ERUNTIME_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_ERUNTIME)

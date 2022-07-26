@@ -6,19 +6,19 @@
 #
 # This file is part of PTXdist package wago-custom-install.
 #
-# Copyright (c) 2018-2020 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   settings_backup_lib
 #
 # Brief:    General definitions and functions for the backup and restore
 #
-# Author:   StM: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   AGa: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   HJH: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   MOe: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   OG:  WAGO Kontakttechnik GmbH & Co. KG
-# Author:   MSc: WAGO Kontakttechnik GmbH & Co. KG
+# Author:   StM: WAGO GmbH & Co. KG
+# Author:   AGa: WAGO GmbH & Co. KG
+# Author:   HJH: WAGO GmbH & Co. KG
+# Author:   MOe: WAGO GmbH & Co. KG
+# Author:   OG:  WAGO GmbH & Co. KG
+# Author:   MSc: WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 
 # load general definitions and functions
@@ -139,7 +139,6 @@ configParam+=(
 
   "service-interface-owner;   /etc/config-tools/get_service_interface_config mode -b;           /etc/config-tools/config_service_interface mode="
   "rs232Owner;                /etc/config-tools/get_coupler_details RS232-owner;                /etc/config-tools/config_RS232 owner="
-  "telnet-state;              /etc/config-tools/get_port_state telnet;                          /etc/config-tools/config_port port=telnet state="
   "codesys-webserver-state;   /etc/config-tools/get_runtime_config cfg-version=2 webserver-state; /etc/config-tools/config_runtime cfg-version=2 webserver-state="
   "codesys3-webserver-state;  /etc/config-tools/get_runtime_config cfg-version=3 webserver-state; /etc/config-tools/config_runtime cfg-version=3 webserver-state="
   "ftp-state;                 /etc/config-tools/config_ssl ftp-status;                          /etc/config-tools/config_port port=ftp state="
@@ -153,7 +152,7 @@ configParam+=(
   "ssh-pwd-login;             /etc/config-tools/get_ssh_config password-request-state;          /etc/config-tools/config_ssh password-request-state="
 
   "http-state;                /etc/config-tools/config_ssl http-status;                         /etc/config-tools/config_port port=http  state="
-  "https-state;               /etc/config-tools/config_ssl https-status;                        /etc/config-tools/config_port port=https state="
+  "https-state;               /etc/config-tools/config_ssl https-status;                        /bin/true "
   "https-cipher-list;         /etc/config-tools/get_https_tls_config cipher-list;               /etc/config-tools/config_https_tls cipher-list="
 
   "tftp-state;                /etc/config-tools/get_tftp_config state;                          /etc/config-tools/config_tftp state="

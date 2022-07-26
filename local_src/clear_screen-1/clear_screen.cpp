@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file clear_screen.cpp
 ///
-/// \version $Id: clear_screen.cpp 63357 2021-12-02 09:01:18Z wrueckl_elrest $
+/// \version $Id: clear_screen.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief touchscreen cleaning tool
 ///

@@ -3,14 +3,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2022 WAGO GmbH & Co. KG
 
 #-----------------------------------------------------------------------------#
 # Script-name: format_medium
 #
 # FAT format of a device
 #
-# Author: WAGO Kontakttechnik GmbH
+# Author: WAGO GmbH
 #-----------------------------------------------------------------------------#
 
 # load general definitions and functions
@@ -52,6 +52,17 @@ function UnmountDevice
   done
 }
 
+function DeleteGptPartitions
+{
+  local device=$1
+  #delete mbr
+  dd if=/dev/zero of=${device} bs=512 count=1
+
+/sbin/sfdisk ${device} <<EOF
+,,L
+EOF
+
+}
 
 # show help-text if requested
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -73,8 +84,8 @@ fsType=`GetParameterValue fs-type $*`
 #echo "device:${device} volumeName:${volumeName}" #> /etc/config-tools/output.txt
 
 if [ -z "$device" ] || [ -z "$volumeName" ]; then
-  status=$MISSING_PARAMETER 
-  SetLastError "Missing parameter for FAT format"
+  status=$MISSING_PARAMETER
+  SetLastError "Missing parameter"
   exit $status
 fi
 
@@ -119,6 +130,12 @@ else
     # add path to device name
     deviceName="/dev/${pureDeviceName}"
     #echo "deviceName:${deviceName}"
+    
+    # GPT handling - CC100 sd-cards
+    ptype=$(blkid -o value -s PTTYPE $deviceName)
+    case $ptype in
+        gpt)  DeleteGptPartitions $deviceName;;
+    esac
 
     # prevent udev from remounting the device...
     udevadm control --env __SD_AUTOMOUNT="0"
@@ -185,6 +202,7 @@ else
     # write buffered filesystem-blocks to disk
     # FIXME (AGa): needed?
     sync
+    udevadm settle
 
   fi
 

@@ -5,10 +5,7 @@ config XORG_DRIVER_VIDEO_ARMADA
 	depends on XORG_DRIVER_VIDEO
 	select XORG_SERVER
 	select XORG_SERVER_XORG
-	select XORG_PROTO_FONTS
-	select XORG_PROTO_RANDR
-	select XORG_PROTO_RENDER
-	select XORG_PROTO_VIDEO
+	select XORGPROTO
 	select LIBETNAVIV
 	select LIBDRM_ARMADA
 	prompt "xorg-driver-video-armada"

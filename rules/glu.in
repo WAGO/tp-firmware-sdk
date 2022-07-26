@@ -1,9 +1,0 @@
-## SECTION=multimedia_libs
-
-config GLU
-	tristate
-	prompt "glu"
-	select MESALIB
-	select MESALIB_GLX
-	help
-	  Mesa OpenGL utility library (GLU)

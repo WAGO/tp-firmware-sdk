@@ -1,0 +1,32 @@
+diff -Naur qt-everywhere-src-5.14.2_org/qtwebengine/src/core/qtwebengine.gni qt-everywhere-src-5.14.2/qtwebengine/src/core/qtwebengine.gni
+--- qt-everywhere-src-5.14.2_org/qtwebengine/src/core/qtwebengine.gni	2020-03-24 10:16:30.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtwebengine/src/core/qtwebengine.gni	2022-05-11 08:42:43.959586237 +0200
+@@ -42,6 +42,7 @@
+   "//qtwebengine/browser:interfaces",
+   "//qtwebengine/browser:service_manifests",
+   "//qtwebengine/common:mojo_bindings",
++  "//chrome/app:generated_resources",
+   ":qtwebengine_sources",
+   ":qtwebengine_resources",
+ ]
+diff -Naur qt-everywhere-src-5.14.2_org/qtwebengine/src/core/qtwebengine_sources.gni qt-everywhere-src-5.14.2/qtwebengine/src/core/qtwebengine_sources.gni
+--- qt-everywhere-src-5.14.2_org/qtwebengine/src/core/qtwebengine_sources.gni	2020-03-24 10:16:30.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtwebengine/src/core/qtwebengine_sources.gni	2022-05-11 08:25:05.612763518 +0200
+@@ -51,6 +51,7 @@
+     "//components/nacl/common:buildflags",
+     "//extensions/buildflags:buildflags",
+     "//third_party/blink/public/mojom:mojom_platform",
++    "//chrome/app:generated_resources",
+   ]
+ 
+   sources = [
+@@ -75,8 +76,8 @@
+     "//chrome/browser/ui/webui/quota_internals/quota_internals_types.h",
+     "//chrome/browser/ui/webui/quota_internals/quota_internals_ui.cc",
+     "//chrome/browser/ui/webui/quota_internals/quota_internals_ui.h",
+-    "//chrome/common/custom_handlers/protocol_handler.cc",
+     "//chrome/common/custom_handlers/protocol_handler.h",
++    "//chrome/common/custom_handlers/protocol_handler.cc",
+     "//chrome/common/chrome_switches.cc",
+     "//chrome/common/chrome_switches.h",
+     "//chrome/common/pref_names.cc",

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.h
 ///
-/// \version $Id: alarmindication.h 63391 2021-12-03 08:40:35Z wrueckl_elrest $
+/// \version $Id: alarmindication.h 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   show connection lost informations
 ///

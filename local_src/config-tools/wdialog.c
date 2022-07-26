@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2000 - 2006 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2000 - 2022 WAGO GmbH & Co. KG
 ///
-/// PROPRIETARY RIGHTS of WAGO Kontakttechnik GmbH & Co. KG are involved in
+/// PROPRIETARY RIGHTS of WAGO GmbH & Co. KG are involved in
 /// the subject matter of this material. All manufacturing, reproduction,
 /// use, and sales rights pertaining to this subject matter are governed
 /// by the license agreement. The recipient of this software implicitly
@@ -11,11 +11,11 @@
 ///
 ///  \file     wdialog.c
 ///
-///  \version  $Revision: 29292 $1
+///  \version  $Revision: 65689 $1
 ///
 ///  \brief
 ///
-///  \author   Stefanie Meihöfer : WAGO Kontakttechnik GmbH & Co. KG
+///  \author   Stefanie Meihöfer : WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 
@@ -282,7 +282,7 @@ int Getkey(void)
       ufds.fd = 0;
       ufds.events = POLLIN;
 
-      if(rv = poll(&ufds, 1, 20) > 0) // poll timeout = 20ms
+      if((rv = poll(&ufds, 1, 20)) > 0) // poll timeout = 20ms
       {
         if( (rv = read(STDIN_FILENO, readSeq + charSeqIndex, 1)) < 1)
         {
@@ -518,6 +518,9 @@ int Clear(int    lineCount,
 // Clears the screen
 //
 {
+  (void) lineCount;     // unused
+  (void) ppLineStrings; // unused
+
   system("clear");
   return(SUCCESS);
 }
@@ -529,6 +532,9 @@ int Help(int    lineCount,
 // Show help-text
 //
 {
+  (void) lineCount;     // unused
+  (void) ppLineStrings; // unused
+
   ShowErrorText();
 
   printf("Description:\n");
@@ -604,8 +610,6 @@ int InfoBox(int    lineCount,
 // Don't wait for a reaction of the user.
 //
 {
-  int lineIndex = 0;
-
   if(lineCount < 3)
   {
     return(MISSING_PARAMETER);
@@ -1158,7 +1162,6 @@ int main(int argc, char** argv)
 {
   tWindowJumptab *pWindowJumptabEntry = &astWindowJumptab[0];
   int             returnValue         = SUCCESS;
-  int             status              = SUCCESS;
 
   setlocale(LC_ALL, "");
 

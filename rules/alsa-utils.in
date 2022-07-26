@@ -25,6 +25,7 @@ if ALSA_UTILS
 config ALSA_UTILS_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/alsa-utils"
 
 config ALSA_UTILS_SYSTEMD_UNIT

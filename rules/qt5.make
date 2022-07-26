@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,31 +14,28 @@ PACKAGES-$(PTXCONF_QT5) += qt5
 #
 # Paths and names
 #
-QT5_VERSION	:= 5.9.7
-#QT5_MD5		:= 738d1b98106e1bd39f00cc228beb522a #QT5.9.2
-#QT5_MD5		:= eae2435509493a2084405714e0a9bdf9	#QT5.9.3
-#QT5_MD5		:= d95f6ecb491e731c2fca622ccc7b6bbd	#QT5.9.4
-QT5_MD5			:= 70e617aeb1f9bbf84a12b8cf09b01ece	#QT5.9.7
-QT5		:= qt-everywhere-opensource-src-$(QT5_VERSION)
+QT5_VERSION	:= 5.14.2
+QT5_MD5		:= b3d2b6d00e6ca8a8ede6d1c9bdc74daf
+QT5		:= qt-everywhere-src-$(QT5_VERSION)
 QT5_SUFFIX	:= tar.xz
 QT5_URL		:= \
-	http://download.qt-project.org/official_releases/qt/$(basename $(QT5_VERSION))/$(QT5_VERSION)/single/$(QT5).$(QT5_SUFFIX) \
-	http://download.qt-project.org/development_releases/qt/$(basename $(QT5_VERSION))/$(shell echo $(QT5_VERSION) | tr 'A-Z' 'a-z')/single/$(QT5).$(QT5_SUFFIX)
+	http://download.qt-project.org/archive/qt/$(basename $(QT5_VERSION))/$(QT5_VERSION)/single/$(QT5).$(QT5_SUFFIX) \
+	http://download.qt-project.org/development_releases/qt/$(basename $(QT5_VERSION))/$(QT5_VERSION)/single/$(QT5).$(QT5_SUFFIX)
 QT5_SOURCE	:= $(SRCDIR)/$(QT5).$(QT5_SUFFIX)
 QT5_DIR		:= $(BUILDDIR)/$(QT5)
 QT5_BUILD_OOT	:= YES
-QT5_LICENSE	:= LGPL-2.1, Nokia-Qt-exception-1.1, LGPL-3.0, GFDL-1.3
+QT5_LICENSE	:= (LGPL-3.0-only OR GPL-2.0-only) AND GFDL-1.3-only
 QT5_LICENSE_FILES := \
-	file://LICENSE.LGPLv21;md5=4bfd28363f541b10d9f024181b8df516 \
-	file://LGPL_EXCEPTION.txt;md5=9625233da42f9e0ce9d63651a9d97654 \
+	file://LICENSE.GPLv2;md5=c96076271561b0e3785dad260634eaa8 \
 	file://LICENSE.GPLv3;md5=88e2b9117e6be406b5ed6ee4ca99a705 \
 	file://LICENSE.LGPLv3;md5=e0459b45c5c4840b353141a8bbed91f0 \
 	file://LICENSE.FDL;md5=6d9f2a9af4c8b8c3c769f6cc1b6aaf7e
-QT5_MKSPECS	:= $(shell ptxd_get_alternative config/qt5 linux-ptx-g++ && echo $$ptxd_reply)
+# Use '=' to delay $(shell ...) calls until this is needed
+QT5_MKSPECS	 = $(call ptx/get-alternative, config/qt5, linux-ptx-g++)
 
 ifdef PTXCONF_QT5
 ifeq ($(strip $(QT5_MKSPECS)),)
-$(error Qt5 mkspecs are missing)
+$(call ptx/error, Qt5 mkspecs are missing)
 endif
 endif
 
@@ -71,19 +66,25 @@ endif
 QT5_WRAPPER_BLACKLIST := \
 	TARGET_COMPILER_RECORD_SWITCHES
 
+# PKG_CONFIG_LIBDIR and PKG_CONFIG_SYSROOT_DIR must be set. Otherwise Qt
+# disables pkg-config while cross-compiling
+# use "/." for PKG_CONFIG_SYSROOT_DIR. Otherwise the resulting "//..."
+# paths are treated as relative to the source dir by chromium
+QT5_PKG_CONFIG_ENV := \
+	$(CROSS_ENV_PKG_CONFIG) \
+	PKG_CONFIG_SYSROOT_DIR=$(PTXCONF_SYSROOT_TARGET) \
+	PKG_CONFIG_LIBDIR=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig \
+
 # target options are provided via mkspecs
 QT5_CONF_ENV := \
-	$(CROSS_ENV_PKG_CONFIG) \
-	MAKEFLAGS="$(PTXDIST_PARALLELMFLAGS)" \
-	COMPILER_PREFIX=$(COMPILER_PREFIX) \
-	PKG_CONFIG_SYSROOT_DIR=$(PTXCONF_SYSROOT_TARGET)
-#	HOST_SYSROOT_DIR=$(PTXDIST_PLATFORMDIR)/sysroot-host \
-#	PKG_CONFIG_LIBDIR=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig
+	$(QT5_PKG_CONFIG_ENV) \
+	MAKEFLAGS="$(PARALLELMFLAGS) --output-sync=none" \
+	COMPILER_PREFIX=$(COMPILER_PREFIX)
 
 
-QT5_MAKE_ENV := \
-	$(CROSS_ENV_PKG_CONFIG) \
-	PKG_CONFIG_SYSROOT_DIR=/.
+ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
+QT5_CONF_ENV += PTX_QMAKE_CFLAGS="$(filter -m%,$(shell ptxd_cross_cc_v | sed -n -e "s/'//g" -e "/^COLLECT_GCC_OPTIONS=/{s/[^=]*=\(.*\)/\1/p;q}"))"
+endif
 
 define ptx/qt5-system
 $(call ptx/ifdef, PTXCONF_$(strip $(1)),-system,-no)
@@ -103,57 +104,37 @@ QT5_CONF_TOOL	:= autoconf
 # This also avoid the problem where e.g. '-largefile' also matches '-l<library>'
 #
 QT5_CONF_OPT	:= \
-	$(if $(filter 1,$(PTXDIST_VERBOSE)),-v) \
-	$(if $(filter 0,$(PTXDIST_VERBOSE)),-silent) \
 	-prefix /usr \
 	-headerdir /usr/include/qt5 \
 	-archdatadir /usr/lib/qt5 \
 	-datadir /usr/share/qt5 \
 	-examplesdir /usr/lib/qt5/examples \
 	-hostbindir /usr/bin/qt5 \
-	-release \
+	$(if $(filter 1,$(PTXDIST_VERBOSE)),-v) \
 	-opensource \
 	-confirm-license \
-	$(call ptx/ifdef, PTXCONF_QT5_ACCESSIBILITY,-accessibility,-no-accessibility) \
-	-no-sql-db2 \
-	-no-sql-ibase \
-	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL,-sql-mysql,-no-sql-mysql) \
-	-no-sql-oci \
-	-no-sql-odbc \
-	-no-sql-psql \
-	-no-sql-sqlite2 \
-	-no-sql-tds \
-	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE,-sql-sqlite,-no-sql-sqlite) \
-	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG,-qml-debug,-no-qml-debug) \
+	-release \
+	--disable-optimized-tools \
+	--disable-separate-debug-info \
+	--disable-gdb-index \
+	--disable-strip \
+	--disable-gc-binaries \
+	--enable-shared \
+	-xplatform linux-ptx-g++ \
+	--disable-qtlibinfix-plugins \
+	--disable-trace \
+	--disable-rpath \
+	-reduce-exports \
+	--disable-pch \
+	--$(call ptx/endis, PTXCONF_ARCH_X86)-ltcg \
+	-linker bfd \
+	$(if $(filter 0,$(PTXDIST_VERBOSE)),-silent) \
+	\
 	-pkg-config \
-	-force-pkg-config \
 	\
-	-system-zlib \
-	-no-mtdev \
-	$(call ptx/ifdef, PTXCONF_QT5_JOURNALD,-journald,-no-journald) \
-	-no-syslog \
-	$(call ptx/ifdef, PTXCONF_QT5_GIF,,-no-gif) \
-	$(call ptx/qt5-system, QT5_LIBPNG)-libpng \
-	$(call ptx/ifdef, QT5_LIBJPEG,-qt-libjpeg,-qt-libjpeg) \
-	$(call ptx/qt5-system, QT5_GUI)-freetype \
-	-qt-harfbuzz \
-	$(call ptx/ifdef, PTXCONF_QT5_OPENSSL,-openssl,-no-openssl) \
-	-no-libproxy \
-	-qt-pcre \
-	-system-xcb \
-	$(call ptx/qt5-system, QT5_PLATFORM_XCB)-xkbcommon-x11 \
-	$(call ptx/ifdef, PTXCONF_QT5_INPUT_LIBINPUT,-xkbcommon-evdev,-no-xkbcommon-evdev) \
-	$(call ptx/ifdef, PTXCONF_QT5_XI,-xinput2,-no-xinput2) \
-	$(call ptx/ifdef, PTXCONF_QT5_X11,-xcb-xlib,-no-xcb-xlib) \
-	$(call ptx/ifdef, PTXCONF_QT5_GLIB,-glib,-no-glib) \
-	\
-	-make libs \
-	-make tools \
-	$(call ptx/ifdef, PTXCONF_QT5_PREPARE_EXAMPLES,-make examples) \
 	$(call ptx/qt5-module, QT3D, qt3d) \
 	-skip qtactiveqt \
 	-skip qtandroidextras \
-	$(call ptx/qt5-module, QTCANVAS3D, qtcanvas3d) \
 	$(call ptx/qt5-module, QTCHARTS, qtcharts) \
 	$(call ptx/qt5-module, QTCONNECTIVITY, qtconnectivity) \
 	$(call ptx/qt5-module, QTDATAVIS3D, qtdatavis3d) \
@@ -163,10 +144,12 @@ QT5_CONF_OPT	:= \
 	$(call ptx/qt5-module, QTGRAPHICALEFFECTS, qtgraphicaleffects) \
 	$(call ptx/qt5-module, QTIMAGEFORMATS, qtimageformats) \
 	$(call ptx/qt5-module, QTLOCATION, qtlocation) \
+	$(call ptx/qt5-module, QTLOTTIE, qtlottie) \
 	-skip qtmacextras \
 	$(call ptx/qt5-module, QTMULTIMEDIA, qtmultimedia) \
 	$(call ptx/qt5-module, QTNETWORKAUTH, qtnetworkauth) \
 	$(call ptx/qt5-module, QTPURCHASING, qtpurchasing) \
+	$(call ptx/qt5-module, QTQUICK3D, qtquick3d) \
 	$(call ptx/qt5-module, QTQUICKCONTROLS, qtquickcontrols) \
 	$(call ptx/qt5-module, QTQUICKCONTROLS2, qtquickcontrols2) \
 	$(call ptx/qt5-module, QTREMOTEOBJECTS, qtremoteobjects) \
@@ -183,97 +166,194 @@ QT5_CONF_OPT	:= \
 	$(call ptx/qt5-module, QTWAYLAND, qtwayland) \
 	$(call ptx/qt5-module, QTWEBCHANNEL, qtwebchannel) \
 	$(call ptx/qt5-module, QTWEBENGINE, qtwebengine) \
+	$(call ptx/qt5-module, QTWEBGLPLUGIN, qtwebglplugin) \
 	$(call ptx/qt5-module, QTWEBSOCKETS, qtwebsockets) \
 	$(call ptx/qt5-module, QTWEBVIEW, qtwebview) \
 	-skip qtwinextras \
 	$(call ptx/qt5-module, QTX11EXTRAS, qtx11extras) \
 	$(call ptx/qt5-module, QTXMLPATTERNS, qtxmlpatterns) \
-	$(call ptx/ifdef, PTXCONF_QT5_PREPARE_EXAMPLES,-compile-examples,-no-compile-examples) \
-	$(call ptx/ifdef, PTXCONF_QT5_GUI,-gui,-no-gui) \
-	$(call ptx/ifdef, PTXCONF_QT5_WIDGETS,-widgets,-no-widgets) \
-	-no-rpath \
-	-no-cups \
+	-make libs \
+	-make tools \
+	$(call ptx/ifdef, PTXCONF_QT5_PREPARE_EXAMPLES,-make examples) \
+	--$(call ptx/endis, PTXCONF_QT5_PREPARE_EXAMPLES)-compile-examples \
+	--$(call ptx/endis, PTXCONF_QT5_GUI)-gui \
+	--$(call ptx/endis, PTXCONF_QT5_WIDGETS)-widgets \
+	-$(call ptx/ifdef, PTXCONF_QT5_DBUS,dbus-linked,no-dbus) \
+	--$(call ptx/endis, PTXCONF_QT5_ACCESSIBILITY)-accessibility \
+	\
+	--$(call ptx/endis, PTXCONF_QT5_GLIB)-glib \
 	--$(call ptx/endis, $(call ptx/ifdef, PTXCONF_QT5_ICU,,PTXCONF_ICONV))-iconv \
-	$(call ptx/ifdef, PTXCONF_QT5_INPUT_EVDEV,-evdev,-no-evdev) \
-	$(call ptx/ifdef, PTXCONF_QT5_INPUT_TSLIB,-tslib,-no-tslib) \
-	$(call ptx/ifdef, PTXCONF_QT5_ICU,-icu,-no-icu) \
-	$(call ptx/ifdef, PTXCONF_QT5_GUI,-fontconfig,-no-fontconfig) \
-	-no-strip \
-	-no-pch \
-	-no-ltcg \
-	-no-separate-debug-info \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_XCB,-xcb,-no-xcb) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS,-eglfs,-no-eglfs) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS_KMS,-kms,-no-kms) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_EGLFS_KMS,-gbm,-no-gbm) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_DIRECTFB,-directfb,-no-directfb) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_LINUXFB,-linuxfb,-no-linuxfb) \
-	-no-mirclient \
-	$(call ptx/ifdef, PTXCONF_QT5_GUI,-qpa $(PTXCONF_QT5_PLATFORM_DEFAULT)) \
-	-xplatform linux-ptx-g++ \
+	--$(call ptx/endis, PTXCONF_QT5_ICU)-icu \
+	-qt-pcre \
+	-system-zlib \
+	--$(call ptx/endis, PTXCONF_QT5_JOURNALD)-journald \
+	--disable-syslog \
+	\
+	--$(call ptx/endis, PTXCONF_QT5_OPENSSL)-ssl \
+	--$(call ptx/endis, PTXCONF_QT5_OPENSSL)-openssl \
+	--disable-sctp \
+	--disable-libproxy \
+	--disable-system-proxies \
+	\
+	--disable-cups \
+	--$(call ptx/endis, PTXCONF_QT5_GUI)-fontconfig \
+	$(call ptx/qt5-system, QT5_GUI)-freetype \
+	-qt-harfbuzz \
+	--disable-gtk \
 	-$(call ptx/ifdef, PTXCONF_QT5_OPENGL,opengl $(PTXCONF_QT5_OPENGL_API),no-opengl) \
-	$(call ptx/ifdef, PTXCONF_QT5_INPUT_LIBINPUT,-libinput,-no-libinput) \
-	-no-system-proxies \
+	--$(call ptx/endis, PTXCONF_QT5_OPENGL_ES2)-opengles3 \
+	--$(call ptx/endis, PTXCONF_QT5_OPENGL)-egl \
+	$(call ptx/ifdef, PTXCONF_QT5_GUI,-qpa $(PTXCONF_QT5_PLATFORM_DEFAULT)) \
+	--$(call ptx/endis, PTXCONF_QT5_X11)-xcb-xlib \
+	\
+	--disable-directfb \
+	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_EGLFS)-eglfs \
+	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_EGLFS_KMS)-gbm \
+	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_BACKEND_KMS)-kms \
+	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_LINUXFB)-linuxfb \
+	--$(call ptx/endis, PTXCONF_QT5_PLATFORM_XCB)-xcb \
+	\
+	--$(call ptx/endis, PTXCONF_QT5_LIBUDEV)-libudev \
+	--$(call ptx/endis, PTXCONF_QT5_INPUT_EVDEV)-evdev \
+	--$(call ptx/endis, PTXCONF_QT5_INPUT_LIBINPUT)-libinput \
+	--disable-mtdev \
+	--$(call ptx/endis, PTXCONF_QT5_INPUT_TSLIB)-tslib \
+	--no-xcb-xinput \
+	-$(call ptx/endis, PTXCONF_QT5_LIBXKBCOMMON)-xkbcommon \
+	\
+	--$(call ptx/endis, PTXCONF_QT5_GIF)-gif \
+	$(call ptx/qt5-system, QT5_LIBPNG)-libpng \
+	$(call ptx/qt5-system, QT5_LIBJPEG)-libjpeg \
+	\
+	--disable-sql-db2 \
+	--disable-sql-ibase \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL)-sql-mysql \
+	--disable-sql-oci \
+	--disable-sql-odbc \
+	--disable-sql-psql \
+	--disable-sql-sqlite2 \
+	--disable-sql-tds \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sql-sqlite \
+	$(call ptx/qt5-system, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sqlite \
 	-v
+
+# Note: these options are not listed in '--help' but they exist
+QT5_CONF_OPT += \
+	--disable-sm \
+	--disable-feature-gssapi \
+	--$(call ptx/endis, PTXCONF_QT5_VULKAN)-vulkan \
+	--disable-zstd
+
+ifdef PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL
+QT5_CONF_OPT += \
+	-mysql_config $(SYSROOT)/usr/bin/mysql_config
+endif
+
+ifdef PTXCONF_QT5_MODULE_QT3D
+QT5_CONF_OPT	+= \
+	-qt-assimp \
+	-no-qt3d-profile-jobs \
+	-no-qt3d-profile-gl \
+	-qt3d-render \
+	-qt3d-input \
+	-qt3d-logic \
+	-qt3d-extras \
+	-qt3d-animation
+endif
+
+ifdef PTXCONF_QT5_MODULE_QTDECLARATIVE
+QT5_CONF_OPT += \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)-qml-debug
+endif
 
 ifdef PTXCONF_QT5_MODULE_QTMULTIMEDIA
 QT5_CONF_OPT	+= \
 	--disable-pulseaudio \
-	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTMULTIMEDIA)-alsa \
+	--enable-alsa \
 	$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST,-gstreamer 1.0,-no-gstreamer)
 endif
+
+ifdef PTXCONF_QT5_MODULE_QTQUICKCONTROLS2
+QT5_CONF_OPT	+= \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTQUICKCONTROLS2_STYLE_FUSION)-style-fusion \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTQUICKCONTROLS2_STYLE_IMAGINE)-style-imagine \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTQUICKCONTROLS2_STYLE_MATERIAL)-style-material \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTQUICKCONTROLS2_STYLE_UNIVERSAL)-style-universal
+endif
+
+ifdef PTXCONF_QT5_MODULE_QTSPEECH
+QT5_CONF_OPT	+= \
+	--disable-flite \
+	--disable-flite-alsa \
+	--disable-speechd
+endif
+
+ifdef PTXCONF_QT5_MODULE_QTWAYLAND
+# Note: these options are not listed in '--help' but they exist
+QT5_CONF_OPT	+= \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTWAYLAND_VULKAN)-feature-wayland-vulkan-server-buffer
+endif
+
 ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
 QT5_CONF_OPT	+= \
-	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTWEBENGINE)-alsa \
-	--$(call ptx/endis, PTXCONF_QT5_PROPRIETARY_CODECS)-proprietary-codecs \
+	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTWEBENGINE_MEDIA)-webengine-alsa \
+	--disable-webengine-pulseaudio \
 	-qt-webengine-icu \
-	-qt-ffmpeg \
-	$(call ptx/qt5-system, QT5_MODULE_QTWEBENGINE)-opus \
-	-qt-webp \
-	--disable-pepper-plugins \
-	--disable-printing-and-pdf \
-	--disable-pulseaudio \
-	--disable-spellchecker \
-	--disable-webrtc
+	-$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTWEBENGINE_MEDIA,qt,no)-webengine-ffmpeg \
+	-system-webengine-opus \
+	-$(call ptx/ifdef, PTXCONF_QT5_MODULE_QTWEBENGINE_MEDIA,qt,no)-webengine-webp \
+	--disable-webengine-pepper-plugins \
+	--disable-webengine-printing-and-pdf \
+	--disable-webengine-proprietary-codecs \
+	--disable-webengine-spellchecker \
+	--disable-webengine-webrtc \
+	--$(call ptx/endis, PTXCONF_QT5_WIDGETS)-webengine-widgets
+
+# Note: these options are not listed in '--help' but they exist
+#QT5_CONF_OPT	+= \
+#	--disable-build-qtpdf
 endif
 
 ifdef PTXCONF_QT5_GUI
 ifndef PTXCONF_QT5_PLATFORM_DEFAULT
-$(error Qt5: select at least one GUI platform!)
+$(call ptx/error, Qt5: select at least one GUI platform!)
 endif
 endif
 
-# Note: these options are not listed in '--help' but they exist
-QT5_CONF_OPT += \
-	-no-sm \
-	$(call ptx/ifdef, PTXCONF_QT5_GUI,-libudev,-no-libudev) \
-	$(call ptx/ifdef, PTXCONF_QT5_OPENGL,-egl,-no-egl) \
-	$(call ptx/ifdef, PTXCONF_QT5_PLATFORM_XCB,-xkb,-no-xkb)
-
-ifdef PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL
-QT5_CONF_OPT += -mysql_config $(SYSROOT)/usr/bin/mysql_config
-endif
-
-QT5_QMAKE_OPT := CONFIG+=release CONFIG-=debug
-
-ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
-QT5_QMAKE_OPT += "PTX_QMAKE_CFLAGS=$(shell ptxd_cross_cc_v | sed -n "s/^COLLECT_GCC_OPTIONS=\(.*\)/\1/p" | tail -n1)"
-QT5_MAKE_OPT += NINJAFLAGS="$(PTXDIST_PARALLELMFLAGS) $(PTXDIST_LOADMFLAGS)"
-endif
-ifdef PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST
-QT5_MAKE_OPT += "GST_VERSION=1.0"
-else
-QT5_QMAKE_OPT += "QT_CONFIG-=gstreamer-0.10 gstreamer-1.0"
-endif
+# change default C++ standard
+# the detected standard is not used for configure and examples
+QT5_CXXFLAGS := -std=c++11
 
 $(STATEDIR)/qt5.prepare:
 	@$(call targetinfo)
+	@rm -rf "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++"
+	@mkdir "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++"
+	@$(foreach file, $(wildcard $(QT5_MKSPECS)/*), \
+		$(QT5_CONF_ENV) ptxd_replace_magic "$(file)" > \
+		"$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/$(notdir $(file))"$(ptx/nl))
+
+ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
+ifndef PTXCONF_ARCH_LP64
+	@echo "Checking for 32bit g++ host compiler ..."
+	@$(call world/execute, QT5, \
+		echo -e '#include <list>\n int main() { std::list<int> a; return 0; }' | \
+		g++ -x c++  - -o /dev/null -m32 &> /dev/null || \
+		ptxd_bailout "32bit g++ host compiler is missing (needed for QtWebengine)." \
+			"Please install g++-multilib (debian)")
+endif
+endif
 	sed -i "s|USER_SYSROOT_DIR|$(PTXCONF_SYSROOT_TARGET)|g" "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf" && \
-	sed -i "s|CROSS_PREFIX|$(COMPILER_PREFIX)|g" "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf" && \
-	rm -Rf $(PTXCONF_SYSROOT_TARGET)/usr/lib/qt5 && \
-	rm -Rf $(PTXCONF_SYSROOT_TARGET)/usr/lib/libQt5*
-	@$(call world/prepare, QT5)
+	sed -i "s|CROSS_PREFIX|$(COMPILER_PREFIX)|g" "$(QT5_DIR)/qtbase/mkspecs/linux-ptx-g++/qmake.conf"
+	@+$(call world/prepare, QT5)
 	@$(call touch)
+
+# ----------------------------------------------------------------------------
+# Compile
+# ----------------------------------------------------------------------------
+
+QT5_MAKE_ENV := \
+	$(QT5_PKG_CONFIG_ENV) \
+	ICECC_REMOTE_CPP=0
 
 # ----------------------------------------------------------------------------
 # Install
@@ -283,37 +363,32 @@ $(STATEDIR)/qt5.install:
 	@$(call targetinfo)
 	@$(call world/install, QT5)
 	@find $(QT5_PKGDIR) -name '*.qmltypes' | xargs -r rm
+	@find $(QT5_PKGDIR) -name '*.pri' -o -name '*.cmake' | \
+		xargs sed -i 's;$(PTXDIST_WORKSPACE);@WORKSPACE@;g'
 	@$(call touch)
 
-QT5_QT_CONF := $(PTXDIST_SYSROOT_CROSS)/bin/qt5/qt.conf
+QT5_QT_CONF := $(PTXDIST_SYSROOT_TARGET)/usr/bin/qt5/qt.conf
 
 $(STATEDIR)/qt5.install.post:
 	@$(call targetinfo)
+	@find $(QT5_PKGDIR) -name '*.pri' -o -name '*.cmake' | \
+		xargs sed -i 's;@WORKSPACE@;$(PTXDIST_WORKSPACE);g'
 	@$(call world/install.post, QT5)
-	@rm -rf $(PTXDIST_SYSROOT_CROSS)/bin/qt5
-	@cp -a $(SYSROOT)/usr/bin/qt5 $(PTXDIST_SYSROOT_CROSS)/bin/qt5
 	@echo "[Paths]"						>  $(QT5_QT_CONF)
 	@echo "HostPrefix=$(SYSROOT)/usr"			>> $(QT5_QT_CONF)
 	@echo "HostData=$(SYSROOT)/usr/lib/qt5"			>> $(QT5_QT_CONF)
 	@echo "HostBinaries=$(PTXDIST_SYSROOT_CROSS)/bin/qt5"	>> $(QT5_QT_CONF)
-	@echo "Prefix=$(SYSROOT)/usr"				>> $(QT5_QT_CONF)
+	@echo "Prefix=/usr"					>> $(QT5_QT_CONF)
 	@echo "Headers=$(SYSROOT)/usr/include/qt5"		>> $(QT5_QT_CONF)
+	@echo "Libraries=$(SYSROOT)/usr/lib"			>> $(QT5_QT_CONF)
 	@echo "Imports=/usr/lib/qt5/imports"			>> $(QT5_QT_CONF)
 	@echo "Qml2Imports=/usr/lib/qt5/qml"			>> $(QT5_QT_CONF)
 	@echo ""						>> $(QT5_QT_CONF)
-	# following code moved from targetinstall
-#	ifeq (,$(wildcard $(PTXCONF_SYSROOT_TARGET)/usr/bin/qmake))
-		@ln -sf $(PTXCONF_SYSROOT_TARGET)/usr/bin/qt5/qmake $(PTXCONF_SYSROOT_TARGET)/usr/bin/qmake 
-#	endif
-
-#	ifeq (,$(wildcard $(PTXCONF_SYSROOT_CROSS)/bin/qmake))
-		@ln -sf $(PTXCONF_SYSROOT_CROSS)/bin/qt5/qmake $(PTXCONF_SYSROOT_CROSS)/bin/qmake
-#	endif
-
-#	ifeq (,$(wildcard $(PTXCONF_SYSROOT_CROSS)/bin/qt.conf))
-		@ln -sf $(PTXCONF_SYSROOT_CROSS)/bin/qt5/qt.conf $(PTXCONF_SYSROOT_CROSS)/bin/qt.conf
-#	endif
+#	# qmake is found in sysroot-cross (via PATH) and sysroot target (via cmake)
+	@rm -rf $(PTXDIST_SYSROOT_CROSS)/bin/qt5
+	@cp -a $(SYSROOT)/usr/bin/qt5 $(PTXDIST_SYSROOT_CROSS)/bin/qt5
 	@$(call touch)
+
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -339,9 +414,11 @@ QT5_LIBS-$(PTXCONF_QT5_DBUS)					+= Qt5DBus
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_GUI)			+= Qt5Gui
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE)				+= Qt5Network
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_OPENGL)			+= Qt5OpenGL
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_WIDGETS)			+= Qt5PrintSupport
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_PRINT)			+= Qt5PrintSupport
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_SQL)			+= Qt5Sql
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE)				+= Qt5Test
+ifdef PTXCONF_QT5_TEST
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_WIDGETS)			+= Qt5Test
+endif
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE_WIDGETS)			+= Qt5Widgets
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTBASE)				+= Qt5Xml
 QT5_LIBS-$(PTXCONF_QT5_PLATFORM_EGLFS)				+= Qt5EglFSDeviceIntegration
@@ -363,22 +440,18 @@ QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= platforminputcontexts/libcomposepl
 ifdef PTXCONF_QT5_MODULE_QTBASE_GUI
 QT5_PLUGINS-$(PTXCONF_QT5_DBUS)					+= platforminputcontexts/libibusplatforminputcontextplugin
 endif
-QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= platforms/libqxcb
-QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_DIRECTFB)			+= platforms/libqdirectfb
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS)			+= platforms/libqeglfs
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_LINUXFB)			+= platforms/libqlinuxfb
-QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_VNC)				+= platforms/libqvnc
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_GUI)			+= platforms/libqminimal
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS)			+= platforms/libqminimalegl
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_GUI)			+= platforms/libqoffscreen
+QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_VNC)				+= platforms/libqvnc
+QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= platforms/libqxcb
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS_KMS)			+= egldeviceintegrations/libqeglfs-kms-integration
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS_X11)			+= egldeviceintegrations/libqeglfs-x11-integration
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= xcbglintegrations/libqxcb-egl-integration
-QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= xcbglintegrations/libqxcb-glx-integration
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL)		+= sqldrivers/libqsqlmysql
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)		+= sqldrivers/libqsqlite
-
-### QtCanvas3d ###
-QT5_QML-$(PTXCONF_QT5_MODULE_QTCANVAS3D_QUICK)			+= QtCanvas3D
 
 ### QtCharts ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTCHARTS)				+= Qt5Charts
@@ -396,15 +469,21 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTDATAVIS3D_QUICK)			+= QtDataVisualization
 
 ### QtDeclarative ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE)			+= Qt5Qml
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5QmlModels
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5QmlWorkerScript
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5Quick
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5QuickShapes
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK_WIDGETS)	+= Qt5QuickWidgets
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5QuickParticles
-QT5_LIBS-							+= Qt5QuickTest
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK_PARTICLES)	+= Qt5QuickParticles
+ifdef PTXCONF_QT5_TEST
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= Qt5QuickTest
+endif
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_debugger
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_local
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_messages
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_native
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_nativedebugger
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_preview
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_profiler
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK_DEBUG)	+= qmltooling/libqmldbg_quickprofiler
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_DEBUG)		+= qmltooling/libqmldbg_server
@@ -414,7 +493,9 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTDECLARATIVE)			+= Qt
 QT5_QML-$(PTXCONF_QT5_MODULE_QTDECLARATIVE)			+= QtQuick
 QT5_QML-$(PTXCONF_QT5_MODULE_QTDECLARATIVE)			+= QtQuick.2
 QT5_QML-$(PTXCONF_QT5_MODULE_QTDECLARATIVE)			+= QtQml
-QT5_QML-							+= QtTest
+ifdef PTXCONF_QT5_TEST
+QT5_QML-$(PTXCONF_QT5_MODULE_QTDECLARATIVE_QUICK)		+= QtTest
+endif
 
 ### QtGamepad ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTGAMEPAD)			+= Qt5Gamepad
@@ -434,20 +515,28 @@ QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTIMAGEFORMATS)		+= imageformats/libqwebp
 
 
 ### QtLocation ###
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTLOCATION)			+= Qt5Positioning Qt5Location
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTLOCATION)			+= Qt5Positioning
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTLOCATION_QUICK)			+= Qt5Location
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTLOCATION_QUICK)			+= Qt5PositioningQuick
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTLOCATION)			+= position/libqtposition_positionpoll
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTLOCATION)			+= geoservices/libqtgeoservices_osm
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTLOCATION_QUICK)		+= geoservices/libqtgeoservices_osm
 QT5_QML-$(PTXCONF_QT5_MODULE_QTLOCATION_QUICK)			+= QtLocation
 QT5_QML-$(PTXCONF_QT5_MODULE_QTLOCATION_QUICK)			+= QtPositioning
 
+### QtLottie ###
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTLOTTIE)				+= Qt5Bodymovin
+
 ### QtMultimedia ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA)			+= Qt5Multimedia
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_QUICK)		+= Qt5MultimediaQuick_p
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_QUICK)		+= Qt5MultimediaQuick
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_WIDGETS)		+= Qt5MultimediaWidgets
-QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)			+= qgsttools_p
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= audio/libqtaudio_alsa
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)			+= Qt5MultimediaGstTools
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA)			+= audio/libqtaudio_alsa
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= mediaservice/libgstaudiodecoder
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= mediaservice/libgstcamerabin
+
+#libgstcamerabin pulls in a dependency to gst-plugins-bad1 that we can't properly describe in the rules
+#QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= mediaservice/libgstcamerabin
+
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= mediaservice/libgstmediacapture
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_GST)		+= mediaservice/libgstmediaplayer
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA)			+= playlistformats/libqtmultimedia_m3u
@@ -459,15 +548,28 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTMULTIMEDIA_QUICK)		+= QtMultimedia
 ### QtNetworkAuth ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTNETWORKAUTH)			+= Qt5NetworkAuth
 
+### QtPurchasing ###
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTPURCHASING)			+= Qt5Purchasing
+QT5_QML-$(PTXCONF_QT5_MODULE_QTPURCHASING)			+= QtPurchasing
+
+### QtQuick3D ###
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICK3D)			+= Qt5Quick3D
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICK3D)			+= Qt5Quick3DAssetImport
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICK3D)			+= Qt5Quick3DRender
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICK3D)			+= Qt5Quick3DRuntimeRender
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICK3D)			+= Qt5Quick3DUtils
+QT5_QML-$(PTXCONF_QT5_MODULE_QTQUICK3D)				+= QtQuick3D
+
 ### QtQuickControls ###
 # all in QT5_QML- added by QtDeclarative
 
 ### QtQuickControls2 ###
-#QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICKCONTROLS2)			+= Qt5QuickTemplates2	# RG TODO
-#QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICKCONTROLS2)			+= Qt5QuickControls2	# RG TODO
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICKCONTROLS2)			+= Qt5QuickTemplates2
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTQUICKCONTROLS2)			+= Qt5QuickControls2
 
 ### QtRemoteObjects ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)			+= Qt5RemoteObjects
+QT5_QML-$(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS_QUICK)		+= QtRemoteObjects
 
 ### QtScript ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTSCRIPT)				+= Qt5Script
@@ -479,11 +581,12 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTSCXML_QUICK)			+= QtScxml
 
 ### QtSensors ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= Qt5Sensors
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_counterplugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_plugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_shakeplugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensors/libqtsensors_generic
+ifdef PTXCONF_QT5_DBUS
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensors/libqtsensors_iio-sensor-proxy
+endif
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensors/libqtsensors_linuxsys
 QT5_QML-$(PTXCONF_QT5_MODULE_QTSENSORS_QUICK)			+= QtSensors
 
@@ -507,34 +610,47 @@ QT5_LIBS-$(PTXCONF_QT5_MODULE_QTTOOLS_WIDGETS)			+= Qt5Designer
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTTOOLS_WIDGETS)			+= Qt5DesignerComponents
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTTOOLS_WIDGETS)			+= Qt5Help
 
-### QtWayland ###
+### QtVirtualKeyboard ###
+QT5_LIBS-$(PTXCONF_QT5_MODULE_QTVIRTUALKEYBOARD)		+= Qt5VirtualKeyboard
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTVIRTUALKEYBOARD)		+= platforminputcontexts/libqtvirtualkeyboardplugin
 
 ### QtWayland ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= Qt5WaylandClient
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= Qt5WaylandCompositor
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= platforms/libqwayland-generic
-ifdef PTXCONF_QT5_OPENGL
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= platforms/libqwayland-egl
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-client/libwayland-egl
-endif
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-client/libqt-plugin-wayland-egl
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-client/libdmabuf-server
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-client/libdrm-egl-server
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libwayland-egl
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libdrm-egl-server
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-shell-integration/libivi-shell
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libqt-wayland-compositor-wayland-egl
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libqt-wayland-compositor-dmabuf-server-buffer
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libqt-wayland-compositor-drm-egl-server-buffer
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_MESA)		+= wayland-graphics-integration-server/libqt-wayland-compositor-linux-dmabuf-unstable-v1
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_VULKAN)		+= wayland-graphics-integration-client/libvulkan-server
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND_VULKAN)		+= wayland-graphics-integration-server/libqt-wayland-compositor-vulkan-server
+
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libivi-shell
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libwl-shell
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libxdg-shell-v5
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libxdg-shell-v6
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libxdg-shell
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-shell-integration/libfullscreen-shell-v1
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWAYLAND)			+= wayland-decoration-client/libbradient
 
-QT5_QML-$(PTXCONF_QT5_MODULE_QTWAYLAND)				+= QtWayland
+QT5_QML-$(PTXCONF_QT5_MODULE_QTWAYLAND_QUICK)			+= QtWayland
 
 ### QtWebChannel ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBCHANNEL)			+= Qt5WebChannel
-QT5_QML-$(PTXCONF_QT5_MODULE_QTWEBCHANNEL)			+= QtWebChannel
+QT5_QML-$(PTXCONF_QT5_MODULE_QTWEBCHANNEL_QUICK)		+= QtWebChannel
 
 ### QtWebEngine ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBENGINE)			+= Qt5WebEngine
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBENGINE)			+= Qt5WebEngineCore
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBENGINE_WIDGETS)		+= Qt5WebEngineWidgets
 QT5_QML-$(PTXCONF_QT5_MODULE_QTWEBENGINE)			+= QtWebEngine
+
+### QtWebGLPlugin ###
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWEBGLPLUGIN)			+= platforms/libqwebgl
 
 ### QtWebSockets ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBSOCKETS)			+= Qt5WebSockets
@@ -543,6 +659,7 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTWEBSOCKETS_QUICK)		+= QtWebSockets
 ### QtWebView ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTWEBVIEW)			+= Qt5WebView
 QT5_QML-$(PTXCONF_QT5_MODULE_QTWEBVIEW)				+= QtWebView
+QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTWEBVIEW)			+= webview/libqtwebview_webengine
 
 ### QtX11Extras ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTX11EXTRAS)			+= Qt5X11Extras
@@ -561,20 +678,8 @@ $(STATEDIR)/qt5.targetinstall:
 	@$(call install_fixup, qt5,AUTHOR,"Michael Olbrich <m.olbrich@pengutronix.de>")
 	@$(call install_fixup, qt5,DESCRIPTION,missing)
 
-#ifeq (,$(wildcard $(PTXCONF_SYSROOT_TARGET)/usr/bin/qmake))
-#	@ln -s $(PTXCONF_SYSROOT_TARGET)/usr/bin/qt5/qmake $(PTXCONF_SYSROOT_TARGET)/usr/bin/qmake 
-#endif
-
-#ifeq (,$(wildcard $(PTXCONF_SYSROOT_CROSS)/bin/qmake))
-#	@ln -s $(PTXCONF_SYSROOT_CROSS)/bin/qt5/qmake $(PTXCONF_SYSROOT_CROSS)/bin/qmake
-#endif
-
-#ifeq (,$(wildcard $(PTXCONF_SYSROOT_CROSS)/bin/qt.conf))
-#	@ln -s $(PTXCONF_SYSROOT_CROSS)/bin/qt5/qt.conf $(PTXCONF_SYSROOT_CROSS)/bin/qt.conf
-#endif
-
 	@$(foreach lib, $(QT5_LIBS-y), \
-		$(call install_lib, qt5, 0, 0, 0644, lib$(lib));)
+		$(call install_lib, qt5, 0, 0, 0644, lib$(lib))$(ptx/nl))
 
 ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
 	@$(call install_copy, qt5, 0, 0, 0755, -, \
@@ -589,20 +694,20 @@ ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
 		/usr/share/qt5/resources/qtwebengine_resources_100p.pak)
 	@$(call install_copy, qt5, 0, 0, 0644, -, \
 		/usr/share/qt5/resources/qtwebengine_resources_200p.pak)
-	@$(call install_alternative_tree, qt5, 0, 0,  /usr/share/qt5/translations)
+	$(call install_tree, qt5, 0, 0, -, /usr/share/qt5/translations)
 endif
 
 	@$(foreach plugin, $(QT5_PLUGINS-y), \
 		$(call install_copy, qt5, 0, 0, 0644, -, \
-			/usr/lib/qt5/plugins/$(plugin).so);)
+			/usr/lib/qt5/plugins/$(plugin).so)$(ptx/nl))
 
 	@$(foreach import, $(QT5_IMPORTS-y), \
 		$(call install_tree, qt5, 0, 0, -, \
-		/usr/lib/qt5/imports/$(import));)
+		/usr/lib/qt5/imports/$(import))$(ptx/nl))
 
 	@$(foreach qml, $(QT5_QML-y), \
 		$(call install_tree, qt5, 0, 0, -, \
-		/usr/lib/qt5/qml/$(qml));)
+		/usr/lib/qt5/qml/$(qml))$(ptx/nl))
 
 ifdef PTXCONF_QT5_MODULE_QTDECLARATIVE_QMLSCENE
 	@$(call install_copy, qt5, 0, 0, 0755, -, /usr/bin/qmlscene)

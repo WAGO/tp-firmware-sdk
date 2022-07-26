@@ -94,7 +94,7 @@ $(STATEDIR)/get_boot.targetinstall:
 
 $(STATEDIR)/get_boot.clean:
 	@$(call targetinfo)
-	cd $(GET_BOOT_DIR) && rm -f *.o $(GET_BOOT)	
+	-cd $(GET_BOOT_DIR) && rm -f *.o $(GET_BOOT)	
 	@-cd $(GET_BOOT_DIR) && \
 		$(GET_BOOT_MAKE_ENV) $(GET_BOOT_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_BOOT)

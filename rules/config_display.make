@@ -94,7 +94,7 @@ $(STATEDIR)/config_display.targetinstall:
 
 $(STATEDIR)/config_display.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_DISPLAY_DIR) && rm -f *.o $(CONFIG_DISPLAY)
+	-cd $(CONFIG_DISPLAY_DIR) && rm -f *.o $(CONFIG_DISPLAY)
 	@-cd $(CONFIG_DISPLAY_DIR) && \
 		$(CONFIG_DISPLAY_MAKE_ENV) $(CONFIG_DISPLAY_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_DISPLAY)

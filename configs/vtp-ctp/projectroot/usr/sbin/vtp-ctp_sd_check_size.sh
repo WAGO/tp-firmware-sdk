@@ -158,7 +158,19 @@ function main_emmc
                             --summarize \
                             --one-file-system \
                             "${directory}" | awk '{print $1}')
-
+            if [[ "${directory}" = "/" ]]; then
+                subtract_mounts=0
+                for directory in "${partition_mountpts[@]}"; do
+                    if [[ -n "${directory}" && "${directory}" != "/" ]]; then
+                        ((subtract_mounts+=$(du --apparent-size \
+                                        --bytes \
+                                        --summarize \
+                                        --one-file-system \
+                                        "${directory}" | awk '{print $1}')))
+                    fi
+                done
+                ((size_on_sd-=subtract_mounts))
+            fi
             # convert partition size to bytes; be conservative (use 1000 rather than 1024)
             if (( ${partition_sizes[${index}]} * 1000 * 1000 < size_on_sd )); then
                 return "${NOT_ENOUGH_SPACE_ERROR}"

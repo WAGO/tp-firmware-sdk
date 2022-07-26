@@ -3,7 +3,7 @@
 config XORG_UTIL_MACROS
 	tristate
 #	select LIBC_PTHREAD
-#	select XORG_PROTO_X
+#	select XORGPROTO
 #	select XCB_PROTO
 #	select XCB_UTIL
 #	select LIBXCB

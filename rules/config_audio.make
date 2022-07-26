@@ -94,7 +94,7 @@ $(STATEDIR)/config_audio.targetinstall:
 
 $(STATEDIR)/config_audio.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_AUDIO_DIR) && rm -f *.o $(CONFIG_AUDIO)	
+	-cd $(CONFIG_AUDIO_DIR) && rm -f *.o $(CONFIG_AUDIO)	
 	@-cd $(CONFIG_AUDIO_DIR) && \
 		$(CONFIG_AUDIO_MAKE_ENV) $(CONFIG_AUDIO_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_AUDIO)

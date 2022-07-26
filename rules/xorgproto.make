@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_XORGPROTO) += xorgproto
 #
 # Paths and names
 #
-XORGPROTO_VERSION	:= 2019.1
-XORGPROTO_MD5		:= 802ccb9e977ba3cf94ba798ddb2898a4
+XORGPROTO_VERSION	:= 2021.5
+XORGPROTO_MD5		:= bff0c9a6a060ecde954e255a2d1d9a22
 XORGPROTO		:= xorgproto-$(XORGPROTO_VERSION)
 XORGPROTO_SUFFIX	:= tar.bz2
 XORGPROTO_URL		:= $(call ptx/mirror, XORG, individual/proto/$(XORGPROTO).$(XORGPROTO_SUFFIX))
@@ -30,15 +30,9 @@ XORGPROTO_LICENSE	:= X11 AND MIT AND BSD-2-Clause
 #
 # autoconf
 #
-XORGPROTO_CONF_TOOL	:= autoconf
+XORGPROTO_CONF_TOOL	:= meson
 XORGPROTO_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-selective-werror \
-	--disable-strict-compilation \
-	--enable-specs \
-	--enable-legacy \
-	--without-xmlto \
-	--without-fop \
-	--without-xsltproc
+	$(CROSS_MESON_USR) \
+	-Dlegacy=true
 
 # vim: syntax=make

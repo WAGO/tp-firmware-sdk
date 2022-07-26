@@ -1,6 +1,0 @@
-## SECTION=hosttools_noprompt
-
-config HOST_LIBEPOXY
-	tristate
-	select HOST_MESON
-	default y if ALLYES

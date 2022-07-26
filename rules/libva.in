@@ -10,7 +10,6 @@ menuconfig LIBVA
 	select MESALIB			if LIBVA_GLX
 	select MESALIB_GLX		if LIBVA_GLX
 	select MESALIB_OPENGL		if LIBVA_GLX
-	select WAYLAND			if LIBVA_WAYLAND
 	prompt "libva                         "
 	help
 	  libva an implementation of VA-API for Linux

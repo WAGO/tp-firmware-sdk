@@ -94,7 +94,7 @@ $(STATEDIR)/config_virtualkeyboard.targetinstall:
 
 $(STATEDIR)/config_virtualkeyboard.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_VIRTUALKEYBOARD_DIR) && rm -f *.o $(CONFIG_VIRTUALKEYBOARD)	
+	-cd $(CONFIG_VIRTUALKEYBOARD_DIR) && rm -f *.o $(CONFIG_VIRTUALKEYBOARD)	
 	@-cd $(CONFIG_VIRTUALKEYBOARD_DIR) && \
 		$(CONFIG_VIRTUALKEYBOARD_ENV) $(CONFIG_VIRTUALKEYBOARD_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_VIRTUALKEYBOARD)

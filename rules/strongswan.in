@@ -50,6 +50,7 @@ config STRONGSWAN_SYSTEMD_UNIT
 	bool
 	default y
 	depends on INITMETHOD_SYSTEMD
+	select STRONGSWAN_SWANCTL
 	prompt "install systemd service file"
 
 config STRONGSWAN_SWANCTL

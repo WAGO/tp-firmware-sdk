@@ -4,10 +4,12 @@ menuconfig XORG_SERVER
 	tristate
 	prompt "xorg server                   "
 
+	select HOST_MESON
 	select HOST_XORG_SERVER
 	select HOST_XORG_UTIL_MACROS
 	select HOST_XORG_LIB_XTRANS	# needed for autoreconf
 	select HOST_XORG_FONT_UTIL	# needed for autoreconf
+
 	#
 	# required dependencies, according to REQUIRED_MODULES
 	# and REQUIRED_LIBS in conrigure.ac:
@@ -18,58 +20,37 @@ menuconfig XORG_SERVER
 	select LIBC_CRYPT	# for SHA1
 
 	# protos
-	select XORG_PROTO_RECORD
-	select XORG_PROTO_RANDR
-	select XORG_PROTO_RENDER
-	select XORG_PROTO_FIXES
-	select XORG_PROTO_DAMAGE
-	select XORG_PROTO_XCMISC
-	select XORG_PROTO_XEXT
-	select XORG_PROTO_X
+	select XORGPROTO
 	select XORG_LIB_XTRANS
-	select XORG_PROTO_BIGREQS
-	select XORG_PROTO_RESOURCE
-	select XORG_PROTO_FONTS
-	select XORG_PROTO_INPUT
-	select XORG_PROTO_KB
-	select XORG_PROTO_VIDEO
 
 	# libs
-	select XORG_LIB_XFONT
+	select XORG_LIB_XFONT2
 	select XORG_LIB_XAU
 	select XORG_LIB_FONTENC
 	select XORG_LIB_XEXT
 	select PIXMAN
-	select OPENSSL
+	select NETTLE
 	select XORG_LIB_XKBFILE
 
-	select LIBDRM			if XORG_SERVER_LIBDRM
-
-	# input hotplug with udev
 	select UDEV			if XORG_SERVER_UDEV
 	select UDEV_LIBUDEV		if XORG_SERVER_UDEV
 
+	select LIBDRM			if XORG_SERVER_LIBDRM
+
 	# glx triggered
 	select XORG_LIB_X11		if XORG_SERVER_EXT_GLX
-	select XORG_PROTO_GL		if XORG_SERVER_EXT_GLX
 	select MESALIB			if XORG_SERVER_EXT_GLX
 
 	# dri triggered
-	select XORG_PROTO_XF86DRI	if XORG_SERVER_EXT_DRI
-	select XORG_PROTO_GL		if XORG_SERVER_EXT_DRI
 	select MESALIB			if XORG_SERVER_EXT_DRI
 	select LIBDRM			if XORG_SERVER_EXT_DRI
 
 	# dri2 triggered
-	select XORG_PROTO_DRI2		if XORG_SERVER_EXT_DRI2
 	select LIBDRM			if XORG_SERVER_EXT_DRI2
 
 	# dri3 triggered
-	select XORG_PROTO_DRI3		if XORG_SERVER_EXT_DRI3
 	select LIBDRM			if XORG_SERVER_EXT_DRI3
 	select XORG_LIB_XSHMFENCE	if XORG_SERVER_EXT_DRI3
-
-	select XORG_PROTO_PRESENT	if XORG_SERVER_EXT_PRESENT
 
 	# xdmcp extension
 	select XORG_LIB_XDMCP		if XORG_SERVER_EXT_XDMCP
@@ -80,14 +61,10 @@ menuconfig XORG_SERVER
 
 	# xorg ddx
 	select LIBPCIACCESS		if XORG_SERVER_XORG
-	#select XORG_PROTO_XF86DGA	if XORG_SERVER_XORG && XORG_SERVER_EXT_DGA	#FIXME: broken
-	select XORG_PROTO_XF86DGA	if XORG_SERVER_XORG
-	select XORG_PROTO_XF86VIDMODE	if XORG_SERVER_XORG && XORG_SERVER_EXT_XF86VIDMODE
 
 	# xwayland ddx
-	select WAYLAND			if XORG_SERVER_XWAYLAND
 	select LIBDRM			if XORG_SERVER_XWAYLAND
-#	select LIBEPOXY			if XORG_SERVER_XWAYLAND
+	select LIBEPOXY			if XORG_SERVER_XWAYLAND
 
 	# glamor module
 	select LIBEPOXY			if XORG_SERVER_GLAMOR
@@ -106,23 +83,16 @@ menuconfig XORG_SERVER
 	# xres triggered
 	select XORG_LIB_XRES		if XORG_SERVER_EXT_XRES
 
-	# xinerama triggered
-	select XORG_PROTO_XINERAMA	if XORG_SERVER_EXT_XINERAMA
-
-	# for kdrive
-	select TSLIB			if XORG_SERVER_TSLIB
+	select LIBTIRPC			if XORG_SERVER_OPT_SECURE_RPC
 
 	# FIXME: unclear dependencies
 	#select XORG_LIB_XXF86VM	if XORG_SERVER_EXT_XV
 	#select XORG_LIB_X11
 	#select XORG_LIB_XAW
-	#select XORG_PROTO_XF86MISC
-	#select XORG_PROTO_XF86BIGFONT
 	#select XORG_LIB_XT
 	#select XORG_LIB_XMU
 	#select XORG_LIB_XTST
 	#select XORG_LIB_XKBUI		if XORG_KEYBOARD_MAPPING_SUPPORT
-	#select XORG_PROTO_DMX		if XORG_SERVER_EXT_XDMCP
 	# FIXME: find out which config options need this
 	#select GCCLIBS_GCC_S
 
@@ -141,7 +111,7 @@ menuconfig XORG_SERVER
 
 	# FIXME: xorg fails in dix subdirectory if no connection to font servers
 	# are enabled.
-	select XORG_LIB_XFONT_FONTSERVER
+	select XORG_LIB_XFONT2_FONTSERVER
 
 
 if XORG_SERVER
@@ -172,12 +142,6 @@ config XORG_SERVER_XORG
 	help
 	  This is the main server to be used for the other video drivers
 
-config XORG_SERVER_KDRIVE
-	bool
-	prompt "kdrive server"
-	help
-	  FIXME
-
 config XORG_SERVER_DMX
 	bool
 	depends on BROKEN
@@ -200,7 +164,7 @@ config XORG_SERVER_XNEST
 	select XORG_SERVER_EXT_XDMCP
 	prompt "xorg xnest server"
 	help
-	  A X server working on a running X server. Disadvantage is Xnest
+	  An X server working on a running X server. Disadvantage is Xnest
 	  supports only features the running X server itself supports.
 
 config XORG_SERVER_XWAYLAND
@@ -208,7 +172,6 @@ config XORG_SERVER_XWAYLAND
 	select XORG_SERVER_EXT_COMPOSITE
 	select XORG_SERVER_EXT_DRI3
 	prompt "Xwayland server"
-	help
 
 config XORG_SERVER_XWIN
 	bool
@@ -225,20 +188,6 @@ config XORG_SERVER_XEPHYR
 	  This server is working on top of a running X server. But instead of
 	  Xnest this kind of server supports all new features (extensions). It
 	  doesn't depend on the features of the underlying X server.
-
-config XORG_SERVER_XFAKE
-	bool
-	depends on BROKEN
-	prompt "fake server"
-	help
-	  FIXME
-
-config XORG_SERVER_XFBDEV
-	bool
-	select XORG_SERVER_KDRIVE
-	prompt "xfbdev server"
-	help
-	  FIXME
 
 endmenu
 
@@ -261,22 +210,11 @@ endmenu
 
 menu "xorg options                  "
 
-config XORG_SERVER_OPT_AIGLX
-	bool
-	depends on BROKEN
-	prompt "aiglx"
-
 config XORG_SERVER_OPT_INSTALL_SETUID
 	bool
 	prompt "install server suid root"
 	help
 	  --enable-install-setuid
-
-config XORG_SERVER_OPT_SECURE_RPC
-	bool
-	prompt "secure rpc"
-	help
-	  Use secure RPC authentication (SUN-DES-1)
 
 config XORG_SERVER_UDEV
 	bool
@@ -285,39 +223,13 @@ config XORG_SERVER_UDEV
 	help
 	  FIXME
 
-endmenu
-
-if XORG_SERVER_KDRIVE
-
-menu "kdrive options                "
-
-config XORG_SERVER_TSLIB
+config XORG_SERVER_OPT_SECURE_RPC
 	bool
-	prompt "tslib support"
+	prompt "secure rpc"
 	help
-	  Build kdrive tslib touchscreen support
-
-config XORG_SERVER_KDRIVE_KBD
-	bool
-	prompt "kbd driver"
-	help
-	  Build kbd driver for kdrive
-
-config XORG_SERVER_KDRIVE_MOUSE
-	bool
-	prompt "mouse driver"
-	help
-	  Build mouse driver for kdrive
-
-config XORG_SERVER_KDRIVE_EVDEV
-	bool
-	prompt "evdev driver"
-	help
-	  Build evdev driver for kdrive
+	  Use secure RPC authentication (SUN-DES-1)
 
 endmenu
-
-endif
 
 # ----------------------------------------------------------------------------
 
@@ -406,17 +318,13 @@ config XORG_SERVER_EXT_XDM_AUTH_1
 
 config XORG_SERVER_EXT_GLX
 	bool
+	select XORG_SERVER_EXT_XRES
 	# This select doesn't work! But it is workarounded by mesalib only
 	# presenting the DRI driver as it's backend if GLX is active.
 	select MESALIB_GLX
 	prompt "glx extension"
 	help
 	  --enable-glx
-
-config XORG_SERVER_OPT_GLX_TLS
-	bool
-	depends on XORG_SERVER_EXT_GLX
-	prompt "tls support for glx"
 
 config XORG_SERVER_EXT_DRI
 	bool
@@ -515,4 +423,3 @@ endmenu
 # ----------------------------------------------------------------------------
 
 endif
-

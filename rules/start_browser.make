@@ -94,7 +94,7 @@ $(STATEDIR)/start_browser.targetinstall:
 
 $(STATEDIR)/start_browser.clean:
 	@$(call targetinfo)
-	cd $(START_BROWSER_DIR) && rm -f *.o $(START_BROWSER)	
+	-cd $(START_BROWSER_DIR) && rm -f *.o $(START_BROWSER)	
 	@-cd $(START_BROWSER_DIR) && \
 		$(START_BROWSER_MAKE_ENV) $(START_BROWSER_PATH) $(MAKE) clean
 	@$(call clean_pkg, START_BROWSER)

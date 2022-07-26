@@ -94,7 +94,7 @@ $(STATEDIR)/config_screensaver.targetinstall:
 
 $(STATEDIR)/config_screensaver.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_SCREENSAVER_DIR) && rm -f *.o $(CONFIG_SCREENSAVER)	
+	-cd $(CONFIG_SCREENSAVER_DIR) && rm -f *.o $(CONFIG_SCREENSAVER)	
 	@-cd $(CONFIG_SCREENSAVER_DIR) && \
 		$(CONFIG_SCREENSAVER_MAKE_ENV) $(CONFIG_SCREENSAVER_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_SCREENSAVER)

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    mainwindow.h
 ///
-/// \version $Id: mainwindow.h 46255 2020-02-03 12:58:03Z rgliese_elrest $
+/// \version $Id: mainwindow.h 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   dialogbox tool
 ///

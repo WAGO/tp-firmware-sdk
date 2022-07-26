@@ -352,15 +352,6 @@ ifdef PTXCONF_WAGO_CUSTOM_ROOTFS_CREATE_HOME_INT_TOOL
 		/usr/sbin/create_home_int, n)
 endif
 
-ifdef PTXCONF_WAGO_CUSTOM_INSTALL_LIGHTTPD_PASSWD_COPY
-	@$(call install_copy, wago-custom-install, 0, 0, 0755, /etc/config-tools/default-settings);
-
-# /etc/config-tools/default-settings/lighttpd-htpasswd.user.default is a link to /etc/lighttpd/lighttpd-htpasswd.user
-# thus we can use install_alternative
-	@$(call install_alternative, wago-custom-install, 0, 102, 0640, \
-		/etc/config-tools/default-settings/lighttpd-htpasswd.user.default, n)
-endif
-
 ifdef PTXCONF_WAGO_CUSTOM_INSTALL_BACKUP_ACCOUNT_SETTINGS
 # backup and restore user, system account setting and groups
 	@$(call install_copy, wago-custom-install, 0, 0, 0755, \
@@ -390,8 +381,15 @@ endif
 #
 
 ifdef PTXCONF_WAGO_CUSTOM_ROOTFS_REVISIONS
+#temporary code for CODESYS3 Transistion
+ifdef PTXCONF_PFC_200_G2_CDS3
+	@$(call install_copy, wago-custom-install, 0, 0, 0644, \
+		$(PTXDIST_WORKSPACE)/projectroot/etc/REVISIONS_CDS3, \
+		/etc/REVISIONS, n)
+else
 	@$(call install_alternative, wago-custom-install, 0, 0, 0644, \
 		/etc/REVISIONS)
+endif
 endif
 
 ifdef PTXCONF_WAGO_CUSTOM_ROOTFS_SHELLS
@@ -696,11 +694,6 @@ ifdef PTXCONF_WAGO_CUSTOM_INSTALL_PROTOCOL_TFTP_ON
 	@$(call install_copy, wago-custom-install, 0, 0, 0644, -, /etc/specific/features/tftp)
 endif
 
-ifdef PTXCONF_WAGO_CUSTOM_INSTALL_PROTOCOL_TELNET_ON
-	@touch $(PKGDIR)/$(WAGO_CUSTOM_INSTALL)/etc/specific/features/telnet
-	@$(call install_copy, wago-custom-install, 0, 0, 0644, -, /etc/specific/features/telnet)
-endif
-
 ifdef PTXCONF_WAGO_CUSTOM_INSTALL_PROTOCOL_BOOTP_ON
 	@touch $(PKGDIR)/$(WAGO_CUSTOM_INSTALL)/etc/specific/features/bootp
 	@$(call install_copy, wago-custom-install, 0, 0, 0644, -, /etc/specific/features/bootp)
@@ -724,8 +717,7 @@ endif
 #build IPK's 
 ifdef PTXCONF_CDS3_TSCIOBACNET
 	#--- bacnet ipk ---
-	$(PTXDIST_WORKSPACE)/scripts/bacnet-helpers/make-metaipk_bacnet.sh $(BACNET_VERSION) $(BACNETSTACK_REVISION) \
-		$(PTXCONF_PROJECT) $(PTXCONF_PROJECT_VERSION) $(PTXCONF_OPKG_OPKG_CONF_HOST)
+	$(PTXDIST_WORKSPACE)/scripts/bacnet-helpers/make-metaipk_bacnet.sh $(BACNET_VERSION) $(BACNETSTACK_REVISION) $(PTXCONF_OPKG_OPKG_CONF_URL)
 endif
 
 	@$(call install_finish, wago-custom-install)

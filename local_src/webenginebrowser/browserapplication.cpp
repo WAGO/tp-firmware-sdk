@@ -207,6 +207,7 @@ BrowserApplication::BrowserApplication(int &argc, char **argv)
     QDir().mkdir(sCacheDir);    
   }
   QWebEngineProfile::defaultProfile()->setCachePath(sCacheDir);
+  QWebEngineProfile::defaultProfile()->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
   
   if (!m_privateProfile)
     m_privateProfile = new QWebEngineProfile(this); 
@@ -327,7 +328,7 @@ void BrowserApplication::loadSettings()
 
   defaultSettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, false);
   defaultSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
-  defaultSettings->setAttribute(QWebEngineSettings::WebGLEnabled, true);
+  defaultSettings->setAttribute(QWebEngineSettings::WebGLEnabled, false);
 
   QString css = ReadUserStyleSheetFromFile();
   css.remove('\r');

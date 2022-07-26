@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_Structuring.cc
 ///
 ///  \brief    Test for structuring helper macros.
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -66,6 +66,13 @@ TEST(Structuring, ElementSizeC)
 }
 
 
+TEST(Structuring, ArrayToPointerC)
+{
+  int test_array[8];
+  ASSERT_EQ(GetArrayPointerPlainC(test_array), GetArrayPointerMacroC(test_array));
+}
+
+
 TEST(Structuring, ContainerFromMemberC)
 {
   ASSERT_EQ(GetContainerAddressPlainC(), GetContainerAddressMacroC());
@@ -100,6 +107,13 @@ TEST(Structuring, MemberSizeCPP)
 TEST(Structuring, ElementSizeCPP)
 {
   ASSERT_EQ(GetSizeOfElementPlainCPP(), GetSizeOfElementMacroCPP());
+}
+
+
+TEST(Structuring, ArrayToPointerCPP)
+{
+  int test_array[8];
+  ASSERT_EQ(GetArrayPointerPlainCPP(test_array), GetArrayPointerMacroCPP(test_array));
 }
 
 

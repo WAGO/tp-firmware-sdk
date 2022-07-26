@@ -94,7 +94,7 @@ $(STATEDIR)/get_microbrowser.targetinstall:
 
 $(STATEDIR)/get_microbrowser.clean:
 	@$(call targetinfo)
-	cd $(GET_MICROBROWSER_DIR) && rm -f *.o $(GET_MICROBROWSER)	
+	-cd $(GET_MICROBROWSER_DIR) && rm -f *.o $(GET_MICROBROWSER)	
 	@-cd $(GET_MICROBROWSER_DIR) && \
 		$(GET_MICROBROWSER_MAKE_ENV) $(GET_MICROBROWSER_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_MICROBROWSER)

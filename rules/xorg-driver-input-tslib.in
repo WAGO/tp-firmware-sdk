@@ -1,0 +1,11 @@
+## SECTION=multimedia_xorg_driver_input
+
+config XORG_DRIVER_INPUT_TSLIB
+	tristate
+	depends on XORG_DRIVER_INPUT
+	select XORG_SERVER
+	select XORG_SERVER_XORG
+	select TSLIB
+	prompt "tslib"
+	help
+	  tslib input driver for use of tslib based touchscreen devices as input

@@ -1,6 +1,6 @@
 # -*-makefile-*-
 #
-# Copyright (C) 2017 by Marius Hellmeier (marius.hellmeier@wago.com), WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (C) 2017-2022 by Marius Hellmeier (marius.hellmeier@wago.com), WAGO GmbH & Co. KG
 #
 # See CREDITS for details about who has contributed to this project.
 #
@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_DISPLAY) += wbm-ng-plugin-display
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_DISPLAY_VERSION        := 1.6.0
+WBM_NG_PLUGIN_DISPLAY_VERSION        := 1.6.1
 WBM_NG_PLUGIN_DISPLAY                := wbm-display-$(WBM_NG_PLUGIN_DISPLAY_VERSION)
 WBM_NG_PLUGIN_DISPLAY_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_DISPLAY)
 WBM_NG_PLUGIN_DISPLAY_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_DISPLAY_URL))
@@ -83,7 +83,7 @@ $(STATEDIR)/wbm-ng-plugin-display.targetinstall:
 	@$(call install_init, wbm-ng-plugin-display)
 	@$(call install_fixup, wbm-ng-plugin-display, PRIORITY, optional)
 	@$(call install_fixup, wbm-ng-plugin-display, SECTION, base)
-	@$(call install_fixup, wbm-ng-plugin-display, AUTHOR,"Marius Hellmeier, WAGO Kontakttechnik GmbH & Co. KG")
+	@$(call install_fixup, wbm-ng-plugin-display, AUTHOR,"Marius Hellmeier, WAGO GmbH & Co. KG")
 	@$(call install_fixup, wbm-ng-plugin-display, DESCRIPTION, missing)
 
 	# create target directory itself

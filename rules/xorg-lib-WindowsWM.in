@@ -1,0 +1,11 @@
+## SECTION=multimedia_xorg_lib
+
+config XORG_LIB_WINDOWSWM
+	tristate
+	select XORG_LIB_X11
+	select XORG_LIB_XEXT
+	select XORGPROTO
+	prompt "libWindowsWM"
+	help
+	  The WindowsWM Library
+

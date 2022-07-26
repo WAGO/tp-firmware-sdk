@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.cpp
 ///
-/// \version $Id: toolbarmenu.cpp 66399 2022-04-07 11:59:58Z wrueckl_elrest $
+/// \version $Id: toolbarmenu.cpp 66398 2022-04-07 11:10:49Z wrueckl_elrest $
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///
@@ -177,21 +177,21 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
 
     m_iBtnCount++;
 
-    //WAT28648 DENIED
-    //no VISU Button if no Bootproject found f.e. WP Panel
-    //QString sOut;
-    //if (ReadBootApp(sOut) == true)
-    //{
-    //  if (sOut.contains("yes") == false)
-    //  {
-    //    if (pButton->m_sAction.compare("ID_TARGETVISU", Qt::CaseInsensitive) == 0)
-    //    {
-    //      //no bootproject, hide VISU Btn ID_TARGETVISU
-    //      pButton->setVisible(false);
-    //      continue;
-    //    }
-    //  }
-    //}
+    //WAT28648
+    //no VISU Button if WP Panel
+    if (pButton->m_sAction.compare("ID_TARGETVISU", Qt::CaseInsensitive) == 0)
+    {
+      QString sOut;
+      if (ReadPanelType(sOut) == true)
+      {
+        if (sOut.contains("PIO1") == true)
+        {
+            //PIO1 WTP, hide VISU Btn ID_TARGETVISU
+            pButton->setVisible(false);
+            continue;
+        }
+      }
+    }
 
     if (!pButton->m_sStyle.isEmpty())
       sQtStyleCTAButton = pButton->m_sStyle;
@@ -1590,4 +1590,5 @@ void ToolBarMenu::OnAction()
 
 void ToolBarMenu::showEvent(QShowEvent *event)
 {
+  //
 }

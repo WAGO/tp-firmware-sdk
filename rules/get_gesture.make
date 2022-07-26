@@ -94,7 +94,7 @@ $(STATEDIR)/get_gesture.targetinstall:
 
 $(STATEDIR)/get_gesture.clean:
 	@$(call targetinfo)
-	cd $(GET_GESTURE_DIR) && rm -f *.o $(GET_GESTURE)	
+	-cd $(GET_GESTURE_DIR) && rm -f *.o $(GET_GESTURE)	
 	@-cd $(GET_GESTURE_DIR) && \
 		$(GET_GESTURE_MAKE_ENV) $(GET_GESTURE_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_GESTURE)

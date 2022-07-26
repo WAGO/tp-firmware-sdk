@@ -95,7 +95,7 @@ $(STATEDIR)/get_operatinghours.targetinstall:
 
 $(STATEDIR)/get_operatinghours.clean:
 	@$(call targetinfo)
-	cd $(GET_OPERATINGHOURS_DIR) && rm -f *.o $(GET_OPERATINGHOURS)
+	-cd $(GET_OPERATINGHOURS_DIR) && rm -f *.o $(GET_OPERATINGHOURS)
 	@-cd $(GET_OPERATINGHOURS_DIR) && \
 		$(GET_OPERATINGHOURS_MAKE_ENV) $(GET_OPERATINGHOURS_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_OPERATINGHOURS)

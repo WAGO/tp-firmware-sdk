@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2022 WAGO GmbH & Co. KG
 
 RUNDIR="/var/run/netconfd"
 PIDFILE="netconfd.pid"
@@ -66,6 +66,9 @@ function stop_netconfd() {
 }
 
 function start_netconfd() {
+
+  killall -9 udhcpc > /dev/null 2>&1 || true
+  
   # First action is to modify the start command based on the current environment
   modify_start_cmd
   

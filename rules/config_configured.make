@@ -94,7 +94,7 @@ $(STATEDIR)/config_configured.targetinstall:
 
 $(STATEDIR)/config_configured.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_CONFIGURED_DIR) && rm -f *.o $(CONFIG_CONFIGURED)	
+	-cd $(CONFIG_CONFIGURED_DIR) && rm -f *.o $(CONFIG_CONFIGURED)	
 	@-cd $(CONFIG_CONFIGURED_DIR) && \
 		$(CONFIG_CONFIGURED_MAKE_ENV) $(CONFIG_CONFIGURED_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_CONFIGURED)

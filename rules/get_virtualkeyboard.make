@@ -94,7 +94,7 @@ $(STATEDIR)/get_virtualkeyboard.targetinstall:
 
 $(STATEDIR)/get_virtualkeyboard.clean:
 	@$(call targetinfo)
-	cd $(GET_VIRTUALKEYBOARD_DIR) && rm -f *.o $(GET_VIRTUALKEYBOARD)	
+	-cd $(GET_VIRTUALKEYBOARD_DIR) && rm -f *.o $(GET_VIRTUALKEYBOARD)	
 	@-cd $(GET_VIRTUALKEYBOARD_DIR) && \
 		$(GET_VIRTUALKEYBOARD_ENV) $(GET_VIRTUALKEYBOARD_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_VIRTUALKEYBOARD)

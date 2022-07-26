@@ -3,13 +3,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 ///------------------------------------------------------------------------------
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 57114 2021-04-07 16:55:53Z rgliese_elrest $
+/// \version $Id: brightness_control.c 67605 2022-06-01 09:39:15Z wrueckl_elrest $
 ///
 /// \brief   brightness control, display backlight settings
 ///
@@ -60,6 +60,7 @@
 #define MIN_SCREENSAVER_TIME  20 //seconds
 
 #define MOTION_PATH           "/var/run/proximation"
+#define SI1142_PATH           "/var/run/si1142"
 #define BACKLIGHT_SYSFS_PATH  "/sys/class/backlight/backlight/"                               //CTP 
 
 #define PID_FILE              "/var/run/brightness_control.pid"
@@ -1952,7 +1953,7 @@ int RefreshBacklightSettings()
     state = ERROR;
     
     iSensorValue = GetSensorBrightnessValue();
-    printf("GetSensorBrightnessValue(): %d\n", iSensorValue);
+    printf("SensorBrightnessValue: %d\n", iSensorValue);
     if (iSensorValue >= 0)
     {
       for (k=0; k < g_brightnessData.rangeCounter; k++)
@@ -2088,35 +2089,42 @@ int GetSensorBrightnessValue()
 	ssize_t s;
 	struct sockaddr_un addr = {
 		.sun_family = AF_UNIX,
-		.sun_path = "/var/run/si1142"
+		.sun_path = SI1142_PATH
 	};
-	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  
+  if (FileExistsWithoutSizeCheck(SI1142_PATH) != 0)
+  {
+    return ERROR;
+  }
+  else
+  { 
+    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd == -1) {
+      perror("socket(AF_UNIX, SOCK_STREAM, 0)");
+      return ERROR;
+    }
+    if (connect(fd, (void*)&addr, sizeof addr) == -1) {
+      perror("connect()");
+      close(fd);
+      return ERROR;
+    }
+    s = read(fd, b, sizeof b);
+    if (s == -1) {
+      perror("read(socket)");
+      close(fd);
+      return ERROR;
+    }
+    close(fd);
 
-	if (fd == -1) {
-		perror("socket(AF_UNIX, SOCK_STREAM, 0)");
-		return ERROR;
-	}
-	if (connect(fd, (void*)&addr, sizeof addr) == -1) {
-		perror("connect()");
-		close(fd);
-		return ERROR;
-	}
-	s = read(fd, b, sizeof b);
-	if (s == -1) {
-		perror("read(socket)");
-		close(fd);
-		return ERROR;
-	}
-	close(fd);
-
-	b[s] = 0;
-	p = strchr(b, '=');
-	if (!p)
-		return ERROR;
-	*p++ = 0;
-	if (strcmp(b, "intensity"))
-		return ERROR;
-	return atoi(p);
+    b[s] = 0;
+    p = strchr(b, '=');
+    if (!p)
+      return ERROR;
+    *p++ = 0;
+    if (strcmp(b, "intensity"))
+      return ERROR;
+    return atoi(p);
+  }
 }
 
 /// \brief CancelThreads

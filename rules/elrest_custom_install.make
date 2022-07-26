@@ -94,7 +94,7 @@ ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_UD.conf)	
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CW.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CCW.conf)
@@ -116,6 +116,7 @@ ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_PEKWM_CONFIG_INSTALL
+	@$(call install_copy, elrest-custom-install, ${PTXCONF_ROOTFS_PASSWD_USER_UID}, ${PTXCONF_ROOTFS_PASSWD_USER_GID}, 0755, /home/user)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/autoproperties)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/config)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/desktop)
@@ -126,6 +127,7 @@ ifdef PTXCONF_ELREST_CUSTOM_PEKWM_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /home/.pekwm/start)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/vars)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /home/.xinitrc)
+	@$(call install_copy, elrest-custom-install, 0, 0, 0700, /root)
 	@$(call install_link, elrest-custom-install, /home/.xinitrc, /root/.xinitrc)
 	rm -Rf $(BUILDDIR)/../root-debug/etc/pekwm && rm -Rf $(BUILDDIR)/../root-debug/.pekwm && rm -Rf $(BUILDDIR)/../root-debug/root/.pekwm && \
 	rm -Rf $(ROOTDIR)/etc/pekwm && rm -Rf $(ROOTDIR)/.pekwm && rm -Rf $(ROOTDIR)/root/.pekwm
@@ -135,19 +137,22 @@ ifdef PTXCONF_ELREST_CUSTOM_PEKWM_CONFIG_INSTALL
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_FLUXBOX_CONFIG_INSTALL
+	@$(call install_copy, elrest-custom-install, 0, 0, 0700, /root)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /root/.xinitrc)
 	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.fluxbox)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
+	@$(call install_copy, elrest-custom-install, 0, 0, 0700, /root)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/icewm.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /usr/share/icewm/preferences)
+	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.icewm)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_WEBKIT_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/webview_style.css)
 	@$(call install_link, elrest-custom-install, /home/webview_style.css, /root/webview_style.css)
 	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /usr/lib/browser/plugins)
-	@$(call install_link, elrest-custom-install, /usr/lib/jvm/ejre1.7.0_10/lib/arm/libnpjp2.so, /usr/lib/browser/plugins/libnpjp2.so)   
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /home/webview_style.css)
 	@$(call install_link, elrest-custom-install, /home/webview_style.css,/root/webview_style.css)
 endif
@@ -157,10 +162,10 @@ ifdef PTXCONF_CDS3_RTS_FEATURE_TARGETVISU
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_CDS3_LIBS_INSTALL
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0750, /usr/lib/libCmpSQLite.so.2.0.1)
-	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.1, /usr/lib/libCmpSQLite.so.2)
-	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.1, /usr/lib/libCmpSQLite.so)
-	@$(call install_link, elrest-custom-install, ../libCmpSQLite.so.2.0.1, /usr/lib/cds3-custom-components/libCmpSQLite.so)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0750, /usr/lib/libCmpSQLite.so.2.0.8)
+	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.8, /usr/lib/libCmpSQLite.so.2)
+	@$(call install_link, elrest-custom-install, ./libCmpSQLite.so.2.0.8, /usr/lib/libCmpSQLite.so)
+	@$(call install_link, elrest-custom-install, ../libCmpSQLite.so.2.0.8, /usr/lib/cds3-custom-components/libCmpSQLite.so)
 endif
 
 ifdef PTXCONF_START_MICROBROWSER
@@ -176,6 +181,7 @@ ifdef PTXCONF_START_MICROBROWSER
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_USER_FILES_INSTALL
+	@$(call install_copy, elrest-custom-install, ${PTXCONF_ROOTFS_PASSWD_USER_UID}, ${PTXCONF_ROOTFS_PASSWD_USER_GID}, 0755, /home/user)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/user/logo.png)
 endif
 
@@ -235,7 +241,7 @@ ifdef PTXCONF_ELREST_CUSTOM_CONFIG_FILES_INSTALL
 	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.config)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0640, /etc/pio2_wretain_direct.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/script/setup_hdmi.sh)
-
+	@$(call install_link, elrest-custom-install, /usr/share, /share)
   
 # only temporarily   TODO remove later
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/specific/network-interfaces-with-modem.xml)
@@ -298,6 +304,8 @@ endif
 ifeq ($(PTXCONF_PLATFORM), cc100)
 	@install -D -m644 $(BUILDDIR)/../../projectroot.cc100/usr/include/pfc-startup.h $(PTXCONF_SYSROOT_TARGET)/usr/include
 	@install -D -m644 $(BUILDDIR)/../../projectroot.cc100/usr/include/pfc_boot_table.h $(PTXCONF_SYSROOT_TARGET)/usr/include
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/calib)
+	@$(call install_link, elrest-custom-install, ../init.d/calib, /etc/rc.d/S99_calib)
 endif
 endif
 

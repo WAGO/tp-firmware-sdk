@@ -1,0 +1,69 @@
+#!/bin/sh
+
+application() {
+# wait for weston
+while [ ! -e  $XDG_RUNTIME_DIR/wayland-0 ] ; do sleep 1; done
+sleep 1
+#export DISPLAY=:0.0
+#/etc/init.d/touchcal start
+/etc/script/start_application.sh
+}
+
+start() {
+	# set weston.ini file
+	/etc/script/set_weston_config.sh
+
+	WESTON_ARGS="--tty=/dev/tty7 --user=root -- --backend=drm-backend.so --log=/var/log/weston.log"
+
+	if [ -z "$XDG_RUNTIME_DIR" ]; then
+		export XDG_RUNTIME_DIR=/tmp/runtime-root
+		mkdir -p "$XDG_RUNTIME_DIR"
+		chmod 0700 "$XDG_RUNTIME_DIR"
+	fi
+
+	# decide start mode weston or framebuffer
+	MICROBROWSER="0"
+	URL=""
+	PLCSELECTED=`/etc/config-tools/get_plcselect plc_selected`
+	URL=`/etc/config-tools/get_plcselect $PLCSELECTED url`
+	MICROBROWSER=`/etc/config-tools/get_plcselect $PLCSELECTED mic`
+
+	ORDER="$(/etc/config-tools/get_typelabel_value ORDER)"
+	if [ "${ORDER:0:5}" == "752-8" ]; then
+		#EDGE Controller
+		if [ "$MICROBROWSER" == "1" ]; then
+			#No MicroBrowser on EDGE Box possible
+			MICROBROWSER="0"
+			#set startpage to WBM
+			/etc/config-tools/config_plcselect plc_selected=0
+			#show notification
+			/usr/bin/dialogbox "EC752 does not support the MicroBrowser." Ok -s 10 -platform linuxfb
+			# blank framebuffer to black background
+			dd if=/dev/zero of=/dev/fb0
+		fi
+	fi
+
+	if [ "$MICROBROWSER" == "1" ]; then
+		# without Xorg except EDGE-BOX
+		/etc/script/start_framebuffer.sh "$URL" &
+	else
+		echo "Starting Weston"
+		exec weston-launch $WESTON_ARGS &
+		#call start_application.sh
+		application
+	fi
+
+}
+
+stop() {
+	echo "Stopping Weston"
+	killall -q weston
+}
+
+case $1 in
+	start|stop) $1 ;;
+	restart) stop ; sleep 1 ; start ;;
+
+	*) echo "Usage: $0 {start|stop|restart}"; exit 1 ;;
+esac
+

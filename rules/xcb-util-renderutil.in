@@ -2,11 +2,7 @@
 
 config XCB_UTIL_RENDERUTIL
 	tristate
-	select LIBC_PTHREAD
-	select XORG_PROTO_X
-	select XCB_PROTO
 	select LIBXCB
-	select HOST_GPERF
 	prompt "xcb-util-renderutil"
 	help
-	  FIXME
+	  utility libraries for X C Binding -- render-util

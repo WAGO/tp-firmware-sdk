@@ -6,10 +6,9 @@ menuconfig OPENSSH
 	select OPENSSL
 	select LIBC_CRYPT
 	select LIBC_UTIL
-	select RC_ONCE if OPENSSH_SSHD && RUNTIME
+	select RC_ONCE if OPENSSH_SSHD_GENKEYS && RUNTIME
 	select BUSYBOX_START_STOP_DAEMON if OPENSSH_SSHD_STARTSCRIPT
-	select LIBSELINUX if GLOBAL_SELINUX
-	select OPENSSH_KEYGEN if OPENSSH_SSHD
+	select OPENSSH_KEYGEN if OPENSSH_SSHD_GENKEYS
 	prompt "openssh                       "
 	help
 	  secure shell client/server, an rlogin/rsh/rcp replacement
@@ -40,14 +39,22 @@ config OPENSSH_SSHD
 config OPENSSH_SSHD_STARTSCRIPT
 	bool
 	default y
-	depends on OPENSSH_SSHD
+	depends on OPENSSH_SSHD && INITMETHOD_BBINIT
 	prompt "install /etc/init.d/openssh"
 
 config OPENSSH_SSHD_SYSTEMD_UNIT
 	bool
 	default y
-	depends on OPENSSH_SSHD && SYSTEMD
+	depends on OPENSSH_SSHD && INITMETHOD_SYSTEMD
 	prompt "install systemd unit files for sshd"
+
+config OPENSSH_SSHD_GENKEYS
+	bool "generate sshd host keys at first boot"
+	default y
+	depends on OPENSSH_SSHD
+	help
+	  If not set host keys must be provided in some other way
+	  (otherwise sshd will not start)
 
 config OPENSSH_SCP
 	bool "scp"

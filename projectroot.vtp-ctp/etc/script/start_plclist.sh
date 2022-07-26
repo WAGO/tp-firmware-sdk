@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   start_plclist.sh
@@ -21,6 +21,7 @@ HOME=/root
 
 URL="http://127.0.0.1/plclist/plclist.html"
 PIDWEBENGINE=`pidof webenginebrowser`
+NOSANDBOX="--no-sandbox"
 
 function ShowUrl
 {
@@ -31,7 +32,7 @@ function ShowUrl
       #echo "disable pinch"
       echo "1" > /tmp/custom_disable_pinch.txt
     fi
-    /usr/bin/webenginebrowser $URL > /dev/null 2>&1 &
+    /usr/bin/webenginebrowser $NOSANDBOX $URL > /dev/null 2>&1 &
   else
     echo "load=$URL" > /dev/webenginebrowser
   fi

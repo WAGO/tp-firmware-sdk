@@ -94,7 +94,7 @@ $(STATEDIR)/config_microbrowser.targetinstall:
 
 $(STATEDIR)/config_microbrowser.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_MICROBROWSER_DIR) && rm -f *.o $(CONFIG_MICROBROWSER)	
+	-cd $(CONFIG_MICROBROWSER_DIR) && rm -f *.o $(CONFIG_MICROBROWSER)	
 	@-cd $(CONFIG_MICROBROWSER_DIR) && \
 		$(CONFIG_MICROBROWSER_MAKE_ENV) $(CONFIG_MICROBROWSER_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_MICROBROWSER)

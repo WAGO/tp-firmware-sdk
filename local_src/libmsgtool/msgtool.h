@@ -3,12 +3,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 ///------------------------------------------------------------------------------
 /// \file    msgtool.h
 ///
-/// \version $Id: msgtool.h 51697 2020-09-02 13:59:51Z wrueckl_elrest $
+/// \version $Id: msgtool.h 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   interprocess communication using messages
 ///
@@ -190,6 +190,9 @@ void AppendSlash(char *pStr);
 
 int IsUsbKeyboardPresent();
 int IsUsbMousePresent();
+
+int SystemCall(char * pCmd, char * argv[]);
+int SystemCallExt(char * pCmd, char * argv[], char * pOut, int iOutSize);
 
 #ifdef __cplusplus
 }

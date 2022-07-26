@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   start_application.sh
@@ -114,10 +114,6 @@ fi
 function InitMotionsensor
 {
 if [ "${ORDER:0:3}" == "762" ]; then
-  mount -t configfs none /sys/kernel/config
-  modprobe si1145
-  daemonize "/usr/bin/si1142"
-
   if [ ! -e /etc/specific/motionsensor.conf ]; then
   /etc/config-tools/config_motionsensor resettofactory
   fi
@@ -127,6 +123,10 @@ if [ "${ORDER:0:3}" == "762" ]; then
   #echo "$? MOTIONSENSOR=$MOTIONSENSOR"
 
   if [ "$MOTIONSENSOR" == "enabled" ]; then  
+    mount -t configfs none /sys/kernel/config
+    modprobe si1145
+    daemonize "/usr/bin/si1142"
+    usleep 100000
     /etc/config-tools/config_motionsensor init
     #echo "initialize motionsensor: $?"
   fi

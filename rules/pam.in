@@ -278,10 +278,10 @@ config PAM_PAM_UNIX
 	help
 	  FIXME
 
-config PAM_PAM_CRACKLIB
+config PAM_PAM_FAILLOCK
 	bool
 	default n
-	prompt "pam_cracklib (deprecated)"
+	prompt "pam_faillock"
 	help
 	  FIXME
 

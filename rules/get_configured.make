@@ -94,7 +94,7 @@ $(STATEDIR)/get_configured.targetinstall:
 
 $(STATEDIR)/get_configured.clean:
 	@$(call targetinfo)
-	cd $(GET_CONFIGURED_DIR) && rm -f *.o $(GET_CONFIGURED)	
+	-cd $(GET_CONFIGURED_DIR) && rm -f *.o $(GET_CONFIGURED)	
 	@-cd $(GET_CONFIGURED_DIR) && \
 		$(GET_CONFIGURED_MAKE_ENV) $(GET_CONFIGURED_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_CONFIGURED)

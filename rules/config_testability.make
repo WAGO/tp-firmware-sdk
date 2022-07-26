@@ -94,7 +94,7 @@ $(STATEDIR)/config_testability.targetinstall:
 
 $(STATEDIR)/config_testability.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_TESTABILITY_DIR) && rm -f *.o $(CONFIG_TESTABILITY)	
+	-cd $(CONFIG_TESTABILITY_DIR) && rm -f *.o $(CONFIG_TESTABILITY)	
 	@-cd $(CONFIG_TESTABILITY_DIR) && \
 		$(CONFIG_TESTABILITY_ENV) $(CONFIG_TESTABILITY_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_TESTABILITY)

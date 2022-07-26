@@ -7,18 +7,25 @@ menuconfig IO_CHECK
 	select LED_SERVER_META            if IO_CHECK_PROT_1288 
 	select WAGO_PFC_DIAGNOSTIC if !LED_SERVER_LEGACY && IO_CHECK_PROT_1288
 	select CONFIG_TOOLS               if IO_CHECK_PROT_1288
+	select SERIAL_DISPATCHER          if IO_CHECK_RS232 && !CDS3_RTS_PRODUCT_VTPCTP && !CDS3_RTS_PRODUCT_CC100
 	select INETUTILS_INETD		  if IO_CHECK_STARTSCRIPT && !BUSYBOX_INETD
 	select TYPELABEL
 	select LIBXML2			  if IO_CHECK_PROT_1288
 	select CROSS_LIBTOOL
 	select LIBWAGODRM                 if IO_CHECK_PROT_1288 
-	select MDMD_NG
 	select NETCONFD
 
 	help
 	  server for handling with the WAGO-Service-Protocoll
 
 if IO_CHECK
+
+config IO_CHECK_MDMD_NG
+	bool
+	default n
+	prompt "Use libmdmd-ng (4G/5G Modems) for modem related functions like GetIMEI"
+	help
+	  Select if GetIMEI function for IO-Check via mdmd-ng (4G Modem) is needed
 
 config IO_CHECK_DEBUGGING
 	bool

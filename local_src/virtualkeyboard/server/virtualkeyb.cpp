@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 ///
 /// This program is free software: you can redistribute it and/or modify  
 /// it under the terms of the GNU General Public License as published by  
@@ -16,7 +16,7 @@
 ///------------------------------------------------------------------------------
 /// \file    virtualkeyb.cpp
 ///
-/// \version $Id: virtualkeyb.cpp 47941 2020-03-26 11:50:44Z wrueckl_elrest $
+/// \version $Id: virtualkeyb.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   virtual keyboard
 ///

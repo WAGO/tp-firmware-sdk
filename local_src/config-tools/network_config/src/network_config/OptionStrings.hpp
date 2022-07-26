@@ -27,6 +27,8 @@ struct Options {
     { "mac-address", "Get mac address of an device. The device name must be given using the --device option." };
   const Option device_info
     { "device-info", "Get information about ports and/or bridges." };
+  const Option interface_status
+    { "interface-status", "Get information about ports states." };
   const Option backup_targetversion
     { "backup-targetversion", "Backup made for the specific firmware version [targetversion], e.g. V03.03.02" };
   const Option backup
@@ -41,6 +43,10 @@ struct Options {
     { "fix-ip", "Set fixed ip (192.168.1.17)" };
   const Option dip_switch_config
     { "dip-switch-config", "Set or get DIP switch configuration. Caution: mode and last address byte cannot be changed." };
+  const Option dynamic_ip_event
+    { "dynamic-ip-event", "Propagate a dynamic ip event. e.g. (UDHCP event: bound, renew, ...)" };
+  const Option reload_host_conf
+    { "reload-host-conf", "Trigger reload of /etc/host.conf" };
 
   // Operations
   const Option get
@@ -63,6 +69,8 @@ struct Options {
     { "quiet", "Suppress any outout to the console" };
   const Option error_msg_dst
     { "error-msg-dst", "filename where error messages are put into", "<filename>" };
+  const Option dryrun
+    { "dryrun", "do not actually write anything just validate the request" };
   // @formatter:on
 };
 
@@ -95,6 +103,8 @@ struct Fields {
     { "duplex", "Duplexity <half|full>" ,"<value>"};
   const Option backup_version
     { "backup-targetversion", "Target version, e.g. V03.03.02" ,"<value>"};
+  const Option action
+      { "action", "action <bound|renew|release|nak>" ,"<value>"};
   // @formatter:on
 };
 

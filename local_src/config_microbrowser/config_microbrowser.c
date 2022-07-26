@@ -3,12 +3,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 ///------------------------------------------------------------------------------
 /// \file     config_eruntime.c
 ///
-/// \version $Id: config_microbrowser.c 51916 2020-09-10 08:16:25Z wrueckl_elrest $
+/// \version $Id: config_microbrowser.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief    audio change settings / config-tools
 ///

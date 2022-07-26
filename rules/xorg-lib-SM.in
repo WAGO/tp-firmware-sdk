@@ -1,9 +1,0 @@
-## SECTION=multimedia_xorg_lib
-
-config XORG_LIB_SM
-	tristate
-	prompt "libSM"
-	select XORG_LIB_ICE
-	select XORGPROTO
-	help
-	  X Session Management Library

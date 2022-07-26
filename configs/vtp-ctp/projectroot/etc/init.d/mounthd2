@@ -6,16 +6,16 @@
 #
 # This file is part of PTXdist package wago-custom-install.
 #
-# Copyright (c) 2014-2020 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2014-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   mounthd2
 #
 # Brief:    Script to mount target specific devices and folders.
 #
-# Author:   HT:  WAGO Kontakttechnik GmbH & Co. KG
-# Author:   PEn: WAGO Kontakttechnik GmbH & Co. KG
-# Author:   MLa: WAGO Kontakttechnik GmbH & Co. KG
+# Author:   HT:  WAGO GmbH & Co. KG
+# Author:   PEn: WAGO GmbH & Co. KG
+# Author:   MLa: WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 
 
@@ -25,8 +25,8 @@ fail_exit=112
 ACTIVE_ROOT_PARTITION="$(grep -o 'root=/[^[:space:]]\+' "/proc/cmdline" | cut -d= -f2)"
 if [ -z "$ACTIVE_ROOT_PARTITION" ]; then
   ACTIVE_ROOT_PARTITION="$(grep -o 'root=ubi[^[:space:]]\+' "/proc/cmdline" | cut -d= -f2)"
-  ACTIVE_ROOT_PARTITION="$(echo "$ACTIVE_ROOT_PARTITION" | sed 's#ubi0:rootfs0#/dev/ubi0_0#g')"
-  ACTIVE_ROOT_PARTITION="$(echo "$ACTIVE_ROOT_PARTITION" | sed 's#ubi0:rootfs1#/dev/ubi0_2#g')"
+  ACTIVE_ROOT_PARTITION="$(echo "$ACTIVE_ROOT_PARTITION" | sed 's#ubi0:rootfs.1#/dev/ubi0_0#g')"
+  ACTIVE_ROOT_PARTITION="$(echo "$ACTIVE_ROOT_PARTITION" | sed 's#ubi0:rootfs.2#/dev/ubi0_2#g')"
 fi
 
 function echo_error
@@ -98,10 +98,10 @@ function umount_point
     sync
 
     # Try to unmount
-    echo -n "Unmounting ${mntpoint}..."
+    echo "Unmounting ${mntpoint}..."
     local timeout=3
     while [ "$timeout" -gt "0" ] && check_mounted "${mntpoint}" >/dev/null 2>&1; do
-      umount "${mntpoint}" >/dev/null 2>&1
+      umount -v "${mntpoint}" 2>&1
       sleep 1
       timeout=$(( $timeout - 1 ))
     done
@@ -121,13 +121,19 @@ function umount_point
 function mount_on_internal_emmc
 {
   local BOOT_PARTITION_EMMC="/dev/mmcblk1p1"
-  local ROOT_PARTITION_EMMC="$ACTIVE_ROOT_PARTITION"
-  local HOME_PARTITION_EMMC="$(/etc/config-tools/get_filesystem_data active-home-partition)"
   local SETTINGS_PARTITION_EMMC="/dev/mmcblk1p6"
   local LOG_PARTITION_EMMC="/dev/mmcblk1p5"
-  local INACTIVE_ROOT_PARTITION_EMMC="$(if [[ "$ROOT_PARTITION_EMMC" == "/dev/mmcblk1p7" ]]; then echo "/dev/mmcblk1p10"; else echo "/dev/mmcblk1p7"; fi)"
-  local INACTIVE_HOME_PARTITION_EMMC="$(/etc/config-tools/get_filesystem_data inactive-home-partition)"
-
+  local ROOT_PARTITION_EMMC="$ACTIVE_ROOT_PARTITION"
+  
+  if [[ "$ACTIVE_ROOT_PARTITION" == "/dev/mmcblk1p7" ]]; then
+      local HOME_PARTITION_EMMC="/dev/mmcblk1p8"
+      local INACTIVE_ROOT_PARTITION_EMMC="/dev/mmcblk1p10"
+      local INACTIVE_HOME_PARTITION_EMMC="/dev/mmcblk1p9"
+  else
+      local HOME_PARTITION_EMMC="/dev/mmcblk1p9"
+      local INACTIVE_ROOT_PARTITION_EMMC="/dev/mmcblk1p7"
+      local INACTIVE_HOME_PARTITION_EMMC="/dev/mmcblk1p8"
+  fi
   mount_partition auto "${BOOT_PARTITION_EMMC}" "/boot/loader" defaults
   mount_partition auto "${HOME_PARTITION_EMMC}" "/home" defaults
   mount_partition auto "${SETTINGS_PARTITION_EMMC}" "/settings" defaults

@@ -1,0 +1,53 @@
+## SECTION=multimedia_xorg_lib
+
+menuconfig XORG_LIB_X11
+	tristate
+	prompt "libX11                        "
+	select LIBC_DL
+	select XORGPROTO
+	select XORG_LIB_XDMCP		if !XORG_LIB_X11_XCB_LOW_LEVEL
+	select XORG_LIB_XAU		if !XORG_LIB_X11_XCB_LOW_LEVEL
+	select LIBXCB
+	select XORG_LIB_XTRANS
+	select LIBC_PTHREAD
+	select HOST_XORGPROTO
+	help
+	  This is the main X library
+
+if XORG_LIB_X11
+
+config XORG_LIB_X11_XCB_LOW_LEVEL
+	bool
+	default y
+	prompt "use XCB for low level protocol implementation"
+	help
+	  FIXME
+
+config XORG_LIB_X11_XF86BIGFONT
+	bool
+	prompt "XF86BigFont extension support"
+	help
+	  FIXME
+
+config XORG_LIB_X11_I18N
+	bool
+	prompt "Loadable i18n module support"
+	help
+	  FIXME
+
+config XORG_LIB_X11_CURSOR
+	bool
+	prompt "loadable xcursor library support"
+	help
+	  FIXME
+
+config XORG_LIB_X11_XKB
+	bool
+	default y
+	prompt "XKB Support"
+	help
+	  This adds the keyboard extension support to the base library. Various
+	  applications handling keyboards need it.
+	  Note: this feature is marked as experimental if disabled!
+
+endif

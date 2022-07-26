@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright (c) WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) WAGO GmbH & Co. KG
 //
 // PROPRIETARY RIGHTS are involved in the subject matter of this material. All
 // manufacturing, reproduction, use and sales rights pertaining to this
@@ -9,11 +9,11 @@
 //------------------------------------------------------------------------------
 ///  \file     modbus_config.c
 ///
-///  \version  $Revision: 18092 $1
+///  \version  $Revision: 65689 $1
 ///
 ///  \brief    <short description of the file contents>
 ///
-///  \author   <u015614> : WAGO Kontakttechnik GmbH & Co. KG
+///  \author   <u015614> : WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // Includes
@@ -310,6 +310,8 @@ static void set_service(mbcfg_Context_type *pCtx, mbcfg_ServiceProtocol_type ser
 
 static void get_statistics(const uint8_t fResetFlag)
 {
+  (void) fResetFlag; // unused
+
   com_tConnection con;
   if (0 == com_GEN_Init(&con))
   {

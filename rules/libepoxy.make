@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_LIBEPOXY) += libepoxy
 #
 # Paths and names
 #
-LIBEPOXY_VERSION	:= 1.5.3
-LIBEPOXY_MD5		:= e2845de8d2782b2d31c01ae8d7cd4cbb
+LIBEPOXY_VERSION	:= 1.5.8
+LIBEPOXY_MD5		:= ad6a912bf95e97d6b8b471efc249ed00
 LIBEPOXY		:= libepoxy-$(LIBEPOXY_VERSION)
 LIBEPOXY_SUFFIX		:= tar.xz
 LIBEPOXY_URL		:= https://github.com/anholt/libepoxy/releases/download/$(LIBEPOXY_VERSION)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_SOURCE		:= $(SRCDIR)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_DIR		:= $(BUILDDIR)/$(LIBEPOXY)
 LIBEPOXY_LICENSE	:= MIT
+LIBEPOXY_LICENSE_FILES	:= \
+	file://COPYING;md5=58ef4c80d401e07bd9ee8b6b58cf464b
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -31,7 +33,6 @@ LIBEPOXY_LICENSE	:= MIT
 # autoconf
 #
 LIBEPOXY_CONF_TOOL	:= meson
-ifeq ($(PTXCONF_CONFIGFILE_VERSION), "2020.08.0")
 LIBEPOXY_CONF_OPT	:= \
 	$(CROSS_MESON_USR) \
 	-Ddocs=false \
@@ -39,15 +40,6 @@ LIBEPOXY_CONF_OPT	:= \
 	-Dglx=$(call ptx/yesno,PTXCONF_LIBEPOXY_GLX) \
 	-Dtests=false \
 	-Dx11=$(call ptx/truefalse,PTXCONF_LIBEPOXY_GLX)
-else
-LIBEPOXY_CONF_OPT	:= \
-	$(CROSS_MESON_USR) \
-	-Ddocs=false \
-	-Degl=$(call ptx/ifdef,PTXCONF_LIBEPOXY_EGL, yes, no) \
-	-Dglx=$(call ptx/ifdef,PTXCONF_LIBEPOXY_GLX, yes, no) \
-	-Dtests=false \
-	-Dx11=$(call ptx/truefalse,PTXCONF_LIBEPOXY_GLX)
-endif
 
 # ----------------------------------------------------------------------------
 # Target-Install

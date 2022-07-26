@@ -94,7 +94,7 @@ $(STATEDIR)/get_eruntime.targetinstall:
 
 $(STATEDIR)/get_eruntime.clean:
 	@$(call targetinfo)
-	cd $(GET_ERUNTIME_DIR) && rm -f *.o $(GET_ERUNTIME)	
+	-cd $(GET_ERUNTIME_DIR) && rm -f *.o $(GET_ERUNTIME)	
 	@-cd $(GET_ERUNTIME_DIR) && \
 		$(GET_ERUNTIME_MAKE_ENV) $(GET_ERUNTIME_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_ERUNTIME)

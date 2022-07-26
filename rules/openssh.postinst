@@ -1,2 +1,4 @@
 #!/bin/sh
-$DESTDIR/usr/sbin/enable-rc-once openssh
+if [ -f $DESTDIR/etc/rc.once.d/openssh ]; then
+	$DESTDIR/usr/sbin/enable-rc-once openssh
+fi

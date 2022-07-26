@@ -94,7 +94,7 @@ $(STATEDIR)/get_testability.targetinstall:
 
 $(STATEDIR)/get_testability.clean:
 	@$(call targetinfo)
-	cd $(GET_TESTABILITY_DIR) && rm -f *.o $(GET_TESTABILITY)	
+	-cd $(GET_TESTABILITY_DIR) && rm -f *.o $(GET_TESTABILITY)	
 	@-cd $(GET_TESTABILITY_DIR) && \
 		$(GET_TESTABILITY_ENV) $(GET_TESTABILITY_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_TESTABILITY)

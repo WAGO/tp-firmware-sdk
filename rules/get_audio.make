@@ -94,7 +94,7 @@ $(STATEDIR)/get_audio.targetinstall:
 
 $(STATEDIR)/get_audio.clean:
 	@$(call targetinfo)
-	cd $(GET_AUDIO_DIR) && rm -f *.o $(GET_AUDIO)	
+	-cd $(GET_AUDIO_DIR) && rm -f *.o $(GET_AUDIO)	
 	@-cd $(GET_AUDIO_DIR) && \
 		$(GET_AUDIO_MAKE_ENV) $(GET_AUDIO_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_AUDIO)

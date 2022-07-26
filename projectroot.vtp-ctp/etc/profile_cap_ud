@@ -12,6 +12,10 @@ export MB_KBD_VARIANT=en
 export QT_XCB_NO_XI2=1
 export QT_QPA_DEFAULT_PLATFORM=xcb
 
+#codesys3 and webenginebrowser needs
+export QWS_COMMANDLINE_PARAM="--no-sandbox"
+export QTWEBENGINE_DISABLE_SANDBOX=1
+
 # enable virtual keyboard
 export QT_IM_MODULE=vkim
 

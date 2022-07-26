@@ -1,4 +1,86 @@
 Firmware Release 03.07.20 (99)
+
+System:
+[NEW] Update MESALIB from 19.0.4 to 21.2.2
+[NEW] Update of QT5 from 5.9.7 to 5.14.2
+[NEW] Update Xorg server from 1.17.4 to 1.20.10
+[NEW] Change of windowmanager from Fluxbox 1.3.7 to Icewm 2.0.1
+[NEW] IR-front sensor can be deactivated via config tool
+[NEW] Improved robustness of application control with operating mode switch
+      and additional detection of invalid states.
+[NEW] IP forwading is activated implicitly when Docker is activated.
+[NEW] Libcurl update to version 7.81.0
+[NEW] Bootloader update to version 2021.10.0
+[FIXED] Sender of SNMP "Informs" could be changed
+[FIXED] deactivate Multicast Snooping by default
+[FIXED] 4-Port PFCs now forwarding BPDU packets
+[FIXED] Security-Fix in config-tool print_log.
+[FIXED] Network bridges discard their IP address when all associated network
+        ports are disconnected.
+[FIXED] “Dirty Pipe" enables root privileges CVE-2022-0847
+[NEW] Integration of Docker Deamon. Docker now can be installed and ac-tivited
+      via. WBM.
+[NEW] Users of WBM and Linux where harmonized. User "user" and "admin" can
+      still be used for authorization in WBM as default, but they are no
+      longer exclusive for WBM. Every WBM user can only change his own
+      password now. To use WBM, linux user can be added to group "wbm-admin"
+      or "wbm-user". All other users where treated as "guest".
+      Note:
+      Configuration/change of password in WBM will directly change the
+      con-figuration of the corresponding linux user and vice versa. After
+      upgrade to FW 20, login in WBM is not possible with the old WBM
+      passwords; you must use the passwords of the corresponding linux us-ers.
+      After a following downgrade to FW 19 (or less), WBM will use the WBM
+      default passwords.
+[NEW] "Codesys port authentication password" can no longer be changed via WBM.
+[NEW] From FW20 the HTTPS port is always active and cannot be disabled via WBM
+      or configtool. Please note that this will be the state after a firmware
+      update, regardless which state was configured before. If nec-essary, the
+      HTTPS port can be blocked via the firewall.
+[NEW] PTXdist update to version 2020.8.0
+[NEW] openSSL update to version 1.1.1.L
+[NEW] Busybox update to version 1.34.1 
+
+CVE-2021-42378, CVE-2021-42379,
+CVE-2021-42380, CVE-2021-42381, CVE-2021-42382, CVE-2021-42383,
+CVE-2021-42384, CVE-2021-42385, CVE-2021-42386
+
+Fieldbus Interface & Protocols:
+-CAN
+ [FIXED] CAN interface goes into BusOff by TxOverflow
+-BACnet
+ [NEW]The BACnet revision has been updated from revision 14 to revision 22
+-Cloud Connectivity
+[NEW] Proxy configuration for MS Azure + Wago Cloud in WBM configurable
+
+Runtime System:
+[NEW] e!RUNTIME Upgrade to version 3.5.17.3
+      (based on CODESYS 3.5, SP 17, Patch 3)
+      Fixed CVE-2021-29242, CVE-2021-36765, CVE-2021-33485, CVE-2021-36763,
+            CVE-2021-36764, CVE-2022-1989
+
+Functional change:
+[DEPRECATED] Config tool function get_telecontrol_state will be removed in
+             future releases. The config tool was used to determine whether a
+             device is a telecon-trol. Since telecontrol services can be added
+             by dynamic licensing, the tool is no longer needed.
+[DEPRECATED] DHCP and DNS Server will be removed in future releases. For the
+             transition, it will be included for now. In the next release, the
+             servers will still be part of the firmware.
+[REMOVED] Removed Telnet server, use SSH instead.
+[REMOVED] Removed TFTP server.
+
+Beta functionalities:
+[BETA] "Wago Device Access" for parametrization and configuration.
+       The service is available and can already be tested. Changes in the
+       model and behavior are possible for future versions. REST-API is active
+       under path "<host>/wda" on port 443. File-Access-API is active under
+       path "<host>/files" on port 443. To disable the service, delete symlink
+       "/etc/rc.d/S11_paramd" or move it to subdirectory "disabled". Compared
+       to the last firmware, many more parameter providers have been added.
+
+################################################################################
+Firmware Release 03.07.20 (99)
 System:
 [FIXED] “Dirty Pipe” enables root privileges CVE-2022-0847
 [FIXED] 21.5” devices: flickering and stripes on the display

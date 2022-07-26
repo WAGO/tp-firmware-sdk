@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   start_webbrowser.sh
@@ -18,23 +18,7 @@
 
 . /etc/profile > /dev/null 2>&1
 HOME=/root
-
-#avoid black screen after WUP
-#codesys SP16 runtime shows a black window only on first startup which overlays the browser window
-function BringToFront
-{
-  if [ ! -e /home/codesys/eRUNTIME.cfg ]; then
-    LINE=$(head -n 1 /etc/specific/rtsversion)
-    RTSVER=${LINE:0:1}
-    if [ "$RTSVER" == "3" ]; then
-       PID_SCRIPT=$(pidof activate_browser_wnd.sh)
-       if [ -z "$PID_SCRIPT" ]; then
-         /etc/script/activate_browser_wnd.sh > /dev/null 2>&1 &
-       fi
-    fi
-  fi
-}
-BringToFront
+NOSANDBOX="--no-sandbox"
 
 URL=`/etc/config-tools/get_plcselect 0 url`
 if [ -z "$URL" ]; then
@@ -54,8 +38,20 @@ if [ -z "$QT_IM_MODULE" ]; then
   export QT_IM_MODULE=vkim
 fi
 
+function ActivateWindow
+{
+  PID_BROWSER=$(pidof webenginebrowser)
+    if [ ! -z "$PID_BROWSER" ]; then
+      WND_ID=$(xdotool search --pid "$PID_BROWSER")
+      if [ ! -z "$WND_ID" ]; then
+         xdotool windowactivate "$WND_ID"
+      fi
+  fi
+}
+
 function ShowUrl
 {
+  local BOOTAPP="$(/etc/config-tools/get_eruntime bootapp)"
   local PINCH_GESTURE=`getconfvalue /etc/specific/webengine/webengine.conf zoom`
   if [ -z $PIDWEBENGINE ]; then
     #browser is not started
@@ -63,7 +59,14 @@ function ShowUrl
       #echo "disable pinch"
       echo "1" > /tmp/custom_disable_pinch.txt
     fi
-    /usr/bin/webenginebrowser $URL > /dev/null 2>&1 &
+    /usr/bin/webenginebrowser $NOSANDBOX $URL > /dev/null 2>&1 &
+    if [ "$BOOTAPP" == "no" ]; then
+      #ensure browser focus
+      for i in {1..4}; do 
+      sleep 5
+      ActivateWindow
+      done
+    fi
   fi
 }
 

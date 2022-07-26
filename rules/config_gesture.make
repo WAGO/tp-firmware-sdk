@@ -94,7 +94,7 @@ $(STATEDIR)/config_gesture.targetinstall:
 
 $(STATEDIR)/config_gesture.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_GESTURE_DIR) && rm -f *.o $(CONFIG_GESTURE)	
+	-cd $(CONFIG_GESTURE_DIR) && rm -f *.o $(CONFIG_GESTURE)	
 	@-cd $(CONFIG_GESTURE_DIR) && \
 		$(CONFIG_GESTURE_MAKE_ENV) $(CONFIG_GESTURE_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_GESTURE)

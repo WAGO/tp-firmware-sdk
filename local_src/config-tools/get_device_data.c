@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2000 - 2006 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2000 - 2022 WAGO GmbH & Co. KG
 ///
-/// PROPRIETARY RIGHTS of WAGO Kontakttechnik GmbH & Co. KG are involved in
+/// PROPRIETARY RIGHTS of WAGO GmbH & Co. KG are involved in
 /// the subject matter of this material. All manufacturing, reproduction,
 /// use, and sales rights pertaining to this subject matter are governed
 /// by the license agreement. The recipient of this software implicitly
@@ -11,11 +11,11 @@
 ///
 ///  \file     get_device_data.c
 ///
-///  \version  $Revision: 33614 $1
+///  \version  $Revision: 65689 $1
 ///
 ///  \brief    
 ///
-///  \author   Stefanie Meihöfer : WAGO Kontakttechnik GmbH & Co. KG
+///  \author   Stefanie Meihöfer : WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -303,7 +303,6 @@ int GetDeviceMediumByName(char* pacRequestedDeviceName,
 {
   int   status                                    = NOT_FOUND;
   char  deviceMediaLine[MAX_LENGTH_OUTPUT_LINE]   = "";
-  char* pcPartitionNo                             = NULL;
   char  acPureDeviceName[MAX_LENGTH_OUTPUT_LINE]  = "";
   //printf("pacRequestedDeviceName:%s\n", pacRequestedDeviceName);
 
@@ -314,7 +313,7 @@ int GetDeviceMediumByName(char* pacRequestedDeviceName,
   }
 
   // initialise output-string
-  sprintf(pacDeviceMedium, "");
+  pacDeviceMedium[0] = '\0';
 
   if(SUCCESS == (status = GetPureDeviceName(pacRequestedDeviceName, acPureDeviceName, sizeof(acPureDeviceName))))
   {
@@ -417,7 +416,7 @@ int GetBootflagByName(char* pacRequestedDeviceName,
   }
 
   // initialise output-string
-  sprintf(pacBootflag, "");
+  pacBootflag[0] = '\0';
 
   // filter pure device name without path or partition number
   if(SUCCESS == (status = GetPureDeviceName(pacRequestedDeviceName, acPureDeviceName, sizeof(acPureDeviceName))))
@@ -491,7 +490,7 @@ int GetEntireSizeByName(char* pacRequestedDeviceName,
   }
 
   // initialise output-string
-  sprintf(pacSize, "");
+  pacSize[0] = '\0';
 
   if(pacRequestedDeviceName != strstr(pacRequestedDeviceName, "/dev/"))
   { // pacDeviceName has no '/dev/' prefix => construct full path
@@ -589,7 +588,7 @@ int GetLabelByName(char* pacDeviceName,
   }
 
   // Initialize output-string
-  sprintf(pacLabel, "");
+  pacLabel[0] = '\0';
 
   // filter pure device name without path or partition number
   if(SUCCESS == (status = GetPureDeviceName(pacDeviceName, acPureDeviceName, sizeof(acPureDeviceName))))
@@ -645,8 +644,6 @@ void ShowHelpText(void)
 // Show describtion and usage of program on stdout
 //
 {
-  int parameterIndex = 0;
-
   printf("\n* Get medium of specified device or partition *\n\n");
   printf("Usage: Usage: get_device_data <\"name\" | \"medium\" | \"bootflag\" | \"label\" > <device | medium>\n\n");
   printf("device: name of device (hda, hdb, ...), given by medium\n");

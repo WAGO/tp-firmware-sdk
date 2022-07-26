@@ -1,0 +1,11 @@
+--- xf86-video-fbdev-0.5.0_org/src/fbdev.c	2021-10-28 11:23:18.575568886 +0200
++++ xf86-video-fbdev-0.5.0/src/fbdev.c	2021-10-28 11:16:25.465187691 +0200
+@@ -1014,7 +1014,7 @@
+ 	fPtr->CloseScreen = pScreen->CloseScreen;
+ 	pScreen->CloseScreen = FBDevCloseScreen;
+ 
+-#if XV
++#ifdef XV
+ 	{
+ 	    XF86VideoAdaptorPtr *ptr;
+ 

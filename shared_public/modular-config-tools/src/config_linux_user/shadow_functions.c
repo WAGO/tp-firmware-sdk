@@ -5,15 +5,15 @@
 //
 // This file is part of project modular-config-tools (PTXdist package modular-config-tools).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     shadow_functions.h
 ///
 ///  \brief    Shadow modify and cryption functionality for config_linux_user.
 ///
-///  \author   HFS: WAGO Kontakttechnik GmbH & Co. KG
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   HFS: WAGO GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -78,11 +78,16 @@ void GetRandomBytes(ctutil_Resources_t const * const pstResources,
   // If first random source does not get enough bytes use second source
   WC_ASSERT(bufferSize <= INT_MAX);
   int const requested = (int)bufferSize;
+
   if(rbytes < requested)
   {
     size_t const received = (rbytes > 0) ? (size_t)rbytes : 0U;
     fd = open(pstResources->pstSpecificResources->szRandomSource2, O_RDONLY);
-    read(fd, arBuffer+received, bufferSize-received); // FIXME: Return value not honored, no error handling
+    ssize_t read_bytes = read(fd, arBuffer+received, bufferSize-received);
+    if ((read_bytes <= 0) && (0 == strcmp(pstResources->pstSpecificResources->szRandomSource2, "/dev/zero")))
+    {
+      memset (arBuffer+received, 0, bufferSize-received);
+    }
     close(fd);
   }
 }

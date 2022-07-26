@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_ALSA_LIB) += alsa-lib
 #
 # Paths and names
 #
-ALSA_LIB_VERSION	:= 1.2.1.2
-ALSA_LIB_MD5		:= 82ddd3698469beec147e4f4a67134ea0
+ALSA_LIB_VERSION	:= 1.2.5.1
+ALSA_LIB_MD5		:= c8335793e7828803311edc48fb71662e
 ALSA_LIB		:= alsa-lib-$(ALSA_LIB_VERSION)
 ALSA_LIB_SUFFIX		:= tar.bz2
 ALSA_LIB_URL		:= \
@@ -25,6 +25,9 @@ ALSA_LIB_URL		:= \
 ALSA_LIB_SOURCE		:= $(SRCDIR)/$(ALSA_LIB).$(ALSA_LIB_SUFFIX)
 ALSA_LIB_DIR		:= $(BUILDDIR)/$(ALSA_LIB)
 ALSA_LIB_LICENSE	:= LGPL-2.1-or-later
+ALSA_LIB_LICENSE_FILES	:= \
+	file://src/async.c;startline=7;endline=25;md5=dcff7cc43cebd5f1816961f1016b162f \
+	file://COPYING;md5=a916467b91076e631dd8edb7424769c7
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -55,6 +58,7 @@ ALSA_LIB_CONF_OPT	:= \
 	--disable-mixer-pymods \
 	--disable-python \
 	--disable-python2 \
+	--disable-lockless-dmix \
 	--enable-thread-safety \
 	--with-versioned \
 	--with-tmpdir=/tmp \

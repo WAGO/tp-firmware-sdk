@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2000 - 2019 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2000 - 2022 WAGO GmbH & Co. KG
 ///
-/// PROPRIETARY RIGHTS of WAGO Kontakttechnik GmbH & Co. KG are involved in
+/// PROPRIETARY RIGHTS of WAGO GmbH & Co. KG are involved in
 /// the subject matter of this material. All manufacturing, reproduction,
 /// use, and sales rights pertaining to this subject matter are governed
 /// by the license agreement. The recipient of this software implicitly
@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 /// \file main.cpp
 ///
-/// \version $Id: main.cpp 46392 2020-02-07 11:11:46Z wrueckl_elrest $
+/// \version $Id: main.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief Thread for receiving command f.e. open menu
 ///

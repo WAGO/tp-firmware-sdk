@@ -1,6 +1,6 @@
 root:x:0:
 daemon:x:1:
-shadow:x:42:paramd
+shadow:x:42:paramd,www
 users:x:100:
 ftp:x:101:
 www:x:102:
@@ -18,6 +18,7 @@ sdcard:x:114:root,admin
 @GROUP_ADMIN@
 @GROUP_USER@
 @GROUP_VISUALISATION@
+@GROUP_CODESYS3@
 nogroup:x:65534:
 rts:x:3540:admin
 wda:x:120:admin
@@ -25,3 +26,8 @@ paramd:x:121:
 wdxprov:x:122:
 wdaadm:x:123:
 docker:x:1001:
+iot:x:118:iot
+wagoupload:x:234:wagoupload,admin
+wbmuser:x:130:user,admin,root
+wbmadmin:x:131:admin,root
+netconf:x:501:admin,iot,opc

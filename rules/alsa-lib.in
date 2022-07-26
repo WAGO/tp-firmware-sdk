@@ -18,7 +18,7 @@ config ALSA_LIB_ASOUND_CONF
 	bool
 	prompt "install /etc/asound.conf from projectroot"
 	help
-	  install a asound.conf file from the projectroot
+	  install an asound.conf file from the projectroot
 
 config ALSA_LIB_RESMGR
 	bool

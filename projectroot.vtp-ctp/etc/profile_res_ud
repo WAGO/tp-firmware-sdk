@@ -17,6 +17,7 @@ export TSLIB_CONFFILE=/etc/ts.conf
 export TSLIB_TSDEVICE=/dev/input/touchscreen
 
 export QTWEBENGINEPROCESS_PATH=/usr/lib/qt5/libexec/QtWebEngineProcess
+export QTWEBENGINE_DISABLE_SANDBOX=1
 
 #Qt5
 export QT_QPA_FB_TSLIB=1
@@ -28,6 +29,9 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/qt5/plugins
 export QT_XCB_NO_XI2=1
 export XDG_RUNTIME_DIR="/tmp/runtime-root"
 export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS="rotate=180"
+
+#codesys3 and webenginebrowser needs
+export QWS_COMMANDLINE_PARAM="--no-sandbox"
 
 # This fixes the backspace when telnetting in.
 if [ "$TERM" != "linux" ]; then

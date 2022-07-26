@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_AssertionMod.hpp
 ///
 ///  \brief    Test module for assertion helper macros (C++).
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 #ifndef TEST_SRC_CPP_MODULES_TEST_ASSERTIONMOD_HPP_
 #define TEST_SRC_CPP_MODULES_TEST_ASSERTIONMOD_HPP_
@@ -34,10 +34,12 @@ extern "C"
 {
 #endif // __cplusplus
 
-  void TriggerSuccessCPP(void);
-  void TriggerFailCPP(void);
-  int  TriggerSuccessReturnCPP(int const value);
-  int  TriggerFailReturnCPP(int const value);
+  void TriggerSuccessCPP();
+  void TriggerFailCPP();
+  int  TriggerSuccessReturnCPP(int value);
+  int  TriggerFailReturnCPP(int value);
+  void TriggerSuccessReturnVoidCPP();
+  void TriggerFailReturnVoidCPP();
 
 #ifdef __cplusplus
 } // extern "C"

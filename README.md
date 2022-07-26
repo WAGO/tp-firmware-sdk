@@ -150,6 +150,9 @@ http://www.github.com/wago/gcc-toolchain-2019.12
     >sudo apt install python-mako       #used to build host-system-python
     >sudo apt install gcc-multilib      #used to build qt5
     >sudo apt install g++-multilib      #used to build qt5
+    >sudo apt install python3-mako
+    >sudo apt install libmpc-dev
+    >sudo apt install libgmp3-dev
 ```
 
 or in one-shot:
@@ -157,7 +160,7 @@ or in one-shot:
 ```
     >sudo apt install libncurses5-dev gawk flex bison texinfo python-dev g++ dialog make bc gettext lzop autoconf \
     libtool xmlstarlet xsltproc doxygen autopoint libx11-dev python-libxml2 python-mako \
-    gcc-multilib g++-multilib
+    gcc-multilib g++-multilib python3-mako libmpc-dev libgmp3-dev
 ```
 
 ### 3.2) Clone the build tool "ptxdist" somewhere, we expect ~/ptxdist

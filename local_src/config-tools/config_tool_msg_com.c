@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2000 - 2006 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2000 - 2022 WAGO GmbH & Co. KG
 ///
-/// PROPRIETARY RIGHTS of WAGO Kontakttechnik GmbH & Co. KG are involved in
+/// PROPRIETARY RIGHTS of WAGO GmbH & Co. KG are involved in
 /// the subject matter of this material. All manufacturing, reproduction,
 /// use, and sales rights pertaining to this subject matter are governed
 /// by the license agreement. The recipient of this software implicitly
@@ -11,11 +11,11 @@
 ///
 ///  \file     config_tool_msg_com.c
 ///
-///  \version  $Revision: 10645 $1
+///  \version  $Revision: 65689 $1
 ///
 ///  \brief    Communicate with PLC via message queue.
 ///
-///  \author   Stefanie Meihöfer : WAGO Kontakttechnik GmbH & Co. KG
+///  \author   Stefanie Meihöfer : WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -84,6 +84,8 @@ int ipcMsgCom_Send(int    messageType,
                    int    responseRequested,
                    int    timeout)
 {
+  UNUSED_PARAMETER(timeout);
+
   int                   status      = SUCCESS;
   ipcMsgCom_tstMessage  stMessage;
 
@@ -122,9 +124,6 @@ int ipcMsgCom_Send(int    messageType,
     }
     else if(responseRequested == TRUE)
     {
-      pid_t pidParent = 0;
-      pid_t pidChild  = 0;
-
       ipcMsgCom_tstMessage stResponseMessage;
       int ret;
       __sighandler_t oldVal;

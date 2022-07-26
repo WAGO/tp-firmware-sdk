@@ -94,7 +94,7 @@ $(STATEDIR)/get_backlight.targetinstall:
 
 $(STATEDIR)/get_backlight.clean:
 	@$(call targetinfo)
-	cd $(GET_BACKLIGHT_DIR) && rm -f *.o $(GET_BACKLIGHT)	
+	-cd $(GET_BACKLIGHT_DIR) && rm -f *.o $(GET_BACKLIGHT)	
 	@-cd $(GET_BACKLIGHT_DIR) && \
 		$(GET_BACKLIGHT_MAKE_ENV) $(GET_BACKLIGHT_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_BACKLIGHT)

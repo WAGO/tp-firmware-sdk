@@ -94,7 +94,7 @@ $(STATEDIR)/config_touchbeeper.targetinstall:
 
 $(STATEDIR)/config_touchbeeper.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_TOUCHBEEPER_DIR) && rm -f *.o $(CONFIG_TOUCHBEEPER)	
+	-cd $(CONFIG_TOUCHBEEPER_DIR) && rm -f *.o $(CONFIG_TOUCHBEEPER)	
 	@-cd $(CONFIG_TOUCHBEEPER_DIR) && \
 		$(CONFIG_TOUCHBEEPER_MAKE_ENV) $(CONFIG_TOUCHBEEPER_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_TOUCHBEEPER)

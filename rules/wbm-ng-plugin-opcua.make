@@ -1,6 +1,6 @@
 # -*-makefile-*-
 #
-# Copyright (C) 2017 by Stefanie Meihöfer (stefanie.meihoefer@wago.com), WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (C) 2017 by Stefanie Meihöfer (stefanie.meihoefer@wago.com), WAGO GmbH & Co. KG
 #
 # See CREDITS for details about who has contributed to this project.
 #
@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_OPCUA) += wbm-ng-plugin-opcua
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_OPCUA_VERSION        := 2.2.0
+WBM_NG_PLUGIN_OPCUA_VERSION        := 2.4.0
 WBM_NG_PLUGIN_OPCUA                := wbm-opcua-$(WBM_NG_PLUGIN_OPCUA_VERSION)
 WBM_NG_PLUGIN_OPCUA_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_OPCUA)
 WBM_NG_PLUGIN_OPCUA_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_OPCUA_URL))
@@ -83,7 +83,7 @@ $(STATEDIR)/wbm-ng-plugin-opcua.targetinstall:
 	@$(call install_init, wbm-ng-plugin-opcua)
 	@$(call install_fixup, wbm-ng-plugin-opcua, PRIORITY, optional)
 	@$(call install_fixup, wbm-ng-plugin-opcua, SECTION, base)
-	@$(call install_fixup, wbm-ng-plugin-opcua, AUTHOR,"Stefanie Meihoefer, WAGO Kontakttechnik GmbH \& Co. KG")
+	@$(call install_fixup, wbm-ng-plugin-opcua, AUTHOR,"Stefanie Meihoefer, WAGO GmbH \& Co. KG")
 	@$(call install_fixup, wbm-ng-plugin-opcua, DESCRIPTION, missing)
 
 	# create target directory itself

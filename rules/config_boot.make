@@ -94,7 +94,7 @@ $(STATEDIR)/config_boot.targetinstall:
 
 $(STATEDIR)/config_boot.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_BOOT_DIR) && rm -f *.o $(CONFIG_BOOT)	
+	-cd $(CONFIG_BOOT_DIR) && rm -f *.o $(CONFIG_BOOT)	
 	@-cd $(CONFIG_BOOT_DIR) && \
 		$(CONFIG_BOOT_MAKE_ENV) $(CONFIG_BOOT_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_BOOT)

@@ -94,7 +94,7 @@ $(STATEDIR)/get_display.targetinstall:
 
 $(STATEDIR)/get_display.clean:
 	@$(call targetinfo)
-	cd $(GET_DISPLAY_DIR) && rm -f *.o $(GET_DISPLAY)
+	-cd $(GET_DISPLAY_DIR) && rm -f *.o $(GET_DISPLAY)
 	@-cd $(GET_DISPLAY_DIR) && \
 		$(GET_DISPLAY_MAKE_ENV) $(GET_DISPLAY_PATH) $(MAKE) clean
 	@$(call clean_pkg, GET_DISPLAY)

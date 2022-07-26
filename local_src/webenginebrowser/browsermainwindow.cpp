@@ -114,7 +114,7 @@ InvokeWrapper<Arg, R, C> invoke(R *receiver, void (C::*memberFun)(Arg))
   return wrapper;
 }
 
-const char *BrowserMainWindow::defaultHome = "http://localhost";
+const char *BrowserMainWindow::defaultHome = "https://127.0.0.1/wbm/index.html";
 
 BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
   : QMainWindow(parent, flags)
@@ -129,6 +129,7 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
   //remove this to avoid black rectangle behind cursor
   //removed setWindowFlags(Qt::FramelessWindowHint);
   //calling setFixedSize makes the fullscreen
+  setWindowFlags(Qt::FramelessWindowHint);
 
   //QTextCodec *codec = QTextCodec::codecForLocale();  
   //if (codec)
@@ -137,7 +138,6 @@ BrowserMainWindow::BrowserMainWindow(QWidget *parent, Qt::WindowFlags flags)
   //}    
   
   QRect mainScreenSize = QApplication::desktop()->screenGeometry();
-  //setGeometry(mainScreenSize);
   setFixedSize(mainScreenSize.width(), mainScreenSize.height());
   
   //qDebug() << "Desktop width: " << mainScreenSize.width() << " height: " << mainScreenSize.height();
@@ -1864,4 +1864,3 @@ void BrowserMainWindow::showEvent(QShowEvent *event)
 {
   //DEPRECATED QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
 }
-

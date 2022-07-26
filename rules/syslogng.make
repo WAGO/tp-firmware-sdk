@@ -18,9 +18,9 @@ PACKAGES-$(PTXCONF_SYSLOGNG) += syslogng
 #
 # Paths and names
 #
-SYSLOGNG_VERSION	:= 3.28.1
-SYSLOG_LIBVERSION	:= 3.28
-SYSLOGNG_MD5		:= 2a7cd121bc60105db973bb8126b5b9d7
+SYSLOGNG_VERSION	:= 3.34.1
+SYSLOG_LIBVERSION	:= 3.34
+SYSLOGNG_MD5		:= c92dacafc90c878de3719a0dc3d82de5
 SYSLOGNG		:= syslog-ng-$(SYSLOGNG_VERSION)
 SYSLOGNG_SUFFIX		:= tar.gz
 SYSLOGNG_URL		:= https://github.com/balabit/syslog-ng/releases/download/syslog-ng-$(SYSLOGNG_VERSION)/$(SYSLOGNG).$(SYSLOGNG_SUFFIX)
@@ -53,6 +53,7 @@ SYSLOGNG_AUTOCONF := \
 	--$(call ptx/endis, PTXCONF_SYSLOGNG_TCP_WRAPPER)-tcp-wrapper \
 	--with-systemd-journal=$(call ptx/ifdef, PTXCONF_SYSLOGNG_SYSTEMD,system,no) \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system \
+	--without-net-snmp \
 	--localstatedir=/var/run \
 	--with-libnet=$(SYSROOT)/usr/bin \
     --disable-java
@@ -83,6 +84,7 @@ $(STATEDIR)/syslogng.targetinstall:
 ifdef PTXCONF_SYSLOGNG_CONFIG
 	@$(call install_alternative, syslogng, 0, 0, 0644, /etc/syslog-ng.conf, n)
 	@$(call install_alternative, syslogng, 0, 0, 0644, /etc/syslog_wago_plc.conf, n)
+	@$(call install_copy,        syslogng, 0, 0, 0755, /etc/syslog-ng.conf.d)
 endif
 
 #	# bb init: start scripts

@@ -5,15 +5,15 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     assertion.h
 ///
 ///  \brief    Assertion macros for unified assertion usage.
 ///
-///  \author   OELH: WAGO Kontakttechnik GmbH & Co. KG
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   OELH: WAGO GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 #ifndef INC_WC_ASSERTION_H_
 #define INC_WC_ASSERTION_H_
@@ -23,6 +23,7 @@
 //------------------------------------------------------------------------------
 #include "wc/compiler.h"
 #include "wc/preprocessing.h"
+#include "wc/structuring.h"
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions
@@ -50,8 +51,8 @@
 #define WC_FAIL_SOURCE_FUNC "[unknown function]"
 #define WC_FAIL_SOURCE_LINE (0)
 #else
-#define WC_FAIL_SOURCE_FILE (__FILE__)
-#define WC_FAIL_SOURCE_FUNC (__func__)
+#define WC_FAIL_SOURCE_FILE (WC_ARRAY_TO_PTR(__FILE__))
+#define WC_FAIL_SOURCE_FUNC (WC_ARRAY_TO_PTR(__func__))
 #define WC_FAIL_SOURCE_LINE (__LINE__)
 #endif
 
@@ -77,10 +78,10 @@ extern "C"
   /// \param line
   ///   Line number of failure source in source file.
   //------------------------------------------------------------------------------
-  void wc_Fail(char const * const szReason,
-               char const * const szFile,
-               char const * const szFunction,
-               int const line);
+  void wc_Fail(char const *szReason,
+               char const *szFile,
+               char const *szFunction,
+               int         line);
 
 #ifdef __cplusplus
 } // extern "C"
@@ -161,8 +162,34 @@ extern "C"
 //                                     disallowed definition for macro
 //lint -estring(961, WC_ASSERT_RETURN) to disable Rule 19.7 it is necessary to disable all 961 messages,
 //                                     function-like macro defined
+#ifndef NDEBUG
 #define WC_ASSERT_RETURN(e, result) \
-  WC_ASSERT(#e); if(!(e)) return (result) //lint -e 506 Constant value Boolean
+  (e) ? (void)0 : WC_FAIL(WC_ASSERT_PREFIX #e); if(!(e)) return (result) //lint -e 506 Constant value Boolean
+#else // NDEBUG
+/// Release version of assert only returning error value
+#define WC_ASSERT_RETURN(e, result) if(!(e)) return (result) //lint -e 506 Constant value Boolean
+#endif // NDEBUG
+
+
+/// \def WC_ASSERT_RETURN_VOID(e)
+/// Helper macro, proves expression satisfies true.
+/// In case expression evaluates to false a run-time error is issued (NDEBUG not set)
+/// and function returned.
+/// This macro is intended for pre-execution checks, e. g. to check function/method parameters.
+///
+/// \note To use this macro you have to provide an implementation for the C function \link wc_Fail \endlink.
+/// \see wc_Fail
+//lint -estring(960, WC_ASSERT_RETURN_VOID) to disable Rule 19.4 it is necessary to disable all 960 messages,
+//                                          disallowed definition for macro
+//lint -estring(961, WC_ASSERT_RETURN_VOID) to disable Rule 19.7 it is necessary to disable all 961 messages,
+//                                          function-like macro defined
+#ifndef NDEBUG
+#define WC_ASSERT_RETURN_VOID(e) \
+  (e) ? (void)0 : WC_FAIL(WC_ASSERT_PREFIX #e); if(!(e)) return //lint -e 506 Constant value Boolean
+#else // NDEBUG
+/// Release version of assert only returning error value
+#define WC_ASSERT_RETURN_VOID(e) if(!(e)) return //lint -e 506 Constant value Boolean
+#endif // NDEBUG
 
 
 /// \def WC_FAIL(reason)

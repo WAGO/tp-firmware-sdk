@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.cpp
 ///
-/// \version $Id: alarmindication.cpp 63391 2021-12-03 08:40:35Z wrueckl_elrest $
+/// \version $Id: alarmindication.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   show connection lost informations
 ///
@@ -75,7 +75,7 @@ AlarmIndication::AlarmIndication(QWidget *parent) : QWidget(parent)
                                    newSize, QApplication::desktop()->availableGeometry()) );
 
   ReadWbmBtnState();
-  sUrlWbm = "http://127.0.0.1/wbm/index.html";
+  sUrlWbm = "https://127.0.0.1/wbm/index.html";
   m_iNumber = 10;
   int iButtonHeight = 40;
 
@@ -297,14 +297,14 @@ void AlarmIndication::Show()
 /// \brief hide widget
 ///
 void AlarmIndication::Hide()
-{  
+{
   if (isVisible())
   {
     hide();
     m_iNumber = 0;
     if (m_pTimer)
       m_pTimer->stop();
-  }  
+  }
 }
 
 /*

@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_StructuringMod.hpp
 ///
 ///  \brief    Test module for structuring helper macros (C++).
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 #ifndef TEST_SRC_CPP_MODULES_TEST_STRUCTURINGMOD_HPP_
 #define TEST_SRC_CPP_MODULES_TEST_STRUCTURINGMOD_HPP_
@@ -45,6 +45,8 @@ extern "C"
   size_t GetSizeOfMemberMacroCPP(void);
   size_t GetSizeOfElementPlainCPP(void);
   size_t GetSizeOfElementMacroCPP(void);
+  int  * GetArrayPointerPlainCPP(int array[]);
+  int  * GetArrayPointerMacroCPP(int array[]);
   void * GetContainerAddressPlainCPP(void);
   void * GetContainerAddressMacroCPP(void);
   void const * GetContainerAddressReadonlyPlainCPP(void);

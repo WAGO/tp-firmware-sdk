@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_Assertion.cc
 ///
 ///  \brief    Test for assertion helper macros.
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -100,6 +100,20 @@ TEST(AssertReturn, FailC_DeathTest)
 }
 
 
+TEST(AssertReturnVoid, SucceedC)
+{
+  TriggerSuccessReturnVoidC();
+}
+
+
+TEST(AssertReturnVoid, FailC_DeathTest)
+{
+#ifndef NDEBUG
+  ASSERT_NO_FATAL_FAILURE(TriggerFailReturnVoidC());
+#endif
+}
+
+
 TEST(Assert, SucceedCPP)
 {
   TriggerSuccessCPP();
@@ -128,6 +142,20 @@ TEST(AssertReturn, FailCPP_DeathTest)
   int result = 0;
   ASSERT_NO_FATAL_FAILURE(result = TriggerFailReturnCPP(15));
   EXPECT_EQ(15, result);
+#endif
+}
+
+
+TEST(AssertReturnVoid, SucceedCPP)
+{
+  TriggerSuccessReturnVoidCPP();
+}
+
+
+TEST(AssertReturnVoid, FailCPP_DeathTest)
+{
+#ifndef NDEBUG
+  ASSERT_NO_FATAL_FAILURE(TriggerFailReturnVoidCPP());
 #endif
 }
 

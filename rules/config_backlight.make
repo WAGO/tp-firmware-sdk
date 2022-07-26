@@ -94,7 +94,7 @@ $(STATEDIR)/config_backlight.targetinstall:
 
 $(STATEDIR)/config_backlight.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_BACKLIGHT_DIR) && rm -f *.o $(CONFIG_BACKLIGHT)	
+	-cd $(CONFIG_BACKLIGHT_DIR) && rm -f *.o $(CONFIG_BACKLIGHT)	
 	@-cd $(CONFIG_BACKLIGHT_DIR) && \
 		$(CONFIG_BACKLIGHT_MAKE_ENV) $(CONFIG_BACKLIGHT_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_BACKLIGHT)

@@ -2,12 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2022 WAGO GmbH & Co. KG
 
 function MainPortGeneric
 #
 # Processing of menu Main -> Port
-# See and change the state of telnet, CODESYS-webserver and FTP-port
+# See and change the state of CODESYS-webserver and FTP-port
 #
 {
   local portOutputText=$1

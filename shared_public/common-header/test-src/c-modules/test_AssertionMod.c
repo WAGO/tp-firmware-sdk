@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_AssertionMod.c
 ///
 ///  \brief    Test module for assertion helper macros (C).
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -63,6 +63,18 @@ int TriggerFailReturnC(int const value)
 {
   WC_ASSERT_RETURN(ONE==ZERO, value); //lint -e 506 Constant value Boolean
   return -1;
+}
+
+
+void TriggerSuccessReturnVoidC(void)
+{
+  WC_ASSERT_RETURN_VOID(ONE==ONE); //lint -e 506 Constant value Boolean
+}
+
+
+void TriggerFailReturnVoidC(void)
+{
+  WC_ASSERT_RETURN_VOID(ONE==ZERO); //lint -e 506 Constant value Boolean
 }
 
 

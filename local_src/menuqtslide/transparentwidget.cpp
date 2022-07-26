@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    transparentwidget.cpp
 ///
-/// \version $Id: transparentwidget.cpp 46481 2020-02-11 12:33:17Z wrueckl_elrest $
+/// \version $Id: transparentwidget.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   Thread for receiving command f.e. open menu
 ///

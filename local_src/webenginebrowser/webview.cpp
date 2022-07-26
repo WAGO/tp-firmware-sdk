@@ -144,6 +144,9 @@ int WebPage::showSslError(QString sTxt, bool bShowCheckbox)
   ba.append(sTxt); // = sTxt.toLatin1();
   int sysret;
 
+  //avoid gray rectangle
+  //webview->repaint();
+
   WebView * pView = qobject_cast<WebView*>(this->view());
   if (pView)
   {
@@ -612,7 +615,7 @@ void WebPage::onPageWbm()
   WebView * pView = qobject_cast<WebView*>(this->view());
   if (pView)
   {
-    QString sUrl = "http://127.0.0.1/wbm/index.html";
+    QString sUrl = "https://127.0.0.1/wbm/index.html";
     if (g_webengine.slUrls.count()>0)
     {
       sUrl = g_webengine.slUrls.at(0);
@@ -622,7 +625,7 @@ void WebPage::onPageWbm()
   else
   {  
     qDebug() << "certificateError: LoadWBM";
-    QUrl UrlWbm("http://127.0.0.1/wbm/index.html");
+    QUrl UrlWbm("https://127.0.0.1/wbm/index.html");
     load(UrlWbm);
   }
 }
@@ -927,6 +930,8 @@ WebView::WebView(QWidget* parent)
   , m_progress(0)
   , m_page(0)
 {  
+  setWindowFlags(Qt::FramelessWindowHint);
+
   QRect mainScreenSize = QApplication::desktop()->screenGeometry();
   setGeometry(mainScreenSize);
   m_iTcpRxTimestamp = 0;

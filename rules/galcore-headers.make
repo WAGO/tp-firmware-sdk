@@ -1,6 +1,6 @@
 # -*-makefile-*-
 #
-# Copyright (C) 2014 by <>Wago Kontakttechnik GmbH @AUTHOR@ Co KG
+# Copyright (C) 2014 by <>WAGO GmbH @AUTHOR@ Co KG
 #
 # See CREDITS for details about who has contributed to this project.
 #
@@ -75,7 +75,7 @@ $(STATEDIR)/galcore_headers.targetinstall:
 	@$(call install_init, galcore_headers)
 	@$(call install_fixup, galcore_headers,PRIORITY,optional)
 	@$(call install_fixup, galcore_headers,SECTION,base)
-	@$(call install_fixup, galcore_headers,AUTHOR,"<>Wago Kontakttechnik GmbH @AUTHOR@ Co KG")
+	@$(call install_fixup, galcore_headers,AUTHOR,"<>WAGO GmbH @AUTHOR@ Co KG")
 	@$(call install_fixup, galcore_headers,DESCRIPTION,missing)
 	tar xjvf $(SRCDIR)/$(GALCORE_HEADERS).$(GALCORE_HEADERS_SUFFIX) -C $(PTXCONF_SYSROOT_TARGET)/usr/include
 	@$(call install_finish, galcore_headers)

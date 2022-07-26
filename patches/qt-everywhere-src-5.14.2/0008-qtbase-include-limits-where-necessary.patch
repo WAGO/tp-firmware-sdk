@@ -1,0 +1,83 @@
+From: Lucas Stach <l.stach@pengutronix.de>
+Date: Sat, 1 May 2021 00:57:24 +0200
+Subject: [PATCH] qtbase: include limits where necessary
+
+Upstream fixes:
+https://code.qt.io/cgit/qt/qtbase.git/commit/?id=813a928c7c3cf986
+https://code.qt.io/cgit/qt/qtbase.git/commit/?id=9c56d4da2ff631a8
+
+Fixes build with GCC11, which changed internal includes so that
+limits isn't implicitly pulled in some cases.
+
+Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
+---
+ qtbase/src/corelib/global/qendian.h             | 2 ++
+ qtbase/src/corelib/global/qfloat16.h            | 1 +
+ qtbase/src/corelib/text/qbytearraymatcher.h     | 2 ++
+ qtbase/src/corelib/tools/qoffsetstringarray_p.h | 1 +
+ qtdeclarative/src/3rdparty/masm/yarr/Yarr.h     | 2 ++
+ 5 files changed, 8 insertions(+)
+
+diff --git a/qtbase/src/corelib/global/qendian.h b/qtbase/src/corelib/global/qendian.h
+index 257efbbdbecf..a97776c761b7 100644
+--- a/qtbase/src/corelib/global/qendian.h
++++ b/qtbase/src/corelib/global/qendian.h
+@@ -44,6 +44,8 @@
+ #include <QtCore/qfloat16.h>
+ #include <QtCore/qglobal.h>
+ 
++#include <limits>
++
+ // include stdlib.h and hope that it defines __GLIBC__ for glibc-based systems
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/qtbase/src/corelib/global/qfloat16.h b/qtbase/src/corelib/global/qfloat16.h
+index c7a9c87af322..5302be072ed8 100644
+--- a/qtbase/src/corelib/global/qfloat16.h
++++ b/qtbase/src/corelib/global/qfloat16.h
+@@ -43,6 +43,7 @@
+ 
+ #include <QtCore/qglobal.h>
+ #include <QtCore/qmetatype.h>
++#include <limits>
+ #include <string.h>
+ 
+ #if defined(QT_COMPILER_SUPPORTS_F16C) && defined(__AVX2__) && !defined(__F16C__)
+diff --git a/qtbase/src/corelib/text/qbytearraymatcher.h b/qtbase/src/corelib/text/qbytearraymatcher.h
+index 0eedfc1d2035..f5f9bef7b87c 100644
+--- a/qtbase/src/corelib/text/qbytearraymatcher.h
++++ b/qtbase/src/corelib/text/qbytearraymatcher.h
+@@ -42,6 +42,8 @@
+ 
+ #include <QtCore/qbytearray.h>
+ 
++#include <limits>
++
+ QT_BEGIN_NAMESPACE
+ 
+ 
+diff --git a/qtbase/src/corelib/tools/qoffsetstringarray_p.h b/qtbase/src/corelib/tools/qoffsetstringarray_p.h
+index 4dd9e9603bc1..8b3fbfe55985 100644
+--- a/qtbase/src/corelib/tools/qoffsetstringarray_p.h
++++ b/qtbase/src/corelib/tools/qoffsetstringarray_p.h
+@@ -53,6 +53,7 @@
+ 
+ #include "private/qglobal_p.h"
+ 
++#include <limits>
+ #include <tuple>
+ #include <array>
+ 
+diff --git a/qtdeclarative/src/3rdparty/masm/yarr/Yarr.h b/qtdeclarative/src/3rdparty/masm/yarr/Yarr.h
+index ccf78f988000..cd745256e9e1 100644
+--- a/qtdeclarative/src/3rdparty/masm/yarr/Yarr.h
++++ b/qtdeclarative/src/3rdparty/masm/yarr/Yarr.h
+@@ -27,6 +27,8 @@
+ 
+ #pragma once
+ 
++#include <limits>
++
+ #include <limits.h>
+ #include "YarrErrorCode.h"
+ 

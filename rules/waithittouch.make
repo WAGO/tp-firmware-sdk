@@ -44,8 +44,9 @@ WAITHITTOUCH_LICENSE	:= unknown
 #
 # qmake
 #
+WAITHITTOUCH_PATH				:= PATH=$(PTXDIST_SYSROOT_CROSS)/bin/qt5:$(CROSS_PATH)
 WAITHITTOUCH_CONF_TOOL	:= qmake
-WAITHITTOUCH_CONF_OPT	:= $(CROSS_QMAKE_OPT) PREFIX=/usr
+WAITHITTOUCH_CONF_OPT		:= $(CROSS_QMAKE_OPT) PREFIX=/usr
 
 # ----------------------------------------------------------------------------
 # Target-Install

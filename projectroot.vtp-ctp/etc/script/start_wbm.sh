@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # Script:   start_wbm.sh
@@ -18,6 +18,7 @@
 
 . /etc/profile > /dev/null 2>&1
 HOME=/root
+NOSANDBOX="--no-sandbox"
 
 URL=`/etc/config-tools/get_plcselect 0 url`
 VKB=`/etc/config-tools/get_plcselect 0 vkb`
@@ -47,7 +48,7 @@ function ShowUrl
       #echo "disable pinch"
       echo "1" > /tmp/custom_disable_pinch.txt
     fi
-    /usr/bin/webenginebrowser $URL > /dev/null 2>&1 &
+    /usr/bin/webenginebrowser $NOSANDBOX $URL > /dev/null 2>&1 &
   fi
 }
 

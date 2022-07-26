@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-/// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+/// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 ///
 /// This program is free software: you can redistribute it and/or modify  
 /// it under the terms of the GNU General Public License as published by  
@@ -18,7 +18,7 @@
 ///
 /// \file    spreading.c
 ///
-/// \version $Id: spreading.c 44644 2019-11-14 15:47:13Z wrueckl_elrest $
+/// \version $Id: spreading.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   spreading module sets spread spectrum mode for PLL2
 ///

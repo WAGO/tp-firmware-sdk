@@ -1,7 +1,7 @@
 ## -*-makefile-*-
 # $Id$
 #
-# Copyright (C) 2013 by Wago Kontakttechnik GmbH & Co. KG
+# Copyright (C) 2013 by WAGO GmbH & Co. KG
 #
 # See CREDITS for details about who has contributed to this project.
 #
@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CDS3_TSCDRM) += cds3-tscdrm
 
-CDS3_TSCDRM_VERSION      := 1.2.1
+CDS3_TSCDRM_VERSION      := 1.3.2
 CDS3_TSCDRM              := TscDrm
 CDS3_TSCDRM_DIR          := $(BUILDDIR)/$(CDS3_TSCDRM)
 CDS3_TSCDRM_URL          := file://$(PTXDIST_WORKSPACE)/wago_intern/codesys3-Component/$(CDS3_TSCDRM)

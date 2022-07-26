@@ -1,0 +1,20 @@
+diff -Naur qt-everywhere-src-5.15.2_org/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn qt-everywhere-src-5.15.2/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn
+--- qt-everywhere-src-5.15.2_org/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn	2020-11-07 02:22:36.000000000 +0100
++++ qt-everywhere-src-5.15.2/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn	2021-10-21 15:30:28.720769882 +0200
+@@ -771,8 +771,14 @@
+         # Root build config sets -mfpu=$arm_fpu, which we expect to be neon
+         # when running this.
+         if (!arm_use_neon) {
+-          configs -= [ "//build/config/compiler:compiler_arm_fpu" ]
+-          cflags += [ "-mfpu=neon" ]
++          if (current_cpu == "arm" && !is_ios && !is_nacl) {
++            cflags += [ "-mfpu=$arm_fpu" ]
++          if (!arm_use_thumb) {
++            cflags += [ "-marm" ]
++          }
++          asmflags = cflags
++        }
++        cflags += [ "-mfpu=neon" ]
+         }
+       }
+     } else {

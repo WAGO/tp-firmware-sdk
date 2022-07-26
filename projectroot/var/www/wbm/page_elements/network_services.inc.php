@@ -1,7 +1,7 @@
 <?php include("page_element_general_content.inc.php");
 
 /*
- * Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+ * Copyright (c) 2018-2022 WAGO GmbH & Co. KG
  *
  * PROPRIETARY RIGHTS are involved in the subject matter of this material.
  */
@@ -14,9 +14,6 @@
     <p>Note: After disabling HTTP or HTTPS service, Web-based Management will possibly lose connection to the controller.</p>
 
     <div id="network_services_interface_state_area">
-
-      <h3>Telnet</h3>
-      <div id="telnet_service_config_area"></div>
 
       <h3>FTP</h3>
       <div id="ftp_service_config_area"></div>

@@ -5,14 +5,14 @@
 //
 // This file is part of project common-header (PTXdist package libcommonheader).
 //
-// Copyright (c) 2017 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2017-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ///  \file     test_StructuringMod.cc
 ///
 ///  \brief    Test module for structuring helper macros (C++).
 ///
-///  \author   PEn: WAGO Kontakttechnik GmbH & Co. KG
+///  \author   PEn: WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -95,6 +95,18 @@ size_t GetSizeOfElementPlainCPP()
 size_t GetSizeOfElementMacroCPP()
 {
   return WC_SIZEOF_ELEMENT(arDoubles);
+}
+
+
+int  * GetArrayPointerPlainCPP(int array[])
+{
+    return &(array[0]);
+}
+
+
+int  * GetArrayPointerMacroCPP(int array[])
+{
+    return WC_ARRAY_TO_PTR(array);
 }
 
 

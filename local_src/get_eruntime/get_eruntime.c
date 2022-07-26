@@ -3,13 +3,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2019 WAGO Kontakttechnik GmbH & Co. KG
+// Copyright (c) 2019-2022 WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 ///------------------------------------------------------------------------------
 ///
 /// \file    get_eruntime.c
 ///
-/// \version $Id: get_eruntime.c 45922 2020-01-20 15:31:05Z wrueckl_elrest $
+/// \version $Id: get_eruntime.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
 ///
 /// \brief   get eruntime cfg contents / config-tools
 ///

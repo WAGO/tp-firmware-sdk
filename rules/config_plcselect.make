@@ -94,7 +94,7 @@ $(STATEDIR)/config_plcselect.targetinstall:
 
 $(STATEDIR)/config_plcselect.clean:
 	@$(call targetinfo)
-	cd $(CONFIG_PLCSELECT_DIR) && rm -f *.o $(CONFIG_PLCSELECT)
+	-cd $(CONFIG_PLCSELECT_DIR) && rm -f *.o $(CONFIG_PLCSELECT)
 	@-cd $(CONFIG_PLCSELECT_DIR) && \
 		$(CONFIG_PLCSELECT_MAKE_ENV) $(CONFIG_PLCSELECT_PATH) $(MAKE) clean
 	@$(call clean_pkg, CONFIG_PLCSELECT)

@@ -4,7 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2018 WAGO Kontakttechnik GmbH & Co. KG
+# Copyright (c) 2018-2022 WAGO GmbH & Co. KG
 
 resize
 clear
@@ -17,7 +17,6 @@ echo -e "To cycle through the windows press the keys 'C-a C-n' or 'C-a C-p' (C =
 echo -e "To detach from the screen session use 'C-a C-d'.\n"
 echo -e "To start or stop Codesys or the screensaver daemon do the following:\n"
 echo -e "\t/etc/init.d/codesys start | stop\n\t/etc/init.d/screend start | stop\n"
-echo -e "If you are logged in via telnet you have to leave the screen session first before doing 'exit' at the command line.\n"
 echo -e "\nPress <Enter> to step into administration terminal or 'C-c' to cancel."
 read
 #screen -S wago -p 0 -X clear
