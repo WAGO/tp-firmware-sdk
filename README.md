@@ -53,7 +53,7 @@ https://ubuntu.com/16-04
 
 **Make sure if you like to use the precompiled toolchain that you use the Ubuntu-64bit variant.**
 
-A minimal disk space of 25GB is required. We recommend 50GB and also 4GB of RAM.
+A minimal disk space of 25GB is required. We recommend 50GB and also 12GB of RAM.
 > For virtual machines on windows x64 hosts:
 You may enable virtualization support(Intel VT-x or AMD-V), typical turned on in BIOS or UEFI.
 
