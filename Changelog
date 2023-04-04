@@ -1,3 +1,28 @@
+Firmware Release 04.02.13 (24) - CODESYS 3
+
+Migration Guide - from e!COCKPIT to CODEYS V3.5:
+- https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
+
+System:
+[NEW] EC: Touchscreen support for display types:
+      Waveshare, Ilitek, PixCir, Elotouch, QDtech
+[FIXED] CVE-2022-0529 , CVE-2022-0530
+[FIXED] Updates libcurl to version 7.84.0;
+      Fixes CVE-2022-22576 , CVE-2022-27782, CVE-2022-30115, CVE-2022-27775,
+      CVE-2022-27781, CVE2022-27776, CVE-2022-27779, CVE-2022-27780, CVE-2022-27774,
+      CVE-2022-32205, CVE-2022-32206, CVE-2022-32207, CVE-2022-32208
+
+Runtime System:
+[NEW] Codesys3 Runtime-System 3.5.18.20
+[CHANGED] Codesys3 Runtime-System supported on TP600 Control Panel
+      (762-x30x/8000-0002) and Edge Controller (752-8303/8000-0002).
+[FIXED] “PLC load watchdog” might not work as expected: the plc load watchdog will
+      detect (e.g. an endless loop) but the IEC task might not be stopped in any case.
+      This might lead to a complete stop of the runtime process. As workaround and
+      improve “hardening” of your IEC application we recommend to use an IEC Task
+      watchdog on all your relevant IEC tasks in your IEC application.
+
+################################################################################
 Firmware Release 03.07.20 (99)
 
 System:
@@ -17,7 +42,7 @@ System:
 [FIXED] Security-Fix in config-tool print_log.
 [FIXED] Network bridges discard their IP address when all associated network
         ports are disconnected.
-[FIXED] “Dirty Pipe" enables root privileges CVE-2022-0847
+[FIXED] "Dirty Pipe" enables root privileges CVE-2022-0847
 [NEW] Integration of Docker Deamon. Docker now can be installed and ac-tivited
       via. WBM.
 [NEW] Users of WBM and Linux where harmonized. User "user" and "admin" can

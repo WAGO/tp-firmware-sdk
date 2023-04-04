@@ -1,0 +1,72 @@
+diff -Naur codesys-3_orig/Components/SysGraphicWindowQt/tvlineedit.cpp codesys-3/Components/SysGraphicWindowQt/tvlineedit.cpp
+--- codesys-3_orig/Components/SysGraphicWindowQt/tvlineedit.cpp	2023-02-17 11:30:26.981171000 +0100
++++ codesys-3/Components/SysGraphicWindowQt/tvlineedit.cpp	2023-02-17 14:23:28.198942224 +0100
+@@ -1,4 +1,8 @@
+ #include "tvlineedit.h"
++#include <fcntl.h>
++#include <unistd.h>
++#include <QMutex>
++#include <QMutexLocker>
+ #include "windowwidget.h"
+ 
+ /* TVLineEdit implementation ----------------------------- */
+@@ -76,6 +80,30 @@
+   }
+ }
+ 
++static void openvk() {
++  //open virtual keyboard
++  int fd = open("/dev/virtualkeyboard", O_RDWR | O_NONBLOCK);
++  if (fd >= 0)
++  {
++    char * pCmd = "tvopen\n";
++    write(fd, pCmd, strlen(pCmd));
++    close(fd);
++  }
++}
++
++static QMutex vkmutex;
++void TVLineEdit::focusInEvent(QFocusEvent *event){
++  //open virtual keyboard
++  QMutexLocker locker(&vkmutex);
++  openvk();
++}
++
++void TVLineEdit::enterEvent(QEvent *event){
++  //open virtual keyboard
++  QMutexLocker locker(&vkmutex);
++  openvk();
++}
++
+ bool TVLineEdit::isInEditControl(int iX, int iY)
+ {
+ 	int x1, x2, y1, y2;
+@@ -84,8 +112,14 @@
+ 	x2 = m_right;
+ 	y2 = m_bottom;
+ 	
+-	if ((iX >= x1 && iX <= x2) && (iY >= y1 && iY <= y2))
+-		return true;
++	if ((iX >= x1 && iX <= x2) && (iY >= y1 && iY <= y2)) {
++    if (isVisible() && isEnabled()) {
++      //open virtual keyboard
++      QMutexLocker locker(&vkmutex);
++      openvk();
++    }
++    return true;
++  }
+ 	return false;
+ }
+ 
+diff -Naur codesys-3_orig/Components/SysGraphicWindowQt/tvlineedit.h codesys-3/Components/SysGraphicWindowQt/tvlineedit.h
+--- codesys-3_orig/Components/SysGraphicWindowQt/tvlineedit.h	2023-02-17 11:30:26.993171000 +0100
++++ codesys-3/Components/SysGraphicWindowQt/tvlineedit.h	2023-02-17 14:21:15.862949874 +0100
+@@ -44,4 +44,8 @@
+ private:
+     //Position:
+     int m_left, m_top, m_right, m_bottom;
++    
++protected:
++	void focusInEvent(QFocusEvent *event);
++	void enterEvent(QEvent *event);  
+ };

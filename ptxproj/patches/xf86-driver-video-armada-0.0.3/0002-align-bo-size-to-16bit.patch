@@ -1,0 +1,16 @@
+diff -Naur xf86-driver-video-armada-0.0.3_org/etnaviv/etnaviv.c xf86-driver-video-armada-0.0.3/etnaviv/etnaviv.c
+--- xf86-driver-video-armada-0.0.3_org/etnaviv/etnaviv.c	2019-05-13 09:49:18.000000000 +0200
++++ xf86-driver-video-armada-0.0.3/etnaviv/etnaviv.c	2022-10-26 07:44:45.570314598 +0200
+@@ -967,7 +967,12 @@
+ static void etnaviv_align_bo_size(ScreenPtr pScreen, int *width, int *height,
+ 	int bpp)
+ {
++#if 0
+ 	*width = etnaviv_pitch(*width, bpp) * 8 / bpp;
++#else
++	*width = etnaviv_pitch(*width, bpp) * 8 / bpp;
++	*width = (*width + (16-1)) & ~(16-1);
++#endif
+ }
+ 
+ static Bool etnaviv_format(struct etnaviv_format *fmt, unsigned int depth,

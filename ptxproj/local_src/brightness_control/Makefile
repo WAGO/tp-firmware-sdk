@@ -1,0 +1,32 @@
+#
+# Simple development makefile
+#
+
+ifndef PTXDIST_SYSROOT_TARGET
+#$(error Environment variable PTXDIST_SYSROOT_TARGET not set properly!)
+endif
+
+GLIB_CFLAGS  = -I$(PTXDIST_SYSROOT_TARGET)/usr/include/glib-2.0
+GLIB_CFLAGS += -I$(PTXDIST_SYSROOT_TARGET)/usr/lib/glib-2.0/include
+GLIB_CFLAGS += -O2 -g -Wall #-Wsign-compare -Wfloat-equal -Wformat-security -D_REENTRANT #-Werror
+GLIB_LDFLAGS = -lglib-2.0
+override LDFLAGS += -L$(PTXDIST_SYSROOT_TARGET)/lib -ludev -lpthread -lmsgtool -lrt -lm -lctcommon $(GLIB_LDFLAGS)
+override CFLAGS += $(GLIB_CFLAGS)
+override CFLAGS+=-O0 -ggdb3
+
+
+all: brightness_control
+
+brightness_control: brightness_control.o
+	$(CC) $(LDFLAGS) -o $@ brightness_control.o $(LDLIBS$(LDLIBS-$(@)))
+
+
+clean:
+	rm -f brightness_control *.gdb *.o
+
+install:
+
+
+.PHONY: all install clean
+
+# end of development makefile
