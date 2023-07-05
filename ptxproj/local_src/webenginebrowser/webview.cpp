@@ -1334,8 +1334,8 @@ void WebView::onShowReconnectPage()
     m_pTimerReconnect->start(g_webengine.iReconnectInterval * 1000);
 
     //close virtual keyboard if neccessary
-    char * pCmd = "close\n";
-    Write2PipedFifo(DEV_VIRTUALKEYBOARD, pCmd);
+    //char * pCmd = "close\n";
+    //Write2PipedFifo(DEV_VIRTUALKEYBOARD, pCmd);
 
     //only show reconnect screen in active tab
     reconnectPage.Countdown(g_webengine.iReconnectInterval);

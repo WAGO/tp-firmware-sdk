@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    get_fonts.c
 ///
-/// \version $Id: get_fonts.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   get font settings
 ///

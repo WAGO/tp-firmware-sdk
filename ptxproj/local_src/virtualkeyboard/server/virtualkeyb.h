@@ -16,7 +16,7 @@
 ///------------------------------------------------------------------------------
 /// \file    virtualkeyb.h
 ///
-/// \version $Id: virtualkeyb.h 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   virtual keyboard
 ///
@@ -99,6 +99,8 @@ public:
 
   //QObject * m_pFocusedObject;
 static QString m_sLastCharacter;
+static int m_iTvOpen;      // open signal from targetvisu received
+static bool m_bPluginOpen; // open signal from plugin received
 
   //QString m_sLanguageId;
   CVKButton * m_pBtn;
@@ -131,7 +133,7 @@ static QString m_sLastCharacter;
   void SetBtnDimensions();
   void SetPanelDimensions(QSize newSize);
   void Show();
-  void Hide();
+  void Hide(bool bForce=false);
   void ShowCbPasswd(bool bShow);
 
   QTimer timerKeyRepetition;
@@ -150,6 +152,8 @@ static QString m_sLastCharacter;
   QCheckBox * m_pCheckPw;
 
   void SetVkEnabled(bool bEnabled);
+  
+  //void Log(QString s);
 
 signals:
   void vkSpecialKeyClicked(int key);

@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file    setup_display.c
 ///
-/// \version $Id: setup_display.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   set and get display brigthness
 ///

@@ -9,7 +9,7 @@
 ///
 /// \file    config_display.c
 ///
-/// \version $Id: config_display.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   change display settings / config-tools
 ///
@@ -56,7 +56,6 @@
 // Local defines
 //------------------------------------------------------------------------------
 static const char EepromDevice[] = "/sys/bus/i2c/devices/1-0054/eeprom";
-#define SYSFS_EEPROM_WP_PATH	"/sys/class/gpio/gpio23/value"
 #define DISPLAY_ROTATION_ADDR	0x01F8
 #define CT_MICROBROWSER   "/etc/config-tools/config_microbrowser"
 
@@ -557,32 +556,15 @@ int eeprom_open(void)
 /// \return -1 ERROR
 int WriteBlock(int fd, unsigned int iMemAddress, char *cData, unsigned short usDataCnt)
 {
-  int sysfs_fd;
-  char eeprom_wp_off='0';
-  char eeprom_wp_on='1';
-  
-  sysfs_fd = open("/sys/class/gpio/gpio23/value", O_WRONLY);
-  if(sysfs_fd < 0) {
-    printf("could not open '/sys/class/gpio/gpio23/value!\n");
-		return -1;
-  }
-  write(sysfs_fd, &eeprom_wp_off, 1);
-  
   if (lseek(fd, iMemAddress, SEEK_SET) < 0) {
     printf("lseek failed \n");
-    write(sysfs_fd, &eeprom_wp_on, 1);
-    close(sysfs_fd);
     return -1;
   }
 
   if( (write(fd, cData, usDataCnt)) < 0 ) {
     printf("eeprom write block failed \n");
-    write(sysfs_fd, &eeprom_wp_on, 1);
-    close(sysfs_fd);
     return -1;
   }
 
-  write(sysfs_fd, &eeprom_wp_on, 1);
-  close(sysfs_fd);  
   return 0;
 }

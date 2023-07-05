@@ -50,6 +50,7 @@ private slots:
 
 private:
     QObject *m_focusObject;
+    void showVirtualKeyboard();
 
 protected:
     void updateText();

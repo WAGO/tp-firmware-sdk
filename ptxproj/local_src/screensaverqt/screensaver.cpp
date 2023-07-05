@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screensaver.cpp
 ///
-/// \version $Id: screensaver.cpp 71840 2022-11-23 12:28:45Z wrueckl_elrest $
+/// \version $Id$
 ///
 /// \brief   screensaver Qt tool
 ///

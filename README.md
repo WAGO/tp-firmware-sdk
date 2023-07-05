@@ -73,7 +73,7 @@ Alternatively you can also run tp-builder in bash mode (```make bash```) and ent
 
     ptxdist select configs/vtp-ctp/ptxconfig_generic && \ 
     ptxdist platform configs/vtp-ctp/platformconfig && \      
-    ptxdist toolchain /opt/gcc-Toolchain-2022.02/LINARO.Toolchain-2022.02/arm-linux-gnueabihf/bin/ && \
+    ptxdist toolchain /opt/gcc-Toolchain-2022.08/LINARO.Toolchain-2022.08/arm-linux-gnueabihf/bin/ && \
     ptxdist clean -q
 
 #### 3.1) Get and download all packages
@@ -141,7 +141,6 @@ Documentation on how to use the WUP can be found in the pfc manual (12.2.1): [ht
 RAUC uses a certificate based approach to authenticate the origin of a bundle. To ease creating of WUP files during development, the BSP contains test certificates. In order to use RAUC's authentication mechanism to ensure the origin of a bundle, it is stricly recommended to to use custom certificates. A HowTo for this can be found here: [https://github.com/WAGO/pfc-howtos/tree/master/HowTo_GenerateWUPFile](https://github.com/WAGO/pfc-howtos/tree/master/HowTo_GenerateWUPFile).
 
 ### 6.) Write the binary image file "sd.hdimg" to SD-Card
-ATTENTION: Size of generated 'sd.hdimg' has been changed to 204MB.
 
 #### 6.1) Virtual machine on a windows host
 

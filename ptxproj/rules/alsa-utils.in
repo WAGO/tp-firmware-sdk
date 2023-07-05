@@ -12,6 +12,9 @@ menuconfig ALSA_UTILS
 	select LIBC_M		if ALSA_UTILS_ALSALOOP
 	select LIBC_PTHREAD
 	select NCURSES		if ALSA_UTILS_ALSAMIXER
+	select NCURSES_FORM	if ALSA_UTILS_ALSAMIXER
+	select NCURSES_MENU	if ALSA_UTILS_ALSAMIXER
+	select NCURSES_PANEL	if ALSA_UTILS_ALSAMIXER
 	select SYSTEMD		if ALSA_UTILS_SYSTEMD_UNIT
 	# to detect where to install its udev rules
 	select UDEV
@@ -43,9 +46,6 @@ config ALSA_UTILS_ASOUND_STATE
 config ALSA_UTILS_ALSAMIXER
 	bool
 	prompt "alsamixer"
-	select NCURSES_FORM
-	select NCURSES_MENU
-	select NCURSES_PANEL
 	help
 	  Build the console and ncurses based 'alsamixer' tool.
 

@@ -9,7 +9,7 @@
 ///
 /// \file    config_testability.c
 ///
-/// \version $Id: config_testability.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   testability settings / config-tools
 ///

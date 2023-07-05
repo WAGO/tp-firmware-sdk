@@ -9,7 +9,7 @@
 ///
 /// \file    config_plcselect.c
 ///
-/// \version $Id: config_plcselect.c 71221 2022-10-25 12:11:50Z wrueckl_elrest $
+/// \version $Id$
 ///
 /// \brief   plc selection settings / config-tools
 ///

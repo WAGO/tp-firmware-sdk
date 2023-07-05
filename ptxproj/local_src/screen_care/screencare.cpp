@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screencare.cpp
 ///
-/// \version $Id: screencare.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   Application main window implementation
 ///

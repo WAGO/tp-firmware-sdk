@@ -9,7 +9,7 @@
 ///
 /// \file    get_operatinghours.c
 ///
-/// \version $Id: get_operatinghours.c 67571 2022-05-31 13:00:57Z rgliese_elrest $
+/// \version $Id$
 ///
 /// \brief   get operating hours / config-tools
 ///

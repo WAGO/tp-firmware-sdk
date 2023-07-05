@@ -9,7 +9,7 @@
 ///
 ///  \file     get_screensaver.c
 ///
-///  \version  $Id: get_screensaver.c 71786 2022-11-21 14:47:46Z wrueckl_elrest $
+///  \version  $Id$
 ///
 ///  \brief    get screensaver settings / config-tools
 ///

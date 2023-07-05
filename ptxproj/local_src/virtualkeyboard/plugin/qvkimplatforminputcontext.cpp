@@ -107,6 +107,13 @@ void QVkImPlatformInputContext::setFocusObject(QObject *object)
 
 void QVkImPlatformInputContext::showInputPanel()
 {
+  //coming from PlatformInputContext
+  showVirtualKeyboard();
+  m_dbusInterface->call("slotOpenFromPlugin");
+}
+
+void QVkImPlatformInputContext::showVirtualKeyboard()
+{
   QPoint globalPos(0, 0);
   QWidget *widget = qobject_cast<QWidget*>(m_focusObject);
 
@@ -240,5 +247,5 @@ void QVkImPlatformInputContext::slotOnUpdateText()
 void QVkImPlatformInputContext::slotShowVirtualKeyboardFromTv()
 {
   //open vk from targetvisu
-  showInputPanel();
+  showVirtualKeyboard();
 }

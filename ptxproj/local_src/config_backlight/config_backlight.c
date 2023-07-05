@@ -9,7 +9,7 @@
 ///
 /// \file    config_backlight.c
 ///
-/// \version $Id: config_backlight.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   change backlight settings / config-tools
 ///

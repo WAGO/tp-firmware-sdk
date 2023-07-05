@@ -57,7 +57,7 @@ $(STATEDIR)/libdrm-armada.prepare:
 	LIBDRM_CFLAGS=-I$(PTXCONF_SYSROOT_TARGET)/usr/include \
 	LIBDRM_LIBS="-L$(PTXCONF_SYSROOT_TARGET)/usr/lib -ldrm" && \
 	PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig && \
-	make clean
+	$(MAKE) clean
 	@$(call touch)
 
 # ----------------------------------------------------------------------------

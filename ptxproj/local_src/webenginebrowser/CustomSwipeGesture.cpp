@@ -26,7 +26,7 @@
 ///
 /// \file    CustomSwipeGesture.cpp
 ///
-/// \version $Id: CustomSwipeGesture.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   use QGestureRecognizer to scroll
 ///

@@ -9,7 +9,7 @@
 ///
 /// \file    brightness_control.c
 ///
-/// \version $Id: brightness_control.c 71673 2022-11-16 15:27:20Z wrueckl_elrest $
+/// \version $Id$
 ///
 /// \brief   brightness control, display backlight settings
 ///
@@ -377,7 +377,7 @@ void ThreadFctScreensaver(void * ptr)
   
   //time_t tLastEventReceived, tNow;
   time_t iSecondsToWait;
-  char * pCmdClose = "close\n";
+  //char * pCmdClose = "close\n";
   
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
   
@@ -435,7 +435,7 @@ void ThreadFctScreensaver(void * ptr)
       }
       
       //close virtualkeyboard      
-      Write2PipedFifo(DEV_VIRTUALKEYBOARD, pCmdClose); 
+      //Write2PipedFifo(DEV_VIRTUALKEYBOARD, pCmdClose); 
       
       //call screensaver app and wait      
       system(szCmd); 

@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file     config_fonts.c
 ///
-/// \version $Id: config_fonts.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief    set font settings
 ///

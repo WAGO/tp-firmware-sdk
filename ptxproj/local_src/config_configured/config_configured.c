@@ -9,7 +9,7 @@
 ///
 /// \file    config_configured.c
 ///
-/// \version $Id: config_configured.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   change IsConfigured settings / config-tools
 ///

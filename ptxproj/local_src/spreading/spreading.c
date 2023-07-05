@@ -18,7 +18,7 @@
 ///
 /// \file    spreading.c
 ///
-/// \version $Id: spreading.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   spreading module sets spread spectrum mode for PLL2
 ///

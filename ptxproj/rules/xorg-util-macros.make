@@ -60,7 +60,7 @@ $(STATEDIR)/xorg-util-macros.targetinstall:
 	@$(call install_fixup, xorg-util-macros,AUTHOR,"Ralf Gliese <gliese@elrest.de>")
 	@$(call install_fixup, xorg-util-macros,DESCRIPTION,missing)
 
-	#@cd $(XORG_UTIL_MACROS_DIR) && make install
+	#@cd $(XORG_UTIL_MACROS_DIR) && $(MAKE) install
 	#@$(call install_lib, xorg-util-macros, 0, 0, 0644, libxcb-image)
 
 	@$(call install_finish, xorg-util-macros)

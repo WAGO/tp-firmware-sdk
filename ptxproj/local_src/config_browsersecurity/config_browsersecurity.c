@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file config_browsersecurity
 ///
-/// \version $Id: config_browsersecurity.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief set the browsers SSL security level
 ///

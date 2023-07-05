@@ -16,7 +16,7 @@
 ///------------------------------------------------------------------------------
 /// \file    virtualkeyb.cpp
 ///
-/// \version $Id: virtualkeyb.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   virtual keyboard
 ///
@@ -64,6 +64,8 @@ extern int g_InputMethodHints;
 //------------------------------------------------------------------------------
 
 QString VirtualKeyb::m_sLastCharacter = "";
+int VirtualKeyb::m_iTvOpen = 0;
+bool VirtualKeyb::m_bPluginOpen = false;
 
 CTextBox::CTextBox(QWidget * parent) : QPlainTextEdit(parent)
 {
@@ -550,8 +552,27 @@ void VirtualKeyb::HandleDown()
 ///
 void VirtualKeyb::HandleOk()
 {
-  m_sLastCharacter = "";
-  Hide();  
+  if (m_iTvOpen > 0)
+  {
+    sendKeyCode(Qt::Key_Enter, 1);
+  }
+
+  //Log("HandleOk");
+  //Log(QString::number(m_iTvOpen));
+
+  Hide();
+  
+/*
+  if (m_bTvOpen == true)
+  {
+    sendKeyCode(Qt::Key_Enter, 1);
+  }
+  else
+  {
+    
+    Hide();
+  }
+*/
 
 }
 
@@ -624,25 +645,41 @@ void VirtualKeyb::sendKeyCode(int iKey, int iSpecialBtn)
 ///
 void VirtualKeyb::Show()
 {
+  //Log("Show");
   m_sLastCharacter = "";
   m_bSwapButtonCalled = false;
 
   if (m_bEnabled)
   {
     show();
-    //ShowEditCursor();
   }
-
 }
+
 
 /// \brief hide keyboard
 ///
-void VirtualKeyb::Hide()
+void VirtualKeyb::Hide(bool bForce)
 {
   m_sLastCharacter = "";
   timerKeyRepetition.stop();
-  hide();
 
+  if (bForce == true)
+  {
+    //switching layer only hiding inactive
+    hide();
+  }
+  else if (isVisible())
+  {
+    //if ((m_iTvOpen == 0)||(m_bPluginOpen == true))
+    if ((m_iTvOpen <= 1)||(m_bPluginOpen == true))
+    {
+      hide();
+      //close comlete vk - not only a layer hiding
+      m_bPluginOpen = false;
+      m_iTvOpen = 0;
+      //Log("hide vk");
+    }
+  }
 }
 
 /// \brief button released received
@@ -844,3 +881,15 @@ void VirtualKeyb::SetVkEnabled(bool bEnabled)
 {
     m_bEnabled = bEnabled;
 }
+
+//void VirtualKeyb::Log(QString s)
+//{
+//    QFile f("/tmp/vklog.txt");
+//    QDateTime dteNow = QDateTime::currentDateTime();
+//    QString sNow = dteNow.toString("hh:mm:ss");
+//    if (f.open(QFile::WriteOnly | QFile::Append)) {
+//        QTextStream out(&f);
+//        out << sNow << ": " << s << "\n";
+//        f.close();
+//    }
+//}

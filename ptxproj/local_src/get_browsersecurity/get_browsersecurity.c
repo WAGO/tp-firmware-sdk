@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file get_browsersecurity
 ///
-/// \version $Id: get_browsersecurity.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief get the browsers SSL security level
 ///

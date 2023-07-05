@@ -9,7 +9,7 @@
 ///
 ///  \file    get_touchbeeper.c
 ///
-///  \version $Id: get_touchbeeper.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+///  \version $Id$
 ///
 ///  \brief   get touchbeeper settings / config-tools
 ///

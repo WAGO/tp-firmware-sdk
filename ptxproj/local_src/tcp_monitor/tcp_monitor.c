@@ -9,7 +9,7 @@
 ///
 /// \file    tcp_monitor.c
 ///
-/// \version $Id: tcp_monitor.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   tcp packet listener to monitor plclist URLs
 ///

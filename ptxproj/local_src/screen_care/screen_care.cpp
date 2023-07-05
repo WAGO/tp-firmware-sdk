@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    screen_care.cpp
 ///
-/// \version $Id: screen_care.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   main file
 ///

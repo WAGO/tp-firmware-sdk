@@ -9,7 +9,7 @@
 ///
 /// \file    config_virtualkeyboard.c
 ///
-/// \version $Id: config_virtualkeyboard.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   change virtualkeyboard settings / config-tools
 ///

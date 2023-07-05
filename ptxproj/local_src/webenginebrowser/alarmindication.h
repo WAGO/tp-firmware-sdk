@@ -26,7 +26,7 @@
 ///
 /// \file    alarmindication.h
 ///
-/// \version $Id: alarmindication.h 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   show connection lost informations
 ///

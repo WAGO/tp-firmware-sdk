@@ -9,7 +9,7 @@
 ///
 /// \file    get_eruntime.c
 ///
-/// \version $Id: get_eruntime.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   get eruntime cfg contents / config-tools
 ///

@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 /// \file main.cpp
 ///
-/// \version $Id: main.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief Thread for receiving command f.e. open menu
 ///

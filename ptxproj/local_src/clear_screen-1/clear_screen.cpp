@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file clear_screen.cpp
 ///
-/// \version $Id: clear_screen.cpp 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief touchscreen cleaning tool
 ///
@@ -60,7 +60,6 @@
 
 #define CONF_FILE            "/etc/specific/qtstyle.conf"
 #define CONF_FILE_DISPLAY    "/etc/specific/display.conf"
-#define DEV_VIRTUALKEYBOARD  "/dev/virtualkeyboard"
 
 #ifndef ERROR
 #define ERROR   -1
@@ -101,18 +100,6 @@ int main(int argc, char **argv)
   int iTimeOut = 15;
   QApplication app(argc, argv);
 
-  //close virtualkeyboard 
-  if (fileexists(DEV_VIRTUALKEYBOARD) == SUCCESS)
-  {
-    int fd = open(DEV_VIRTUALKEYBOARD, O_RDWR | O_NONBLOCK);
-    if (fd >= 0)
-    {
-      char * pCmd = "close\n";
-      write(fd, pCmd, strlen(pCmd));
-      close(fd);
-    }
-  }
-  
   //screen width and height
   QRect rDesk = QApplication::desktop()->screenGeometry();
 

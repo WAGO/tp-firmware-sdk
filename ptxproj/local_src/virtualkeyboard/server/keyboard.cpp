@@ -190,7 +190,7 @@ void Keyboard::HandleSwap()
         inputPanel->m_bSwapButtonCalled = true;
 
         inputPanel->Show();       
-        savePtr->Hide();
+        savePtr->Hide(true);
 
         break;
       }
@@ -985,7 +985,10 @@ void Keyboard::CreateSpecialButton(tKeyValues * pKeyVal, int &xpos,
 void Keyboard::showKeyboard()
 {
   if (inputPanel)
+  {
+    //signal from dbus
     inputPanel->Show();
+  }
 }
 
 /// \brief hide software input panel
@@ -1007,6 +1010,17 @@ bool Keyboard::keyboardVisible() const
   else
   {
     return false;
+  }
+}
+
+void Keyboard::slotOpenFromPlugin()
+{
+  //open from webenginebrowser - not targetvisu
+  if (inputPanel)
+  {
+    //inputPanel->Log("slotOpenFromPlugin");
+    inputPanel->m_iTvOpen = 0;
+    inputPanel->m_bPluginOpen = true;
   }
 }
 
@@ -1065,11 +1079,20 @@ void Keyboard::cmdSlotReceived(QString s)
   }
   else if (s.left(6).compare("tvopen", Qt::CaseInsensitive) == 0)
   {
-    emit signalShowVirtualKeyboardFromTv();
+    if ((inputPanel) && (inputPanel->isVisible() == false))
+    {
+      inputPanel->m_iTvOpen++;
+      if (inputPanel->m_iTvOpen == 1)
+      {
+        //inputPanel->Log("tvopen");
+        emit signalShowVirtualKeyboardFromTv();
+      }
+    }
   }
   else if (s.left(5).compare("close", Qt::CaseInsensitive) == 0)
   {
     //close
+    inputPanel->m_iTvOpen = 0;
     inputPanel->Hide();
   }
   else if (s.left(6).compare("enable", Qt::CaseInsensitive) == 0)

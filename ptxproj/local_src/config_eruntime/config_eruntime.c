@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file     config_eruntime.c
 ///
-/// \version $Id: config_eruntime.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief    audio change settings / config-tools
 ///

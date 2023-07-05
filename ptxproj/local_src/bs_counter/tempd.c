@@ -8,7 +8,7 @@
 ///------------------------------------------------------------------------------
 /// \file tempd.c
 ///
-/// \version $Id: tempd.c 67572 2022-05-31 13:13:43Z rgliese_elrest $
+/// \version $Id$
 ///
 /// \brief operating hours counter
 ///

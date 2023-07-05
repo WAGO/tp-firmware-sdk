@@ -9,7 +9,7 @@
 ///
 ///  \file    get_audio.c
 ///
-///  \version $Id: get_audio.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+///  \version $Id$
 ///
 ///  \brief   get audio settings / config-tools
 ///

@@ -43,6 +43,7 @@ public slots:
   void inputFieldTextChanged(const QString &s, int iCursorPos);
   void slotSpecialKeyClicked(int key);
   void slotKeyClicked(const QString &text);
+  void slotOpenFromPlugin();
 
 
 signals:
@@ -72,7 +73,7 @@ private:
 
   cmdThread * pCmdThread;
   void startCmdThread();
-
+  
 };
 
 #endif

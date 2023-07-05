@@ -9,7 +9,7 @@
 ///
 /// \file    config_boot.c
 ///
-/// \version $Id: config_boot.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   change boot settings / config-tools
 ///

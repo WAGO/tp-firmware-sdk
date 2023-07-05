@@ -9,7 +9,7 @@
 ///
 /// \file    gesture_control.c
 ///
-/// \version $Id: gesture_control.c 65689 2022-03-11 14:37:43Z falk.werner@wago.com $
+/// \version $Id$
 ///
 /// \brief   gesture control, show toolbarmenu on swipe
 ///

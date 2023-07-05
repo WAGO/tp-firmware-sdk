@@ -53,7 +53,7 @@ SETUP_DISPLAY_MAKE_ENV	:= $(CROSS_ENV)
 $(STATEDIR)/setup_display.compile:
 	@$(call targetinfo)
 	cd $(SETUP_DISPLAY_DIR) && \
-	make CFLAGS=-I$(BUILDDIR)/../sysroot-target/usr/include LD=$(COMPILER_PREFIX)ld\
+	$(MAKE) CFLAGS=-I$(BUILDDIR)/../sysroot-target/usr/include LD=$(COMPILER_PREFIX)ld\
   CC=$(COMPILER_PREFIX)gcc CFLAGS="-I$(BUILDDIR)/../sysroot-target/usr/include"\
   LDADD="$(BUILDDIR)/../sysroot-target/usr/lib/lconfparse.so"\
   LDFLAGS="-lconfparse -L$(BUILDDIR)/../sysroot-target/usr/lib"

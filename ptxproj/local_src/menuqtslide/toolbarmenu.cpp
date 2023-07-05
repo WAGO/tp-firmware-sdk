@@ -25,7 +25,7 @@
 ///------------------------------------------------------------------------------
 /// \file    toolbarmenu.cpp
 ///
-/// \version $Id: toolbarmenu.cpp 66398 2022-04-07 11:10:49Z wrueckl_elrest $
+/// \version $Id$
 ///
 /// \brief   show menu bar in order to activate plc selection list
 ///

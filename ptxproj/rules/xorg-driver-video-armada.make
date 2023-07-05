@@ -78,7 +78,7 @@ $(STATEDIR)/xorg-driver-video-armada.prepare:
 	DRM_CFLAGS="-I$(PTXCONF_SYSROOT_TARGET)/usr/include/libdrm" \
 	DRM_LIBS="-L$(PTXCONF_SYSROOT_TARGET)/usr/lib -ldrm" \
 	PKG_CONFIG_PATH=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig && \
-	make clean
+	$(MAKE) clean
 	@$(call touch)
 
 

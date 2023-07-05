@@ -1,4 +1,21 @@
+Firmware Release 04.03.03 (25) - CODESYS 3
+
+Engineering by CODESYS IDE V. 3.5 is supported
+Engineering by e!COCKPIT IDE is not supported
+
+Migration Guide – from e!COCKPIT to CODEYS V3.5:
+• https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
+
+Runtime System:
+[NEW] Codesys3 Runtime-System 3.5.18.40
+[CHANGED] Codesys3 Runtime-System supported on TP600 Visu Panel (762-x20x/8000-0002).
+
+################################################################################
+
 Firmware Release 04.02.13 (24) - CODESYS 3
+
+Engineering by CODESYS IDE V. 3.5 is supported
+Engineering by e!COCKPIT IDE is not supported
 
 Migration Guide - from e!COCKPIT to CODEYS V3.5:
 - https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
@@ -8,22 +25,23 @@ System:
       Waveshare, Ilitek, PixCir, Elotouch, QDtech
 [FIXED] CVE-2022-0529 , CVE-2022-0530
 [FIXED] Updates libcurl to version 7.84.0;
-      Fixes CVE-2022-22576 , CVE-2022-27782, CVE-2022-30115, CVE-2022-27775,
-      CVE-2022-27781, CVE2022-27776, CVE-2022-27779, CVE-2022-27780, CVE-2022-27774,
-      CVE-2022-32205, CVE-2022-32206, CVE-2022-32207, CVE-2022-32208
+        Fixes CVE-2022-22576 , CVE-2022-27782, CVE-2022-30115, CVE-2022-27775,
+        CVE-2022-27781, CVE2022-27776, CVE-2022-27779, CVE-2022-27780, CVE-2022-27774,
+        CVE-2022-32205, CVE-2022-32206, CVE-2022-32207, CVE-2022-32208
 
 Runtime System:
 [NEW] Codesys3 Runtime-System 3.5.18.20
 [CHANGED] Codesys3 Runtime-System supported on TP600 Control Panel
-      (762-x30x/8000-0002) and Edge Controller (752-8303/8000-0002).
+          (762-x30x/8000-0002) and Edge Controller (752-8303/8000-0002).
 [FIXED] “PLC load watchdog” might not work as expected: the plc load watchdog will
-      detect (e.g. an endless loop) but the IEC task might not be stopped in any case.
-      This might lead to a complete stop of the runtime process. As workaround and
-      improve “hardening” of your IEC application we recommend to use an IEC Task
-      watchdog on all your relevant IEC tasks in your IEC application.
+        detect (e.g. an endless loop) but the IEC task might not be stopped in any case.
+        This might lead to a complete stop of the runtime process. As workaround and
+        improve “hardening” of your IEC application we recommend to use an IEC Task
+        watchdog on all your relevant IEC tasks in your IEC application.
 
 ################################################################################
-Firmware Release 03.07.20 (99)
+
+Firmware Release 03.07.20 (19)
 
 System:
 [NEW] Update MESALIB from 19.0.4 to 21.2.2
@@ -64,7 +82,7 @@ System:
       HTTPS port can be blocked via the firewall.
 [NEW] PTXdist update to version 2020.8.0
 [NEW] openSSL update to version 1.1.1.L
-[NEW] Busybox update to version 1.34.1 
+[NEW] Busybox update to version 1.34.1
 
 CVE-2021-42378, CVE-2021-42379,
 CVE-2021-42380, CVE-2021-42381, CVE-2021-42382, CVE-2021-42383,
@@ -105,20 +123,24 @@ Beta functionalities:
        to the last firmware, many more parameter providers have been added.
 
 ################################################################################
-Firmware Release 03.07.20 (99)
+
+Firmware Release 03.07.20 (19)
+
 System:
 [FIXED] “Dirty Pipe” enables root privileges CVE-2022-0847
 [FIXED] 21.5” devices: flickering and stripes on the display
 [FIXED] Edge Controller: Sporadically no USB-C connection
 
 Fieldbus Interface & Libraries:
-[FIXED] When using BACnet, there is no longer an increase in open 
+[FIXED] When using BACnet, there is no longer an increase in open
         file discreptors
-[FIXED] When using WriteMapping of Binary Object Property Present 
+[FIXED] When using WriteMapping of Binary Object Property Present
         Value, the device does not send cyclic the value "active".
 
 ################################################################################
-Firmware Release 03.07.14 (99)
+
+Firmware Release 03.07.14 (19)
+
 System:
 [NEW] Changed startup behavior: Web pages can be set as start page even if PLC
       application is present.
@@ -128,13 +150,15 @@ Runtime System:
 [NEW] e!RUNTIME Upgrade to Version 3.5.16.3
 
 ################################################################################
-Firmware Release 03.06.11 (99)
+
+Firmware Release 03.06.11 (18)
 
 System:
 [FIXED] Display freeze after screen care
 
 ################################################################################
-Firmware Release 03.06.09 (99)
+
+Firmware Release 03.06.09 (18)
 
 Devices:
 [New] Support of Edge Controller
@@ -152,12 +176,14 @@ Runtime System:
 ################################################################################
 
 Firmware Release 03.03.11 (99)
+
 System:
 [FIXED] Improved robustness by heavy ethernet traffic.
 
 ################################################################################
 
-Firmware Release 03.03.10 (99)
+Firmware Release 03.03.10 (15)
+
 System:
 [New] Added new pages to WBM on TP devices:
     • Firewall
