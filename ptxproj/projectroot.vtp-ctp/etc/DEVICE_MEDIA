@@ -4,3 +4,6 @@
 mmcblk0=sd-card
 mmcblk1=internal-flash-emmc
 mtd2=internal-flash-nand
+sda=usb1
+sdb=usb2
+sdc=usb3

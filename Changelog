@@ -1,3 +1,17 @@
+Firmware Release 04.03.04 (26) - CODESYS 3
+
+Engineering by CODESYS IDE V. 3.5 is supported
+Engineering by e!COCKPIT IDE is not supported
+
+Migration Guide – from e!COCKPIT to CODEYS V3.5:
+• https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
+
+Runtime System:
+[NEW] Codesys3 Runtime-System 3.5.19.20
+[CHANGED] Access blocking for 1h after 5 login failures
+
+################################################################################
+
 Firmware Release 04.03.03 (25) - CODESYS 3
 
 Engineering by CODESYS IDE V. 3.5 is supported
