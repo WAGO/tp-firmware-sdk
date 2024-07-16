@@ -94,7 +94,7 @@ class VirtualKeyb: public QWidget
   Q_OBJECT
 
 public:
-  VirtualKeyb();
+  VirtualKeyb(QObject * pParent);
   ~VirtualKeyb();
 
   //QObject * m_pFocusedObject;
@@ -103,6 +103,7 @@ static int m_iTvOpen;      // open signal from targetvisu received
 static bool m_bPluginOpen; // open signal from plugin received
 
   //QString m_sLanguageId;
+  QObject * m_pKeyboard;
   CVKButton * m_pBtn;
   QList<CVKButton *> m_btnList;
   QList<CVKButton *> m_btnListSpecial;

@@ -81,9 +81,10 @@ CVKButton::CVKButton(const QString & text, QWidget * parent) :
 
 }
 
-VirtualKeyb::VirtualKeyb() :
+VirtualKeyb::VirtualKeyb(QObject * pParent) :
     QWidget(0, Qt::WindowDoesNotAcceptFocus | Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint)
 {
+  m_pKeyboard = pParent;
   m_pGroupBox = NULL;
   m_bHiddenText = false;
   m_bEnabled = true;
@@ -249,38 +250,31 @@ void VirtualKeyb::OnCheckBoxStateChanged(int iState)
 /// \brief handle button
 ///
 void VirtualKeyb::OnButtonPressed()
-{  
+{
+  CVKButton * pBtn = static_cast<CVKButton *>(QObject::sender());
+  if ( pBtn == NULL )
+    return;
 
-  QObject * ptr = QObject::sender();
+  m_pBtn = (CVKButton *) pBtn;
 
-  for (int k = 0; k < m_btnList.count(); k++)
+  if (m_iShift)
   {
-    if (ptr == m_btnList.at(k))
-    {
-      m_pBtn = (CVKButton *) ptr;    
+    if (m_pBtn->m_iCodeShifted)
+        sendKeyCode(m_pBtn->m_iCodeShifted, m_pBtn->m_iSpecialBtn);
+    else
+        sendCharacter(m_pBtn->m_sKeyShifted.at(0));
+  }
+  else
+  {
+    if (m_pBtn->m_iCode)
+        sendKeyCode(m_pBtn->m_iCode, m_pBtn->m_iSpecialBtn);
+    else
+        sendCharacter(m_pBtn->m_sKey.at(0));
+  }
 
-      if (m_iShift)
-      {
-        if (m_pBtn->m_iCodeShifted)
-          sendKeyCode(m_pBtn->m_iCodeShifted, m_pBtn->m_iSpecialBtn);
-        else
-          sendCharacter(m_pBtn->m_sKeyShifted.at(0));
-      }
-      else
-      {
-        if (m_pBtn->m_iCode)
-          sendKeyCode(m_pBtn->m_iCode, m_pBtn->m_iSpecialBtn);
-        else
-          sendCharacter(m_pBtn->m_sKey.at(0));
-      }
-
-      if (m_pBtn->m_iRepetitionAllowed)
-      {
-        KeyRepetitionStartTimer();
-      }
-
-      break;
-    }
+  if (m_pBtn->m_iRepetitionAllowed)
+  {
+    KeyRepetitionStartTimer();
   }
 
   if ((!m_iShiftLock) && (m_iShift))
@@ -289,6 +283,7 @@ void VirtualKeyb::OnButtonPressed()
     HandleShift();
   }
 }
+
 
 /// \brief handle backspace
 ///

@@ -72,9 +72,9 @@ QVkImPlatformInputContext::QVkImPlatformInputContext()
 
   if (m_dbusInterface)
   {
-    connect(m_dbusInterface, SIGNAL(keyClicked(QString)), SLOT(keyboardKeyClicked(QString)));
-    connect(m_dbusInterface, SIGNAL(specialKeyClicked(int)), SLOT(keyboardSpecialKeyClicked(int)));
-    connect(m_dbusInterface, SIGNAL(signalShowVirtualKeyboardFromTv()), SLOT(slotShowVirtualKeyboardFromTv()));
+    connect(m_dbusInterface, SIGNAL(signalDbusKeyClicked(QString)), SLOT(dbusKeyboardKeyClicked(QString)));
+    connect(m_dbusInterface, SIGNAL(signalDbusSpecialKeyClicked(int)), SLOT(dbusKeyboardSpecialKeyClicked(int)));
+    connect(m_dbusInterface, SIGNAL(signalDbusShowVirtualKeyboardFromTv()), SLOT(dbusShowVirtualKeyboardFromTv()));
   }
   else
   {
@@ -97,7 +97,11 @@ void QVkImPlatformInputContext::setFocusObject(QObject *object)
   QQuickItem * quickitem = qobject_cast<QQuickItem*>(object);
   if (!quickitem)
   {
+    if (m_focusObject != object)
+    {
       m_focusObject = object;
+      update(Qt::ImQueryAll);
+    }
   }
   //else
   //{
@@ -205,7 +209,7 @@ void QVkImPlatformInputContext::updateText()
 
 }
 
-void QVkImPlatformInputContext::keyboardSpecialKeyClicked(int key)
+void QVkImPlatformInputContext::dbusKeyboardSpecialKeyClicked(int key)
 {
   if (!m_focusObject)
       return;
@@ -227,7 +231,7 @@ void QVkImPlatformInputContext::keyboardSpecialKeyClicked(int key)
   QTimer::singleShot(DELAY_GET_TEXT_FROM_EDIT_FIELD, this, SLOT(slotOnUpdateText()));
 }
 
-void QVkImPlatformInputContext::keyboardKeyClicked(const QString &characters)
+void QVkImPlatformInputContext::dbusKeyboardKeyClicked(const QString &characters)
 {
   if (!m_focusObject)
       return;
@@ -244,7 +248,7 @@ void QVkImPlatformInputContext::slotOnUpdateText()
   updateText();
 }
 
-void QVkImPlatformInputContext::slotShowVirtualKeyboardFromTv()
+void QVkImPlatformInputContext::dbusShowVirtualKeyboardFromTv()
 {
   //open vk from targetvisu
   showVirtualKeyboard();

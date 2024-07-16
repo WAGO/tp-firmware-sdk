@@ -269,11 +269,11 @@ InitTestability
 StartTP
 StartBrightnessControl
 StartGestureControl
-#Xorg and fluxbox are running so /etc/init.d/runtime is able to start codesys3
-touch /var/run/xorg.start.done
 
 /etc/script/setup_hdmi.sh
 
-#not with fluxbox if [ -e /etc/script/wndactivate.sh ]; then
-#not with fluxbox /etc/script/wndactivate.sh 2>&1 > /dev/null &
-#not with fluxbox fi
+#Xorg and icewm are running so /etc/init.d/runtime is able to start codesys3
+sleep 1
+touch /var/run/xorg.start.done
+
+

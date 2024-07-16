@@ -36,7 +36,6 @@ public:
   QList<VirtualKeyb *> m_panelList;
 
 public slots:
-  // these are the DBUS Interface Functions called from the PLUGIN
   void showKeyboard();
   void hideKeyboard();
   bool keyboardVisible() const;
@@ -47,10 +46,10 @@ public slots:
 
 
 signals:
-  void specialKeyClicked(int key);
-  void keyClicked(const QString &text);
+  void signalDbusSpecialKeyClicked(int key);
+  void signalDbusKeyClicked(const QString &text);
+  void signalDbusShowVirtualKeyboardFromTv();
   void textChanged(QString, int);
-  void signalShowVirtualKeyboardFromTv();
 
 private slots:
   void cmdSlotReceived(QString s);

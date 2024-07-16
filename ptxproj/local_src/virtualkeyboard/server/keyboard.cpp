@@ -289,7 +289,7 @@ void Keyboard::parseLayout(QXmlStreamReader &xml)
     return;
   }
 
-  inputPanel = new VirtualKeyb;
+  inputPanel = new VirtualKeyb(this);
   if (inputPanel)
   {
 #ifdef DEBUG_MSG
@@ -1026,12 +1026,12 @@ void Keyboard::slotOpenFromPlugin()
 
 void Keyboard::slotSpecialKeyClicked(int key)
 {
-  emit specialKeyClicked(key);
+  emit signalDbusSpecialKeyClicked(key);
 }
 
 void Keyboard::slotKeyClicked(const QString &text)
 {
-   emit keyClicked(text);
+   emit signalDbusKeyClicked(text);
 }
 
 
@@ -1085,7 +1085,7 @@ void Keyboard::cmdSlotReceived(QString s)
       if (inputPanel->m_iTvOpen == 1)
       {
         //inputPanel->Log("tvopen");
-        emit signalShowVirtualKeyboardFromTv();
+        emit signalDbusShowVirtualKeyboardFromTv();
       }
     }
   }

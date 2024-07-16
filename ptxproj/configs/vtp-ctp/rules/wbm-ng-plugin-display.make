@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_WBM_NG_PLUGIN_DISPLAY) += wbm-ng-plugin-display
 #
 # Paths and names
 #
-WBM_NG_PLUGIN_DISPLAY_VERSION        := 1.6.2
+WBM_NG_PLUGIN_DISPLAY_VERSION        := 1.6.3
 WBM_NG_PLUGIN_DISPLAY                := wbm-display-$(WBM_NG_PLUGIN_DISPLAY_VERSION)
 WBM_NG_PLUGIN_DISPLAY_URL            := $(call jfrog_template_to_url, WBM_NG_PLUGIN_DISPLAY)
 WBM_NG_PLUGIN_DISPLAY_SUFFIX         := $(suffix $(WBM_NG_PLUGIN_DISPLAY_URL))

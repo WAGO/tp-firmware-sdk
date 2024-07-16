@@ -31,7 +31,8 @@ menuconfig XORG_SERVER
 	select PIXMAN
 	select NETTLE
 	select XORG_LIB_XKBFILE
-	select LIBXCVT			# needed for xorg-server-21.1.6
+	select XORG_FONT_UTIL
+	select LIBXCVT
 
 	select UDEV			if XORG_SERVER_UDEV
 	select UDEV_LIBUDEV		if XORG_SERVER_UDEV

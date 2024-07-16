@@ -41,32 +41,45 @@ int main(int argc, char **argv)
 
 #ifdef DEBUG_MSG
     foreach (const QString &path, app.libraryPaths())
-      qDebug() <<  "LPath: " << path;
+        qDebug() <<  "LPath: " << path;
 #endif
 
-    if (!QDBusConnection::sessionBus().isConnected()) {
+    if (!QDBusConnection::sessionBus().isConnected())
+    {
         qFatal("SERVER: Cannot connect to the D-Bus session bus. To start it, run: eval `dbus-launch --auto-syntax`");
         return 1;
     }
 
-    if (!QDBusConnection::sessionBus().registerService("com.kdab.inputmethod")) {
+    if (!QDBusConnection::sessionBus().registerService("com.kdab.inputmethod"))
+    {
         qFatal("SERVER:  Unable to register at DBus - com.kdab.inputmethod");
         return 1;
     }
 
+    Keyboard * pKeyboard = new Keyboard();
+    if (pKeyboard == NULL)
+    {
+        qFatal("SERVER:  Create Keyboard instance failed.");
+        return 1;
+    }
 
-    Keyboard keyboard;
-    Keyboard * pKeyboard = &keyboard;
-
-    if (!QDBusConnection::sessionBus().registerObject("/VirtualKeyboard", pKeyboard, QDBusConnection::ExportAllSignals | QDBusConnection::ExportAllSlots)) {
+    if (!QDBusConnection::sessionBus().registerObject("/VirtualKeyboard", pKeyboard,
+            QDBusConnection::ExportAllSignals | QDBusConnection::ExportAllSlots))
+    {
         qFatal("SERVER:  Unable to register object at DBus - /VirtualKeyboard");
+        delete pKeyboard;
         return 1;
     }
 
 #ifdef DEBUG_MSG
     qDebug() << "SERVER: virtual keyboard started";
 #endif
-    return app.exec();
+
+    int rc = app.exec();
+    // clean up
+    if (pKeyboard)
+        delete pKeyboard;
+    return rc;
 }
 
 

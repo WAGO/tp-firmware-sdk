@@ -54,6 +54,15 @@ config ELREST_CUSTOM_CC100_UDEV_RULES_INSTALL
 	help
 	  This installs elrest custom CC100 udev rules to /etc/udev/rules.d.
 
+config CC100OVERSAMPLINGFACTOR
+	bool
+	default n
+	prompt "install custom CC100, oversampling init.d files"
+	help
+	  This installs elrest custom CC100 oversampling factor settings.
+
+
+
 #config ELREST_CUSTOM_TIME_LOCALE_CONFIG_INSTALL
 #	bool
 #	default n

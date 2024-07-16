@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_SERVER) += xorg-server
 #
 # Paths and names
 #
-XORG_SERVER_VERSION	:= 21.1.6
-XORG_SERVER_MD5		:= b3d9a66554b2fd72960ea0545a87ea80
+XORG_SERVER_VERSION	:= 21.1.11
+XORG_SERVER_MD5		:= 57a4ef6ea505254599d9bbe29b0eb769
 XORG_SERVER		:= xorg-server-$(XORG_SERVER_VERSION)
 XORG_SERVER_SUFFIX	:= tar.xz
 XORG_SERVER_URL		:= $(call ptx/mirror, XORG, individual/xserver/$(XORG_SERVER).$(XORG_SERVER_SUFFIX))
@@ -60,7 +60,7 @@ XORG_SERVER_CONF_OPT	= \
 	-Dbuilder_string=PTXdist \
 	-Ddefault_font_path=$(subst $(space),$(comma),$(addprefix $(XORG_FONTDIR)/,$(XORG_FONT_DIRS))) \
 	-Ddga=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_DGA) \
-	-Ddmx=$(call ptx/truefalse, PTXCONF_XORG_SERVER_DMX) \
+#	-Ddmx=$(call ptx/truefalse, PTXCONF_XORG_SERVER_DMX) \
 	-Ddpms=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_DPMS) \
 	-Ddri1=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_DRI) \
 	-Ddri2=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_DRI2) \
@@ -75,14 +75,14 @@ XORG_SERVER_CONF_OPT	= \
 	-Dlisten_tcp=false \
 	-Dlisten_unix=true \
 	-Dmitshm=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_SHM) \
-	-Dos_vendor=PTXdist \
+#	-Dos_vendor=PTXdist \
 	-Dpciaccess=$(call ptx/truefalse, PTXCONF_XORG_SERVER_XORG) \
 	-Dscreensaver=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_SCREENSAVER) \
 	-Dsecure-rpc=$(call ptx/truefalse, PTXCONF_XORG_SERVER_OPT_SECURE_RPC) \
 	-Dsuid_wrapper=false \
 	-Dsystemd_logind=false \
 	-Dudev=$(call ptx/truefalse, PTXCONF_XORG_SERVER_UDEV) \
-	-Dvbe=true \
+#	-Dvbe=true \
 	-Dvgahw=true \
 	-Dxace=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_XACE) \
 	-Dxcsecurity=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_XCSECURITY) \
@@ -99,8 +99,8 @@ XORG_SERVER_CONF_OPT	= \
 	-Dxv=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_XV) \
 	-Dxvfb=$(call ptx/truefalse, PTXCONF_XORG_SERVER_XVFB) \
 	-Dxvmc=$(call ptx/truefalse, PTXCONF_XORG_SERVER_EXT_XVMC) \
-	-Dxwayland=$(call ptx/truefalse, PTXCONF_XORG_SERVER_XWAYLAND) \
-	-Dxwayland_eglstream=false \
+#	-Dxwayland=$(call ptx/truefalse, PTXCONF_XORG_SERVER_XWAYLAND) \
+#	-Dxwayland_eglstream=false \
 	-Dxwin=$(call ptx/truefalse, PTXCONF_XORG_SERVER_XWIN)
 
 # ----------------------------------------------------------------------------

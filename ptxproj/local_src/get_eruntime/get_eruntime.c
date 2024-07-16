@@ -32,7 +32,7 @@
 // Local macros
 //------------------------------------------------------------------------------
 
-#define CFG_FILE            "/home/codesys/eRUNTIME.cfg"
+#define CFG_FILE            "/home/codesys/CODESYSControl.cfg"
 #define CNF_FILE            ERUNTIME_CONF_FILE
 
 //------------------------------------------------------------------------------

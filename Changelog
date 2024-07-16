@@ -1,3 +1,34 @@
+Firmware Release 04.05.10 (27) - CODESYS 3
+
+Engineering by CODESYS IDE V. 3.5 is supported
+Engineering by e!COCKPIT IDE is not supported
+
+Migration Guide – from e!COCKPIT to CODEYS V3.5:
+• https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
+
+System
+[NEW] Support for Spanning Tree Protocols STP/RSTP
+[NEW] WAT-35711 Support for VS code
+
+Operating System
+[FIXED] SECURITY  CVE-2024-23651, CVE-2024-23652, CVE-2024-23653, CVE-2024-21626,
+                  CVE-2022-48624, CVE-2023-42465, CVE-2023-48795, CVE-2023-29491,
+                  CVE-2023-45853, CVE-2023-28321, CVE-2023-28322, CVE-2023-28320,
+                  CVE-2023-28319, CVE-2023-4527, CVE-2023-5156, CVE-2023-4911,
+                  CVE-2023-28320, CVE-2023-28319, CVE-2023-37464, CVE-2023-28484,
+                  CVE-2023-29469, CVE-2022-23471, CVE-2022-48303, CVE-2024-25062,
+                  CVE-2023-48795, CVE-2023-2603, CVE-2023-38545, CVE-2023-41913,
+                  CVE-2023-38545, CVE-2023-38546, CVE-2019-11358, CVE 2020-11022,
+                  CVE-2020-11023, CVE-2020-23064, CVE-2023-4089
+
+Runtime System
+[NEW] CODESYS3 Runtime-System 3.5.19.50
+
+Web Based Management
+[NEW] WAT-34425 Package Server: Backup and restore possible via USB stick
+
+################################################################################
+
 Firmware Release 04.03.04 (26) - CODESYS 3
 
 Engineering by CODESYS IDE V. 3.5 is supported

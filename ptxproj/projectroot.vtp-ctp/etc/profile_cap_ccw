@@ -5,7 +5,7 @@ export DISPLAY=:0
 #setterm -blank 0 2> /dev/null
 
 export PATH="$PATH:/usr/bin:/bin:/sbin:/usr/sbin"
-export LANG="de_DE.UTF-8"
+export LANG="en_US.UTF-8"
 export MB_KBD_VARIANT=en
 
 #Qt5

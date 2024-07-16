@@ -350,11 +350,6 @@ ifeq ($(PTXCONF_PLATFORM), cc100)
 endif
 endif
 
-ifdef PTXCONF_ELREST_CUSTOM_ROOT_DIRECTORIES_INSTALL
-	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /log)
-	@$(call install_copy, elrest-custom-install, 0, 0, 0755, /settings)
-endif
-
 ifdef PTXCONF_ELREST_CUSTOM_U_BOOT_FILES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /boot/uEnv.txt)
 endif

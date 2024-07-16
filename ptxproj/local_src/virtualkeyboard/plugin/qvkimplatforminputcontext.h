@@ -42,11 +42,11 @@ public:
     QDBusInterface * m_dbusInterface;
 
 private slots:
-    void keyboardSpecialKeyClicked(int key);
-    void keyboardKeyClicked(const QString &character);
+    void dbusKeyboardSpecialKeyClicked(int key);
+    void dbusKeyboardKeyClicked(const QString &character);
+    void dbusShowVirtualKeyboardFromTv();
 
     void slotOnUpdateText();
-    void slotShowVirtualKeyboardFromTv();
 
 private:
     QObject *m_focusObject;
