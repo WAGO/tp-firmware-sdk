@@ -43,6 +43,7 @@
 
 #include <QDebug>
 #include <QFontDatabase>
+#include <QFile>
 
 #include <QMouseEvent>
 #include <QDragEnterEvent>
@@ -103,7 +104,14 @@ ToolbarButton::ToolbarButton(const QString & text, QWidget * parent) :
 //------------------------------------------------------------------------------
 ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
 {
-  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint );
+  if (FindProcess("cwm") == true)
+  {
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+  }
+  else
+  {
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint );
+  }
   pCmdThread = NULL;
   m_pSender = NULL;
   m_iFadeHeight = 0;
@@ -555,6 +563,9 @@ void ToolBarMenu::Show()
   m_LastSlideEvent = QDateTime::currentDateTime();
 
   show();
+
+  activateWindow();
+  raise();
 
   RestartTimeout();
   RestartTimeoutCursorPos();
@@ -1574,12 +1585,16 @@ void ToolBarMenu::OnAction()
       //call to action
       if (!sAction.isEmpty())
       {
-        if (sAction.right(1) != "&")
+        if (QFile::exists(sAction))
         {
-          sAction.append(" &");
+          if (sAction.right(1) != "&")
+          {
+            sAction.append(" &");
+          }
+        
+          QByteArray ba = sAction.toLatin1();
+          system(ba.data());
         }
-        QByteArray ba = sAction.toLatin1();
-        system(ba.data());
       }
 
       break;

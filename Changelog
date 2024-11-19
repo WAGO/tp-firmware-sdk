@@ -1,3 +1,26 @@
+Firmware Release 04.06.01 (28) - CODESYS 3
+
+Engineering by CODESYS IDE V. 3.5 is supported
+Engineering by e!COCKPIT IDE is not supported
+
+Migration Guide – from e!COCKPIT to CODEYS V3.5:
+• https://techdocs.wago.com/Software/eCOCKPIT_Migration/en-US/index.html#index_content
+
+System:
+[FIXED]     WAT-37003   MicroBrowser does not start properly
+
+Operating System:
+[FIXED]     SECURITY    CVE-2024-34397, CVE-2024-34459, CVE-2024-6387,
+                        CVE-2024-37676
+
+Web Based Management:
+[KNOWN]     WAT-36520   Mass Storage - Format memory card: If one or more USB
+                        sticks are connected to the device, the memory card is
+                        not always for-matted, but the last connected medium.
+                        Workaround: Remove USB stick(s).
+
+################################################################################
+
 Firmware Release 04.05.10 (27) - CODESYS 3
 
 Engineering by CODESYS IDE V. 3.5 is supported

@@ -6,7 +6,7 @@
 
 
   // loading moustache
-  require  $plcListRoot . 'mustache/src/Mustache/Autoloader.php';
+  require  '/usr/share/mustache/src/Mustache/Autoloader.php';
 
   Mustache_Autoloader::register();
 

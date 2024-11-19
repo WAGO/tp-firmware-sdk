@@ -79,13 +79,15 @@
 #include <QLocale>
 #include <QLatin1String>
 
+#include <QFile>
+#include <QDateTime>
+
 //#include <QGestureEvent>
 #include <time.h>
 #include "globals.h"
 
 #include <QWebEngineCertificateError>
 
-#define HTML_FILE_NO_CONN    "/etc/specific/webengine/noConnection.html"
 #define SSL_CB_OFFSET         100
 #define SSL_CB_TEXT           "Always allowed"
 
@@ -1109,6 +1111,18 @@ void WebView::loadStarted()
     pPage->slotClearScrollbarLists();
 }
 
+void WebView::qLog(QString s)
+{
+    QFile data("/tmp/webview.txt");
+    QDateTime dteNow = QDateTime::currentDateTime();
+    QString sNow = dteNow.toString("hh:mm:ss");
+    if (data.open(QFile::WriteOnly | QFile::Append)) {
+        QTextStream out(&data);
+        out << sNow << ": " << s << "\n";
+        data.close();
+    }
+}
+
 void WebView::loadFinished(bool success)
 {
   //qDebug() << "loadFinished success: " << success << " url: " << url();
@@ -1190,27 +1204,31 @@ void WebView::loadFinished(bool success)
           if (nViewports>0)
           {
               pPage->runJavaScript("document.getElementsByName('viewport')[0].content;", [=](QVariant resContent){
-                  QString strContent = resContent.toString() ;
-                  bool bRun = false;
-                  //qDebug() << "Viewport content: " << strContent;
-                  if (strContent.contains("minimum-scale", Qt::CaseInsensitive)==false)
+                  QString strContent = resContent.toString();
+                  strContent = strContent.trimmed();
+                  //qLog(strContent);
+                  if (strContent.length() > 3)
                   {
-                      strContent = strContent+", minimum-scale=1.0";
-                      bRun = true;
+                    bool bRun = false;
+                    //qDebug() << "Viewport content: " << strContent;
+                    if (strContent.contains("minimum-scale", Qt::CaseInsensitive)==false)
+                    {
+                        strContent = strContent+", minimum-scale=1.0";
+                        bRun = true;
+                    }
+                    if(strContent.contains("user-scalable=no") && (strContent.contains("initial-scale")==false))
+                    {
+                        strContent = strContent + ", initial-scale=1.0";
+                        bRun = true;
+                    }
+                    if (bRun)
+                    {
+                        //qDebug() << "going to set:" << "document.getElementsByName('viewport')[0].content=\""+strContent+"\"";
+                        pPage->runJavaScript("document.getElementsByName('viewport')[0].content=\""+strContent+"\"", [=](QVariant res){
+                            //qDebug() << "result:" << res.toString();
+                        });
+                    }
                   }
-                  if(strContent.contains("user-scalable=no") && (strContent.contains("initial-scale")==false))
-                  {
-                      strContent = strContent + ", initial-scale=1.0";
-                      bRun = true;
-                  }
-                  if (bRun)
-                  {
-                      //qDebug() << "going to set:" << "document.getElementsByName('viewport')[0].content=\""+strContent+"\"";
-                      pPage->runJavaScript("document.getElementsByName('viewport')[0].content=\""+strContent+"\"", [=](QVariant res){
-                          //qDebug() << "result:" << res.toString();
-                      });
-                  }
-
               });
           }
       });

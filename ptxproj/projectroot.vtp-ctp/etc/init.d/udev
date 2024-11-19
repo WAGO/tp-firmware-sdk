@@ -274,8 +274,10 @@ start)
 	fi
 
 	# The /run is used by udev and must be mounted at this early stage
-	echo "mounting tmpfs at /run"
-	mount -n -t tmpfs tmpfs /run -o mode=755
+  if ! mountpoint -q /run; then
+    echo "mounting tmpfs at /run"
+    mount -n -t tmpfs tmpfs /run -o mode=755
+  fi
 
 	# udev handles uevents itself, so we don't need to have
 	# the kernel call out to any binary in response to them

@@ -1199,15 +1199,13 @@ void BrowserMainWindow::slotCmdReceived(QString s)
   QString sCmd = s.trimmed();
   //qDebug() << "slotCmdReceived: " << sCmd;
   
-  bool bBringToFront = false;
-
   if (sCmd.left(5) == "load=")
   {
     sCmd.remove(0,5);
     if (!sCmd.isEmpty())
     {     
       loadPage(sCmd);
-      bBringToFront = true;
+      //bBringToFront = true;
     }
   }
   else if (sCmd.left(10) == "tcpmonitor")
@@ -1245,7 +1243,7 @@ void BrowserMainWindow::slotCmdReceived(QString s)
       if ((idx < MAX_TAB_COUNT)&&(idx >= 0))
       {
         m_tabWidget->setCurrentIndex(idx);
-        bBringToFront = true;
+        //bBringToFront = true;
       }
     }
 
@@ -1314,7 +1312,7 @@ void BrowserMainWindow::slotCmdReceived(QString s)
     {
       WebView * pView = m_tabWidget->currentWebView();
       pView->reload();
-      bBringToFront = true;
+      //bBringToFront = true;
     }
   }
   else if (sCmd == "back")
@@ -1410,15 +1408,6 @@ void BrowserMainWindow::slotCmdReceived(QString s)
   {
     qDebug() << "Tabcount: " << m_tabWidget->count();
     qDebug() << "unknown: " << sCmd;
-  }
-
-  
-  if (bBringToFront)
-  {
-    raise();
-    WebPage * pPage = qobject_cast<WebPage *>(m_tabWidget->currentWebView()->page());
-    if (pPage)
-      pPage->slotClearScrollbarLists();
   }
   
 }

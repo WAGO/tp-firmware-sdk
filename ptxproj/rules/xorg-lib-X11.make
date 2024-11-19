@@ -79,6 +79,9 @@ $(STATEDIR)/xorg-lib-x11.targetinstall:
 	@$(call install_lib, xorg-lib-x11, 0, 0, 0644, libX11)
 	@$(call install_lib, xorg-lib-x11, 0, 0, 0644, libX11-xcb)
 
+# fix cwm locale support
+	@$(call install_tree, xorg-lib-x11, 0, 0, $(PTXCONF_SYSROOT_TARGET)/usr/share/X11/locale/common, /usr/share/X11/locale/common)
+
 	@$(call install_finish, xorg-lib-x11)
 
 	@$(call touch)

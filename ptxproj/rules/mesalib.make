@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_MESALIB) += mesalib
 #
 # Paths and names
 #
-MESALIB_VERSION	:= 21.2.2
-MESALIB_MD5	:= 25f4b3a8e92d20e2fc6231e253fce1ee
+MESALIB_VERSION	:= 24.0.0
+MESALIB_MD5	:= 367c6b186780326de6e4ad6aacd23ae8
 MESALIB		:= mesa-$(MESALIB_VERSION)
 MESALIB_SUFFIX	:= tar.xz
 MESALIB_URL	:= \
@@ -24,21 +24,14 @@ MESALIB_SOURCE	:= $(SRCDIR)/$(MESALIB).$(MESALIB_SUFFIX)
 MESALIB_DIR	:= $(BUILDDIR)/Mesa-$(MESALIB_VERSION)
 MESALIB_LICENSE	:= MIT
 MESALIB_LICENSE_FILES := \
-	file://docs/license.rst;md5=17a4ea65de7a9ab42437f3131e616a7f
+	file://docs/license.rst;md5=63779ec98d78d823a9dc533a0735ef10
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-ifdef PTXCONF_ARCH_X86
-MESALIB_DRI_DRIVERS-$(PTXCONF_MESALIB_DRI_I915)		+= i915
-MESALIB_DRI_DRIVERS-$(PTXCONF_MESALIB_DRI_I965)		+= i965
-endif
-MESALIB_DRI_DRIVERS-$(PTXCONF_MESALIB_DRI_NOUVEAU_VIEUX)+= nouveau
-MESALIB_DRI_DRIVERS-$(PTXCONF_MESALIB_DRI_R200)		+= r200
-
-MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_KMSRO)	+= kmsro
-ifndef PTXCONF_ARCH_ARM # broken: https://bugs.freedesktop.org/show_bug.cgi?id=72064
+MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_VIRGL)	+= virgl
+ifndef PTXCONF_ARCH_ARM # broken: https://gitlab.freedesktop.org/mesa/mesa/-/issues/473
 ifndef PTXCONF_ARCH_X86 # needs llvm
 MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_R300)	+= r300
 endif
@@ -62,36 +55,53 @@ MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_ZINK)	+= zink
 MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_ASAHI)	+= asahi
 ifdef PTXCONF_ARCH_X86
 MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_CROCUS)	+= crocus
+MESALIB_GALLIUM_DRIVERS-$(PTXCONF_MESALIB_DRI_SVGA)	+= svga
 endif
 
-MESALIB_DRI_LIBS-y = \
-	$(subst nouveau,nouveau_vieux,$(MESALIB_DRI_DRIVERS-y))
-
 MESALIB_DRI_GALLIUM_LIBS-y = \
-	$(subst kmsro, \
+	$(call ptx/ifdef, PTXCONF_MESALIB_DRI_KMSRO, \
 		armada-drm \
 		exynos \
 		hx8357d \
 		ili9225 \
 		ili9341 \
+		imx-dcss \
 		imx-drm \
+		imx-lcdif \
 		ingenic-drm \
+		kirin \
+		komeda \
+		mali-dp \
 		mcde \
+		mediatek \
 		meson \
 		mi0283qt \
 		mxsfb-drm \
 		pl111 \
+		rcar-du \
 		repaper \
 		rockchip \
 		st7586 \
 		st7735r \
 		stm \
-		sun4i-drm \
-	,$(subst freedreno,kgsl,$(MESALIB_GALLIUM_DRIVERS-y)))
+		sun4i-drm) \
+	$(subst swrast,swrast kms_swrast \
+	,$(subst freedreno,kgsl msm \
+	,$(subst svga,vmwgfx \
+	,$(subst virgl,virtio_gpu \
+	,$(MESALIB_GALLIUM_DRIVERS-y) \
+	))))
+
+MESALIB_VIDEO_CODECS-$(PTXCONF_MESALIB_VIDEO_VC1DEC)	+= vc1dec
+MESALIB_VIDEO_CODECS-$(PTXCONF_MESALIB_VIDEO_H264DEC)	+= h264dec
+MESALIB_VIDEO_CODECS-$(PTXCONF_MESALIB_VIDEO_H264ENC)	+= h264enc
+MESALIB_VIDEO_CODECS-$(PTXCONF_MESALIB_VIDEO_H265DEC)	+= h265dec
+MESALIB_VIDEO_CODECS-$(PTXCONF_MESALIB_VIDEO_H265ENC)	+= h265enc
 
 ifdef PTXCONF_ARCH_X86
 MESALIB_VULKAN_DRIVERS-$(PTXCONF_MESALIB_VULKAN_AMD)		+= amd
 MESALIB_VULKAN_DRIVERS-$(PTXCONF_MESALIB_VULKAN_INTEL)		+= intel
+MESALIB_VULKAN_DRIVERS-$(PTXCONF_MESALIB_VULKAN_INTEL_HASVK)	+= intel_hasvk
 endif
 ifdef PTXCONF_ARCH_ARM_NEON
 MESALIB_VULKAN_DRIVERS-$(PTXCONF_MESALIB_VULKAN_BROADCOM)	+= broadcom
@@ -118,9 +128,19 @@ MESALIB_LIBS-$(PTXCONF_MESALIB_GBM)	+= libgbm
 MESALIBS_EGL_PLATFORMS-$(PTXCONF_MESALIB_EGL_WAYLAND)	+= wayland
 MESALIBS_EGL_PLATFORMS-$(PTXCONF_MESALIB_EGL_X11)	+= x11
 
+ifdef PTXCONF_MESALIB_VA
+ifndef PTXCONF_ARCH_ARM # broken: https://gitlab.freedesktop.org/mesa/mesa/-/issues/473
+MESALIB_DRI_VA_LIBS-$(PTXCONF_MESALIB_DRI_R600)		+= r600
+MESALIB_DRI_VA_LIBS-$(PTXCONF_MESALIB_DRI_RADEONSI)	+= radeonsi
+endif
+MESALIB_DRI_VA_LIBS-$(PTXCONF_MESALIB_DRI_NOUVEAU)	+= nouveau
+endif
+
 MESALIB_CONF_TOOL	:= meson
 MESALIB_CONF_OPT	:= \
 	$(CROSS_MESON_USR) \
+	-Dallow-kcmp=enabled \
+	-Dandroid-libbacktrace=disabled \
 	-Dandroid-stub=false \
 	-Dbuild-aco-tests=false \
 	-Dbuild-tests=false \
@@ -128,25 +148,28 @@ MESALIB_CONF_OPT	:= \
 	-Dd3d-drivers-path=/usr/lib/d3d \
 	-Ddatasources=auto \
 	-Ddraw-use-llvm=true \
-	-Ddri-drivers=$(subst $(space),$(comma),$(MESALIB_DRI_DRIVERS-y)) \
 	-Ddri-drivers-path=/usr/lib/dri \
 	-Ddri-search-path=/usr/lib/dri \
 	-Ddri3=$(call ptx/endis, PTXCONF_MESALIB_DRI3)d \
 	-Degl=$(call ptx/endis, PTXCONF_MESALIB_EGL)d \
 	-Degl-lib-suffix= \
 	-Degl-native-platform=auto \
+	-Denable-glcpp-tests=false \
 	-Dexecmem=true \
-	-Dfreedreno-kgsl=false \
+	-Dexpat=enabled \
+	-Dfreedreno-kmds=msm \
 	-Dgallium-d3d10umd=false \
+	-Dgallium-d3d12-video=disabled \
 	-Dgallium-drivers=$(subst $(space),$(comma),$(MESALIB_GALLIUM_DRIVERS-y)) \
 	-Dgallium-extra-hud=$(call ptx/truefalse, PTXCONF_MESALIB_EXTENDED_HUD) \
 	-Dgallium-nine=false \
 	-Dgallium-omx=disabled \
 	-Dgallium-opencl=disabled \
-	-Dgallium-va=disabled \
+	-Dgallium-rusticl=false \
+	-Dgallium-va=$(call ptx/endis, PTXCONF_MESALIB_VA)d \
 	-Dgallium-vdpau=disabled \
+	-Dgallium-windows-dll-name=libgallium_wgl \
 	-Dgallium-xa=disabled \
-	-Dgallium-xvmc=disabled \
 	-Dgbm=$(call ptx/endis, PTXCONF_MESALIB_GBM)d \
 	-Dgbm-backends-path= \
 	-Dgles-lib-suffix= \
@@ -157,44 +180,46 @@ MESALIB_CONF_OPT	:= \
 	-Dglx=$(call ptx/ifdef, PTXCONF_MESALIB_GLX, dri, disabled) \
 	-Dglx-direct=true \
 	-Dglx-read-only-text=false \
+	-Dimagination-srv=false \
 	-Dinstall-intel-gpu-tests=false \
+	-Dintel-clc=disabled \
+	-Dintel-xe-kmd=disabled \
 	-Dlibunwind=disabled \
 	-Dllvm=disabled \
 	-Dlmsensors=$(call ptx/endis, PTXCONF_MESALIB_LMSENSORS)d \
 	-Dmicrosoft-clc=disabled \
+	-Dmin-windows-version=8 \
 	-Dmoltenvk-dir= \
 	-Domx-libs-path=/usr/lib/dri \
-	-Dopencl-native=false \
 	-Dopencl-spirv=false \
 	-Dopengl=$(call ptx/truefalse, PTXCONF_MESALIB_OPENGL) \
 	-Dosmesa=false \
-	-Dosmesa-bits=8 \
 	-Dperfetto=false \
 	-Dplatform-sdk-version=25 \
 	-Dplatforms=$(subst $(space),$(comma),$(MESALIBS_EGL_PLATFORMS-y)) \
 	-Dpower8=disabled \
-	-Dprefer-crocus=false \
-	-Dprefer-iris=true \
+	-Dradv-build-id='' \
 	-Dselinux=false \
 	-Dshader-cache=$(call ptx/endis, PTXCONF_MESALIB_SHADER_CACHE)d \
 	-Dshader-cache-default=true \
 	-Dshader-cache-max-size=1G \
 	-Dshared-glapi=enabled \
 	-Dshared-llvm=disabled \
-	-Dshared-swr=true \
 	-Dspirv-to-dxil=false \
 	-Dsse2=true \
 	-Dstatic-libclc=[] \
-	-Dswr-arches=[] \
 	-Dtools=[] \
 	-Dva-libs-path=/usr/lib/dri \
 	-Dvalgrind=disabled \
 	-Dvdpau-libs-path=/usr/lib/vdpau \
+	-Dvideo-codecs=$(subst $(space),$(comma),$(MESALIB_VIDEO_CODECS-y)) \
+	-Dvmware-mks-stats=false \
+	-Dvulkan-beta=false \
 	-Dvulkan-drivers=$(subst $(space),$(comma),$(MESALIB_VULKAN_DRIVERS-y)) \
 	-Dvulkan-icd-dir=/etc/vulkan/icd.d \
 	-Dvulkan-layers=$(subst $(space),$(comma),$(MESALIB_VULKAN_LAYERS-y)) \
 	-Dxlib-lease=$(call ptx/endis, PTXCONF_MESALIB_EGL_X11)d \
-	-Dxvmc-libs-path=/usr/lib \
+	-Dxmlconfig=$(call ptx/endis, PTXCONF_MESALIB_XMLCONFIG)d \
 	-Dzlib=enabled \
 	-Dzstd=$(call ptx/endis, PTXCONF_MESALIB_SHADER_CACHE)d
 
@@ -211,7 +236,7 @@ endif
 
 $(STATEDIR)/mesalib.compile:
 	@$(call targetinfo)
-	cp $(PTXDIST_SYSROOT_HOST)/bin/mesa/glsl_compiler $(MESALIB_DIR)/src/compiler/
+	cp $(PTXDIST_SYSROOT_HOST)/usr/bin/mesa/glsl_compiler $(MESALIB_DIR)/src/compiler/
 	@$(call world/compile, MESALIB)
 	@$(call touch)
 
@@ -228,18 +253,27 @@ $(STATEDIR)/mesalib.targetinstall:
 	@$(call install_fixup, mesalib,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
 	@$(call install_fixup, mesalib,DESCRIPTION,missing)
 
-	@$(foreach lib, $(MESALIB_DRI_LIBS-y), \
-		$(call install_copy, mesalib, 0, 0, 0644, -, \
-		/usr/lib/dri/$(lib)_dri.so)$(ptx/nl))
-
 ifneq ($(strip $(MESALIB_DRI_GALLIUM_LIBS-y)),)
 	@$(call install_copy, mesalib, 0, 0, 0644, \
 		$(MESALIB_PKGDIR)/usr/lib/dri/$(firstword $(MESALIB_DRI_GALLIUM_LIBS-y))_dri.so, \
 		/usr/lib/dri/gallium_dri.so)
 
 	@$(foreach lib, $(MESALIB_DRI_GALLIUM_LIBS-y), \
+		test -f $(MESALIB_PKGDIR)/usr/lib/dri/$(lib)_dri.so || \
+			ptxd_bailout "missing gallium driver $(lib)_dri.so"$(ptx/nl) \
 		$(call install_link, mesalib, gallium_dri.so, \
 		/usr/lib/dri/$(lib)_dri.so)$(ptx/nl))
+endif
+ifneq ($(strip $(MESALIB_DRI_VA_LIBS-y)),)
+	@$(call install_copy, mesalib, 0, 0, 0644, \
+		$(MESALIB_PKGDIR)/usr/lib/dri/$(firstword $(MESALIB_DRI_VA_LIBS-y))_drv_video.so, \
+		/usr/lib/dri/va_dri.so)
+
+	@$(foreach lib, $(MESALIB_DRI_VA_LIBS-y), \
+		test -f $(MESALIB_PKGDIR)/usr/lib/dri/$(lib)_drv_video.so || \
+			ptxd_bailout "missing va driver $(lib)_drv_video.so"$(ptx/nl) \
+		$(call install_link, mesalib, va_dri.so, \
+		/usr/lib/dri/$(lib)_drv_video.so)$(ptx/nl))
 endif
 
 ifneq ($(strip $(MESALIB_VULKAN_LIBS-y)),)

@@ -4,6 +4,7 @@ config WEBENGINEBROWSER
 	bool
 	prompt "webenginebrowser"
 	select QT5
+	select MUSTACHE
 	help
 	  FIXME
 

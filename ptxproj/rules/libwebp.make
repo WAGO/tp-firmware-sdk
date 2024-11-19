@@ -72,6 +72,7 @@ $(STATEDIR)/libwebp.targetinstall:
 	@$(call install_fixup, libwebp,DESCRIPTION,missing)
 
 	@$(call install_lib, libwebp, 0, 0, 0644, libwebp)
+	@$(call install_lib, libwebp, 0, 0, 0644, libsharpyuv)
 ifdef PTXCONF_LIBWEBP_DEMUX
 	@$(call install_lib, libwebp, 0, 0, 0644, libwebpdemux)
 endif

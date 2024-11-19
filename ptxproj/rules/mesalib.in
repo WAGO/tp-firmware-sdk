@@ -8,16 +8,16 @@ menuconfig MESALIB
 	select HOST_MAKEDEPEND
 	select HOST_SYSTEM_PYTHON3
 	select HOST_SYSTEM_PYTHON3_MAKO
+	select HOST_GLSLANG		if MESALIB_VULKAN_AMD
+	select HOST_GLSLANG		if MESALIB_VULKAN_INTEL
 	select HOST_GLSLANG		if MESALIB_VULKAN_OVERLAY
 	select GCCLIBS
 	select GCCLIBS_CXX
 	select LIBDRM
-	select LIBDRM_INTEL		if MESALIB_DRI_I915 || MESALIB_DRI_I965
-	select LIBDRM_RADEON		if MESALIB_DRI_R200
 	select LIBDRM_RADEON		if MESALIB_DRI_R300
 	select LIBDRM_RADEON		if MESALIB_DRI_R600
 	select LIBDRM_RADEON		if MESALIB_DRI_RADEONSI
-	select LIBDRM_NOUVEAU		if MESALIB_DRI_NOUVEAU || MESALIB_DRI_NOUVEAU_VIEUX
+	select LIBDRM_NOUVEAU		if MESALIB_DRI_NOUVEAU
 	select VULKAN_LOADER		if MESALIB_DRI_ZINK
 	select LM_SENSORS		if MESALIB_LMSENSORS
 	select XORGPROTO		if MESALIB_GLX
@@ -49,21 +49,6 @@ config MESALIB_DRI_SWRAST
 	bool
 	prompt "Software Rasterizer"
 
-config MESALIB_DRI_I915
-	bool
-	select MESALIB_OPENGL
-	prompt "Intel i915"
-
-config MESALIB_DRI_I965
-	bool
-	select MESALIB_OPENGL
-	prompt "Intel i965"
-
-config MESALIB_DRI_R200
-	bool
-	select MESALIB_OPENGL
-	prompt "AMD R200"
-
 config MESALIB_DRI_R300
 	bool
 	prompt "AMD R300"
@@ -78,18 +63,21 @@ config MESALIB_DRI_RADEONSI
 	depends on BROKEN
 	prompt "AMD RadeonSI"
 
-config MESALIB_DRI_NOUVEAU_VIEUX
-	bool
-	select MESALIB_OPENGL
-	prompt "Nvidia <= GForce4"
-
 config MESALIB_DRI_NOUVEAU
 	bool
 	prompt "Nvidia > GForce4"
 
 config MESALIB_DRI_KMSRO
 	bool
-	prompt "KMS renderonly"
+	default MESALIB_DRI_V3D || MESALIB_DRI_VC4 || MESALIB_DRI_ETNAVIV || MESALIB_DRI_PANFROST || MESALIB_DRI_LIMA || MESALIB_DRI_FREEDRENO
+
+config MESALIB_DRI_SVGA
+	bool
+	prompt "SVGA"
+
+config MESALIB_DRI_VIRGL
+	bool
+	prompt "VIRGL"
 
 config MESALIB_DRI_FREEDRENO
 	bool
@@ -101,10 +89,12 @@ config MESALIB_DRI_ETNAVIV
 
 config MESALIB_DRI_V3D
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "v3d"
 
 config MESALIB_DRI_VC4
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "vc4"
 
 config MESALIB_DRI_PANFROST
@@ -113,6 +103,7 @@ config MESALIB_DRI_PANFROST
 
 config MESALIB_DRI_IRIS
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "iris"
 
 config MESALIB_DRI_LIMA
@@ -129,6 +120,7 @@ config MESALIB_DRI_ASAHI
 
 config MESALIB_DRI_CROCUS
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "crocus"
 
 comment "API Support"
@@ -161,6 +153,39 @@ config MESALIB_EGL
 config MESALIB_GBM
 	bool
 	prompt "GBM"
+
+config MESALIB_VA
+	bool
+	depends on MESALIB_DRI_RADEONSI || MESALIB_DRI_R600 || MESALIB_DRI_NOUVEAU
+	prompt "VA"
+
+if MESALIB_VA
+
+menu "Patent encumbered video codecs"
+
+config MESALIB_VIDEO_VC1DEC
+	bool
+	prompt "VC-1 decoding"
+
+config MESALIB_VIDEO_H264DEC
+	bool
+	prompt "H.264 decoding"
+
+config MESALIB_VIDEO_H264ENC
+	bool
+	prompt "H.264 encoding"
+
+config MESALIB_VIDEO_H265DEC
+	bool
+	prompt "H.265 decoding"
+
+config MESALIB_VIDEO_H265ENC
+	bool
+	prompt "H.265 encoding"
+
+endmenu
+
+endif
 
 comment "Platforms"
 
@@ -201,11 +226,18 @@ config MESALIB_VULKAN_AMD
 
 config MESALIB_VULKAN_BROADCOM
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "Broadcom"
 
 config MESALIB_VULKAN_INTEL
 	bool
+	select MESALIB_XMLCONFIG
 	prompt "Intel (Anvil)"
+
+config MESALIB_VULKAN_INTEL_HASVK
+	bool
+	select MESALIB_XMLCONFIG
+	prompt "Intel (hasvk)"
 
 config MESALIB_VULKAN_FREEDRENO
 	bool
@@ -239,6 +271,10 @@ config MESALIB_VULKAN_OVERLAY
 config MESALIB_SHADER_CACHE
 	bool
 	prompt "enable shader cache"
+
+config MESALIB_XMLCONFIG
+	bool
+	prompt "build custom xmlconfig (driconf) support"
 
 endif
 

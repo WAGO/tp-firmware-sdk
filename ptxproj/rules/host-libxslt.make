@@ -21,16 +21,18 @@ HOST_LIBXSLT_DIR	= $(HOST_BUILDDIR)/$(LIBXSLT)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBXSLT_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBXSLT_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_LIBXSLT_AUTOCONF := \
+HOST_LIBXSLT_CONF_TOOL	:= autoconf
+HOST_LIBXSLT_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--disable-static \
+	--without-python \
 	--without-crypto \
-	--without-python
+	--without-debug \
+	--without-debugger \
+	--without-profiler \
+	--without-plugins
 
 # vim: syntax=make

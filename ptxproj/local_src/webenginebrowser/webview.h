@@ -167,6 +167,8 @@ public:
   bool IsCurrentWebView();
   bool IsMonitoringConfigured();
   bool IsLocalhost(QUrl u);
+  
+  void qLog(QString s);
 
 protected:
   void mousePressEvent(QMouseEvent *event);

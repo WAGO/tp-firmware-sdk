@@ -140,6 +140,7 @@ configParam+=(
   "rs232Owner;                /etc/config-tools/get_coupler_details RS232-owner;                /etc/config-tools/config_RS232 owner="
   "codesys-webserver-state;   /etc/config-tools/get_runtime_config cfg-version=2 webserver-state; /etc/config-tools/config_runtime cfg-version=2 webserver-state="
   "codesys3-webserver-state;  /etc/config-tools/get_runtime_config cfg-version=3 webserver-state; /etc/config-tools/config_runtime cfg-version=3 webserver-state="
+  "codesys3-webserver-authentication;  /etc/config-tools/get_runtime_config cfg-version=3 webserver-authentication; /etc/config-tools/config_runtime cfg-version=3 webserver-authentication="
   "ftp-state;                 /etc/config-tools/config_ssl ftp-status;                          /etc/config-tools/config_port port=ftp state="
   "ftps-state;                /etc/config-tools/config_ssl ftps-status;                         /etc/config-tools/config_port port=ftps state="
   "codesys-port-state;        /etc/config-tools/get_runtime_config service-state;               /etc/config-tools/config_runtime cfg-version=2 service-state="
@@ -183,16 +184,6 @@ configParam+=(
   
   "iocheck-port;              /etc/config-tools/get_iocheckport_config state;                   /etc/config-tools/config_iocheckport state="
   
-  "sim-pin;                   /etc/config-tools/settings_backup_mdmd backup sim-pin;            /etc/config-tools/settings_backup_mdmd restore sim-pin "
-  "port-state;                /etc/config-tools/settings_backup_mdmd backup port-state;         /etc/config-tools/settings_backup_mdmd restore port-state "
-  "log-level;                 /etc/config-tools/settings_backup_mdmd backup log-level;          /etc/config-tools/settings_backup_mdmd restore log-level "
-
-  "gprs-auth-type;            /etc/config-tools/settings_backup_mdmd backup gprs-auth-type;     /etc/config-tools/settings_backup_mdmd restore dummy "
-  "gprs-username;             /etc/config-tools/settings_backup_mdmd backup gprs-username;      /etc/config-tools/settings_backup_mdmd restore dummy " 
-  "gprs-apn;                  /etc/config-tools/settings_backup_mdmd backup gprs-apn;           /etc/config-tools/settings_backup_mdmd restore dummy "
-  "gprs-connectivity;         /etc/config-tools/settings_backup_mdmd backup gprs-connectivity;  /etc/config-tools/settings_backup_mdmd restore gprs-connectivity "
-  "net-selection-mode;        /etc/config-tools/settings_backup_mdmd backup net-selection-mode; /etc/config-tools/settings_backup_mdmd restore net-selection-mode " 
-
   "inotify-max-queued-events; /etc/config-tools/config_inotify backup max_queued_events;        /etc/config-tools/config_inotify restore max_queued_events "
   "inotify-max-user-instances;/etc/config-tools/config_inotify backup max_user_instances;       /etc/config-tools/config_inotify restore max_user_instances "
   "inotify-max-user-watches;  /etc/config-tools/config_inotify backup max_user_watches;         /etc/config-tools/config_inotify restore max_user_watches "
@@ -319,7 +310,6 @@ configParam+=(
   "screensaver-time;          /etc/config-tools/get_screensaver time;                           /etc/config-tools/config_screensaver time="
 # touchbeeper
   "touchbeeper-state;         /etc/config-tools/get_touchbeeper state;                          /etc/config-tools/config_touchbeeper state="
-  "touchbeeper-duration;      /etc/config-tools/get_touchbeeper duration;                       /etc/config-tools/config_touchbeeper duration="
 # pointercal
   "touch-calibration;         /etc/config-tools/get_pointercal;                                 /etc/config-tools/config_pointercal "
 # ledserver settings

@@ -1,0 +1,7 @@
+## SECTION=elrest_specific_applications_browser
+
+config PDFJS
+	tristate
+	prompt "pdfjs"
+	help
+	  FIXME

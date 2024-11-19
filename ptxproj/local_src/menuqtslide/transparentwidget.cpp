@@ -72,18 +72,18 @@ TransparentWidget::TransparentWidget(QWidget *parent) : QWidget(parent)
     return;
   }
 
+  setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
   //widget always on top and transparent
   if (g_bEventDetection)
   {
     //slide mode (kapazitiv)
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);  
     SetTransparent();   
   }
   else
   {
     //cmdlineoption -nodetection
     //no slide mode (resistiv) - gesture_control sends an open cmd to /dev/toolbarmenu
-    setWindowFlags(Qt::FramelessWindowHint);  
     //start listener thread to /dev/toolbarmenu
     m_toolBar.startCmdThread();
   }
