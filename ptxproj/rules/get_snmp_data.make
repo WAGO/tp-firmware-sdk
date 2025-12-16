@@ -23,13 +23,13 @@ GET_SNMP_DATA_BUILDCONFIG    := Release
 GET_SNMP_DATA_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(GET_SNMP_DATA)
 GET_SNMP_DATA_BUILDROOT_DIR  := $(BUILDDIR)/$(GET_SNMP_DATA)
 GET_SNMP_DATA_DIR            := $(GET_SNMP_DATA_BUILDROOT_DIR)/src
-GET_SNMP_DATA_BUILD_DIR      := $(GET_SNMP_DATA_BUILDROOT_DIR)/bin/$(GET_SNMP_DATA_BUILDCONFIG)
+GET_SNMP_DATA_BIN_DIR        := $(GET_SNMP_DATA_BUILDROOT_DIR)/bin/$(GET_SNMP_DATA_BUILDCONFIG)
 GET_SNMP_DATA_LICENSE        := MPL-2.0
 GET_SNMP_DATA_CONF_TOOL      := NO
 GET_SNMP_DATA_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(GET_SNMP_DATA_BUILDCONFIG) \
-BIN_DIR=$(GET_SNMP_DATA_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(GET_SNMP_DATA_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 
 # ----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ $(STATEDIR)/get_snmp_data.targetinstall:
 	@$(call install_fixup, get_snmp_data,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, get_snmp_data,DESCRIPTION,missing)
 
-	@$(call install_copy, get_snmp_data, 0, 0, 0755, $(GET_SNMP_DATA_BUILD_DIR)/get_snmp_data.elf, /etc/config-tools/get_snmp_data)
+	@$(call install_copy, get_snmp_data, 0, 0, 0755, $(GET_SNMP_DATA_BIN_DIR)/get_snmp_data.elf, /etc/config-tools/get_snmp_data)
 
 	@$(call install_finish, get_snmp_data)
 

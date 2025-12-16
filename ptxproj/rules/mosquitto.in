@@ -1,45 +1,46 @@
 ## SECTION=networking
 
 menuconfig MOSQUITTO
-	bool
+	tristate
+	prompt "mosquitto                     "
 	select HOST_CMAKE
-	select OPENSSL
-	select LIBC_PTHREAD
-	prompt "mosquitto"
+	select OPENSSL			if MOSQUITTO_TLS
+	select SYSTEMD			if MOSQUITTO_SYSTEMD_UNIT
+	select LIBWEBSOCKETS		if MOSQUITTO_WEBSOCKETS
+	select LIBWEBSOCKETS_TLS	if MOSQUITTO_WEBSOCKETS && MOSQUITTO_TLS
 	help
-		Eclipse Mosquitto provides a lightweight server implementation of the MQTT protocol that is suitable for all situations from full power machines to embedded and 
-		low power machines. Sensors and actuators, which are often the sources and destinations of MQTT messages, can be very small and lacking in power. 
-		This also applies to the embedded machines to which they are connected, which is where Mosquitto could be run.
+	  Open source MQTT message broker, library, and client.
 
-#if MOSQUITTO
+if MOSQUITTO
 
-#TODO: Add mosquitto specific options
+config MOSQUITTO_BROKER
+	bool
+	prompt "Broker"
 
-#config AZURE_HTTP
-#	bool
-#	default y
-#	prompt "with HTTP support"
+config MOSQUITTO_SYSTEMD_UNIT
+	bool
+	default y
+	select MOSQUITTO_BROKER
+	depends on INITMETHOD_SYSTEMD
+	prompt "install systemd unit file"
 
-#config AZURE_MQTT
-#	bool
-#	default y
-#	prompt "with MQTT support"
+config MOSQUITTO_CLIENTS
+	bool
+	prompt "Clients"
 
-#config AZURE_AMQP
-#	bool
-#	default y
-#	prompt "with AMQP support"
+config MOSQUITTO_TLS
+	bool
+	prompt "TLS support"
 
-#config AZURE_WSIO
-#	bool
-#	prompt "with WebSocket support"
+config MOSQUITTO_SRV
+	bool
+	prompt "SRV lookup support"
 
-#config AZURE_SAMPLES
-#	bool
-#	prompt "install sample applications"
+config MOSQUITTO_WEBSOCKETS
+	bool
+	depends on MOSQUITTO_BROKER
+	prompt "Websockets support"
 
-#endif
+endif
 
-
-
-
+# vim: ft=kconfig noet tw=72

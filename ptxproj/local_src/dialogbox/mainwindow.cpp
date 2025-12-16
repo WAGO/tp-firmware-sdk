@@ -36,17 +36,22 @@
 // Include files
 //------------------------------------------------------------------------------
 
+#include <QApplication>
+#include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QDebug>
 #include <QSettings>
 #include <QProcess>
-#include <QX11Info>
 #include <stdlib.h>
 #include "globals.h"
 #include "tools.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions
@@ -79,7 +84,11 @@ MainWindow::MainWindow(QWidget *parent) :
     iFntSizeBtn = 16;
 
     //screen dimensions
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    QRect r = QApplication::primaryScreen()->geometry();
+#else
     QRect r = QApplication::desktop()->screenGeometry();
+#endif
     m_iScreenWidth = r.width();
     m_iScreenHeight = r.height();
 
@@ -435,9 +444,13 @@ void MainWindow::Initialize()
       }
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    setGeometry(QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,
+                newSize, qApp->primaryScreen()->availableGeometry()) );
+#else
     setGeometry(QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter,
                 newSize, qApp->desktop()->availableGeometry()) );
-
+#endif
     if (m_iSeconds > 0)
     {
       connect(&m_timer, SIGNAL(timeout()), this, SLOT(TimeoutFunction()));
@@ -523,9 +536,17 @@ void MainWindow::TimeoutFunction()
 int MainWindow::CalculatePixelWidth(QString sText, QFont fnt, bool bDefBtn)
 {
     QFontMetrics fm(fnt);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    int pixelsWide = fm.horizontalAdvance(sText);
+#else
     int pixelsWide = fm.width(sText);
+#endif
     if (bDefBtn)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+      pixelsWide += fm.horizontalAdvance(S_COUNTDOWN);
+#else
       pixelsWide += fm.width(S_COUNTDOWN);
+#endif
     return (pixelsWide);
 }
 
@@ -536,21 +557,27 @@ int MainWindow::CalculatePixelWidth(QString sText, QFont fnt, bool bDefBtn)
 int MainWindow::CalculatePixelHeight(QFont fnt)
 {
     QFontMetrics fm(fnt);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    int pixelsHigh = fm.xHeight();
+#else
     int pixelsHigh = fm.height();
+#endif
     return (pixelsHigh);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-  QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
+    QTimer::singleShot(250, this, SLOT(ActivateX11Window()));
+#endif
 }
 
 /// \brief ensure X11 window to be shown in front
 /// \param[in]  X11 window id
 void MainWindow::ActivateX11Window()
 {
-  if (QX11Info::isPlatformX11())
-  {
+//  if (QX11Info::isPlatformX11())
+//  {
     int id = QWidget::winId ();
     if (id > 0)
     {
@@ -564,5 +591,5 @@ void MainWindow::ActivateX11Window()
       QByteArray ba = sAction.toLatin1();
       system(ba.data());
     }
-  }
+//  }
 }

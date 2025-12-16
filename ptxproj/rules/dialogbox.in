@@ -3,7 +3,19 @@
 config DIALOGBOX
 	tristate
 	prompt "dialogbox"
-	select QT5
+	select QT5 if DIALOGBOX_USE_QT5
 	help
-	  FIXME
+	  qt based dialogbox util
 
+if DIALOGBOX
+choice
+	prompt "QT_VERSION_USED"
+		config DIALOGBOX_USE_QT5
+			bool
+			prompt "QT5"
+
+		config DIALOGBOX_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

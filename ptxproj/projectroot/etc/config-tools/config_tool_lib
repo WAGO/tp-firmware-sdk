@@ -1471,7 +1471,7 @@ function GetTargetName
 function CheckPasswordQuality
 {
   if [[ -x "/usr/bin/pwqcheck" ]]; then
-    pwqcheck -1 min=disabled,disabled,disabled,disabled,10 passphrase=0 match=0 <<<"$1" 1>/dev/null 2>&1
+    pwqcheck -1 config=/etc/passwdqc.conf <<<"$1" 1>/dev/null 2>&1
   fi
 }
 

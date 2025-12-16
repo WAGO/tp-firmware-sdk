@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_LIBXSLT) += libxslt
 #
 # Paths and names
 #
-LIBXSLT_VERSION	:= 1.1.40
-LIBXSLT_MD5	:= d9f936c2d94cbb229b504d48b2649376
+LIBXSLT_VERSION	:= 1.1.43
+LIBXSLT_MD5	:= 5dc0179c81be7a3082b43030ecfdebd4 
 LIBXSLT		:= libxslt-$(LIBXSLT_VERSION)
 LIBXSLT_SUFFIX	:= tar.xz
 LIBXSLT_SOURCE	:= $(SRCDIR)/$(LIBXSLT).$(LIBXSLT_SUFFIX)
@@ -41,7 +41,7 @@ LIBXSLT_CONF_ENV := \
 #
 LIBXSLT_CONF_TOOL := autoconf
 LIBXSLT_CONF_OPT := \
-	 $(CROSS_AUTOCONF_USR) \
+	$(CROSS_AUTOCONF_USR) \
 	--disable-static \
 	--without-python \
 	--$(call ptx/wwo, PTXCONF_LIBXSLT_CRYPTO)-crypto \

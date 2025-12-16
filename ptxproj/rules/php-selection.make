@@ -1,6 +1,6 @@
 # -*-makefile-*-
 #
-# Copyright (C) 2022-2023 by Patrick Enns <patrick.enns@wago.com>
+# Copyright (C) 2022-2025 by Patrick Enns <patrick.enns@wago.com>
 #
 # For further information about the PTXdist project and license conditions
 # see the README file.
@@ -14,7 +14,7 @@ PACKAGES-$(PTXCONF_PHP_SELECTION) += php-selection
 #
 # Paths and names
 #
-PHP_SELECTION_VERSION       := 1.2.0
+PHP_SELECTION_VERSION       := 2.0.0
 PHP_SELECTION_MD5           := 
 PHP_SELECTION               := php-$(PHP_VERSION)
 PHP_SELECTION_SUFFIX        := 
@@ -57,11 +57,6 @@ $(STATEDIR)/php-selection.install:
 	@rm -f $(PTXDIST_SYSROOT_TARGET)/usr/bin/php-config
 	@rm -f $(PTXDIST_SYSROOT_TARGET)/usr/bin/phpize
 
-ifdef PTXCONF_PHP_SELECTION_PREFER_PHP7
-	@ln -s $(PTXDIST_SYSROOT_TARGET)/usr/include/php7    $(PTXDIST_SYSROOT_TARGET)/usr/include/php
-	@ln -s $(PTXDIST_SYSROOT_TARGET)/usr/bin/php7-config $(PTXDIST_SYSROOT_TARGET)/usr/bin/php-config
-	@ln -s $(PTXDIST_SYSROOT_TARGET)/usr/bin/phpize7     $(PTXDIST_SYSROOT_TARGET)/usr/bin/phpize
-endif
 ifdef PTXCONF_PHP_SELECTION_PREFER_PHP8
 	@ln -s $(PTXDIST_SYSROOT_TARGET)/usr/include/php8    $(PTXDIST_SYSROOT_TARGET)/usr/include/php
 	@ln -s $(PTXDIST_SYSROOT_TARGET)/usr/bin/php8-config $(PTXDIST_SYSROOT_TARGET)/usr/bin/php-config
@@ -81,22 +76,6 @@ $(STATEDIR)/php-selection.targetinstall:
 	@$(call install_fixup, php-selection,SECTION,base)
 	@$(call install_fixup, php-selection,AUTHOR,"Patrick Enns <patrick.enns@wago.com>")
 	@$(call install_fixup, php-selection,DESCRIPTION,missing)
-
-ifdef PTXCONF_PHP_SELECTION_PREFER_PHP7
-	@$(call install_link, php-selection, php7, /etc/php)
-ifdef PTXCONF_PHP7_SAPI_CLI
-	@$(call install_link, php-selection, php7, /usr/bin/php)
-endif
-ifdef PTXCONF_PHP7_SAPI_CGI
-	@$(call install_link, php-selection, php7-cgi, /usr/bin/php-cgi)
-endif
-ifdef PTXCONF_PHP7_SAPI_FPM
-	@$(call install_link, php-selection, php7-fpm, /usr/bin/php-fpm)
-endif
-ifdef PTXCONF_PHP7_EXT_OPCACHE
-	@$(call install_link, php-selection, ../php7/opcache.so, /usr/lib/php/opcache.so)
-endif
-endif
 
 ifdef PTXCONF_PHP_SELECTION_PREFER_PHP8
 	@$(call install_link, php-selection, php8, /etc/php)

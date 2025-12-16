@@ -1,22 +1,23 @@
 ## SECTION=elrest_specific
 
-menu "Tools                         "
+menu "Tools                            "
 source "generated/elrest_specific_tools.in"
 endmenu
 
-menu "Drivers                       "
+menu "Drivers                          "
 source "generated/elrest_specific_drivers.in"
 endmenu
 
-menu "Applications                  "
+menu "Applications                     "
 source "generated/elrest_specific_applications.in"
 endmenu
 
-menu "Command-Line Tools            "
+menu "Command-Line Tools               "
 source "generated/elrest_specific_commandline_tools.in"
 endmenu
 
 
-menu "Install Elrest custom files   "
+menu "Install Elrest custom files      "
 source "generated/elrest_custom_install.in"
 endmenu
+

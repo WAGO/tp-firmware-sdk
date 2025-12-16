@@ -1,0 +1,7 @@
+## SECTION=initmethod_bbinit
+
+config WDX_LINUX_SERVICE_DAEMON_BBINIT_LINK
+	string
+	depends on WDX_LINUX_SERVICE_DAEMON_STARTSCRIPT
+	prompt "run paramd at startup"
+	default "S11_paramd"

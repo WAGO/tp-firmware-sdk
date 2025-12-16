@@ -330,7 +330,7 @@ config CDS3_TSCSYSPROCESSORLOAD
 	help
 		Platform specific library to determine the current processor load.
 
-    
+	
 config CDS3_TSCCURL
 	bool "TscCurl"
 	default n
@@ -370,19 +370,19 @@ config CDS3_TSCSHAREDPOINTER
 		SNMP-abstraction for CODESYS V3
 
 config CDS3_TSCWEBSOCKETSERVER
-  bool "cds3-tscwebsocketserver"
-  default n
-  select CODESYS3
-  help
-    WebSocket Server library for CODESYS V3 (currently elrest)
+	bool "cds3-tscwebsocketserver"
+	default n
+	select CODESYS3
+	help
+		WebSocket Server library for CODESYS V3 (currently elrest)
 
 if CDS3_TSCWEBSOCKETSERVER
 config WEBSOCKETFRONTEND
-  bool "websocket-frontend (eWS.js)"
-  default n
-  select CODESYS3
-  help
-    Java Script WebSocket library (currently elrest)
+	bool "websocket-frontend (eWS.js)"
+	default n
+	select CODESYS3
+	help
+		Java Script WebSocket library (currently elrest)
 endif
  
 config CDS3_TSCSYSSQLITE
@@ -398,68 +398,67 @@ config CDS3_TSCSYSSQLITE
 		SQLite for CODESYS V3
 
 config CDS3_TSCIODRVCTP
-        bool "cds3-tsciodrvctp"
-        default n
-        select CDS3_INCLUDES
-        select CODESYS3
-        help
-                IoDrv for CTP (currently elrest)
+	bool "cds3-tsciodrvctp"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		IoDrv for CTP (currently elrest)
 
 config CDS3_TSCVIRTUALKEYBOARD
-        bool "cds3-tscvirtualkeyboard"
-        default n
-        select CDS3_INCLUDES
-        select CODESYS3
-        help
-                Virtualkeyboard Events for CTP (currently elrest)
+	bool "cds3-tscvirtualkeyboard"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		Virtualkeyboard Events for CTP (currently elrest)
 
 config CDS3_TSCWAGOSYSBEEPER
-        bool "cds3-tscwagosysbeeper"
-        default n
-        select CDS3_INCLUDES
-        select CODESYS3
-        help
-                Library for TP600/EdgeBox Beeper (currently elrest)
+	bool "cds3-tscwagosysbeeper"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		Library for TP600/EdgeBox Beeper (currently elrest)
 
 config CDS3_TSCWAGOSYSSENSOR
-        bool "cds3-tscwagosyssensor"
-        default n
-        select CDS3_INCLUDES
-        select CODESYS3
-        help
-                Library for TP600/EdgeBox Sensor (currently elrest)
+	bool "cds3-tscwagosyssensor"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		Library for TP600/EdgeBox Sensor (currently elrest)
 
 config CDS3_TSCWAGOSYSAUDIO
-        bool "cds3-tscwagosysaudio"
-        default n
-        select CDS3_INCLUDES
-        select CODESYS3
-        help
-                Library for TP600/EdgeBox Audio (currently elrest)
+	bool "cds3-tscwagosysaudio"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		Library for TP600/EdgeBox Audio (currently elrest)
 
 config CDS3_TSCSYNCBOOTPROJECT
-    bool "TscSyncBootproject" 
-    default n 
-    select CODESYS3 
-    select CDS3_INCLUDES 
-    help  
-        This component synchronizes the bootproject to the storage after it has been uploaded to the controller
-        
+	bool "TscSyncBootproject" 
+	default n 
+	select CODESYS3 
+	select CDS3_INCLUDES 
+	help  
+		This component synchronizes the bootproject to the storage after it has been uploaded to the controller
+		
 config TSCPARAMSERV
-    bool "TscParamServ"
-    default n
-    select HOST_CT_BUILD
-    select GOOGLETEST
-    select CDS3_INCLUDES
-    select CODESYS3
-    select CDS3_INCLUDES
-    select WAGO_LOGGING
-    select WAGO_PARAMETER_SERVICE
-    select WAGO_PARAMETER_SERVICE_CORE
-    select WAGO_PARAMETER_SERVICE_COM
-    select WAGO_PARAMETER_SERVICE_COM_LIB
-    help
-        This component implements access to parameter service in CODESYSv3 / e!RUNTIME
+	bool "TscParamServ"
+	default n
+	select HOST_CT_BUILD
+	select GOOGLETEST
+	select CDS3_INCLUDES
+	select CODESYS3
+	select CDS3_INCLUDES
+	select WAGO_DAEMON_UTILS
+	select WDX_CORE
+	select WDX_LINUX
+	select WDX_LINUX_COM_LIB
+	help
+		This component implements access to parameter service in CODESYSv3 / e!RUNTIME
 
 config CDS3_TSCDRMIECINTERFACE
 	bool "TscDrmIecInterface"
@@ -467,9 +466,9 @@ config CDS3_TSCDRMIECINTERFACE
 	select CODESYS3
 	select CDS3_INCLUDES
 	select LIBWAGODRM
-  select HOST_CT_BUILD
-  select GOOGLETEST
-    help
+	select HOST_CT_BUILD
+	select GOOGLETEST
+	help
 		Builds and installs an IEC61131-Interface for CODESYSv3 to the WAGO licensing component
 
 config CDS3_TSCPAMIECINTERFACE
@@ -490,36 +489,36 @@ config CDS3_TSCWAGOSYSUSERGROUPIECINTERFACE
 		Builds and installs lib-interface for checking user group library
 		
 config CDS3_TSCIODRVCC100
-    bool "cds3-tsciodrvcc100"
-    default n
-    select CDS3_INCLUDES
-    select CODESYS3
-    help
-        IoDrv for CC100 (currently elrest)
+	bool "cds3-tsciodrvcc100"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		IoDrv for CC100 (currently elrest)
 
 config CDS3_SYSUTIL
-    bool "cds3-sysutil"
-    default n
-    select CDS3_INCLUDES
-    select CODESYS3
-    help
-        SysUtil for websockets (currently elrest)
+	bool "cds3-sysutil"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		SysUtil for websockets (currently elrest)
 
 config CDS3_CMPWSSERVER
-    bool "cds3-cmpwsserver"
-    default n
-    select CDS3_INCLUDES
-    select CODESYS3
-    select CDS3_TSCDRMIECINTERFACE
-    select CDS3_SYSUTIL
-    select HOST_PYTHON3_JSMIN
-    help
-        CmpWSServer for websockets (currently elrest)
-        
+	bool "cds3-cmpwsserver"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	select CDS3_TSCDRMIECINTERFACE
+	select CDS3_SYSUTIL
+	select HOST_PYTHON3_JSMIN
+	help
+		CmpWSServer for websockets (currently elrest)
+		
 config CDS3_TSCIODRVCC100WDX
-    bool "cds3-tsciodrvcc100wdx"
-    default n
-    select CDS3_INCLUDES
-    select CODESYS3
-    help
-        IoDrv for CC100 based on WDx (currently elrest)
+	bool "cds3-tsciodrvcc100wdx"
+	default n
+	select CDS3_INCLUDES
+	select CODESYS3
+	help
+		IoDrv for CC100 based on WDx (currently elrest)

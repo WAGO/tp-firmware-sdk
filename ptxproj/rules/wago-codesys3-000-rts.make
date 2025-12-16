@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CODESYS3) += codesys3
 
-CODESYS3_VERSION    := 6.3.1.0
+CODESYS3_VERSION    := 6.4.5.0
 CODESYS3            := codesys-3
 CODESYS3_DIR        := $(BUILDDIR)/$(CODESYS3)
 ifdef PTXCONF_CODESYS3_SOURCE_LOCAL
@@ -28,9 +28,10 @@ CODESYS3_PACKAGE_NAME := codesys3_$(CODESYS3_VERSION)_$(PTXDIST_IPKG_ARCH_STRING
 CODESYS3_PLATFORMCONFIGPACKAGEDIR := $(PTXDIST_PLATFORMCONFIGDIR)/packages
 CODESYS3_PACKAGE_DIR := $(PTXDIST_TEMPDIR)/package/$(CODESYS3_PACKAGE_NAME)
 CODESYS3_INCLUDE := $(PTXCONF_SYSROOT_TARGET)/usr/include/codesys3
+CODESYS3_DEVPKG := NO
 
 ifdef PTXCONF_CODESYS3_SOURCE_GIT
-CODESYS3_GIT_URL         := https://tfs-eng:8081/tfs/ProductDevelopment/eRuntime/_git/eRuntime
+CODESYS3_GIT_URL         := git@svgithub01001.wago.local:BU-Automation/codesys-codesys3.git
 endif
 
 ifdef PTXCONF_CODESYS3_SOURCE_ARTIFACTORY
@@ -134,7 +135,7 @@ endif
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
-CODESYS3_MAKE_ENV:= $(CROSS_ENV) ARCH=$(PTXCONF_ARCH_STRING)
+CODESYS3_MAKE_ENV:= $(CROSS_ENV) ARCH=$(PTXCONF_ARCH_STRING) PTXCONF_TARGET_EXTRA_ASFLAGS=$(PTXCONF_TARGET_EXTRA_ASFLAGS)
 $(STATEDIR)/codesys3.compile:
 	@$(call targetinfo)
 ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES

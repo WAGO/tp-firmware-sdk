@@ -2,7 +2,7 @@
 
 config LIBCOMMONHEADER
 	bool
-	select HOST_CT_BUILD
+	select HOST_CMAKE
 	select GOOGLETEST
 	prompt "libcommonheader"
 	help

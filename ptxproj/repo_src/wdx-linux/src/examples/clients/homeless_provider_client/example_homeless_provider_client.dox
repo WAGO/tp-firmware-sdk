@@ -1,0 +1,26 @@
+/** \example  example_homeless_provider_client.cpp
+
+The following file shows the implementation of an example homeless provider client.\n 
+This example uses
+\ref wago::wdx::linuxos::client::abstract_client
+to register a providers at
+\ref wago::wdx::parameter_service_backend_i.
+
+Derived class my_client:\n 
+At begin of the my_client class the default constructor and destructor is used For this simple client there is no need
+for a custom one. Next both pure virtual methods (my_client::get_name() and my_client::init()) of the abstract base class
+are implemented. Inside my_client::init() method is the right place to organize and register the providers which should
+be part of this client. Therefore the common backend interface wago::wdx::parameter_service_backend_i is requested from
+the base class by call of abstract_client::get_backend().\n 
+
+In the end of this example
+\ref wago::wdx::linuxos::client::create_client()
+is implemented as factory function for the concrete example client. This function is called by the common main() shipped
+with the archive libwdxlinuxosclient to create a client instance.\n 
+
+Provider unregistration:\n 
+In the end there is no need to unregister the providers, because this is done by backend proxy/stub on program exit.
+
+\see example_backend_client.cpp for an example how to create a custom client without use of libwdxlinuxosclient
+(e. g. for more flexibility).
+*/

@@ -1,0 +1,13 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: @wago_optparsing_lib_target@
+Description: @wago_optparsing_lib_description@
+Version: @PROJECT_VERSION@
+Requires: @wago_optparsing_pc_req_public@
+Requires.private: @wago_optparsing_pc_req_private@
+Cflags: -I"${includedir}"
+Libs: -L"${libdir}" -l@wago_optparsing_lib_target@ -Wl,-Bdynamic
+Libs.private: -L"${libdir}" -l@wago_optparsing_lib_target@ -Wl,-Bdynamic

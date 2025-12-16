@@ -49,6 +49,22 @@ function ActivateWindow
   fi
 }
 
+function wait4virtualkeyboard
+{
+  #TP600
+  local COUNTER=0
+  while [ ! -e "/dev/virtualkeyboard" ]; do
+    ((COUNTER++))
+    #sleep 500 ms
+    usleep 500000
+    if [ $COUNTER -gt 50 ]; then
+      echo "Timeout waiting for virtualkeyboard device"
+      break;
+    fi
+  done
+  sleep 1
+}
+
 function ShowUrl
 {
   local BOOTAPP="$(/etc/config-tools/get_eruntime bootapp)"
@@ -96,9 +112,14 @@ if [ -z "$URL" ]; then
  VKB=`/etc/config-tools/get_plcselect 0 vkb`
 fi
 
+VIRTUALKEYBOARD=$(getconfvalue /etc/specific/virtualkeyboard.conf state -l)
+if [ "$VIRTUALKEYBOARD" == "enabled" ]; then
+    wait4virtualkeyboard
+fi
+
 PIDVKB=`pidof virtualkeyboard`
 if [ ! -z $PIDVKB ]; then
-  if [ "$VKB" == "disabled" ]; then
+    if [ "$VKB" == "disabled" ]; then
     echo "disabled" > /dev/virtualkeyboard
   fi
 fi

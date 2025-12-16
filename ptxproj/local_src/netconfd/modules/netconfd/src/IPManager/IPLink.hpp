@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <list>
+#include <optional>
 
 #include "Types.hpp"
 #include "NetworkInterfaceConstants.hpp"

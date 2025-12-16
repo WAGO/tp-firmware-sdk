@@ -1,0 +1,15 @@
+## SECTION=wago_specific_paramprovider
+
+config PP_SWITCHCONFIG
+	bool
+	select HOST_CT_BUILD
+	select GOOGLETEST
+	select CONFIG_TOOLS
+	select WDX_CORE
+	select WDX_WDM
+	select WDX_WDM_CPP_HEADERS
+	select WDX_LINUX
+	select LIBSWITCHCONFIG
+	prompt "pp_switchconfig"
+	help
+	  FIXME

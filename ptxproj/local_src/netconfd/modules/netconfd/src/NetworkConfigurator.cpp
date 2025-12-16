@@ -27,11 +27,27 @@
 #include "UriEscape.hpp"
 #include "HostnameManager.hpp"
 #include "DeviceTypeLabel.hpp"
-#include "HostnameController.hpp"
+#include "IDeviceTypeLabel.hpp"
 
 namespace netconf {
 
 using namespace std::string_literals;
+
+namespace{
+
+  ::std::string DefineDHCPVendorClassID(const IDeviceTypeLabel &device_type_label) {
+    auto dhcp_vendor_class_id = device_type_label.GetDHCPVendorClassID();
+    if(!dhcp_vendor_class_id.empty()) {
+      LogInfo("Use DHCP vendor class id: " + dhcp_vendor_class_id);
+      return dhcp_vendor_class_id;
+    }
+    dhcp_vendor_class_id = device_type_label.GetOrderNumber();
+    LogInfo("Use order number as fallback DHCP vedor class id: " + dhcp_vendor_class_id);
+    return dhcp_vendor_class_id;
+  }
+
+}
+
 
 class NetworkConfiguratorImpl {
  public:
@@ -83,8 +99,8 @@ NetworkConfiguratorImpl::NetworkConfiguratorImpl(InterprocessCondition &start_co
       ip_dip_switch_ { DEV_DIP_SWITCH_VALUE },
       persistence_provider_ { persistence_file_path, ip_dip_switch_, static_cast<uint32_t>(netdev_manager_.GetNetDevs({DeviceType::Port}).size()) },
       bridge_manager_ { netdev_manager_, mac_distributor_, stp_, device_type_label_.GetOrderNumber() },
-      interface_manager_ { netdev_manager_, persistence_provider_, ethernet_interface_factory_ },
-      dyn_ip_client_admin_ {device_type_label_.GetOrderNumber() },
+      interface_manager_ { netdev_manager_, persistence_provider_, ethernet_interface_factory_, event_manager_ },
+      dyn_ip_client_admin_ {DefineDHCPVendorClassID(device_type_label_)},
       hostname_manager_{device_type_label_.GetMac()},
       ip_manager_ { event_manager_, persistence_provider_, netdev_manager_, ip_dip_switch_, interface_manager_,
           dyn_ip_client_admin_, ip_controller_, ip_monitor_, hostname_manager_},

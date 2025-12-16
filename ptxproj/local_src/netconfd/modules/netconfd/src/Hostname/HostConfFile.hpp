@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Status.hpp"
-#include "BaseTypes.hpp"
 #include "FileEditor.hpp"
 #include "HostConfFileParser.hpp"
 
@@ -13,9 +11,7 @@ class HostConfFile {
   virtual ~HostConfFile() = default;
 
   HostConfFile(const HostConfFile &other) = default;
-  HostConfFile(HostConfFile &&other) = delete;
-  HostConfFile& operator=(const HostConfFile &other) = delete;
-  HostConfFile& operator=(HostConfFile &&other) = delete;
+  HostConfFile(HostConfFile &&other) = default;
 
   ::std::string GetHostname();
   ::std::string GetDomain();

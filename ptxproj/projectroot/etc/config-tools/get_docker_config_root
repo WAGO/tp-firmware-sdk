@@ -3,7 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2020-2022 WAGO GmbH & Co. KG
+# Copyright (c) 2020-2025 WAGO GmbH & Co. KG
 
 #-----------------------------------------------------------------------------#
 # Script-name: get_docker_config
@@ -15,7 +15,7 @@
 
 . /etc/config-tools/config_tool_lib
 
-
+DOCKER_DATA="/home/docker"
 #--------------------------------------------------------------------
 # help text (requested with specified parameter).
 #--------------------------------------------------------------------
@@ -44,11 +44,15 @@ get_docker_install_status() {
     if [ -f /etc/init.d/dockerd ]; then
         if docker ps > /dev/null 2>&1; then
             printf "installed"
+        elif [ -d $DOCKER_DATA ]; then
+            printf "installed"
         else
             printf "not installed"
         fi
-    else
-        printf "not installed"
+    elif [ -d $DOCKER_DATA ]; then
+            printf "installed"
+        else
+            printf "not installed"
     fi
 }
 

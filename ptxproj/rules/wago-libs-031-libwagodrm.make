@@ -24,14 +24,14 @@ LIBWAGODRM_BUILDCONFIG    := Release
 LIBWAGODRM_SRC_DIR        := $(PTXDIST_WORKSPACE)/wago_intern/$(LIBWAGODRM)
 LIBWAGODRM_BUILDROOT_DIR  := $(BUILDDIR)/$(LIBWAGODRM)
 LIBWAGODRM_DIR            := $(LIBWAGODRM_BUILDROOT_DIR)/src
-LIBWAGODRM_BUILD_DIR      := $(LIBWAGODRM_BUILDROOT_DIR)/bin/$(LIBWAGODRM_BUILDCONFIG)
+LIBWAGODRM_BIN_DIR        := $(LIBWAGODRM_BUILDROOT_DIR)/bin/$(LIBWAGODRM_BUILDCONFIG)
 LIBWAGODRM_LICENSE        := WAGO
 LIBWAGODRM_BIN            := $(LIBWAGODRM).so.$(LIBWAGODRM_VERSION)
 LIBWAGODRM_CONF_TOOL      := NO
 LIBWAGODRM_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(LIBWAGODRM_BUILDCONFIG) \
-BIN_DIR=$(LIBWAGODRM_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(LIBWAGODRM_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 LIBWAGODRM_PACKAGE_NAME         := $(LIBWAGODRM)_$(LIBWAGODRM_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)
 LIBWAGODRM_PLATFORMCONFIGPACKAGEDIR    := $(PTXDIST_PLATFORMCONFIGDIR)/packages
@@ -119,7 +119,7 @@ $(STATEDIR)/libwagodrm.targetinstall:
 	@$(call install_fixup, libwagodrm,DESCRIPTION,missing)
 
 	@$(call install_lib, libwagodrm, 0, 0, 0644, libwagodrm)
-#	@$(call install_copy, libwagodrm, 0, 0, 0644, $(LIBWAGODRM_BUILD_DIR)/libwagodrm.so, /usr/lib/$(LIBWAGODRM_BIN))
+#	@$(call install_copy, libwagodrm, 0, 0, 0644, $(LIBWAGODRM_BIN_DIR)/libwagodrm.so, /usr/lib/$(LIBWAGODRM_BIN))
 #	@$(call install_link, libwagodrm, $(LIBWAGODRM_BIN), /usr/lib/$(LIBWAGODRM).so.0)
 #	@$(call install_link, libwagodrm, $(LIBWAGODRM_BIN), /usr/lib/$(LIBWAGODRM).so)
 

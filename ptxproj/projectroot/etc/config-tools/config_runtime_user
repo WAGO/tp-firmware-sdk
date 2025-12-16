@@ -1,0 +1,103 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) 2018-2023 WAGO GmbH & Co. KG
+
+#-----------------------------------------------------------------------------#
+# Script-name: config_runtime_user
+#
+# configuration of the PLC runtime.
+# This script abstracts the usage of different config tools to set
+# CODESYS runtime parameters for CODESYS2 as well as CODESYS3.
+# It is a wrapper for the config tool config_runtime to restrict access
+# to some parameters from wbm when logged in as user
+#
+# Author: WAGO GmbH
+#-----------------------------------------------------------------------------#
+
+# load general definitions and functions
+. /etc/config-tools/config_runtime_common
+
+# check for wait option
+WAIT_OPTION=
+if [ "$1" = "-w" ] || [ "$1" = "--wait" ]; then
+    WAIT_OPTION=$1
+fi
+
+NEW_RUNTIME_VERSION=$(GetParameterValue "runtime-version" $*)
+FORCE_NEW_VERSION=$(GetParameterValue "force-new-version" $*)
+NEW_HOMEDIR_SD=$(GetParameterValue "homedir-on-sdcard" $*)
+NEW_DEFAULT_WEBPAGE=$(GetParameterValue "default-webpage" $*)
+NEW_WEBSERVER_STATE=$(GetParameterValue "webserver-state" $*)
+NEW_PORT_AUTH=$(GetParameterValue "authentication" $*)
+SERIAL_PROGRAMMING=$(GetParameterValue "serial-programming" $*)
+NEW_SERVICE_DISABLED=$(GetParameterValue "service-state" $*)
+NEW_SERVICE_PORT_NO=$(GetParameterValue "comm-port" $*)
+CFG_VERSION=$(GetParameterValue "cfg-version" $*)
+RESTART_SERVER=$(GetParameterValue "restart-server" $*)
+NEW_WEBSERVER_PORT_AUTH=$(GetParameterValue "webserver-authentication" $*)
+
+function print_parameter_forbidden()
+{
+    echo "$0 does not allow parameter $1, use config_runtime instead!"
+    exit 1
+}
+
+# Check forbidden parameters
+if [[ -n "$FORCE_NEW_VERSION" ]]; then
+    print_parameter_forbidden force-new-version
+fi
+
+if [[ -n "$NEW_WEBSERVER_STATE" ]]; then
+    print_parameter_forbidden webserver-state
+fi
+
+if [[ -n "$NEW_PORT_AUTH" ]]; then
+    print_parameter_forbidden authentication
+fi
+
+if [[ -n "$SERIAL_PROGRAMMING" ]]; then
+    print_parameter_forbidden serial-programming
+fi
+
+if [[ -n "$NEW_SERVICE_DISABLED" ]]; then
+    print_parameter_forbidden service-state
+fi
+
+if [[ -n "$NEW_SERVICE_PORT_NO" ]]; then
+    print_parameter_forbidden comm-port
+fi
+
+if [[ -n "$CFG_VERSION" ]]; then
+    print_parameter_forbidden cfg-version
+fi
+
+if [[ -n "$NEW_WEBSERVER_PORT_AUTH" ]]; then
+    print_parameter_forbidden webserver-authentication
+fi
+
+# check allowed parameters and create sanitized arg list
+ARGS=$WAIT_OPTION
+if [[ -n "$NEW_RUNTIME_VERSION" ]]; then
+    ARGS+=" runtime-version=$NEW_RUNTIME_VERSION"
+fi
+
+if [[ -n "$NEW_HOMEDIR_SD" ]]; then
+    ARGS+=" homedir-on-sdcard=$NEW_HOMEDIR_SD"
+fi
+
+if [[ -n "$NEW_DEFAULT_WEBPAGE" ]]; then
+    ARGS+=" default-webpage=$NEW_DEFAULT_WEBPAGE"
+fi
+
+if [[ -n "$RESTART_SERVER" ]]; then
+    if [[ -z "$NEW_RUNTIME_VERSION" && -z "$NEW_DEFAULT_WEBPAGE" ]]; then
+        print_parameter_forbidden restart-server
+    fi
+    ARGS+=" restart-server=$RESTART_SERVER"
+fi
+
+# call real config-tool with sanitized argument list
+/etc/config-tools/config_runtime $ARGS

@@ -4,10 +4,11 @@ config FP_X509_PKEY
 	bool
 	select HOST_CT_BUILD
 	select GOOGLETEST
-	select WAGO_PARAMETER_SERVICE_CORE
-	select WAGO_PARAMETER_SERVICE_COM
-	select WAGO_PARAMETER_SERVICE_TEST_LIB
-	select WAGO_WDX_FILE
+	select WDX_CORE
+	select WDX_CORE_TEST_LIB
+	select WDX_LINUX
+	select WDX_LINUX_CLIENT_LIB
+	select WDX_FILE
 	select OPENSSL
 	prompt "fp_x509-pkey"
 	help

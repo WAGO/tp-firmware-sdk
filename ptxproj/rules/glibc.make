@@ -25,6 +25,20 @@ GLIBC_VERSION	:= $(call remove_quotes,$(PTXCONF_GLIBC_VERSION))
 -include $(PTXDIST_PLATFORMDIR)/selected_toolchain/../share/compliance/glibc.make
 
 # ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/glibc.prepare:
+	@$(call targetinfo)
+ifdef PTXCONF_GLIBC_Y2038
+	@echo Checking Y2038 support...
+	@echo 'static_assert(sizeof(time_t) == 8, "y2038");' | \
+		$(CROSS_CC) -c -x c -fsyntax-only -include sys/types.h -include assert.h - &>/dev/null || \
+		ptxd_bailout "PTXCONF_GLIBC_Y2038 is enabled but the toolchain has no Y2038 support!"
+endif
+	@$(call touch)
+
+# ----------------------------------------------------------------------------
 # Target-Install
 # ----------------------------------------------------------------------------
 
@@ -112,7 +126,7 @@ ifdef PTXCONF_GLIBC_NSL
 	@$(call install_copy_toolchain_lib, glibc, libnsl.so)
 endif
 
-ifdef PTXCONF_GLIBC_GCONF_BASE
+ifdef PTXCONF_GLIBC_GCONV_BASE
 	@$(call install_copy_toolchain_lib, glibc, gconv/gconv-modules,, n)
 	@$(call install_copy_toolchain_usr, glibc, bin/iconv, /usr/bin/iconv)
 endif

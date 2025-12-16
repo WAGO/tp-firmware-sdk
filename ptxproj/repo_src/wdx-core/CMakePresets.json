@@ -1,0 +1,187 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {   "name": "default",
+            "hidden": true,
+            "description": "Default build using Make generator",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {   "name": "check",
+            "inherits": "default",
+            "displayName": "Check"
+        },
+        {   "name": "coverage",
+            "inherits": "check",
+            "displayName": "Code Coverage",
+            "description": "Enable Code Coverage during build",
+            "binaryDir": "${sourceDir}/build/coverage",
+            "cacheVariables": {
+                "WITH_COVERAGE": "true"
+            }
+        },
+        {   "name": "sanitize-undefined",
+            "inherits": "check",
+            "displayName": "Undefined Behavior Sanitizer",
+            "description": "Enable Undefined Behavior Sanitizer",
+            "binaryDir": "${sourceDir}/build/ubsan",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS_DEBUG": "-fsanitize=undefined -fno-sanitize-recover -fno-sanitize=vptr",
+                "CMAKE_C_FLAGS_DEBUG": "-fsanitize=undefined -fno-sanitize-recover -fno-sanitize=vptr"
+            }
+        }
+    ],
+    "buildPresets": [
+        {   "name": "default",
+            "hidden": true,
+            "configurePreset": "default"
+        },
+        {   "name": "check",
+            "inherits": "default",
+            "configurePreset": "check",
+            "displayName": "Build Tests",
+            "description": "Build the unit tests",
+            "cleanFirst": false,
+            "targets": "wdx-core_test",
+            "jobs": 16
+        },
+        {   "name": "coverage",
+            "inherits": "check",
+            "configurePreset": "coverage",
+            "displayName": "Build Tests for Coverage",
+            "description": "Build the unit tests with support for code coverage"
+        },
+        {   "name": "coverage-report",
+            "inherits": "coverage",
+            "displayName": "Generate Coverage Report",
+            "targets": "coverage",
+            "description": "Generate code coverage report"
+        },
+        {   "name": "sanitize-undefined",
+            "inherits": "check",
+            "configurePreset": "sanitize-undefined",
+            "displayName": "Build Tests for Sanitizer",
+            "description": "Build the unit tests for Undefined Behavior Sanitizer"
+        }
+    ],
+    "testPresets": [
+        {   "name": "default",
+            "hidden": true,
+            "configurePreset": "default",
+            "output": {
+                "outputOnFailure": true,
+                "shortProgress": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {   "name": "check",
+            "inherits": "default",
+            "configurePreset": "check",
+            "displayName": "Run Unit Tests",
+            "execution": {
+                "jobs": 16,
+                "stopOnFailure": true
+            },
+            "filter": {
+                "exclude": { "name": "xxxparameter_service_test_fixture.*|xxxfragments.*" },
+                "include": { "name": ".*" }
+            }
+        },
+        {   "name": "coverage",
+            "inherits": "check",
+            "configurePreset": "coverage",
+            "displayName": "Run Unit Tests with Coverage"
+        },
+        {   "name": "sanitize-undefined",
+            "inherits": "check",
+            "configurePreset": "sanitize-undefined",
+            "displayName": "Run Unit Tests with Sanitizer",
+            "description": "Abort if ubsan finds an issue"
+        }
+    ],
+    "workflowPresets": [
+        {   "name": "build",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "check"
+                },
+                {
+                    "type": "build",
+                    "name": "check"
+                }
+            ]
+        },
+        {   "name": "check",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "check"
+                },
+                {
+                    "type": "build",
+                    "name": "check"
+                },
+                {
+                    "type": "test",
+                    "name": "check"
+                }
+            ]
+        },
+        {   "name": "coverage",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "coverage"
+                },
+                {
+                    "type": "build",
+                    "name": "coverage"
+                },
+                {
+                    "type": "test",
+                    "name": "coverage"
+                }
+            ]
+        },
+        {   "name": "coverage-report",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "coverage"
+                },
+                {
+                    "type": "build",
+                    "name": "coverage-report"
+                }
+            ]
+        },
+        {   "name": "sanitize-undefined",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "sanitize-undefined"
+                },
+                {
+                    "type": "build",
+                    "name": "sanitize-undefined"
+                },
+                {
+                    "type": "test",
+                    "name": "sanitize-undefined"
+                }
+            ]
+        }
+    ]
+}

@@ -22,6 +22,7 @@ MSTPD_URL		:= https://github.com/mstpd/mstpd/archive/refs/tags/$(MSTPD_VERSION).
 MSTPD_SOURCE	:= $(SRCDIR)/$(MSTPD).$(MSTPD_SUFFIX)
 MSTPD_DIR		:= $(BUILDDIR)/$(MSTPD)
 MSTPD_LICENSE	:= GPL-2.0-only
+MSTPD_DEVPKG    := NO
 
 #MSTPD_BUILD_OOT	:= YES
 

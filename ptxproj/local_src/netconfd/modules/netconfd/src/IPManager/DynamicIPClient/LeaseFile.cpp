@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "LeaseFile.hpp"
-#include "Logger.hpp"
+#include "FileEditor.hpp"
 
 namespace netconf {
 

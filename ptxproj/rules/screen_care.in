@@ -3,7 +3,19 @@
 config SCREEN_CARE
 	tristate
 	prompt "screen_care"
-	select QT5
+	select QT5 if SCREEN_CARE_USE_QT5
 	help
-	  FIXME
+	  qt based screen care application
 
+if SCREEN_CARE
+choice
+	prompt "QT_VERSION_USED"
+		config SCREEN_CARE_USE_QT5
+			bool
+			prompt "QT5"
+
+		config SCREEN_CARE_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

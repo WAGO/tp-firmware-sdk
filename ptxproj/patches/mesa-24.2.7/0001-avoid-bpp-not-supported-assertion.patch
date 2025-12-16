@@ -1,0 +1,13 @@
+diff -Naur mesa-24.2.7_org/src/gallium/drivers/etnaviv/etnaviv_rs.c mesa-24.2.7/src/gallium/drivers/etnaviv/etnaviv_rs.c
+--- mesa-24.2.7_org/src/gallium/drivers/etnaviv/etnaviv_rs.c	2024-11-13 16:28:52.000000000 +0100
++++ mesa-24.2.7/src/gallium/drivers/etnaviv/etnaviv_rs.c	2025-08-12 13:43:45.990149471 +0200
+@@ -288,6 +288,9 @@
+    uint32_t format;
+ 
+    switch (util_format_get_blocksizebits(surf->base.format)) {
++   case 8:
++      format = RS_FORMAT_A8R8G8B8;
++      break;
+    case 16:
+       format = RS_FORMAT_A4R4G4B4;
+       break;

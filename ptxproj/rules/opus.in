@@ -1,0 +1,36 @@
+## SECTION=multimedia_libs
+
+menuconfig OPUS
+	tristate
+	prompt "opus                          "
+	select HOST_SYSTEM_PERL
+	select HOST_MESON
+	help
+	  Opus is a totally open, royalty-free, highly versatile audio codec.
+
+if OPUS
+
+config OPUS_DEEP_PLC
+	bool
+	prompt "enable deep packet loss concealment (PLC)"
+	help
+	  Improves voice quality under sporadic packet loss, by using a deep
+	  neural network to help with filling in short audio gaps in the
+	  decoder. The decoder complexity needs to be set to 5 or more for this.
+	  Increases binary size by about 1 MiB.
+	  For details, see https://opus-codec.org/demo/opus-1.5/.
+
+config OPUS_OSCE
+	bool
+	select OPUS_DEEP_PLC
+	prompt "enable opus speech coding enhancement (OSCE)"
+	help
+	  Improves voice quality of low-bitrate streams by applying voice
+	  enhancements in the decoder.
+	  A Linear Adaptive Coding Enhancer (LACE, ~100 MFLOPS) is used at
+	  decoder complexity setting 6, and a Non-Linear variation (NoLACE,
+	  ~400 MFLOPS) is used at decoder complexity setting 7.
+	  Increases binary size by about 1.6 MiB.
+	  For details, see https://opus-codec.org/demo/opus-1.5/.
+
+endif

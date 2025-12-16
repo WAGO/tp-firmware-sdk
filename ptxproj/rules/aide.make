@@ -16,8 +16,8 @@ PACKAGES-$(PTXCONF_AIDE) += aide
 #
 # Paths and names
 #
-AIDE_VERSION	:= 0.17.4
-AIDE_MD5	:= adac3bc719b923d49059edb992eb95c9
+AIDE_VERSION	:= 0.19.2
+AIDE_MD5	:= 538a5660b753fe6ccdd1093f8924f5c3
 AIDE		:= aide-$(AIDE_VERSION)
 AIDE_SUFFIX	:= tar.gz
 AIDE_URL	:= https://github.com/aide/aide/releases/download/v$(AIDE_VERSION)/$(AIDE).$(AIDE_SUFFIX)
@@ -42,11 +42,22 @@ AIDE_LICENSE_FILES	:= file://$(AIDE_LICENSE_FILE);md5=b234ee4d69f5fce4486a80fdaf
 AIDE_CONF_TOOL := autoconf
 
 AIDE_CONF_OPT	:= $(CROSS_AUTOCONF_USR) \
+			--$(call ptx/endis, PTXCONF_GLOBAL_LARGE_FILE)-largefile \
 			--disable-static \
+			--enable-default-db \
+			--$(call ptx/endis, PTXDIST_Y2038)-year2038 \
+			--without-fstype \
+			--with-zlib \
+			--without-posix-acl \
+			--$(call ptx/wwo, PTXCONF_GLOBAL_SELINUX)-selinux \
+			--without-xattr \
+			--without-capabilities \
+			--without-e2fsattrs \
 			--without-curl \
-			--without-mhash \
-			--with-gcrypt	\
-			--with-zlib
+			--without-nettle \
+			--with-gcrypt \
+			--without-audit \
+			--without-locale
 
 # ----------------------------------------------------------------------------
 # Compile

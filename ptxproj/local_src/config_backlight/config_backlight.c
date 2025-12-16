@@ -55,6 +55,7 @@ tConfList * g_pList = NULL;
 /// \brief Config data in form of name, default value, value list comma separated (no spaces)
 static tConfValues aConfigValues[] =
 {
+  { "backlightminvalue", "0", "" },
   { "backlighton", "255", "" },
   { "backlightonnight", "50", "" },
   { "backlightoff", "0", "" },
@@ -198,6 +199,7 @@ int main(int argc, char **argv)
             }
             else if ((stricmp(aConfigValues[k].nameStr, "backlighton") == 0) || \
                      (stricmp(aConfigValues[k].nameStr, "backlightoff") == 0) || \
+                     (stricmp(aConfigValues[k].nameStr, "backlightminvalue") == 0) || \
                      (stricmp(aConfigValues[k].nameStr, "backlightonnight") == 0) || \
                      (stricmp(aConfigValues[k].nameStr, "backlightoffnight") == 0))
             { 
@@ -265,6 +267,7 @@ void ShowHelpText()
   printf("\n* Backlight settings * \n\n");
   printf("Usage: config_backlight [backlighton=0..255] [backlightoff=0..255]\n");
   printf("                        [backlightonnight=0..255] [backlightoffnight=0..255]\n");
+  printf("                        [backlightminvalue=0..255]\n");
   printf("                        [daynightswitch=daynightswitch-value]\n");
   printf("                        [nighttime=nighttime-value]\n");
   printf("                        [daytime=daytime-value]\n");

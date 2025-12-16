@@ -15,9 +15,7 @@ class FileEditor : public IFileEditor {
   ~FileEditor() override = default;
 
   FileEditor(const FileEditor&) = default;
-  FileEditor& operator=(const FileEditor&) = delete;
-  FileEditor(const FileEditor&&) = delete;
-  FileEditor& operator=(const FileEditor&&) = delete;
+  FileEditor(FileEditor&&) = default;
 
   Status Read(const ::std::string& file_path, ::std::string& data) const override;
   Status Write(const ::std::string& file_path, const ::std::string& data) const override;

@@ -1,0 +1,13 @@
+diff --git a/bin/ptxdist-make b/bin/ptxdist-make
+index 2dfef2a..a68e8f9 100755
+--- a/bin/ptxdist-make
++++ b/bin/ptxdist-make
+@@ -31,7 +31,7 @@ map_to_workspace_path() {
+ default_ptxdist_workspace() {
+   # we need to strip out linked-folder ct-build, in-order to ensure readlink returns the correct path
+   # ptxproj/platform/sysroot-host/lib/ct-build/bin/ptxdist-make => ptxproj
+-  echo "$(dirname "$(dirname "$(dirname "${BASH_SOURCE[0]}")")")/../../.."
++  echo "$(dirname "$(dirname "$(dirname "${BASH_SOURCE[0]}")")")/../../../.."
+ }
+ 
+ running_in_docker_cli_scripts_container() {

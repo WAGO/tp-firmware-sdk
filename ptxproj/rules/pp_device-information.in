@@ -4,7 +4,7 @@ config PP_DEVICE_INFORMATION
 	bool
 	select HOST_CT_BUILD
 	select GOOGLETEST
-	select WAGO_PARAMETER_SERVICE_CORE
+	select WDX_CORE
 	select TYPELABEL
 	select LIBCOMMONHEADER
 	prompt "pp_device-information"

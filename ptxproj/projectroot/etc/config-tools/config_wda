@@ -1,0 +1,256 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of project parameter-service (PTXdist package wago-parameter-service).
+#
+# Copyright (c) 2021-2025 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   /etc/config-tools/config_wda
+#
+# Brief:    Tool to write WAGO Parameter Service own config parameters.
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+
+# General definitions
+readonly FAILEXIT=64
+readonly SELF="$(/usr/bin/basename "$0")"
+readonly WAGO_SYSTEM_MODULE="WAGO Parameter Service"
+readonly WAGO_CT_TITLE="* Command line interface tool to write $WAGO_SYSTEM_MODULE config parameters *"
+readonly SERVICE_CONFIG="/etc/paramd/paramd.conf"
+readonly WEBSERVER_CONFIG="/etc/lighttpd/settings.conf"
+readonly WEBSERVER_APP_DIR="/etc/lighttpd/apps.confd/param_service"
+readonly CORS_POLICY_SYMLINK_NAME="cors_policy.conf"
+readonly CORS_POLICY_TARGET_ALL="../../snippets/cors_policies/all_origins.conf"
+readonly CORS_POLICY_TARGET_ALL_AND_NULL="../../snippets/cors_policies/all_origins_and_null.conf"
+readonly CORS_POLICY_TARGET_NONE="../../snippets/cors_policies/none.conf"
+readonly CORS_POLICY_TARGET_WHITELIST="../../snippets/cors_policies/whitelist.conf"
+readonly CORS_ORIGIN_WHITELIST_REGEX='^((https?://[]\[a-zA-Z0-9.:_-]+|null)(,https?://[]\[a-zA-Z0-9.:_-]+|,null)*)?$'
+
+if [ ! -f "/etc/config-tools/config_tool_lib" ]; then
+    echo "config_tool_lib missing"
+    exit $FAILEXIT
+fi
+source "/etc/config-tools/config_tool_lib"
+
+
+# Main tool/script function.
+#
+# Param 1..n: Script parameters
+#
+# Return: Exit code, 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+main()
+{
+    local parameter_name="${1-}"
+    local parameter_value="${2-missing}"
+    local result=0
+
+    if [[ $# -lt 1 ]]; then
+        print_info
+        exit $FAILEXIT
+    fi
+
+    if [[ "$parameter_name" == "-h" || "$parameter_name" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    if grep -q '=' <<< "$parameter_name"; then
+        parameter_value="$(printf "%s" "$parameter_name" | /usr/bin/cut -d'=' -f2 2>/dev/NULL)"
+        parameter_name="$(printf "%s" "$parameter_name" | /usr/bin/cut -d'=' -f1 2>/dev/NULL)"
+    fi
+
+    if [[ "$parameter_value" == "missing" ]]; then
+        SetLastError "Missing parameter value for parameter \"$parameter_name\""
+        exit $MISSING_PARAMETER
+    fi
+
+    if [[ "$parameter_name" == "cors-policy" ]]; then
+        write_symlink_parameter "$parameter_name" "$parameter_value"
+        result=$?
+    else
+        write_config_parameter "$parameter_name" "$parameter_value"
+        result=$?
+    fi
+
+    return $result
+}
+
+# Function to print general tool/script information.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+print_info()
+{
+    echo "$WAGO_CT_TITLE"
+    echo
+    echo "For detailed usage information use:"
+    echo "  $SELF --help"
+    echo
+
+    return 0
+}
+
+# Function to print usage to stdout.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+usage()
+{
+    echo "$WAGO_CT_TITLE"
+    echo
+    echo "Usage:"
+    echo "  $SELF <config param name|-h|--help>[=| ]<param value>"
+    echo
+    echo "Config parameter names:"
+    echo "  allow-unauth-scan-devices"
+    echo "  cors-policy"
+    echo "  cors-whitelist"
+    echo
+    echo "CORS policy options:"
+    echo "  allow_all"
+    echo "  allow_all_and_null"
+    echo "  none"
+    echo "  whitelist"
+    echo
+    echo "Examples:"
+    echo "  $SELF allow-unauth-scan-devices false"
+    echo "    Writes config value (false) for \"allow-unauth-scan-devices\""
+    echo
+    echo "  $SELF cors-policy=allow_all"
+    echo "    Writes config value (allow_all) for \"cors-policy\""
+    echo
+}
+
+# Function to write config parameter.
+#
+# Param 1: Config parameter name to write
+# Param 2: Config parameter value to write
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+write_config_parameter()
+{
+    local result=$SUCCESS
+    local param_name="$1"
+    local param_value="$2"
+
+    local config_file
+    local config_param_name
+    if [[ "$param_name" == "cors-whitelist" ]]; then
+        config_file="$WEBSERVER_CONFIG"
+        config_param_name="var.CORS_ORIGIN_WHITELIST"
+    else
+        config_file="$SERVICE_CONFIG"
+        config_param_name="$param_name"
+    fi
+
+    if [[ ! -e "$config_file" ]]; then
+        result=$CONFIG_FILE_MISSING
+        SetLastError "Config file \"$config_file\" is missing"
+    fi
+
+    if [[ $result -eq $SUCCESS ]]; then
+        if [[ "$param_name" == "cors-whitelist" ]]; then
+            if [[ "$param_value" =~ $CORS_ORIGIN_WHITELIST_REGEX ]]; then
+                # Convert comma separated list into regex pattern (',' -> '$|^' and escape regex chars)
+                param_value="\"^$(printf "%s" "$param_value" | /usr/bin/sed 's/,/\$|\^/g'  \
+                                                             | /usr/bin/sed 's/\[/\\[/g' \
+                                                             | /usr/bin/sed 's/\]/\\]/g' \
+                                                             | /usr/bin/sed 's/\./\\./g')\$\""
+            else
+                result=$INVALID_PARAMETER
+                SetLastError "Invalid value for parameter \"$config_param_name\""
+            fi
+        else
+            if [[ "$param_value" != "true" && "$param_value" != "false" ]]; then
+                result=$INVALID_PARAMETER
+                SetLastError "Invalid value for parameter \"$config_param_name\""
+            fi
+        fi
+    fi
+
+    if [[ $result -eq $SUCCESS ]]; then
+        # sed uses a regex pattern by himself to search and replace, so we have to escape
+        # escape character '\' and '%' (used as divider) in the value to write
+        local sed_value; sed_value="$(printf "%s" "$param_value" | /usr/bin/sed 's/\%/\\%/g' \
+                                                                 | /usr/bin/sed 's/\\/\\\\/g')";
+        cp -a "$config_file" "$config_file".tmp                          
+        if ! /usr/bin/sed -i "s%^[ \t]*$config_param_name[ \t]*=[ \t]*.*[ \t]*$%$config_param_name = $sed_value%g" "$config_file".tmp ; then
+            result=$INTERNAL_ERROR
+            SetLastError "Unable to write parameter \"$config_param_name\" in config file \"$config_file\""
+            rm -f "${config_file}.tmp"
+        fi
+    fi
+
+    if [[ $result -eq $SUCCESS ]]; then
+        if ! mv "${config_file}.tmp" "$config_file"; then
+            result=$INTERNAL_ERROR
+            SetLastError "Unable to replace config file \"$config_file\""
+        fi
+    fi
+
+    return $result
+}
+
+# Function to write symlink parameter.
+#
+# Param 1: Symlink parameter name to write
+# Param 2: Symlink parameter value to write
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+write_symlink_parameter()
+{
+    local result=$SUCCESS
+    local param_name="$1"
+    local param_value="$2"
+
+    if [[ ! -d "${WEBSERVER_APP_DIR}" ]]; then
+        result=$CONFIG_FILE_MISSING
+        SetLastError "Config folder \"$WEBSERVER_APP_DIR\" is missing"
+    fi
+
+    local symlink_name
+    local target
+    if [[ $result -eq $SUCCESS ]]; then
+        if [[ $param_name == "cors-policy" ]]; then
+            symlink_name="$CORS_POLICY_SYMLINK_NAME"
+
+            if [[ "$param_value" == "allow_all" ]]; then
+                target="$CORS_POLICY_TARGET_ALL"
+                result=$SUCCESS
+            elif [[ "$param_value" == "allow_all_and_null" ]]; then
+                target="$CORS_POLICY_TARGET_ALL_AND_NULL"
+                result=$SUCCESS
+            elif [[ "$param_value" == "none" ]]; then
+                target="$CORS_POLICY_TARGET_NONE"
+                result=$SUCCESS
+            elif [[ "$param_value" == "whitelist" ]]; then
+                target="$CORS_POLICY_TARGET_WHITELIST"
+                result=$SUCCESS
+            else
+                result=$INVALID_PARAMETER
+                SetLastError "Invalid value for parameter \"$param_name\""
+            fi
+        fi
+    fi
+
+    if [[ $result -eq $SUCCESS ]]; then                      
+        if ! /usr/bin/ln -sf "$target" "${WEBSERVER_APP_DIR}/${symlink_name}" ; then
+            result=$INTERNAL_ERROR
+            SetLastError "Unable to set parameter \"$param_name\" as symlink \"$WEBSERVER_APP_DIR/$symlink_name\""
+        fi
+    fi
+
+    return $result
+}
+
+# Start main function
+main "$@"
+exit $?

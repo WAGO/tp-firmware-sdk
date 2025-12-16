@@ -13,4 +13,11 @@ config CT_EXTENSION_PREFIX
     prompt "Extension script prefix"
     help
      Prefix used for extension script names, i.e. pfc200
+
+config CT_BOARD_SPECIFIC_EXTENSIONS_SWITCH_EEPROM
+  bool
+  prompt "install switch eeprom script"
+  default n
+  help
+   "install switch eeprom script"
 endif

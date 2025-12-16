@@ -1,7 +1,7 @@
 ptxproj/src/qt-everywhere-src-5.14.2.tar.xz filter=lfs diff=lfs merge=lfs -text
-ptxproj/src/nss-3.54.tar.gz filter=lfs diff=lfs merge=lfs -text
-ptxproj/src/boost_1_68_0.tar.bz2 filter=lfs diff=lfs merge=lfs -text
-ptxproj/src/linux-*.tgz filter=lfs diff=lfs merge=lfs -text
 ptxproj/src/go1.21.8.linux-amd64.tar.gz filter=lfs diff=lfs merge=lfs -text
 ptxproj/src/rootlesskit-dep-2.0.2.tar.gz filter=lfs diff=lfs merge=lfs -text
-ptxproj/configs/vtp-ctp/packages/libbacnetstack_rev25_3.3.5_armhf.tgz filter=lfs diff=lfs merge=lfs -text
+ptxproj/src/nss-3.106.tar.gz filter=lfs diff=lfs merge=lfs -text
+ptxproj/src/linux-6.6.94-rt56-w05.08.01-gaa7927dc8052.tgz filter=lfs diff=lfs merge=lfs -text
+ptxproj/src/boost_1_83_0.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+ptxproj/configs/vtp-ctp/packages/libbacnetstack_rev25_3.3.12_armhf.tgz filter=lfs diff=lfs merge=lfs -text

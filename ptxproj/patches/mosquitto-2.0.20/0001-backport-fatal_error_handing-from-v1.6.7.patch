@@ -1,0 +1,104 @@
+From: Jan Sondhauss <jan.sondhauss@wago.com>
+Date: Tue, 17 Jun 2025 07:57:48 +0200
+Subject: [PATCH] backport fatal_error_handing from v1.6.7
+
+---
+ include/mosquitto.h |  1 +
+ lib/loop.c          | 25 ++++++++++++++++++++++++-
+ lib/strings_mosq.c  |  2 ++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/include/mosquitto.h b/include/mosquitto.h
+index 524bf34913e3..ea8c886d828c 100644
+--- a/include/mosquitto.h
++++ b/include/mosquitto.h
+@@ -122,6 +122,7 @@ enum mosq_err_t {
+ 	MOSQ_ERR_TOPIC_ALIAS_INVALID = 29,
+ 	MOSQ_ERR_ADMINISTRATIVE_ACTION = 30,
+ 	MOSQ_ERR_ALREADY_EXISTS = 31,
++	MOSQ_ERR_LOOP_FOREVER_EXITED = 32,
+ };
+ 
+ /* Enum: mosq_opt_t
+diff --git a/lib/loop.c b/lib/loop.c
+index 0277a1d3a8f6..c252afa9149e 100644
+--- a/lib/loop.c
++++ b/lib/loop.c
+@@ -17,6 +17,7 @@ Contributors:
+ */
+ 
+ #include "config.h"
++#include "logging_mosq.h"
+ 
+ #include <errno.h>
+ #ifndef WIN32
+@@ -36,6 +37,21 @@ Contributors:
+ #define HAVE_PSELECT
+ #endif
+ 
++static void _mosquitto_handle_fatal_error(struct mosquitto *mosq, int errorCode)
++{
++	log__printf(mosq, MOSQ_LOG_ERR, "LOOP_FOREVER_EXITED: %s", mosquitto_strerror(errorCode));
++
++	COMPAT_pthread_mutex_lock(&mosq->callback_mutex);
++	if (mosq->on_disconnect)
++	{
++		mosq->in_callback = true;
++		mosq->on_disconnect(mosq, mosq->userdata, errorCode);
++		mosq->on_disconnect(mosq, mosq->userdata, MOSQ_ERR_LOOP_FOREVER_EXITED);
++		mosq->in_callback = false;
++	}
++	COMPAT_pthread_mutex_unlock(&mosq->callback_mutex);
++}
++
+ int mosquitto_loop(struct mosquitto *mosq, int timeout, int max_packets)
+ {
+ #ifdef HAVE_PSELECT
+@@ -270,11 +286,13 @@ int mosquitto_loop_forever(struct mosquitto *mosq, int timeout, int max_packets)
+ 			case MOSQ_ERR_UNKNOWN:
+ 			case MOSQ_ERR_EAI:
+ 			case MOSQ_ERR_PROXY:
++				_mosquitto_handle_fatal_error(mosq, rc);
+ 				return rc;
+ 			case MOSQ_ERR_ERRNO:
+ 				break;
+ 		}
+ 		if(errno == EPROTO){
++			_mosquitto_handle_fatal_error(mosq, rc);
+ 			return rc;
+ 		}
+ 		do{
+@@ -302,7 +320,11 @@ int mosquitto_loop_forever(struct mosquitto *mosq, int timeout, int max_packets)
+ 				}
+ 
+ 				rc = interruptible_sleep(mosq, (time_t)reconnect_delay);
+-				if(rc) return rc;
++				if(rc) {
++					_mosquitto_handle_fatal_error(mosq, rc);
++					return rc;
++				}
++
+ 
+ 				if(mosquitto__get_request_disconnect(mosq)){
+ 					run = 0;
+@@ -312,6 +334,7 @@ int mosquitto_loop_forever(struct mosquitto *mosq, int timeout, int max_packets)
+ 			}
+ 		}while(run && rc != MOSQ_ERR_SUCCESS);
+ 	}
++	_mosquitto_handle_fatal_error(mosq, rc);
+ 	return rc;
+ }
+ 
+diff --git a/lib/strings_mosq.c b/lib/strings_mosq.c
+index 21624178201d..46ebfcfe21e8 100644
+--- a/lib/strings_mosq.c
++++ b/lib/strings_mosq.c
+@@ -89,6 +89,8 @@ const char *mosquitto_strerror(int mosq_errno)
+ 			return "Packet larger than supported by the server.";
+ 		case MOSQ_ERR_OCSP:
+ 			return "OCSP error.";
++		case MOSQ_ERR_LOOP_FOREVER_EXITED:
++			return "Loop-Forever exited.";
+ 		default:
+ 			if(mosq_errno >= 128) {
+ 				// If mosq_errno is greater than 127,

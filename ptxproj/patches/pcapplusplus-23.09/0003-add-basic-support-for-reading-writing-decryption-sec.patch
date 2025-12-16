@@ -37,13 +37,14 @@ new file mode 100644
 index 000000000000..0a445290b32b
 --- /dev/null
 +++ b/Packet++/header/DecryptionSecret.h
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +#ifndef PACKETPP_DECRYPTION_SECRET
 +#define PACKETPP_DECRYPTION_SECRET
 +
 +#include <sstream>
 +#include <string>
 +#include <vector>
++#include <cstdint>
 +
 +/// @file
 +

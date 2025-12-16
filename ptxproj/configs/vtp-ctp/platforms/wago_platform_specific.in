@@ -1,1 +1,8 @@
 ## SECTION=wago_platform_specific
+
+config TARGET_EXTRA_ASFLAGS
+    string
+	prompt "Extra ASFLAGS"
+	default ""
+	help
+	  Platformspecific Assembler-Flags

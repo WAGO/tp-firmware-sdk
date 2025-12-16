@@ -1,0 +1,22 @@
+From: "daniel.martens" <daniel.martens@wago.com>
+Date: Tue, 15 Jul 2025 10:22:45 +0200
+Subject: [PATCH] fix: virtual memory leak github issue: 2377
+
+---
+ lib/thread_mosq.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/lib/thread_mosq.c b/lib/thread_mosq.c
+index 64a0f70ded41..38f387debd26 100644
+--- a/lib/thread_mosq.c
++++ b/lib/thread_mosq.c
+@@ -130,9 +130,6 @@ void *mosquitto__thread_main(void *obj)
+ 		/* Sleep for our keepalive value. publish() etc. will wake us up. */
+ 		mosquitto_loop_forever(mosq, keepalive*1000, 1);
+ 	}
+-	if(mosq->threaded == mosq_ts_self){
+-		mosq->threaded = mosq_ts_none;
+-	}
+ 
+ 	return obj;
+ }

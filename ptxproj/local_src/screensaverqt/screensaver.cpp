@@ -40,10 +40,14 @@
 #include <QWidget>
 #include <QApplication>
 #include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QTextStream>
 #include <QProcess>
-#include <QX11Info>
 #include <QPainter>
 #include <QTime>
 #include <QFile>
@@ -61,8 +65,13 @@ ScreenSaver::ScreenSaver(QWidget *parent) :
   m_iCounter = 0;
   m_bFirst = true;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  //screen dimensions
+  QRect r = QApplication::primaryScreen()->geometry();
+#else
   //screen dimensions
   QRect r = QApplication::desktop()->screenGeometry();
+#endif
   m_iScreenWidth = r.width();
   m_iScreenHeight = r.height();
 
@@ -87,8 +96,11 @@ ScreenSaver::~ScreenSaver()
 ///
 void ScreenSaver::Initialize()
 {
-  //qsrand(time(NULL));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  srand(QTime::currentTime().msec());
+#else
   qsrand(QTime::currentTime().msec());
+#endif
 
   if (m_iThemeId == THEME_IMAGE)
   {
@@ -223,10 +235,14 @@ void ScreenSaver::paintEvent(QPaintEvent*)
   if (m_iThemeId == THEME_IMAGE)
   {
     QPainter painter(this);
-
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    m_xRandom = rand() % (m_iScreenWidth - m_image.width() - 2);
+    m_yRandom = rand() % (m_iScreenHeight - m_image.height() - 2);
+#else
     m_xRandom = qrand() % (m_iScreenWidth - m_image.width() - 2);
+    m_yRandom = qrand() % (m_iScreenHeight - m_image.height() - 2); 
+#endif
     m_xRandom++;
-    m_yRandom = qrand() % (m_iScreenHeight - m_image.height() - 2);
     m_yRandom++;
 
     QRect r;
@@ -250,9 +266,14 @@ void ScreenSaver::paintEvent(QPaintEvent*)
 
       if ((m_iCounter % 5) == 0)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+        m_xRandom = rand() % (m_iScreenWidth - iPixelWidth - 2);
+        m_yRandom = rand() % (m_iScreenHeight - iPixelHeight - 2);
+#else
         m_xRandom = qrand() % (m_iScreenWidth - iPixelWidth - 2);
-        m_xRandom++;
         m_yRandom = qrand() % (m_iScreenHeight - iPixelHeight - 2);
+#endif
+        m_xRandom++;
         m_yRandom++;
       }
 

@@ -52,7 +52,6 @@ $(STATEDIR)/stress-ng.targetinstall:
 	@$(call install_fixup, stress-ng,AUTHOR,"Jan Luebbe <jlu@pengutronix.de>")
 	@$(call install_fixup, stress-ng,DESCRIPTION,missing)
 
-	@$(call install_copy_toolchain_lib, stress-ng, libatomic.so)
 	@$(call install_copy, stress-ng, 0, 0, 0755, -, /usr/bin/stress-ng)
 
 	@$(call install_finish, stress-ng)

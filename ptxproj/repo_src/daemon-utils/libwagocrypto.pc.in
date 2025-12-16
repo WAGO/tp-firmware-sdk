@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libwagocrypto
+Description: WAGO Cryptography Library providing high level encrypt/decrypt functions
+URL: https://github.com/WAGO/daemon-utils
+Version: @PROJECT_VERSION@
+Requires: openssl libcommonheader
+Libs: -L${libdir} -lwagocrypto
+Cflags: -I${includedir}

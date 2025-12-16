@@ -21,8 +21,8 @@ function wait4xorg
 
     #sleep 500 ms
     usleep 500000
-    
-    if [ $COUNTER -gt 900 ]; then
+
+    if [ $COUNTER -gt 100 ]; then
       echo "Timeout waiting for Xorg"
       break;
     fi

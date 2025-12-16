@@ -18,9 +18,9 @@ PACKAGES-$(PTXCONF_CT_BOARD_SPECIFIC_EXTENSIONS) += ct-board-specific-extensions
 #
 CT_BOARD_SPECIFIC_EXTENSIONS_VERSION	:= 1.0.0
 CT_BOARD_SPECIFIC_EXTENSIONS		:= ct-board-specific-extensions-$(CT_BOARD_SPECIFIC_EXTENSIONS_VERSION)
-CT_BOARD_SPECIFIC_EXTENSIONS_SUFFIX	:= 
+CT_BOARD_SPECIFIC_EXTENSIONS_SUFFIX	:=
 CT_BOARD_SPECIFIC_EXTENSIONS_URL	:= /$(CT_BOARD_SPECIFIC_EXTENSIONS).$(CT_BOARD_SPECIFIC_EXTENSIONS_SUFFIX)
-CT_BOARD_SPECIFIC_EXTENSIONS_SOURCE	:= 
+CT_BOARD_SPECIFIC_EXTENSIONS_SOURCE	:=
 CT_BOARD_SPECIFIC_EXTENSIONS_DIR	:= $(BUILDDIR)/$(CT_BOARD_SPECIFIC_EXTENSIONS)
 CT_BOARD_SPECIFIC_EXTENSIONS_LICENSE	:= unknown
 
@@ -89,7 +89,12 @@ $(STATEDIR)/ct-board-specific-extensions.install:
 
 EXTENSION_SCRIPT_SUFFIXES := defines commons copy_data.sh copy_data_emmc_extensions.sh \
                              switch_boot_partition.sh get_inactive_system_partition.sh \
-                             config_default_gateway.sh get_boot_project_location.sh config_network_switch_eeprom.sh
+                             config_default_gateway.sh get_boot_project_location.sh
+
+ifdef PTXCONF_CT_BOARD_SPECIFIC_EXTENSIONS_SWITCH_EEPROM
+	EXTENSION_SCRIPT_SUFFIXES := $(EXTENSION_SCRIPT_SUFFIXES) config_network_switch_eeprom.sh
+endif
+
 
 $(STATEDIR)/ct-board-specific-extensions.targetinstall:
 	@$(call targetinfo)
@@ -99,12 +104,11 @@ $(STATEDIR)/ct-board-specific-extensions.targetinstall:
 	@$(call install_fixup, ct-board-specific-extensions,SECTION,base)
 	@$(call install_fixup, ct-board-specific-extensions,AUTHOR,"<Andrej.Gantvorg@wago.com>")
 	@$(call install_fixup, ct-board-specific-extensions,DESCRIPTION,missing)
-
 	@$(call install_alternative, ct-board-specific-extensions, 0, 0, 0644, /etc/config-tools/board_specific_defines)
 	@$(call install_replace, ct-board-specific-extensions, /etc/config-tools/board_specific_defines, @CT_EXTENSION_PREFIX@, $(PTXCONF_CT_EXTENSION_PREFIX))
 
 	@$(call install_copy, ct-board-specific-extensions, 0, 0, 0755, $(CT_BOARD_SPECIFIC_SD_CHECK_SIZE_SCRIPT), /usr/sbin/$(PTXCONF_CT_EXTENSION_PREFIX)_sd_check_size.sh)
-                
+
 	@for suffix in $(EXTENSION_SCRIPT_SUFFIXES); do \
 		$(call install_copy, ct-board-specific-extensions, 0, 0, 0755, \
 			$(CT_BOARD_SPECIFIC_EXTENSIONS_SCRIPT_DIR)/$(PTXCONF_CT_EXTENSION_PREFIX)_$$suffix, \
@@ -125,7 +129,7 @@ ifdef PTXCONF_CT_FEATURE_UPDATE_BOOTLOADER_ON_TARGET
 endif
 
 	@$(call install_finish, ct-board-specific-extensions)
- 
+
 	@$(call touch)
 
 # ----------------------------------------------------------------------------

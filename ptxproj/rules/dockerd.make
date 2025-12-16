@@ -23,6 +23,7 @@ DOCKERD_URL				:= https://github.com/moby/moby/archive/refs/tags/v$(DOCKERD_VERS
 DOCKERD_SOURCE		:= $(SRCDIR)/$(DOCKERD).$(DOCKERD_SUFFIX)
 DOCKERD_DIR				:= $(BUILDDIR)/$(DOCKERD)
 DOCKERD_LICENSE		:= Apache-2.0
+DOCKERD_DEVPKG      := NO
 
 DOCKERD_INSTALLDIR := $(DOCKERD_PKGDIR)/bin/docker
 

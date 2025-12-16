@@ -38,8 +38,15 @@
 
 #include "tools.h"
 #include <QApplication>
+#include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QDebug>
+
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions
@@ -62,7 +69,11 @@
 /// \retval DISPLAY_ORIENTATION
 DISPLAY_ORIENTATION GetDisplayOrientation()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rScreen = QApplication::primaryScreen()->geometry();
+#else
   QRect rScreen = QApplication::desktop()->screenGeometry();
+#endif
 
   //Auflösungen der WAGO Displays
   // 4,3“  480 x 272 Pixel Small
@@ -87,7 +98,11 @@ DISPLAY_ORIENTATION GetDisplayOrientation()
 /// \retval DISPLAY_SIZE
 DISPLAY_SIZE GetDisplaySize()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rScreen = QApplication::primaryScreen()->geometry();
+#else
   QRect rScreen = QApplication::desktop()->screenGeometry();
+#endif
 
   //Auflösungen der WAGO Displays
   // 4,3“  480 x 272 Pixel Small

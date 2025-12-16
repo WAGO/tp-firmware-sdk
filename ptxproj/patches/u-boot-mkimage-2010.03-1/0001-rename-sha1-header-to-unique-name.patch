@@ -1,0 +1,43 @@
+diff --git a/include/mkimage.h b/include/mkimage.h
+index 9033a7d..6a0d480 100644
+--- a/include/mkimage.h
++++ b/include/mkimage.h
+@@ -31,7 +31,7 @@
+ #include <sys/stat.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <sha1.h>
++#include <my_sha1.h>
+ #include "fdt_host.h"
+ 
+ #undef MKIMAGE_DEBUG
+diff --git a/include/sha1.h b/include/my_sha1.h
+similarity index 100%
+rename from include/sha1.h
+rename to include/my_sha1.h
+diff --git a/src/image.c b/src/image.c
+index 9e49713..78fd7af 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -53,7 +53,7 @@
+ 
+ #if defined(CONFIG_FIT)
+ #include <u-boot/md5.h>
+-#include <sha1.h>
++#include <my_sha1.h>
+ 
+ static int fit_check_ramdisk (const void *fit, int os_noffset,
+ 		uint8_t arch, int verify);
+diff --git a/src/sha1.c b/src/sha1.c
+index da5bc16..2ee4d14 100644
+--- a/src/sha1.c
++++ b/src/sha1.c
+@@ -36,7 +36,7 @@
+ #include <string.h>
+ #endif /* USE_HOSTCC */
+ #include <watchdog.h>
+-#include "sha1.h"
++#include "my_sha1.h"
+ 
+ /*
+  * 32-bit integer manipulation macros (big endian)

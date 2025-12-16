@@ -1,0 +1,19 @@
+--- libuio-0.2.8_orig/base.c	2025-08-08 20:28:59.012102587 +0200
++++ libuio-0.2.8/base.c	2025-08-08 20:33:59.306478610 +0200
+@@ -73,15 +73,12 @@
+ 
+ void *uio_mmap_with_addr(void* map_addr, struct uio_info_t* info, int map_num)                                                                                                                                                                                                 
+ {
+-	char dev_name[16];
+ 	int fd;
+ 
+ 	if (info->maps[map_num].size <= 0)
+ 		return MAP_FAILED;
+ 
+-	sprintf(dev_name,"/dev/uio%d",map_num);
+-
+-	fd = open(dev_name,O_RDWR);
++	fd = open(info->devname, O_RDWR);
+ 
+ 	if (fd < 0)
+ 		return MAP_FAILED;

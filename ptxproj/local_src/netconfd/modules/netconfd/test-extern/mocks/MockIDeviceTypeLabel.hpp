@@ -15,6 +15,7 @@ class MockIDeviceTypeLabel : public IDeviceTypeLabel {
       MacAddress());
   MOCK_CONST_METHOD0(GetMacCount,
                      uint32_t());
+  MOCK_CONST_METHOD0(GetDHCPVendorClassID,::std::string());
 };
 
 

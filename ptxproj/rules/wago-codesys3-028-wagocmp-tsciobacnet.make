@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CDS3_TSCIOBACNET) += cds3-tsciobacnet
 #
-#--- paths and names --------------------------------------------------------- 
+#--- paths and names ---------------------------------------------------------
 #
 CDS3_TSCIOBACNET                 := TscIoBacnet
 CDS3_TSCIOBACNET_SO_VERSION      := 2.2.0
@@ -54,15 +54,15 @@ CDS3_TSCIOBACNET_DIR             := $(CDS3_TSCIOBACNET_BUILDROOT_DIR)/$(CDS3_TSC
 CDS3_TSCIOBACNET_LICENSE         := unknown
 
 CDS3_TSCIOBACNET_BUILDCONFIG     := Release
-CDS3_TSCIOBACNET_BUILD_DIR       := $(CDS3_TSCIOBACNET_BUILDROOT_DIR)/bin/$(CDS3_TSCIOBACNET_BUILDCONFIG)
+CDS3_TSCIOBACNET_BIN_DIR         := $(CDS3_TSCIOBACNET_BUILDROOT_DIR)/bin/$(CDS3_TSCIOBACNET_BUILDCONFIG)
 CDS3_TSCIOBACNET_BIN             := lib$(CDS3_TSCIOBACNET).so.$(CDS3_TSCIOBACNET_VERSION)
 CDS3_TSCIOBACNET_CONF_TOOL       := NO
 CDS3_TSCIOBACNET_MAKE_ENV        := $(CROSS_ENV) \
 BUILDCONFIG=$(LIBBACNETSTACK_BUILDCONFIG_BUILDCONFIG) \
-              BIN_DIR=$(LIBBACNETSTACK_BUILDCONFIG_BUILD_DIR) \
+              BIN_DIR=$(LIBBACNETSTACK_BUILDCONFIG_BIN_DIR) \
               TARGET_ARCH=$(PTXCONF_ARCH_STRING) \
               ARM_ARCH_VERSION=7 \
-              SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build \
+              SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build \
               CDS3_TSCIOBACNET_SO_VERSION=$(CDS3_TSCIOBACNET_SO_VERSION)
 
 CDS3_TSCIOBACNET_PATH            := PATH=$(CROSS_PATH)
@@ -120,16 +120,19 @@ $(STATEDIR)/cds3-tsciobacnet.extract:
 	@$(call targetinfo)
 	@mkdir -p $(CDS3_TSCIOBACNET_BUILDROOT_DIR)
 ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
-	@mkdir -p $(CDS3_TSCIOBACNET_DIR)
 ifdef PTXCONF_CDS3_TSCIOBACNET_SOURCE_RELEASED
+	@mkdir -p $(CDS3_TSCIOBACNET_DIR)
 	@tar xvf wago_intern/artifactory_sources/$(CDS3_TSCIOBACNET_ARCHIVE) -C $(CDS3_TSCIOBACNET_DIR) --strip-components=1
 	@$(call patchin, CDS3_TSCIOBACNET)
 else
 ifdef PTXCONF_CDS3_TSCIOBACNET_ARTIFACTORY_DEV
+	@mkdir -p $(CDS3_TSCIOBACNET_DIR)
 	@tar xvf wago_intern/artifactory_sources/$(CDS3_TSCIOBACNET_ARCHIVE) -C $(CDS3_TSCIOBACNET_DIR) --strip-components=1
 	@$(call patchin, CDS3_TSCIOBACNET)
 else
-	@mv $(CDS3_TSCIOBACNET_SRC_DIR)/* $(CDS3_TSCIOBACNET_DIR)
+	@if [ ! -L $(CDS3_TSCIOBACNET_DIR) ]; then \
+	  	ln -s $(CDS3_TSCIOBACNET_SRC_DIR) $(CDS3_TSCIOBACNET_DIR); \
+	fi
 endif
 endif
 endif
@@ -154,7 +157,7 @@ $(STATEDIR)/cds3-tsciobacnet.prepare:
 ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
 	$(MAKE) -C $(CDS3_TSCIOBACNET_DIR) SYSROOT=$(PTXCONF_SYSROOT_TARGET) itf
 	$(MAKE) -C $(CDS3_TSCIOBACNET_DIR) SYSROOT=$(PTXCONF_SYSROOT_TARGET) dep
-	
+
 	@$(call world/prepare, CDS3_TSCIOBACNET)
 endif
 	@$(call touch)
@@ -167,7 +170,7 @@ CDS3_TSCIOBACNET_MAKE_OPT  := CC=$(CROSS_CC)
 CDS3_TSCIOBACNET_MAKE_OPT += "DBGMODE=-g3"
 CDS3_TSCIOBACNET_MAKE_OPT += "OPTIMIZE=-O2"
 
- 
+
 $(STATEDIR)/cds3-tsciobacnet.compile:
 	@$(call targetinfo)
 ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
@@ -186,11 +189,11 @@ ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
 #   BSP mode: install by extracting tgz file
 	@mkdir -p $(CDS3_TSCIOBACNET_PKGDIR) && \
   tar xvzf $(CDS3_TSCIOBACNET_PLATFORMCONFIGPACKAGEDIR)/$(CDS3_TSCIOBACNET_PACKAGE_NAME).tgz -C $(CDS3_TSCIOBACNET_PKGDIR)
-else	
-# 	normal mode, call "make install"	
-	
+else
+# 	normal mode, call "make install"
+
 	@$(call world/install, CDS3_TSCIOBACNET)
-	
+
 ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
 #   # save install directory to tgz for BSP mode
 	@mkdir -p $(CDS3_TSCIOBACNET_PLATFORMCONFIGPACKAGEDIR)
@@ -206,7 +209,7 @@ endif
 
 $(STATEDIR)/cds3-tsciobacnet.targetinstall:
 	@$(call targetinfo)
-	
+
 	@$(call install_init, cds3-tsciobacnet)
 	@$(call install_fixup, cds3-tsciobacnet,PRIORITY,optional)
 	@$(call install_fixup, cds3-tsciobacnet,SECTION,base)
@@ -236,6 +239,5 @@ $(STATEDIR)/cds3-tsciobacnet.clean:
 		$(CDS3_TSCIOBACNET_MAKE_ENV) $(CDS3_TSCIOBACNET_PATH) $(MAKE) $(MFLAGS) -C $(CDS3_TSCIOBACNET_DIR) clean; \
 	fi
 	@$(call clean_pkg, CDS3_TSCIOBACNET)
-	
-	rm -rf $(CDS3_TSCIOBACNET_SRC_DIR)
+
 	rm -rf $(CDS3_TSCIOBACNET_BUILDROOT_DIR)

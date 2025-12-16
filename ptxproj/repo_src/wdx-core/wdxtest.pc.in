@@ -1,0 +1,13 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: @test_lib_target@
+Description: @test_lib_description@
+Version: @PROJECT_VERSION@
+Requires: @test_pc_req_public@
+Requires.private: @test_pc_req_private@
+Cflags: -I"${includedir}"
+Libs: -L"${libdir}" -Wl,-Bstatic -l@test_lib_target@ -Wl,-Bdynamic
+Libs.private: -L"${libdir}" -Wl,-Bstatic -l@test_lib_target@ -Wl,-Bdynamic

@@ -1,0 +1,22 @@
+From:           Martin Essig, elrest GmbH
+Date:           2025-09-04
+Description:    Ninja normally uses all cores+2 when building
+                a package.  This patch allows useers to limit the 
+                cores used by setting an environment variable:
+                NINJAJOBS to an integer.
+                         
+--- ninja-1.11.1.g95dee.kitware.jobserver-1.orig/src/ninja.cc	2022-11-01 19:17:08.000000000 +0100
++++ ninja-1.11.1.g95dee.kitware.jobserver-1/src/ninja.cc	2025-09-04 18:27:00.822081949 +0200
+@@ -240,6 +240,12 @@
+ 
+ /// Choose a default value for the -j (parallelism) flag.
+ int GuessParallelism() {
++
++  int   j = 0;
++  char* jobs = getenv( "NINJAJOBS" );
++  if ( jobs != NULL ) j = atoi( jobs );
++  if ( j > 0 ) return j;
++
+   switch (int processors = GetProcessorCount()) {
+   case 0:
+   case 1:

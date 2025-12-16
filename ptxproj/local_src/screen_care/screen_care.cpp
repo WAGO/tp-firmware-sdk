@@ -35,7 +35,12 @@
 #include <stdio.h>
 
 #include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QTimer>
 #include <QDebug>
 #include <QTime>
@@ -51,8 +56,13 @@ int main(int argc, char **argv)
 
   QApplication app(argc, argv);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  //screen width and height
+  QRect rDesk = QApplication::primaryScreen()->geometry();
+#else
   //screen width and height
   QRect rDesk = QApplication::desktop()->screenGeometry();
+#endif
 
   if (argc > 0)
   {

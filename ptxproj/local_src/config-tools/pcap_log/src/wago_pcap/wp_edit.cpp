@@ -91,7 +91,7 @@ bool wp::SecretsHandler::inject_secrets(
 {
   if (!std::filesystem::exists(src_pcapng_path))
   {
-    Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "Given pcap(ng) file \"%s\" does not exist\n", src_pcapng_path.c_str());
+    Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "Given pcap(ng) file \"%s\" does not exist.\n", src_pcapng_path.c_str());
     return false;
   }
 

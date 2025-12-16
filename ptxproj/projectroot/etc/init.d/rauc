@@ -24,9 +24,6 @@ start_rauc() {
     local result=0
 
     echo "Start rauc..."
-    local variant=$(cat /sys/class/wago/system/board_variant)
-    rm -f /etc/rauc/system.conf
-    ln -s /etc/rauc/system.conf.${variant} /etc/rauc/system.conf
     if [ ! -e /etc/rauc/system.conf ]; then
         result=112
     else

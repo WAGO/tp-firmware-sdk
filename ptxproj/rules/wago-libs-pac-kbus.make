@@ -6,7 +6,7 @@ PACKAGES-$(PTXCONF_LIBPACKBUS) += libpackbus
 
 # This is the package version and is automatically used by PTXDIST! It will result in a package named
 # $(packagename)_$(LIBPACKBUS_VERSION)_arm.ipk. It is also written as meta-information into the .ipk itself. 
-LIBPACKBUS_VERSION := 1.0.0
+LIBPACKBUS_VERSION := 1.0.3
 
 
 # Libtool versioning information - DO NOT CHANGE THESE VALUES CARELESSLY BY INCREMENTING SOMETHING YOU DON'T UNDERSTAND
@@ -21,6 +21,7 @@ LIBPACKBUS				:= libpackbus
 LIBPACKBUS_URL			:= file://$(PTXDIST_WORKSPACE)/wago_intern/device/kbus/$(LIBPACKBUS)
 LIBPACKBUS_DIR			:= $(BUILDDIR)/$(LIBPACKBUS)
 LIBPACKBUS_VERSION_ARG	:= SO_VERSION=$(LIBPACKBUS_LT_VERSION)
+LIBPACKBUS_DEVPKG		:= NO
 
 ifdef PTXCONF_LIBPACKBUS_TESTAPP
 LIBPACKBUS_TESTAPP	:= --enable-test

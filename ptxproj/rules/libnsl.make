@@ -26,6 +26,7 @@ LIBNSL_DIR	:= $(BUILDDIR)/$(LIBNSL)
 LIBNSL_BUILD_ROOT:= YES
 LIBNSL_LICENSE	:= lgpl
 LIBNSL_LICENSE_FILE := COPYING
+LIBNSL_DEVPKG := NO
 
 # ----------------------------------------------------------------------------
 # Extract

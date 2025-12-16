@@ -20,7 +20,7 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 
 DEFINE_FAKE_VALUE_FUNC1(int, close, int);
-DEFINE_FAKE_VALUE_FUNC3(long int, lseek, int, long int, int);
+DEFINE_FAKE_VALUE_FUNC3(off_t, lseek, int, off_t, int);
 DEFINE_FAKE_VALUE_FUNC3(ssize_t, read, int, void *,size_t);
 
 

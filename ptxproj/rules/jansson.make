@@ -23,6 +23,7 @@ JANSSON_SOURCE	:= $(SRCDIR)/$(JANSSON).$(JANSSON_SUFFIX)
 JANSSON_DIR	:= $(BUILDDIR)/lib$(JANSSON)
 JANSSON_LICENSE	:= MIT
 JANSSON_LICENSE_FILE := LICENSE
+JANSSON_DEVPKG := NO
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -1,7 +1,7 @@
 AC_PREREQ(2.59)
 esyscmd([echo "define(myversion, $(dir=$(basename $(pwd)); if test \"${dir%%-trunk}\" != \"$dir\"; then echo 99999999-9; else prefix=${dir%%-[0-9]*-[0-9]}; echo ${dir##$prefix-}; fi))"])
 
-AC_INIT([wago_dbus], 1.3.0, [bugs@pengutronix.de])
+AC_INIT([wago_dbus], 1.4.0, [bugs@pengutronix.de])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([testtool])
 AC_CONFIG_HEADERS([config.h])
@@ -21,9 +21,9 @@ CFLAGS="${CFLAGS} -W -Wall"
 # Interfaces changed/added/removed: CURRENT++   REVISION=0
 # Interfaces added:                 AGE++
 # Interfaces removed:               AGE=0
-LT_CURRENT=7
+LT_CURRENT=8
 LT_REVISION=0
-LT_AGE=5
+LT_AGE=6
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)

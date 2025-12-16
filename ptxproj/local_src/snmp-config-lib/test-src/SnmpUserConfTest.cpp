@@ -48,7 +48,7 @@ TEST_P(SnmpUserConfTest, UpdateSnmpUserConf ) {
   EXPECT_EQ(param_.new_user_conf_, param_.actual_user_conf_);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     UpdateSnmpUserConf, SnmpUserConfTest,
     ::testing::Values<TestData>(TestData { "USE_USER_DEFINED_DEVICE_NAME=no\nUSE_USER_DEFINED_DESCRIPTION=no\n",
                                     "USE_USER_DEFINED_DEVICE_NAME=yes\nUSE_USER_DEFINED_DESCRIPTION=yes\n", "name1",

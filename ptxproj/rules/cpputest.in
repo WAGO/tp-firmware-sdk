@@ -1,7 +1,7 @@
 ## SECTION=wago_specific_libs
 
 config CPPUTEST
-	bool
+	tristate
     default n
 	prompt "cpputest"	
 	select HOST_CMAKE

@@ -57,6 +57,10 @@ config BERLIOS_CAN_UTILS_CANSEND
 	bool
 	prompt "cansend"
 
+config BERLIOS_CAN_UTILS_CANSEQUENCE
+	bool
+	prompt "cansequence"
+
 config BERLIOS_CAN_UTILS_CANSNIFFER
 	bool
 	prompt "cansniffer"
@@ -105,21 +109,21 @@ config BERLIOS_CAN_UTILS_SLCANPTY
 	bool
 	prompt "slcanpty"
 
-config BERLIOS_CAN_UTILS_JSPY
+config BERLIOS_CAN_UTILS_J1939SPY
 	bool
-	prompt "jspy"
+	prompt "j1939spy"
 
-config BERLIOS_CAN_UTILS_JSR
+config BERLIOS_CAN_UTILS_J1939SR
 	bool
-	prompt "jsr"
+	prompt "j1939sr"
 
-config BERLIOS_CAN_UTILS_JACD
+config BERLIOS_CAN_UTILS_J1939ACD
 	bool
-	prompt "jacd"
+	prompt "j1939acd"
 
-config BERLIOS_CAN_UTILS_JCAT
+config BERLIOS_CAN_UTILS_J1939CAT
 	bool
-	prompt "jcat"
+	prompt "j1939cat"
 
 config BERLIOS_CAN_UTILS_TESTJ1939
 	bool

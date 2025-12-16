@@ -1,0 +1,17 @@
+## SECTION=wago_specific_config_parameterservice
+
+config WDX_APITEST
+	bool
+	select HOST_CMAKE
+	select GOOGLETEST
+	select LIBCOMMONHEADER
+	select WAGO_DAEMON_UTILS
+	select WDX_CORE
+	select WDX_LINUX
+	select WDX_LINUX_COM_LIB
+	select WDX_LINUX_CLIENT_LIB
+	select WDX_FILE
+	prompt "WDx Service API-Test client"
+	help
+	  API-Test client for WDx (WAGO Parameter Service).
+	  Used for automated tests of REST-API and file-API.

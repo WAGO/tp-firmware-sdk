@@ -13,9 +13,9 @@ class HostConfFileParser {
   virtual ~HostConfFileParser() = default;
 
   HostConfFileParser(const HostConfFileParser&) = default;
-  HostConfFileParser& operator=(const HostConfFileParser&) = delete;
-  HostConfFileParser(const HostConfFileParser&&) = delete;
-  HostConfFileParser& operator=(const HostConfFileParser&&) = delete;
+  HostConfFileParser& operator=(const HostConfFileParser&) = default;
+  HostConfFileParser(HostConfFileParser&&) = default;
+  HostConfFileParser& operator=(HostConfFileParser&&) = default;
 
   void Parse(const ::std::string &content);
 

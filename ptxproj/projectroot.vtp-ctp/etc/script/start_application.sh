@@ -56,6 +56,23 @@ if [ ! -d "/tmp/runtime-root" ]; then
   chmod 0700 /tmp/runtime-root
 fi
 
+function wait4virtualkeyboard
+{
+  #TP600
+  local COUNTER=0
+  while [ ! -e "/dev/virtualkeyboard" ]; do
+    ((COUNTER++))
+    #sleep 500 ms
+    usleep 500000
+    if [ $COUNTER -gt 50 ]; then
+      echo "Timeout waiting for virtualkeyboard device"
+      break;
+    fi
+  done
+  sleep 1
+}
+
+
 function StartVirtualKeyboard
 {
   #START VIRTUALKEYBOARD
@@ -69,7 +86,9 @@ function StartVirtualKeyboard
     fi
     /usr/bin/virtualkeyboard 2>&1 > /dev/null &
     # needs some time to start correctly
-    sleep 3
+    sleep 2
+    # wait until device is ready
+    wait4virtualkeyboard
   fi
   fi
 }
@@ -148,7 +167,7 @@ function InitTestability
 
 function StartBrightnessControl
 {
-if [ "${ORDER:0:3}" == "762" ]; then
+if [ "${ORDER:0:3}" == "762" ] || [ "${ORDER:0:3}" == "752" ]; then
   #start brightness control at the end of this script
   PIDBRIGHT=`pidof brightness_control`
   if [ -z $PIDBRIGHT ]; then

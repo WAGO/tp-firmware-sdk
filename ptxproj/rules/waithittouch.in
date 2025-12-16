@@ -6,6 +6,19 @@ config WAITHITTOUCH
 #	select XORG_LIB_SM
 #	select XORG_LIB_ICE
 #	select XORG_LIB_XCURSOR
-	select QT5
+	select QT5 if WAITHITTOUCH_USE_QT5
 	help
 	  FIXME
+
+if WAITHITTOUCH
+choice
+	prompt "QT_VERSION_USED"
+		config WAITHITTOUCH_USE_QT5
+			bool
+			prompt "QT5"
+
+		config WAITHITTOUCH_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

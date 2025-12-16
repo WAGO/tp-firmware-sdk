@@ -16,20 +16,20 @@ PACKAGES-$(PTXCONF_EEPROM_XSECTION) += eeprom-xsection
 #
 # Paths and names
 #
-EEPROM_XSECTION_VERSION        := 0.5.0
+EEPROM_XSECTION_VERSION        := 0.5.1
 EEPROM_XSECTION_MD5            :=
 EEPROM_XSECTION                := eeprom-xsection
 EEPROM_XSECTION_BUILDCONFIG    := Release
 EEPROM_XSECTION_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/$(EEPROM_XSECTION)
 EEPROM_XSECTION_BUILDROOT_DIR  := $(BUILDDIR)/$(EEPROM_XSECTION)
 EEPROM_XSECTION_DIR            := $(EEPROM_XSECTION_BUILDROOT_DIR)/src
-EEPROM_XSECTION_BUILD_DIR      := $(EEPROM_XSECTION_BUILDROOT_DIR)/bin/$(EEPROM_XSECTION_BUILDCONFIG)
+EEPROM_XSECTION_BIN_DIR        := $(EEPROM_XSECTION_BUILDROOT_DIR)/bin/$(EEPROM_XSECTION_BUILDCONFIG)
 EEPROM_XSECTION_LICENSE        := WAGO
 EEPROM_XSECTION_CONF_TOOL      := NO
 EEPROM_XSECTION_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(EEPROM_XSECTION_BUILDCONFIG) \
-BIN_DIR=$(EEPROM_XSECTION_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build \
+BIN_DIR=$(EEPROM_XSECTION_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build \
 PTXDIST_PACKAGE_MK_FILE=$(call ptx/in-path, PTXDIST_PATH, rules/wago-tools-012-eeprom-xsection.make)
 
 
@@ -92,7 +92,7 @@ $(STATEDIR)/eeprom-xsection.targetinstall:
 	@$(call install_fixup, eeprom-xsection,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, eeprom-xsection,DESCRIPTION,missing)
 
-	@$(call install_copy, eeprom-xsection, 0, 0, 0755, $(EEPROM_XSECTION_BUILD_DIR)/eeprom-xsection.elf, /usr/sbin/eeprom-xsection)
+	@$(call install_copy, eeprom-xsection, 0, 0, 0755, $(EEPROM_XSECTION_BIN_DIR)/eeprom-xsection.elf, /usr/sbin/eeprom-xsection)
 
 	@$(call install_finish, eeprom-xsection)
 

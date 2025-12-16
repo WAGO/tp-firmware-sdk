@@ -39,6 +39,7 @@ if [ "$#" -eq "0" ]; then
 	cp -p $DEFAULT_SETTINGS_DIR/shadow.default /etc/ && mv /etc/shadow.default /etc/shadow
 	cp -p $DEFAULT_SETTINGS_DIR/group.default /etc/ && mv /etc/group.default /etc/group
 	cp -p $DEFAULT_SETTINGS_DIR/passwd.default /etc/ && mv /etc/passwd.default /etc/passwd
+	cp -p $DEFAULT_SETTINGS_DIR/CODESYSControl_User.cfg.default /etc/codesys3.d/ && mv /etc/codesys3.d/CODESYSControl_User.cfg.default   /etc/codesys3.d/CODESYSControl_User.cfg
 	rm -rf /home/codesys/*
 	rm -rf /home/user/bacnet/*
 	sync
@@ -55,6 +56,7 @@ else
 			cp -p /etc/shadow $DEFAULT_SETTINGS_DIR/shadow.default
 			cp -p /etc/group $DEFAULT_SETTINGS_DIR/group.default
 			cp -p /etc/passwd $DEFAULT_SETTINGS_DIR/passwd.default
+			cp -p /etc/codesys3.d/CODESYSControl_User.cfg $DEFAULT_SETTINGS_DIR/CODESYSControl_User.cfg.default
 			sync
 			md5sum "$DEFAULT_SETTINGS_DIR/$DEFAULT_SETTINGS_FILENAME" > "$DEFAULT_SETTINGS_DIR/$DEFAULT_SETTINGS_FILENAME.md5"
 			sync

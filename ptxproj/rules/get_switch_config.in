@@ -1,0 +1,12 @@
+## SECTION=wago_specific_config
+
+config GET_SWITCH_CONFIG
+	bool
+	select HOST_CT_BUILD
+	select GOOGLETEST
+	select LIBSWITCHCONFIG
+	select NLOHMANN_JSON
+    select BOOST
+	prompt "get_switch_config"
+	help
+	  Config tool to read the switch configuration file.

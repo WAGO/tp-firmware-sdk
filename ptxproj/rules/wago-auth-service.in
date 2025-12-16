@@ -3,22 +3,23 @@
 config WAGO_AUTH_SERVICE
 	bool
 	default n
-	select HOST_CT_BUILD
+	select HOST_CMAKE
 	select GOOGLETEST
-	select LIBCOMMONHEADER                  if WAGO_AUTH_SERVICE_LIB
-	select NLOHMANN_JSON                    if WAGO_AUTH_SERVICE_LIB
-	select PAM                              if WAGO_AUTH_SERVICE_LIB
-	select PAM_PAM_SUCCEED_IF               if PAM
-	select FCGI                             if WAGO_AUTH_SERVICE_LIB
-	select CJOSE                            if WAGO_AUTH_SERVICE_LIB
-	select WAGO_PARAMETER_SERVICE_COM       if WAGO_AUTH_SERVICE_LIB
-	select WAGO_PARAMETER_SERVICE_COM_LIB   if WAGO_AUTH_SERVICE_LIB
-	select WAGO_PARAMETER_SERVICE_TEST_LIB  if WAGO_AUTH_SERVICE_LIB
-	select LIGHTTPD                         if WAGO_AUTH_SERVICE_LIGHTTPD_INTEGRATION
-	select WAGO_LOGGING                     if WAGO_AUTH_SERVICE_DAEMON
-	select WAGO_PRIVILEGES                  if WAGO_AUTH_SERVICE_DAEMON
-	select WAGO_OPTPARSING                  if WAGO_AUTH_SERVICE_DAEMON
-
+	select LIBCOMMONHEADER        if WAGO_AUTH_SERVICE_LIB
+	select NLOHMANN_JSON          if WAGO_AUTH_SERVICE_LIB
+	select PAM                    if WAGO_AUTH_SERVICE_LIB
+	select PAM_PAM_SUCCEED_IF     if PAM
+	select FCGI                   if WAGO_AUTH_SERVICE_LIB
+	select OPENSSL                if WAGO_AUTH_SERVICE_LIB
+	select WDX_CORE               if WAGO_AUTH_SERVICE_LIB
+	select WDX_CORE_TEST_LIB      if WAGO_AUTH_SERVICE_LIB
+	select WDX_LINUX              if WAGO_AUTH_SERVICE_LIB
+	select WDX_LINUX_COM_LIB      if WAGO_AUTH_SERVICE_LIB
+	select WDX_WDM                if WAGO_AUTH_SERVICE_LIB
+	select WDX_WDM_CPP_HEADERS    if WAGO_AUTH_SERVICE_LIB
+	select LIGHTTPD               if WAGO_AUTH_SERVICE_LIGHTTPD_INTEGRATION
+	select WAGO_DAEMON_UTILS      if WAGO_AUTH_SERVICE_DAEMON
+	
 config WAGO_AUTH_SERVICE_LIB
 	bool
 	default n

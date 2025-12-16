@@ -24,6 +24,7 @@ XDOTOOL_URL		:= https://svsv01003/svn/repo14/$(XDOTOOL).$(XDOTOOL_SUFFIX)
 XDOTOOL_SOURCE	:= $(SRCDIR)/$(XDOTOOL).$(XDOTOOL_SUFFIX)
 XDOTOOL_DIR		:= $(BUILDDIR)/$(XDOTOOL)
 XDOTOOL_LICENSE	:= unknown
+XDOTOOL_DEVPKG  := NO
 
 # ----------------------------------------------------------------------------
 # Extract

@@ -50,9 +50,9 @@ UMKIMAGE_MAKE_OPT := \
 
 $(STATEDIR)/umkimage.install:
 	@$(call targetinfo, $@)
-	mkdir -p $(PTXDIST_SYSROOT_TARGET)/include/u-boot-mkimage
-	install $(UMKIMAGE_DIR)/include/export/image.h $(PTXDIST_SYSROOT_TARGET)/include/u-boot-mkimage/image.h
-	install $(UMKIMAGE_DIR)/include/compiler.h $(PTXDIST_SYSROOT_TARGET)/include/u-boot-mkimage/compiler.h
+	mkdir -p $(PTXDIST_SYSROOT_TARGET)/usr/include/u-boot-mkimage
+	install $(UMKIMAGE_DIR)/include/export/image.h $(PTXDIST_SYSROOT_TARGET)/usr/include/u-boot-mkimage/image.h
+	install $(UMKIMAGE_DIR)/include/compiler.h $(PTXDIST_SYSROOT_TARGET)/usr/include/u-boot-mkimage/compiler.h
 	@$(call touch, $@)
 
 # ----------------------------------------------------------------------------

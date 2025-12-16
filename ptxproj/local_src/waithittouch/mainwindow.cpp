@@ -38,14 +38,15 @@
 
 #include <QApplication>
 #include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QSettings>
-//#include <QProcess>
-//#include <QX11Info>
-
 #include "globals.h"
 #include "tools.h"
-
 #include "mainwindow.h"
 
 
@@ -69,8 +70,13 @@ MainWindow::MainWindow(QWidget *parent)
   m_iNumber = 10;
   m_iReturnValue = 0;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  //screen dimensions
+  QRect r = QApplication::primaryScreen()->geometry();
+#else
   //screen dimensions
   QRect r = QApplication::desktop()->screenGeometry();
+#endif
   m_iScreenWidth = r.width();
   m_iScreenHeight = r.height();
 

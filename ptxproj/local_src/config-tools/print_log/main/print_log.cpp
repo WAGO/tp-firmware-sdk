@@ -47,7 +47,7 @@ struct option g_longopts[] = {
    { "read",        required_argument,  nullptr,   'r' },
    { "scan",        no_argument,        nullptr,   's' },
    { "limit",       required_argument,  nullptr,   'l' },
-   { "archive",     required_argument,  nullptr,   'a' },
+   { "archive",     optional_argument,  nullptr,   'a' },
    // last line
    { nullptr,       no_argument,        nullptr,    0  }
 };
@@ -60,6 +60,9 @@ const char * g_packagesPath = "/tmp/packages.txt";
 
 // archive list
 std::vector<std::string> g_archiveList;
+
+// dest
+const char * g_archivePath =  "/tmp/log.tar.gz";
 
 //------------------------------------------------------------------------------
 // function implementation
@@ -118,13 +121,13 @@ int main(int    argc,
     // first check all options
     while ((oc = getopt_long(argc,
                              argv,
-                             "hjr:sl:a:",
+                             "hjr:sl:a::",
                              &g_longopts[0],
                              nullptr)) != -1) {
       switch (oc) {
         // valid options
         case 'h':
-          status = PrintHelpText(std::cout);
+          status = PrintHelpText(std::cout, g_archivePath);
           break;
         case 'j':
           buffer_json = true;
@@ -134,19 +137,19 @@ int main(int    argc,
           break;
         case 'a':
           archiveProlog();
-          if(FolderToPathExist(optarg))
+          if(FolderToPathExist(g_archivePath))
           {
             auto archivList = GetArchiveList();
             status = CreateNewArchive(archivList,
-                                      optarg);
+                                      g_archivePath);
             if(SUCCESS == status)
             {
-              std::cout << "Create archive to: " << optarg << " done" << std::endl;
+              std::cout << "Done creating archive to:" << "\n" << g_archivePath << std::endl;
             }
           }
           else
           {
-            std::cout << "Create archive to: " << optarg << " failed" << std::endl;
+            std::cout << "Failed creating archive to:" << "\n" << g_archivePath << std::endl;
             status = INVALID_PARAMETER;
           }
           archiveEpilog();

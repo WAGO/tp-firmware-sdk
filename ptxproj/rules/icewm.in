@@ -12,7 +12,9 @@ config ICEWM
 	select XORG_LIB_XCOMPOSITE
 	select XORG_LIB_XDAMAGE
 	select GDK_PIXBUF
-	select GDK_PIXBUF_X11
+	select GDK_PIXBUF_XLIB
 	select XORG_LIB_XFT
+	select LIBPNG
+	select LIBJPEG
 	help
-	  FIXME
+	  icewm window manager

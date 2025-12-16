@@ -5,7 +5,7 @@ set -e
 # Default values
 SERVERNET="192.168.42.42/30"
 START="192.168.42.41"
-STOP="192.168.42.41"
+END="192.168.42.41"
 
 if test -r "/etc/specific/usb_gadget.conf"; then
  . "/etc/specific/usb_gadget.conf"
@@ -39,7 +39,7 @@ usb_gadget_as_server()
   usb_gadget_stop
   cat > "$UDHCPD".tmp << EOF
 start  $START
-stop  $STOP
+end  $END
 interface  $IFNAME
 lease_file $LEASES
 option subnet 255.255.255.252

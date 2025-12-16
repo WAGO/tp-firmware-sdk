@@ -101,19 +101,6 @@ WUP_ZIP_CMD ?= zip -j
 RAUC_UPDATEFILE ?= $(OUT_DIR)/$(FIRMWARE_PLATFORM)_update_$(IMAGE_ID).raucb
 RAUC_UPDATEFILE_ORIGINAL ?= $(PLATFORMDIR)/images/update.raucb
 
-# RAUC specific files
-RAUC_HOST_FOLDER = $(shell ptxdist print RAUC)
-ifeq ($(BUILDTYPE),release)
-RAUC_KEY ?= $(shell echo $(PTXCONF_RAUC_RELEASE_KEY))
-RAUC_CERTIFICATE ?= $(shell echo $(PTXCONF_RAUC_RELEASE_CERT))
-else
-RAUC_KEY ?= $(shell echo $(PTXCONF_RAUC_DEVELOPMENT_KEY))
-RAUC_CERTIFICATE ?= $(shell echo $(PTXCONF_RAUC_DEVELOPMENT_CERT))
-endif
-RAUC_KEYRING ?= $(shell echo $(PTXCONF_RAUC_DEVELOPMENT_KEYRING))
-RAUC_CMD ?= $(PLATFORMDIR)/build-host/$(RAUC_HOST_FOLDER)/rauc
-RAUC_DISTINCT_KEYRING = $(RAUC_CERTIFICATE)
-
 # Lazy packages to build
 ADDITIONAL_PACKAGES ?= $(shell ptxdist print LAZY_PACKAGES-y | sed 's/host-[^ ]*//g' | sed 's/cross-[^ ]*//g')
 
@@ -285,16 +272,9 @@ $(WUP): $(WUP_FILES) Makefile | $(OUT_DIR)
 	   rm -f $@ \
 	&& $(WUP_ZIP_CMD) $@ $(WUP_FILES)
 
-ifeq ($(BUILDTYPE),release)
-$(RAUC_UPDATEFILE): $(RAUC_UPDATEFILE_ORIGINAL) $(RAUC_CERTIFICATE) $(RAUC_KEY) $(RAUC_KEYRING) Makefile | $(OUT_DIR)
-	@echo "Create RAUC update file \"$@\" for build type $(BUILDTYPE) by resign with key \"$(RAUC_KEY)\""
-	   rm -f $@ \
-	&& PATH="$$PATH:$(PTXDIST_SYSROOT_HOST_PATH)" $(RAUC_CMD) resign --debug --no-verify --cert=$(RAUC_CERTIFICATE) --key=$(RAUC_KEY) --keyring=$(RAUC_KEYRING) --signing-keyring=$(RAUC_DISTINCT_KEYRING)  $< $@
-else
 $(RAUC_UPDATEFILE): $(RAUC_UPDATEFILE_ORIGINAL) Makefile | $(OUT_DIR)
 	@echo "Create RAUC update file \"$@\" for build type $(BUILDTYPE) by copy"
 	cp $< $@
-endif
 
 $(WUP_CONTROLFILE): $(WUP_CONTROLFILE_SCHEMA) $(WUP_CONTROLFILE_GENERATOR) $(RAUC_UPDATEFILE) Makefile | $(OUT_DIR)
 	@echo "Create WAGO update package control file \"$@\" and validate against schema \"$(WUP_CONTROLFILE_SCHEMA)\""
@@ -340,14 +320,3 @@ $(RAUC_UPDATEFILE_ORIGINAL):
 
 $(WUP_CONTROLFILE_SCHEMA):
 	$(error WUP control file schema not provided (under "$(WUP_CONTROLFILE_SCHEMA)" or via path in variable WUP_CONTROLFILE_SCHEMA))
-
-$(RAUC_CERTIFICATE):
-	$(error RAUC certificate file not provided (under "$(RAUC_CERTIFICATE)" or via path in variable RAUC_CERTIFICATE))
-
-$(RAUC_KEY):
-	$(error RAUC key file not provided (under "$(RAUC_KEY)" or via path in variable RAUC_KEY))
-
-ifneq ($(RAUC_CERTIFICATE),$(RAUC_KEYRING))
-$(RAUC_KEYRING):
-	$(error RAUC keyring file not provided (under "$(RAUC_KEYRING)" or via path in variable RAUC_KEYRING))
-endif

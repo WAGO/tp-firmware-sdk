@@ -878,7 +878,7 @@ HandleReply:
     //dbus_pending_call_unref(pending_return);
     if(DBUS_MESSAGE_TYPE_ERROR == dbus_message_get_type  (  reply) )
     {
-      dbus_error_free(&con->error);
+      //dbus error_free already called, see function entry above
       dbus_set_error_from_message (&con->error, reply);
       if(ret == 0)ret = -ENOMSG;
     }
@@ -889,6 +889,7 @@ HandleReply:
         first_arg_type = va_arg (var_args, int);
       }
       first_arg_type = va_arg (var_args, int);
+      //dbus error_free already called, see function entry above
       if(FALSE == dbus_message_get_args_valist  ( reply,&con->error,first_arg_type,var_args))
       {
         if(ret == 0)ret = -EMEDIUMTYPE;

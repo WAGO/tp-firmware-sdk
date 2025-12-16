@@ -514,6 +514,26 @@ if ROOTFS_GROUP_CODESYS3
 endif
 endif
 
+if ROOTFS_GROUP
+    menuconfig ROOTFS_GROUP_CODESYSCONTROLADMIN
+    bool
+    default y
+    prompt "Enable group 'codesyscontroladmin'"
+
+if ROOTFS_GROUP_CODESYSCONTROLADMIN
+    config ROOTFS_GROUP_CODESYSCONTROLADMIN_GID
+    string 
+    default "1004"
+    prompt "GID for linux group 'codesyscontroladmin'"
+
+    config ROOTFS_GROUP_CODESYSCONTROLADMIN_ENTRY
+    string 
+    default "codesyscontroladmin:x:${PTXCONF_ROOTFS_GROUP_CODESYSCONTROLADMIN_GID}:admin"
+    prompt "codesyscontroladmin group entry"
+
+endif
+endif
+
 config ROOTFS_GSHADOW
 	bool
 	prompt "install /etc/gshadow"

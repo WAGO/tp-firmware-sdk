@@ -3,7 +3,19 @@
 config SCREENSAVERQT
 	tristate
 	prompt "screensaverqt"
-	select QT5
+	select QT5 if SCREENSAVERQT_USE_QT5
 	help
-	  FIXME
+	  QT based screen saver utility
 
+if SCREENSAVERQT
+choice
+	prompt "QT_VERSION_USED"
+		config SCREENSAVERQT_USE_QT5
+			bool
+			prompt "QT5"
+
+		config SCREENSAVERQT_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

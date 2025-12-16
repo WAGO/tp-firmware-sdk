@@ -35,4 +35,10 @@ config OPENSSL_CRYPTODEV
 	help
 	  Enable the BSD cryptodev engine even if we are not using BSD.
 
+config OPENSSL_KTLS
+	bool
+	prompt "enable OpenSSL kTLS support"
+	help
+	  Whether to build OpenSSL with kTLS support.
+
 endif

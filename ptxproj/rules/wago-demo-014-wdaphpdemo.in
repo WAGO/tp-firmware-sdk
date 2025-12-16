@@ -3,7 +3,7 @@
 config WDAPHPDEMO
         bool
 	prompt "WDA demo for PHP"
-	select WAGO_PARAMETER_SERVICE
+	select WDX_LINUX
 	select PHP_SELECTION
 	help
 	  PHP demo script for communication with WDA

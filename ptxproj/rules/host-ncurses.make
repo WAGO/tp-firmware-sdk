@@ -31,8 +31,8 @@ $(STATEDIR)/host-ncurses.install:
 	@$(call targetinfo)
 	@$(call world/install, HOST_NCURSES)
 #	# don't install headers or libs, so packages like the kernel don't use it
-	@rm -r $(HOST_NCURSES_PKGDIR)/include
-#	@rm -r $(HOST_NCURSES_PKGDIR)/lib/*.a
+	@rm -r $(HOST_NCURSES_PKGDIR)/usr/include
+	@rm -r $(HOST_NCURSES_PKGDIR)/usr/lib/*.a
 	@$(call touch)
 
 # vim: syntax=make

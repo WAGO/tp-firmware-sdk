@@ -22,6 +22,7 @@ LIBMSGTOOL		:= libmsgtool
 LIBMSGTOOL_URL		:= file://local_src/$(LIBMSGTOOL)
 LIBMSGTOOL_DIR		:= $(BUILDDIR)/$(LIBMSGTOOL)
 LIBMSGTOOL_LICENSE	:= unknown
+LIBMSGTOOL_DEVPKG   := NO
 
 # ----------------------------------------------------------------------------
 # Extract

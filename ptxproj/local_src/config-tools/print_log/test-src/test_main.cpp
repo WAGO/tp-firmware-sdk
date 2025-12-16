@@ -28,21 +28,21 @@ class Excuteable {
   public:
     ~Excuteable() {
       freeValues();
-    };
+    }
     void setCommand(const std::string & command) {
       _command=command;
-    };
+    }
     gboolean call() {
       return g_spawn_command_line_sync(_command.c_str(),
                                        &_standard_output,
                                        &_standard_error,
                                        &_exit_status,
                                        &_err);
-    };
+    }
     gboolean checkExitStatus() {
       return g_spawn_check_exit_status(_exit_status,
                                        &_err);
-    };
+    }
     gint getExitStatus() {
       checkExitStatus();
       return _exit_status;
@@ -68,7 +68,7 @@ class Excuteable {
         _err = nullptr;
       }
       _exit_status = 0;
-    };
+    }
 };
 
 //------------------------------------------------------------------------------

@@ -27,6 +27,7 @@ VIRTUALKEYBOARD_URL		:= file://$(PTXDIST_WORKSPACE)/local_src/$(VIRTUALKEYBOARD)
 VIRTUALKEYBOARD_DIR		:= $(BUILDDIR)/$(VIRTUALKEYBOARD)
 VIRTUALKEYBOARD_BUILD_OOT	:= YES
 VIRTUALKEYBOARD_LICENSE	:= unknown
+VIRTUALKEYBOARD_DEVPKG  := NO
 
 # ----------------------------------------------------------------------------
 # Get

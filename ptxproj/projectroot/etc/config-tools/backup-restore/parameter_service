@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of project parameter-service (PTXdist package wdx-linux).
+#
+# Copyright (c) 2021-2025 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   /etc/config-tools/backup-restore/parameter_service
+#
+# Brief:    Backup and restore plugIn script for WAGO Parameter Service.
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+set -o nounset
+
+readonly BACKUP_PREFIX='paramd'
+
+# List of the paramd parameters for backup/restore
+# one line with 2 parts for each parameter, parts seperated by ';'
+# 1. part: parameter name for WDA config tools
+# 2. part: parameter name in settings backup file
+config_params=()
+
+config_params+=(
+    "allow-unauth-scan-devices; allow-unauth-scan-devices"
+)
+
+config_params+=(
+    "cors-policy; cors-policy"
+)
+
+config_params+=(
+    "cors-whitelist; cors-whitelist"
+)
+
+
+# load general definitions and functions
+if [ ! -f "/etc/config-tools/config_tool_defines" ]; then
+    print_dbg "config_tool_defines missing"
+    exit 64
+fi
+source "/etc/config-tools/config_tool_defines"
+
+function PrintUsage
+{
+    local self; self="$(basename "$0")"
+    echo "${self} --save <backup-file>      backup paramd related settings"
+    echo "${self} --restore <backup-file>   restore paramd related settings"
+    echo "${self} --param-count             get number of paramd related parameters to save"
+}
+
+# Write logging data using syslog.
+#
+# Input: Message to log.
+#
+function Log
+{
+    [[ $# -gt 0 ]] && logger -t "$(basename "$0")" "$1"
+}
+
+
+#### Backup & Restore ##########################################################
+
+# Get number of parameters that have to be saved during backup.
+#
+# output: 1.) number of parameters to save during backup.
+#         2.) returns config tool status, see /etc/config-tools/config_tool_defines.
+#
+function GetParameterCount
+{
+    echo ${#config_params[*]}
+    return $SUCCESS
+}
+
+# Save configuration parameters to backup file.
+#
+# input:  backup file path
+# output: returns config tool status, see /etc/config-tools/config_tool_defines.
+#
+function Save
+{
+    local result=$SUCCESS
+    local backup_file="$1"
+
+    config_param_index=0
+    while [[ $config_param_index -lt ${#config_params[*]} ]]; do
+        local config_name; config_name="$(echo -n "${config_params[config_param_index]}" | cut -d';' -f1 | xargs)"
+        local setting_name; setting_name="$(echo -n "${config_params[config_param_index]}" | cut -d';' -f2 | xargs)"
+        local setting_value; setting_value="$(/etc/config-tools/get_wda "${config_name}")"
+        if [[ $? -ne 0 ]]; then
+            Log "$0: Failed to read settings value for \"${config_name}\""
+            result=$INTERNAL_ERROR
+        else
+            echo "${BACKUP_PREFIX}-${setting_name}=${setting_value}" >>"${backup_file}"
+        fi
+        config_param_index=$((config_param_index + 1))
+    done
+
+    return $result
+}
+
+# Restore configuration parameters from backup file.
+#
+# input: backup file path
+# output: returns config tool status, see /etc/config-tools/config_tool_defines.
+#
+function Restore
+{
+    local result=$SUCCESS;
+    local backup_file="$1"
+
+    config_param_index=0
+    while [[ $config_param_index -lt ${#config_params[*]} ]]; do
+        local config_name; config_name="$(echo -n "${config_params[config_param_index]}" | cut -d';' -f1 | xargs)"
+        local setting_name; setting_name="$(echo -n "${config_params[config_param_index]}" | cut -d';' -f2 | xargs)"
+        local setting_value; setting_value="$(grep -E "^[ \t]*${BACKUP_PREFIX}-${setting_name}[ \t]*=[ \t]*.?" "$backup_file" | tail -n1 | cut -d'=' -f2 | xargs)"
+        if [[ $? -ne 0 ]]; then
+            # not set in backup file keeping currently set value
+            Log "$0: Config \"${config_name}\" isn't included in backup file, skipping change."
+        else
+            /etc/config-tools/config_wda "${config_name}" "${setting_value}"
+            if [[ $? -ne 0 ]]; then
+                Log "$0: Failed to write settings value for \"${config_name}\""
+                result=$INTERNAL_ERROR
+            fi
+        fi
+        config_param_index=$((config_param_index + 1))
+    done
+    return $result
+}
+
+
+#### MAIN ######################################################################
+
+status=$SUCCESS
+
+if [[ $# -ge 1 ]]; then
+    operation="$1"
+
+    if [[ $# -ge 2 ]]; then
+        file="$2"
+        if [[ "${operation}" == "--save" ]]; then
+            Save "${file}"
+            status=$?
+        elif [[ "${operation}" == "--restore" ]]; then
+            Restore "${file}"
+            status=$?
+        else
+            # Unknown operation
+            status=$INTERNAL_ERROR
+            Log "$0: Unknown operation \"${operation}\""
+        fi
+    else
+        if [[ "$operation" == "--param-count" ]]; then
+            GetParameterCount
+        elif [[ "$operation" == "-h" || "$operation" == "--help" ]]; then
+            PrintUsage
+        else
+            # Unknown operation
+            status=$INTERNAL_ERROR
+            Log "$0: Unknown or incomplete operation \"$operation\""
+        fi
+    fi
+fi
+
+exit $status

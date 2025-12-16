@@ -53,7 +53,7 @@ class FilesForTesting {
         return false;
       }
       return true;
-    };
+    }
     bool check() {
       for(const boost::filesystem::path & path : paths) {
         if(!boost::filesystem::exists(path)) {
@@ -61,12 +61,12 @@ class FilesForTesting {
         }
       }
       return true;
-    };
+    }
     void remove() {
       for(const boost::filesystem::path & path : paths) {
         boost::filesystem::remove(path);
       }
-    };
+    }
     const unsigned int lineBegin = 0;
     std::string testStr = ". Line: ---Test---";
     std::vector<std::string> filenames = {"afile.log",

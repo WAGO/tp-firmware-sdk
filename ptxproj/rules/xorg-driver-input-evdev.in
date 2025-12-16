@@ -1,0 +1,18 @@
+## SECTION=multimedia_xorg_driver_input
+
+config XORG_DRIVER_INPUT_EVDEV
+	tristate
+	prompt "evdev"
+	depends on XORG_DRIVER_INPUT
+	select XORGPROTO
+	select UDEV
+	select UDEV_LIBUDEV
+	select LIBEVDEV
+	select MTDEV
+	select XORG_SERVER
+	select XORG_SERVER_XORG
+	help
+	  evdev is an Xorg input driver for Linux's generic
+	  event devices.  It therefore supports all input
+	  devices that the kernel knows about, including
+	  most mice and keyboards.

@@ -1,0 +1,41 @@
+/** \example  example_providers.hpp
+
+The following file shows the header file of a component which instantiate all available example providers
+and register them at the given backend interface.\n 
+
+All providers living in this component held by an unique pointer to avoid any need for a default constructor.
+
+\see example_providers.cpp for implementation of this class.
+
+/** \example  example_providers.cpp
+
+The following file shows the implementation of a component which instantiate all available example providers
+and register them at the given backend interface.\n 
+
+This class simply registers all providers within its constructor with help of the corresponding register backend methods.
+On cleanup all providers will be unregistered with help of the corresponding unregister backend methods.
+
+\see wago::wdx::parameter_service_backend_i::register_parameter_providers()
+\see wago::wdx::parameter_service_backend_i::register_parameter_provider()
+\see wago::wdx::parameter_service_backend_i::register_model_providers()
+\see wago::wdx::parameter_service_backend_i::register_model_provider()
+\see wago::wdx::parameter_service_backend_i::register_device_description_providers()
+\see wago::wdx::parameter_service_backend_i::register_device_description_provider()
+\see wago::wdx::parameter_service_backend_i::register_device_extension_providers()
+\see wago::wdx::parameter_service_backend_i::register_device_extension_provider()
+\see wago::wdx::parameter_service_backend_i::register_file_providers()
+\see wago::wdx::parameter_service_backend_i::register_file_provider()
+
+\see wago::wdx::parameter_service_backend_i::unregister_parameter_providers()
+\see wago::wdx::parameter_service_backend_i::unregister_parameter_provider()
+\see wago::wdx::parameter_service_backend_i::unregister_model_providers()
+\see wago::wdx::parameter_service_backend_i::unregister_model_provider()
+\see wago::wdx::parameter_service_backend_i::unregister_device_description_providers()
+\see wago::wdx::parameter_service_backend_i::unregister_device_description_provider()
+\see wago::wdx::parameter_service_backend_i::unregister_device_extension_providers()
+\see wago::wdx::parameter_service_backend_i::unregister_device_extension_provider()
+\see wago::wdx::parameter_service_backend_i::unregister_file_providers()
+\see wago::wdx::parameter_service_backend_i::unregister_file_provider()
+
+\see example_providers.hpp for definition of this class.
+*/

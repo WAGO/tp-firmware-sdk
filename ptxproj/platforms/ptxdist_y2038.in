@@ -1,0 +1,16 @@
+## SECTION=architecture_options
+
+menuconfig PTXDIST_Y2038
+	prompt "ptxdist_y2038                 "
+		bool
+		default n
+	help
+		Work around PTXdist not correctly passing Y2038 support to the toolchain when in PTXdist bash.
+		
+		PTXdist's handling of the ptxconfig switch `PTXCONF_GLIBC_Y2038` seems broken. Other switches that affect
+		the toolchain's behavior are defined within the platformconfig file, for example `TARGET_COMPILER_RECORD_SWITCHES`.
+		These switches are evaluated by `wrapper/libwrapper.sh`.
+		For `PTXCONF_GLIBC_Y2038` it's different. It is evaluated in `lib/ptxd_make_00-init.sh` and an intermediate switch
+		`PTXDIST_Y2038` is created dynamically and evaluated in `wrapper/libwrapper.sh`. But this intermediate switch is
+		only created when running `ptxdist compile`, not for `ptxdist bash`, which is used to build _ct-build_ projects locally.
+

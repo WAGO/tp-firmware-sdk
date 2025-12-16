@@ -17,8 +17,9 @@
 ///  \author   <author> : WAGO GmbH & Co. KG
 //------------------------------------------------------------------------------
 
-#define _GNU_SOURCE
 #include <errno.h>
+#include <stdio.h>
+#include <sys/mman.h>
 // clang-format off
 // dont reorder the net-snmp includes, otherwise it will not compile
 #include <net-snmp/net-snmp-config.h>
@@ -39,35 +40,33 @@ struct stHandlerList {
 };
 
 static tHandlerList *pHandlerListRoot = NULL;
-static pthread_t stThreadID = 0;
-static mqd_t trap_queue = -1;
-static sem_t *oidMutex = NULL;
-static int oidShmFd = -1;
-static tOidShm *pOidShm = NULL;
-static size_t localShmSize = sizeof(tOidShm);
+static pthread_t stThreadID           = 0;
+static mqd_t trap_queue               = -1;
+static sem_t *oidMutex                = NULL;
+static int oidShmFd                   = -1;
+static tOidShm *pOidShm               = NULL;
+static size_t localShmSize            = sizeof(tOidShm);
 
 PUBLIC_SYM void deinit_libwagosnmp_AgentEntry(void);
 
 static void _Reset(void);
 
 /* deinit function for snmpd-plugin. For init function see libwagosnmp.c */
-void deinit_libwagosnmp_AgentEntry(void)
-{
-    snmp_log(LOG_INFO, "Deinit\n");
+void deinit_libwagosnmp_AgentEntry(void) {
+  snmp_log(LOG_INFO, "Deinit\n");
 
-    if(agent_init_alarm_register != 0) {
-      snmp_alarm_unregister(agent_init_alarm_register);
-      agent_init_alarm_register = 0;
-    }
+  if (agent_init_alarm_register != 0) {
+    snmp_alarm_unregister(agent_init_alarm_register);
+    agent_init_alarm_register = 0;
+  }
 
-    if(stThreadID != 0) {
-      pthread_cancel(stThreadID);
-      pthread_join(stThreadID, NULL);
-    }
-    _Reset();
-    mq_unlink(TRAP_AGENT_MQ);
+  if (stThreadID != 0) {
+    pthread_cancel(stThreadID);
+    pthread_join(stThreadID, NULL);
+  }
+  _Reset();
+  mq_unlink(TRAP_AGENT_MQ);
 }
-
 
 int __attribute__((weak)) netsnmp_unregister_handler(netsnmp_handler_registration *reginfo) {
   (void)reginfo;
@@ -303,12 +302,12 @@ INTERNAL_SYM void AGENT_InitServerCommunication(unsigned int clientreg, void *cl
   (void)clientarg;
   snmp_log(LOG_INFO, "Init WAGO snmp plugin\n");
 
-  if(stThreadID == 0) {
+  if (stThreadID == 0) {
     _InitExistingShm();
 
     trap_queue = _OpenServerQueue(TRAP_AGENT_MQ, sizeof(tWagoSnmpMsg), 1);
 
-    if((pthread_create(&stThreadID, NULL, _ServerMain, NULL)) == -1)
+    if ((pthread_create(&stThreadID, NULL, _ServerMain, NULL)) == -1)
       DEBUGMSGTL(("plcsnmp_trap_agent", "error while starting thread\n"));
     else {
       DEBUGMSGTL(("plcsnmp_trap_agent", "starting thread ok; id: %lu\n", stThreadID));
@@ -363,26 +362,59 @@ INTERNAL_SYM void AGENT_DestroyMutex(void) {
 
 INTERNAL_SYM void AGENT_RemapShm(void) {
   size_t newSize;
-  // Compile Errors
-  // pOidShm = mremap(pOidShm,localShmSize,pOidShm->oidShmSize, MREMAP_MAYMOVE);
+  if (!pOidShm) {
+    snmp_log(LOG_ERR, "AGENT_RemapShm: shared memory not mapped\n");
+    return;
+  }
+
   newSize = pOidShm->oidShmSize;
   munmap(pOidShm, localShmSize);
   pOidShm      = mmap(0, newSize, PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+  if (pOidShm == MAP_FAILED) {
+    pOidShm = NULL;
+    localShmSize = 0;
+    perror("AGENT_RemapShm: mmap");
+    return;
+  }
   localShmSize = newSize;
 }
 
-INTERNAL_SYM void AGENT_CreateShm() {
+INTERNAL_SYM void AGENT_CreateShm(void) {
+
   if (oidShmFd < 0) {
+    pOidShm = NULL;
+    localShmSize = 0;
+
     oidShmFd = shm_open(WAGO_SNMP_OID_SHM, O_RDWR | O_CREAT | O_EXCL, 0666);
     if (oidShmFd < 0) {
       if (errno == EEXIST) {
         oidShmFd = shm_open(WAGO_SNMP_OID_SHM, O_RDWR, 0666);
-        pOidShm  = mmap(0, sizeof(tOidShm), PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+        if (oidShmFd < 0) {
+          perror("AGENT_CreateShm: shm_open");
+          return;
+        }
+
+        void* pShm = mmap(0, sizeof(tOidShm), PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+        if (pShm == MAP_FAILED) {
+          perror("AGENT_CreateShm: mmap");
+          return;
+        }
+
+        pOidShm      = pShm;
         AGENT_RemapShm();
       }
     } else {
-      ftruncate(oidShmFd, sizeof(tOidShm));
-      pOidShm             = mmap(0, sizeof(tOidShm), PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+      if (ftruncate(oidShmFd, sizeof(tOidShm)) < 0) {
+        perror("AGENT_CreateShm: ftruncate");
+        return;
+      }
+      void* pShm = mmap(0, sizeof(tOidShm), PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+      if (pShm == MAP_FAILED) {
+        perror("AGENT_CreateShm: mmap");
+        return;
+      }
+
+      pOidShm             = pShm;
       pOidShm->oidShmSize = sizeof(tOidShm);
       localShmSize        = pOidShm->oidShmSize;
       pOidShm->oidCount   = 0;
@@ -408,13 +440,26 @@ INTERNAL_SYM void AGENT_DestroyShm(void) {
 /* adding size bytes to SHM*/
 INTERNAL_SYM int AGENT_ExtendShm(size_t size) {
   int ret = -1;
-  if (oidShmFd >= 0) {
+  if (oidShmFd >= 0 && pOidShm) {
     size_t newSize = size + pOidShm->oidShmSize;
-    ftruncate(oidShmFd, (ssize_t)newSize);
-    // Compile Errors
-    // pOidShm = mremap(pOidShm, pOidShm->oidShmSize,newSize, MREMAP_MAYMOVE);
-    munmap(pOidShm, pOidShm->oidShmSize);
-    pOidShm             = mmap(0, newSize, PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+    if (ftruncate(oidShmFd, (ssize_t)newSize) < 0) {
+      perror("AGENT_ExtendShm: ftruncate");
+      return WAGOSNMP_RETURN_ERROR_SHM;
+    }
+
+    if (munmap(pOidShm, pOidShm->oidShmSize) < 0) {
+      perror("AGENT_ExtendShm: munmap");
+      return WAGOSNMP_RETURN_ERROR_SHM;
+    }
+    pOidShm = NULL;
+
+    void *pNewShm = mmap(0, newSize, PROT_READ | PROT_WRITE, MAP_SHARED, oidShmFd, 0);
+    if (pNewShm == MAP_FAILED) {
+      perror("AGENT_ExtendShm: mmap");
+      return WAGOSNMP_RETURN_ERROR_SHM;
+    }
+
+    pOidShm             = pNewShm;
     pOidShm->oidShmSize = newSize;
     ret                 = 0;
   }
@@ -424,14 +469,14 @@ INTERNAL_SYM int AGENT_ExtendShm(size_t size) {
 
 INTERNAL_SYM tOidObject *AGENT_GetNextOidObject(tOidObject *pAct) {
   if (pAct == NULL) {
-    if (pOidShm->oidCount > 0) {
+    if (pOidShm && pOidShm->oidCount > 0) {
       return &pOidShm->oidStart[0];
     } else {
       return NULL;
     }
   }
   // if this is the last index
-  if (pOidShm->oidCount <= (pAct->index + 1)) {
+  if (pOidShm == NULL || pOidShm->oidCount <= (pAct->index + 1)) {
     return NULL;
   }
 
@@ -459,18 +504,21 @@ INTERNAL_SYM tOidObject *AGENT_GetOidObject(oid *anOID, size_t anOID_len) {
 INTERNAL_SYM tOidObject *AGENT_GetFreeOidObject(size_t size) {
   tOidObject *pAct;
   tOidObject *pLast = NULL;
-  /*pAct = AGENT_GetNextOidObject(NULL);
-  while(pAct != NULL)
-  {
-    pLast = pAct;
-    pAct = AGENT_GetNextOidObject(pAct);
-  }*/
-  AGENT_ExtendShm(size);
+
+  if (!pOidShm) {
+    return NULL;
+  }
+
+  if (AGENT_ExtendShm(size) != 0) {
+    return NULL;
+  }
+
   pAct = AGENT_GetNextOidObject(NULL);
   while (pAct != NULL) {
     pLast = pAct;
     pAct  = AGENT_GetNextOidObject(pAct);
   }
+
   pOidShm->oidCount++;
   pAct = AGENT_GetNextOidObject(pLast);
   if (pAct != NULL) {
@@ -505,8 +553,8 @@ INTERNAL_SYM tWagoSnmpReturnCode AGENT_CreateNewOidObject(oid *anOID, size_t anO
 
     CALC_OBJ_SIZE(objectSize, stData->val_len, stData->val.string == stData->buf);
     AGENT_MutexLock();
-    pObj = AGENT_GetFreeOidObject(objectSize);
 
+    pObj = AGENT_GetFreeOidObject(objectSize);
     if (pObj != NULL) {
       pObj->readOnly = readOnly;
       memcpy(pObj->anOID, anOID, anOID_len * sizeof(oid));
@@ -514,6 +562,7 @@ INTERNAL_SYM tWagoSnmpReturnCode AGENT_CreateNewOidObject(oid *anOID, size_t anO
       AGENT_SetOidObjectValue(pObj, stData);
       result = WAGOSNMP_RETURN_OK;
     }
+
     AGENT_MutexUnlock();
   }
 

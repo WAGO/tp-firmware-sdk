@@ -54,16 +54,16 @@ LIBBACNET_DIR               := $(LIBBACNET_BUILDROOT_DIR)/$(LIBBACNET)
 LIBBACNET_LICENSE           := unknown
 
 LIBBACNET_BUILDCONFIG       := Release
-LIBBACNET_BUILD_DIR         := $(LIBBACNET_BUILDROOT_DIR)/bin/$(LIBBACNET_BUILDCONFIG)
+LIBBACNET_BIN_DIR           := $(LIBBACNET_BUILDROOT_DIR)/bin/$(LIBBACNET_BUILDCONFIG)
 LIBBACNET_BIN               := $(LIBBACNET).so.$(LIBBACNET_VERSION)
 LIBBACNET_SO_NAME           := $(LIBBACNET).so
 LIBBACNET_CONF_TOOL         := NO
 LIBBACNET_MAKE_ENV          := $(CROSS_ENV) \
                                BUILDCONFIG=$(LIBBACNETSTACK_BUILDCONFIG) \
-                               BIN_DIR=$(LIBBACNETSTACK_BUILD_DIR) \
+                               BIN_DIR=$(LIBBACNETSTACK_BIN_DIR) \
                                TARGET_ARCH=$(PTXCONF_ARCH_STRING) \
                                ARM_ARCH_VERSION=7 \
-                               SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+                               SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 LIBBACNET_PATH              := PATH=$(CROSS_PATH)
 LIBBACNET_PACKAGE_NAME      := $(LIBBACNET)_$(LIBBACNET_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)

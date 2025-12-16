@@ -1,0 +1,16 @@
+## SECTION=wago_specific_config_parameterservice
+
+menuconfig WDX_WDD
+	bool
+	default n
+	prompt "WAGO Parameter Service (WDx) WDD"
+	select HOST_PYTHON3
+	depends on WDX_LINUX
+	help
+	  Platform specific WDD Model files used by the WAGO Parameter Service.
+
+config WDX_WDD_DIR
+	string
+	depends on WDX_WDD
+	prompt "directory to contain WDD artifacts"
+	default "/etc/wdx/wdd"

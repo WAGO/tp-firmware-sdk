@@ -13,9 +13,9 @@ class IFileEditor {
   virtual ~IFileEditor() = default;
 
   IFileEditor(const IFileEditor&) = default;
-  IFileEditor& operator=(const IFileEditor&) = delete;
-  IFileEditor(IFileEditor&&) = delete;
-  IFileEditor& operator=(IFileEditor&&) = delete;
+  IFileEditor& operator=(const IFileEditor&) = default;
+  IFileEditor(IFileEditor&&) = default;
+  IFileEditor& operator=(IFileEditor&&) = default;
 
   virtual Status Read(const ::std::string &file_path, ::std::string &data) const =0;
   virtual Status Write(const ::std::string &file_path, const ::std::string &data) const =0;

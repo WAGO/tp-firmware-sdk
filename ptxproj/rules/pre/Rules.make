@@ -9,17 +9,12 @@
 
 # FIXME: cleanup
 
-ifeq ($(PTXCONF_CONFIGFILE_VERSION), "2020.08.0")
-GNU_BUILD	:= $(call ptx/force-sh, $(SCRIPTSDIR)/autoconf/config.guess)
+GNU_BUILD	:= $(call ptx/force-sh, $(SCRIPTSDIR)/autoconf/config.guess | sed s/-pc-/-unknown-/)
 GNU_HOST	:= $(call ptx/force-sh, echo $(GNU_BUILD) | sed s/-[a-zA-Z0-9_]*-/-host-/)
-else
-GNU_BUILD	:= $(shell $(SCRIPTSDIR)/autoconf/config.guess)
-GNU_HOST	:= $(shell echo $(GNU_BUILD) | sed s/-[a-zA-Z0-9_]*-/-host-/)
-endif
 
 INSTALL		:= install
 
-FAKEROOT	:= $(PTXDIST_SYSROOT_HOST)/bin/fakeroot
+FAKEROOT	:= $(PTXDIST_SYSROOT_HOST)/usr/bin/fakeroot
 
 CHECK_PIPE_STATUS := \
 	for i in  "$${PIPESTATUS[@]}"; do [ $$i -gt 0 ] && {			\
@@ -34,7 +29,7 @@ CHECK_PIPE_STATUS := \
 #
 # prepare the search path when cross compiling
 #
-CROSS_PATH := $(PTXDIST_SYSROOT_CROSS)/bin:$(PTXDIST_SYSROOT_CROSS)/sbin:$(PATH)
+CROSS_PATH := $(PTXDIST_SYSROOT_CROSS)/usr/bin:$(PTXDIST_SYSROOT_CROSS)/usr/sbin:$(PATH)
 
 
 # ----------------------------------------------------------------------------
@@ -51,6 +46,7 @@ CROSS_NM		:= $(PTXCONF_COMPILER_PREFIX)nm
 CROSS_CC		:= $(PTXCONF_COMPILER_PREFIX)gcc
 CROSS_CXX		:= $(PTXCONF_COMPILER_PREFIX)g++
 CROSS_CPP		:= "$(PTXCONF_COMPILER_PREFIX)gcc -E"
+CROSS_FC		:= $(PTXCONF_COMPILER_PREFIX)gfortran
 CROSS_RANLIB		:= $(PTXCONF_COMPILER_PREFIX)ranlib
 CROSS_READELF		:= $(PTXCONF_COMPILER_PREFIX)readelf
 CROSS_OBJCOPY		:= $(PTXCONF_COMPILER_PREFIX)objcopy
@@ -78,6 +74,7 @@ CROSS_ENV_NM		:= NM=$(CROSS_NM)
 CROSS_ENV_CC		:= CC=$(CROSS_CC)
 CROSS_ENV_CXX		:= CXX=$(CROSS_CXX)
 CROSS_ENV_CPP		:= CPP=$(CROSS_CPP)
+CROSS_ENV_FC		:= FC=$(CROSS_FC)
 CROSS_ENV_RANLIB	:= RANLIB=$(CROSS_RANLIB)
 CROSS_ENV_READELF	:= READELF=$(CROSS_READELF)
 CROSS_ENV_OBJCOPY	:= OBJCOPY=$(CROSS_OBJCOPY)
@@ -118,6 +115,7 @@ CROSS_ENV_PROGS := \
 	$(CROSS_ENV_CC) \
 	$(CROSS_ENV_CXX) \
 	$(CROSS_ENV_CPP) \
+	$(CROSS_ENV_FC) \
 	$(CROSS_ENV_RANLIB) \
 	$(CROSS_ENV_READELF) \
 	$(CROSS_ENV_OBJCOPY) \
@@ -141,7 +139,8 @@ CROSS_ENV_PROGS := \
 	$(CROSS_ENV_LINK_FOR_BUILD) \
 	$(CROSS_ENV_PKG_CONFIG)
 
-CROSS_LIB_DIR   := $(shell ptxd_get_lib_dir)
+CROSS_LIB_DIR		:= lib
+CROSS_LINKER_LIB_DIR	:= $(shell ptxd_get_lib_dir)
 
 #
 # prepare to use pkg-config with wrapper which takes care of
@@ -221,7 +220,6 @@ endif
 #
 CROSS_ENV := \
 	$(CROSS_ENV_PROGS) \
-	$(CROSS_ENV_PKG_CONFIG) \
 	$(CROSS_ENV_AC)
 
 
@@ -236,10 +234,10 @@ CROSS_ENV := \
 #
 
 CROSS_AUTOCONF_SYSROOT_USR := \
-	--prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/$(CROSS_LIB_DIR)
+	--prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 
 CROSS_AUTOCONF_SYSROOT_ROOT := \
-	--libdir=/$(CROSS_LIB_DIR) --prefix=
+	--libdir=/lib --prefix=
 
 CROSS_AUTOCONF_ARCH := \
 	--build=$(GNU_HOST) \
@@ -250,12 +248,15 @@ CROSS_AUTOCONF_ROOT := $(CROSS_AUTOCONF_SYSROOT_ROOT) $(CROSS_AUTOCONF_ARCH)
 
 CROSS_CMAKE_USR	 := \
 	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_SYSCONFDIR=/etc \
 	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+	-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_TARGET}'
 
 CROSS_CMAKE_ROOT := \
 	-DCMAKE_INSTALL_PREFIX=/ \
 	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+	-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_TARGET}'
 
 CROSS_QMAKE_OPT := \
@@ -263,18 +264,30 @@ CROSS_QMAKE_OPT := \
 	$(if $(filter 0,$(PTXDIST_VERBOSE)),CONFIG+=silent)
 
 CROSS_PYTHON_INSTALL := install --prefix=/usr
-HOST_PYTHON_INSTALL := install --prefix=/.
+HOST_PYTHON_INSTALL := install --prefix=/usr
+HOST_SYSTEM_PYTHON_INSTALL := install --prefix=/usr/lib/system-python3
 
 CROSS_MESON_USR := \
 	--cross-file '${PTXDIST_MESON_CROSS_FILE}' \
 	--wrap-mode nodownload \
 	-Dbackend=ninja \
 	-Dbuildtype=debugoptimized \
-	-Dlibdir=$(CROSS_LIB_DIR) \
+	-Dpkgconfig.relocatable=true \
+	-Dlibdir=lib \
 	-Dprefix=/usr
 
 CROSS_MESON_ENV = \
 	$(HOST_ENV_PROGS)
+
+CROSS_CARGO_ENV := \
+	CARGO_BUILD_TARGET=$(PTXCONF_RUST_TARGET) \
+	RUST_TARGET_PATH=$(PTXDIST_PLATFORMDIR)/selected_toolchain
+
+CROSS_CARGO_OPT := \
+	build \
+	--target $(PTXCONF_RUST_TARGET) \
+	--release \
+	--frozen
 
 ifdef PTXCONF_GLOBAL_IPV6
 GLOBAL_IPV6_OPTION := --enable-ipv6
@@ -324,16 +337,25 @@ HOST_ENV	:= \
 	$(HOST_ENV_PKG_CONFIG)
 
 
-HOST_AUTOCONF  := --prefix=
-HOST_AUTOCONF_SYSROOT := --prefix=$(PTXDIST_SYSROOT_HOST)
+HOST_AUTOCONF  := \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--libdir=/usr/lib
+
+HOST_AUTOCONF_SYSROOT := \
+	--prefix=$(PTXDIST_SYSROOT_HOST)/usr \
+	--sysconfdir=$(PTXDIST_SYSROOT_HOST)/etc \
+	--libdir=$(PTXDIST_SYSROOT_HOST)/usr/lib
 
 HOST_CMAKE_OPT := \
-	-DCMAKE_INSTALL_PREFIX= \
+	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_LIBDIR=lib \
 	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
 	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_HOST}'
 
 HOST_CMAKE_OPT_SYSROOT := \
-	-DCMAKE_INSTALL_PREFIX=$(PTXDIST_SYSROOT_HOST) \
+	-DCMAKE_INSTALL_PREFIX=$(PTXDIST_SYSROOT_HOST)/usr \
+	-DCMAKE_INSTALL_LIBDIR=lib \
 	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
 	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_HOST}'
 
@@ -342,7 +364,12 @@ HOST_MESON_OPT := \
 	-Dbackend=ninja \
 	-Dbuildtype=debugoptimized \
 	-Dlibdir=lib \
-	-Dprefix=/
+	-Dprefix=/usr
+
+HOST_CARGO_OPT := \
+	build \
+	--release \
+	--frozen
 
 # ----------------------------------------------------------------------------
 # HOST_CROSS stuff
@@ -355,8 +382,23 @@ HOST_CROSS_ENV := $(HOST_ENV)
 
 HOST_CROSS_AUTOCONF_ARCH := --target=$(PTXCONF_GNU_TARGET)
 
-HOST_CROSS_AUTOCONF := --prefix= $(HOST_CROSS_AUTOCONF_ARCH)
-HOST_CROSS_AUTOCONF_SYSROOT := --prefix=$(PTXDIST_SYSROOT_CROSS) $(HOST_CROSS_AUTOCONF_ARCH)
+HOST_CROSS_AUTOCONF := \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--libdir=/usr/lib \
+	$(HOST_CROSS_AUTOCONF_ARCH)
+
+HOST_CROSS_AUTOCONF_SYSROOT := \
+	--prefix=$(PTXDIST_SYSROOT_CROSS)/usr \
+	--sysconfdir=$(PTXDIST_SYSROOT_CROSS)/etc \
+	--libdir=$(PTXDIST_SYSROOT_CROSS)/usr/lib \
+	$(HOST_CROSS_AUTOCONF_ARCH)
+
+HOST_CROSS_CMAKE_OPT := \
+	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_LIBDIR=lib \
+	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_CROSS}'
 
 # ----------------------------------------------------------------------------
 # Convenience macros
@@ -366,11 +408,11 @@ HOST_CROSS_AUTOCONF_SYSROOT := --prefix=$(PTXDIST_SYSROOT_CROSS) $(HOST_CROSS_AU
 # add_locale
 #
 # add locale support to locales-archive, if not exist, a new locale
-# archive will be created automaticly
+# archive will be created automatically
 #
 # $1: localename: localename (i.E. zh_CN or zh_CN.GBK)
 # $2: localedef; locale definition file (i.E. de_DE or de_DE@euro)
-# $3: charmap; charachter encoding map (i.E. ISO-8859-1)
+# $3: charmap; character encoding map (i.E. ISO-8859-1)
 # $4: prefix; installation prefix for locales-archive
 #
 #
@@ -390,7 +432,7 @@ add_locale =							\
 	fi;							\
 	${CROSS_ENV_CC} $(CROSS_ENV_STRIP)			\
 	$(SCRIPTSDIR)/make_locale.sh 				\
-		-e $(PTXDIST_SYSROOT_HOST)/bin/localedef 	\
+		-e $(PTXDIST_SYSROOT_HOST)/usr/bin/localedef 	\
 		-f $$CHARMAP -i $$LOCALE_DEF 			\
 		-p $$PREF 					\
 		-n $$LOCALE_NAME				\

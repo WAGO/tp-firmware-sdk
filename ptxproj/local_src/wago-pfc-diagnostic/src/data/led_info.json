@@ -68,6 +68,10 @@
                 {
                     "name":"BT",
                     "startid":"0x00140001"
+                },
+                {
+                    "name":"DALI",
+                    "startid":"0x000E0001"
                 }
             ]
         },

@@ -19,7 +19,7 @@ PACKAGES-$(PTXCONF_WAGO_DBUS) += wago_dbus
 ifdef PTXCONF_WAGO_DBUS_TRUNK
 WAGO_DBUS_VERSION	:= trunk
 else
-WAGO_DBUS_VERSION	:= 1.1
+WAGO_DBUS_VERSION	:= 1.4.0
 endif
 WAGO_DBUS		:= wago_dbus
 WAGO_DBUS_URL		:= file://local_src/$(WAGO_DBUS)

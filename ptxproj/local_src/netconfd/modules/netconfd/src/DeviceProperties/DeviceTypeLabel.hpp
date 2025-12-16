@@ -19,6 +19,7 @@ class DeviceTypeLabel : public IDeviceTypeLabel {
   DeviceTypeLabel& operator=(DeviceTypeLabel&&) = delete;
 
   ::std::string GetOrderNumber() const override;
+  ::std::string GetDHCPVendorClassID() const override;
   MacAddress GetMac() const override;
   uint32_t GetMacCount() const override;
 
@@ -27,6 +28,7 @@ class DeviceTypeLabel : public IDeviceTypeLabel {
   CommandExecutor& command_executer_;
 
   ::std::string order_number_;
+  ::std::string vendor_class_id_;
   MacAddress mac_;
   uint32_t mac_count_;
 

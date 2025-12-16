@@ -18,6 +18,7 @@
 #define SRC_CONFIG_DNSMASQ_IPADDRESS_HPP_
 
 #include <string>
+#include <cstdint>
 
 namespace configdnsmasq {
 

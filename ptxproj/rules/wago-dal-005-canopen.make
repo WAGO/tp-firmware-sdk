@@ -17,7 +17,7 @@ PACKAGES-$(PTXCONF_CANOPEN) += canopen
 #
 # Paths and names
 #
-CANOPEN_VERSION	:= 1.4
+CANOPEN_VERSION	:= 1.5
 CANOPEN			:= canopen
 CANOPEN_URL		:= file://$(PTXDIST_WORKSPACE)/wago_intern/device/can/
 CANOPEN_DIR		:= $(BUILDDIR)/$(CANOPEN)

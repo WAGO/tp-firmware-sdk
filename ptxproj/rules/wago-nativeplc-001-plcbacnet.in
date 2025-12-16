@@ -73,7 +73,7 @@ config BACNETNATIVE_ARTIFACTORY_DEV_URL_TEMPLATE
 	string
 	depends on BACNETNATIVE
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2Fbacnetnative%2Fmain&a=bacnetnative-Source&repos=pl_controller-generic-dev-local&v=*"
+	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2Fbacnetnative%2Fdev&a=bacnetnative-Source&repos=pl_controller-generic-dev-local&v=*"
 	help
 	  Searches for the current dev artifact.
 

@@ -17,7 +17,7 @@ PACKAGES-$(PTXCONF_CONFIG_TOOLS) += config-tools
 #
 # Paths and names
 #
-CONFIG_TOOLS_VERSION 	      := 2.0.3
+CONFIG_TOOLS_VERSION 	      := 2.0.5
 CONFIG_TOOLS		            := config-tools
 CONFIG_TOOLS_URL            := file://$(PTXDIST_WORKSPACE)/local_src/$(CONFIG_TOOLS)
 CONFIG_TOOLS_DIR	          := $(BUILDDIR)/$(CONFIG_TOOLS)
@@ -51,11 +51,6 @@ endif
 
 ifdef PTXCONF_INITMETHOD_INITNG
 CT_CFLAGS +=-D__HAVE_INITMETHOD_SYSV
-endif
-
-ifdef PTXCONF_CT_FEATURE_ETH_SWITCH_ADVANCED
-# also triggers libctnetwork.so to be linked against libswconfig.so
-CT_CFLAGS += -D__ENABLE_SWCONFIG
 endif
 
 ifdef PTXCONF_CT_FEATURE_TYPELABEL_SUPPORT
@@ -196,15 +191,10 @@ ifdef PTXCONF_CT_GET_ACTUAL_ETH_CONFIG
 	CT_MAKE_ARGS+=get_actual_eth_config
 endif
 
-ifdef PTXCONF_CT_GET_SWITCH_SETTINGS
-	CT_MAKE_ARGS+=get_switch_settings
-endif
-ifdef PTXCONF_CT_CONFIG_SWITCH
-	CT_MAKE_ARGS+=config_switch
-endif
 ifdef PTXCONF_CT_IPDATACHECK
 	CT_MAKE_ARGS+=ipdatacheck
 endif
+
 ifdef PTXCONF_CT_GET_RS485_SETTINGS
 	CT_MAKE_ARGS+=get_rs485_settings
 endif
@@ -429,10 +419,6 @@ ifdef PTXCONF_CT_CONFIG_TOUCHSCREEN
 	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_touchscreen);
 endif
 
-ifdef PTXCONF_CT_CONFIG_USER
-	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_user);
-endif
-
 ifdef PTXCONF_CT_CONFIG_SSL
 	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_ssl);
 endif
@@ -603,6 +589,7 @@ endif
 
 ifdef PTXCONF_CT_CONFIG_RUNTIME
 	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_runtime)
+	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_runtime_user)
 	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/config_runtime_common)
 endif
 
@@ -614,7 +601,6 @@ endif
 
 ifdef PTXCONF_CT_GET_POSSIBLE_RUNTIMES
 	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/get_possible_runtimes, /etc/config-tools/get_possible_runtimes);
-	@$(call install_alternative, config-tools, 0, 0, 0440, /etc/specific/rtsbl);
 endif
 
 ifdef PTXCONF_CT_HTTPS_CIPHER_SELECTION
@@ -804,14 +790,6 @@ ifdef PTXCONF_CT_GET_DSA_MODE
 endif
 ifdef PTXCONF_CT_SET_DSA_MODE
 	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/set_dsa_mode);
-endif
-ifdef PTXCONF_CT_GET_SWITCH_SETTINGS
-	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/get_switch_settings, /etc/config-tools/get_switch_settings);
-	@$(call install_alternative, config-tools, 0, 0, 0644, /etc/switch_settings.conf)
-	@$(call install_alternative, config-tools, 0, 0, 0750, /etc/config-tools/events/networking/update_switch_config);
-endif
-ifdef PTXCONF_CT_CONFIG_SWITCH
-	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/config_switch, /etc/config-tools/config_switch);
 endif
 ifdef PTXCONF_CT_IPDATACHECK
 	@$(call install_copy, config-tools, 0, 0, 0750, $(CONFIG_TOOLS_DIR)/ipdatacheck, /etc/config-tools/ipdatacheck);

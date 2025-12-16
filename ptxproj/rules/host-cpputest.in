@@ -1,6 +1,6 @@
 ## SECTION=hosttools
 config HOST_CPPUTEST
-	bool
+	tristate
    default n
 	prompt "cpputest"
 	select HOST_CMAKE

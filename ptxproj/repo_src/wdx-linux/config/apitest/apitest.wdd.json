@@ -1,0 +1,83 @@
+{
+  "ModelReference": "APITest",
+  "WDMMVersion": "1.0.0",
+  "Features": ["APITest", "LocalbusMaster"],
+  "Instantiations": [
+    {
+      "Class": "APITestStaticClass",
+      "Instances": [
+        {
+          "ID": 1,
+          "ParameterValues": [
+            {
+              "ID": 536871523,
+              "Value": true
+            },
+            {
+              "ID": 536871525,
+              "Value": ""
+            }
+          ]
+        },
+        {
+          "ID": 2,
+          "ParameterValues": [
+            {
+              "ID": 536871523,
+              "Value": false
+            },
+            {
+              "ID": 536871525,
+              "Value": "Greek Capital Letter Omega: Ω"
+            }
+          ],
+          "Overrides": [
+            {
+              "ID": 536871526,
+              "AllowedValues": {
+                "Not": [42]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Class": "APITestReferencesClass",
+      "Instances": [
+        {
+          "ID": 1,
+          "ParameterValues": [
+            {
+              "ID": 536871623,
+              "Value": "KeyOne"
+            }
+          ]
+        },
+        {
+          "ID": 2,
+          "ParameterValues": [
+            {
+              "ID": 536871623,
+              "Value": "KeyTwo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Class": "APITestReferencesOtherClass",
+      "Instances": [
+        {
+          "ID": 123,
+          "ParameterValues": [
+            {
+              "ID": 536871633,
+              "Value": "TheKey"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

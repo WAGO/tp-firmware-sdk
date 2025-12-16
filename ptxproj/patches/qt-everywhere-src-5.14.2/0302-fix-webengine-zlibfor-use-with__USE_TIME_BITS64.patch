@@ -1,0 +1,11 @@
+diff -Naur qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/third_party/zlib/gzguts.h qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/third_party/zlib/gzguts.h
+--- qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/third_party/zlib/gzguts.h	2025-08-06 13:49:05.803773486 +0200
++++ qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/third_party/zlib/gzguts.h	2025-08-06 13:49:03.299753976 +0200
+@@ -9,6 +9,7 @@
+ #  endif
+ #  ifdef _FILE_OFFSET_BITS
+ #    undef _FILE_OFFSET_BITS
++#    undef _TIME_BITS
+ #  endif
+ #endif
+ 

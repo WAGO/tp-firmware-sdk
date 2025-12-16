@@ -202,27 +202,8 @@ set_xorg_conf () {
 	fi
 
 	xorg_conf_file=$xorg_conf_file$addchar_xres
-
-	### get screen orientation
-	orientation=$(hexdump -v -s 0x00001f8 -n 2 $eeprom_device | head -n 1 | cut  -f 2 -d ' ')
-	orientation=$(echo ${orientation:3})
-	if [ "$orientation" == 0 ] ; then
-		addchar=".conf"
-		xorg_conf_file=$xorg_conf_file$addchar
-	elif [ "$orientation" == 1 ] ; then
-		addchar="_CW.conf"
-		xorg_conf_file=$xorg_conf_file$addchar
-	elif [ "$orientation" == 2 ] ; then
-		addchar="_UD.conf"
-		xorg_conf_file=$xorg_conf_file$addchar
-	elif [ "$orientation" == 3 ] ; then
-		addchar="_CCW.conf"
-		xorg_conf_file=$xorg_conf_file$addchar
-	else
-		echo "screen orientation touch not recognized"
-		addchar=".conf"
-		xorg_conf_file=$xorg_conf_file$addchar
-	fi
+	addchar=".conf"
+	xorg_conf_file=$xorg_conf_file$addchar
 
 	if [ -e "$xorg_conf_file" ] ; then
 		rm -f /etc/X11/xorg.conf

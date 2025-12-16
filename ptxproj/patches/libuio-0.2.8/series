@@ -3,3 +3,4 @@
 0003-lsuio_update.patch
 0004_uio_mmap_with_addr_WAT26756.patch
 0005_gcc9_update.patch
+0007-WAT-37930-use-device-name-from-info-struct.patch

@@ -1,0 +1,26 @@
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Wed, 20 Jan 2010 00:05:54 +0100
+Subject: [PATCH] Makefile: add installtarget
+
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 0b596626fd9c..4ae37fd3dd43 100644
+--- a/Makefile
++++ b/Makefile
+@@ -39,5 +39,11 @@ ntpclient.o phaselock.o: ntpclient.h
+ 
+ adjtimex: adjtimex.o
+ 
++install: all
++	install -c ntpclient $(DESTDIR)/usr/sbin/ntpclient
++
++install_adjtimex: adjtimex
++	install -c adjtimex $(DESTDIR)/sbin/adjtimex
++
+ clean:
+ 	rm -f ntpclient adjtimex *.o

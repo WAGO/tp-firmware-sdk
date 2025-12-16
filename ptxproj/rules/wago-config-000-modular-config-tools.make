@@ -26,14 +26,14 @@ MODULAR_CONFIG_TOOLS_BUILDCONFIG    := Release
 MODULAR_CONFIG_TOOLS_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/$(MODULAR_CONFIG_TOOLS)
 MODULAR_CONFIG_TOOLS_BUILDROOT_DIR  := $(BUILDDIR)/$(MODULAR_CONFIG_TOOLS)
 MODULAR_CONFIG_TOOLS_DIR            := $(MODULAR_CONFIG_TOOLS_BUILDROOT_DIR)/src
-MODULAR_CONFIG_TOOLS_BUILD_DIR      := $(MODULAR_CONFIG_TOOLS_BUILDROOT_DIR)/bin/$(MODULAR_CONFIG_TOOLS_BUILDCONFIG)
+MODULAR_CONFIG_TOOLS_BIN_DIR        := $(MODULAR_CONFIG_TOOLS_BUILDROOT_DIR)/bin/$(MODULAR_CONFIG_TOOLS_BUILDCONFIG)
 MODULAR_CONFIG_TOOLS_LICENSE        := MPL-2.0, MIT
 MODULAR_CONFIG_TOOLS_PATH           := PATH=$(CROSS_PATH)
 MODULAR_CONFIG_TOOLS_BIN            := 
 MODULAR_CONFIG_TOOLS_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(MODULAR_CONFIG_TOOLS_BUILDCONFIG) \
-BIN_DIR=$(MODULAR_CONFIG_TOOLS_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(MODULAR_CONFIG_TOOLS_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 # ----------------------------------------------------------------------------
 # Extract
@@ -106,17 +106,15 @@ $(STATEDIR)/modular-config-tools.targetinstall:
 	@$(call install_fixup, modular-config-tools,DESCRIPTION,missing)
 
 ifdef PTXCONF_CT_CONFIG_LINUX_USER
-	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BUILD_DIR)/config_linux_user.elf, /etc/config-tools/config_linux_user)
+	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BIN_DIR)/config_linux_user.elf, /etc/config-tools/config_linux_user)
 endif
 
 ifdef PTXCONF_CT_RESERVED_AREA
-ifneq ($(PTXCONF_PLATFORM), $(filter $(PTXCONF_PLATFORM),wago-pfc300 wago-wp400))
-	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BUILD_DIR)/reserved_area.elf, /etc/config-tools/reserved_area)
-endif
+	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BIN_DIR)/reserved_area.elf, /etc/config-tools/reserved_area)
 endif
 
 ifdef PTXCONF_CT_DETECT_FEATURE
-	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BUILD_DIR)/detect_feature.elf, /etc/config-tools/detect_feature)
+	@$(call install_copy, modular-config-tools, 0, 0, 0750, $(MODULAR_CONFIG_TOOLS_BIN_DIR)/detect_feature.elf, /etc/config-tools/detect_feature)
 endif
 
 	@$(call install_finish, modular-config-tools)

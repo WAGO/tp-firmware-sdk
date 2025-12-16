@@ -29,10 +29,10 @@ config LED_SERVER_2_STARTSCRIPT
 	 within the screen session 'wago'.
 
 config WAGO_PFC_DIAGNOSTIC_DEBUGGING
-	bool debugging
+	bool "debugging"
 	default n
 	help
-		debug program
-	 
+	 debug program
+
 endif
 

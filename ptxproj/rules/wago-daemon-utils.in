@@ -1,0 +1,51 @@
+## SECTION=wago_specific_daemonutils
+
+config WAGO_DAEMON_UTILS
+	bool
+	default n
+	select HOST_CMAKE
+	select GOOGLETEST
+	select LIBCOMMONHEADER
+	select OPENSSL
+
+config WAGO_LOGGING
+	bool
+	default n
+	select WAGO_DAEMON_UTILS
+	prompt "WAGO Logging C++ Library"
+	help
+	  Utility library to setup logging for wc_log using either std-out or syslog
+		as the sink.
+
+config WAGO_OPTPARSING
+	bool
+	default n
+	select WAGO_DAEMON_UTILS
+	prompt "WAGO Option Parsing C++ Library"
+	help
+	  Utility library for parsing command line arguments.
+
+config WAGO_PRIVILEGES
+	bool
+	default n
+	select WAGO_DAEMON_UTILS
+	prompt "WAGO Privileges C++ Library"
+	help
+	  Helper library to drop privileges
+	  and switch over to a given user.
+
+config WAGO_TRACE
+	bool
+	default n
+	select WAGO_DAEMON_UTILS
+	prompt "WAGO Trace C++ Library"
+	help
+	  Library to build trace functionality into applications for debug and analysis.
+
+config WAGO_CRYPTO
+	bool
+	default n
+	select WAGO_DAEMON_UTILS
+	prompt "WAGO Crypto C++ Library"
+	help
+	  Library providing high-level encryption/decryption functionality.

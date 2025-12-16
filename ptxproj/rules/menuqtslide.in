@@ -3,7 +3,19 @@
 config MENUQTSLIDE
 	tristate
 	prompt "menuqtslide"
-	select QT5
+	select QT5 if MENUQTSLIDE_USE_QT5
 	help
 	  FIXME
 
+if MENUQTSLIDE
+choice
+	prompt "QT_VERSION_USED"
+		config MENUQTSLIDE_USE_QT5
+			bool
+			prompt "QT5"
+
+		config MENUQTSLIDE_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

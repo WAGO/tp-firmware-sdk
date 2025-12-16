@@ -22,13 +22,15 @@ LIBDPS_SRC						:= $(call ptx/in-path, PTXDIST_PATH, wago_intern/device/profibus
 LIBDPS_DIR							:= $(BUILDDIR)/$(LIBDPS_NAME)-$(LIBDPS_VERSION)
 LIBDPS_LICENSE					:=
 LIBDPS_TARGET_PLATFORM	:= ptx-dist
-LIBDPS_MAKE_PARAMETER		:= CROSS_COMPILE=$(COMPILER_PREFIX) \
+LIBDPS_SUBDIR := project
+LIBDPS_MAKE_OPT		:= CROSS_COMPILE=$(COMPILER_PREFIX) \
 																		TARGET_PLATFORM=$(LIBDPS_TARGET_PLATFORM) \
 																		TARGET_ARCH=$(PTXCONF_ARCH_STRING) \
 																		ARM_ARCH_VERSION=7 \
 																		TARGET_OS=LINUX \
 																		DEBUG=n \
-																		SYSROOT_TARGET=$(PTXCONF_SYSROOT_TARGET)
+																		SYSROOT_TARGET=$(PTXCONF_SYSROOT_TARGET) \
+																		shared_lib
 
 LIBDPS_PACKAGE_NAME := libdps_$(LIBDPS_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)
 LIBDPS_PLATFORMCONFIGPACKAGEDIR := $(PTXDIST_PLATFORMCONFIGDIR)/packages
@@ -66,15 +68,15 @@ endif
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
-
-LIBDPS_ENV := $(CROSS_ENV)
+#LIBDPS_PATH := PATH=$(CROSS_PATH)
+LIBDPS_MAKE_ENV := $(CROSS_ENV)
 
 $(STATEDIR)/libdps.compile:
 		@$(call targetinfo)
 ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
  		# WAGO_TOOLS_BUILD_VERSION_TRUNK | WAGO_TOOLS_BUILD_VERSION_RELEASE
 		@$(call xslt_compile, $(LIBDPS_DIR)/project/config/dps_diagnostics.xml)
-		cd $(LIBDPS_DIR)/project && $(LIBDPS_ENV) $(MAKE) $(LIBDPS_MAKE_PARAMETER) shared_lib
+		@$(call world/compile, LIBDPS)
 endif
 		@$(call touch)
 

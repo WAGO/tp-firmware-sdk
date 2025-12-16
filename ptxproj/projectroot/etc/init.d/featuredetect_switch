@@ -4,39 +4,59 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-# Copyright (c) 2024 WAGO GmbH & Co. KG
+# Copyright (c) 2025 WAGO GmbH & Co. KG
 
 # detect switch features and create files for detect_feature config tool
 
-SWCFG=/usr/sbin/swconfig
 FEATURE_DIR=/etc/specific/features
+
+function get_switch_type() {
+    local switch_driver=$(devlink dev info | grep driver ) # | tr -d '\n'
+
+    if [[ "$switch_driver" == *"mv88e6"* ]]; then
+        echo "marvell"
+    elif [[ "$switch_driver" == *"am65-cpsw-nuss"* ]]; then
+        echo "ti"
+    elif [[ "$switch_driver" == *"ksz8863-switch"* ]]; then
+        echo "micrel"
+    else
+        echo "unknown"
+    fi
+}
+
+function setup_common_switch_features() {
+    touch "$FEATURE_DIR/switch-port-mapping"
+    touch "$FEATURE_DIR/switch-mac-learning"
+    touch "$FEATURE_DIR/switch-stp"
+}
+
+function setup_marvell_switch_features() {
+    setup_common_switch_features
+    touch "$FEATURE_DIR/switch-broadcast-protection-v2" # port based broadcast protection available
+    touch "$FEATURE_DIR/switch-multicast-protection" # port based multicast protection available
+}
+
+function setup_ti_switch_features() {
+    setup_common_switch_features
+    setup_marvell_switch_features
+    touch "$FEATURE_DIR/switch-port-mirroring-v2"
+}
+
+function setup_micrel_switch_features() {
+    setup_common_switch_features
+    touch "$FEATURE_DIR/switch-broadcast-protection-v2" # port based broadcast protection available (ON/OFF)
+    touch "$FEATURE_DIR/switch-port-mirroring-v2"
+    touch "$FEATURE_DIR/switch-multicast-protection-global" # global multicast protection available
+}
 
 rm -f $FEATURE_DIR/switch-*
 
-if [[ -e /etc/switch_settings.conf && -x "${SWCFG}" ]]; then
-	touch "$FEATURE_DIR/switch-port-mapping"
-	touch "$FEATURE_DIR/switch-mac-learning"
-	touch "$FEATURE_DIR/switch-stp"
-	
-	declare -A feature_file_map
-	feature_file_map["bcast_protect"]="switch-broadcast-protection"
-	feature_file_map["rate_limit"]="switch-rate-limiting"
-	feature_file_map["port_mirror"]="switch-port-mirroring"
-		
-	SWCFG_INFO="$($SWCFG dev switch0 show)"
+SWITCH_TYPE=$(get_switch_type)
 
-	for f in "${!feature_file_map[@]}"
-	do
-		if [[ "$SWCFG_INFO" == *"$f"* ]]; then
-			touch $FEATURE_DIR/${feature_file_map[$f]}
-		fi
-	done
-
-elif [[ -e /etc/specific/switchconfig.json && -x /etc/config-tools/config_switch ]]; then
-	touch "$FEATURE_DIR/switch-port-mapping"
-	touch "$FEATURE_DIR/switch-broadcast-protection-v2"
-	touch "$FEATURE_DIR/switch-multicast-protection"
-	touch "$FEATURE_DIR/switch-port-mirroring-v2"
-	touch "$FEATURE_DIR/switch-mac-learning"
-	touch "$FEATURE_DIR/switch-stp"
+if [[ "$SWITCH_TYPE" == "marvell" ]]; then
+    setup_marvell_switch_features
+elif [[ "$SWITCH_TYPE" == "micrel" ]]; then
+    setup_micrel_switch_features
+elif [[ "$SWITCH_TYPE" == "ti" ]]; then
+    setup_ti_switch_features
 fi

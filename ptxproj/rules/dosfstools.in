@@ -3,16 +3,8 @@ menuconfig DOSFSTOOLS
 	tristate
 	prompt "dosfstools                    "
 	select GCCLIBS_GCC_S
-	select UDEV			if DOSFSTOOLS_UDEV
-	select UDEV_LIBUDEV		if DOSFSTOOLS_UDEV
 
 if DOSFSTOOLS
-
-config DOSFSTOOLS_UDEV
-	bool
-	prompt "make use of udev"
-	help
-	  make use of udev
 
 config DOSFSTOOLS_MKFS_FAT
 	bool
@@ -67,6 +59,6 @@ config DOSFSTOOLS_FATLABEL
 	bool
 	prompt "fatlabel"
 	help
-	  set or get a MS-DOS filesystem label
+	  set or get an MS-DOS filesystem label
 
 endif

@@ -13,7 +13,6 @@
 __BEGIN_DECLS
 
 #define NETWORK_INTERFACES_XML  "/etc/specific/network-interfaces.xml"
-#define SWCONFIG_SWITCH_NAME "switch0"
 
 typedef struct libnetSession libnetSession_t;
 
@@ -168,33 +167,6 @@ int ct_libnet_get_dsa_state(char *value, size_t valueLen, libnetSession_t *sessi
 int ct_libnet_get_actual_dsa_state(char * const value, size_t const valueLen);
 
 const char * ct_libnet_get_last_error(void);
-
-#ifdef __ENABLE_SWCONFIG
-int ct_libnet_set_bcast_protect(const char *dev, const char *value);
-int ct_libnet_get_bcast_protect(const char *dev, char *value, size_t valueLen);
-void ct_libnet_print_bcast_protect_args(void);
-
-int ct_libnet_set_port_mirror(const char *dev, const char *value);
-int ct_libnet_get_port_mirror(const char *dev, char *value, size_t valueLen);
-void ct_libnet_print_port_mirror_args(void);
-
-int ct_libnet_set_rate_limit(const char *dev, const char *value);
-int ct_libnet_get_rate_limit(const char *dev, char *value, size_t valueLen);
-void ct_libnet_print_rate_limit_args(void);
-const char * ct_libnet_get_rate_limit_by_index (size_t value);
-
-int ct_libnet_set_fast_aging(const char *dev, const char *value);
-int ct_libnet_get_fast_aging(const char *dev, char *value, size_t valueLen);
-void ct_libnet_print_fast_aging_args(void);
-
-typedef struct {
-    const char *bcastProtect;
-    const char *rateLimit;
-    const char *portMirror;
-} ct_switch_settings_t;
-
-int ct_libnet_save_switch_settings_to_config(const char *configFile, ct_switch_settings_t *settings);
-#endif
 
 __END_DECLS
 

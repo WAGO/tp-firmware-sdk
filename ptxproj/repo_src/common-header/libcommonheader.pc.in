@@ -1,0 +1,11 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: libcommonheader
+Description: WAGO Common Header library
+Version: @PROJECT_VERSION@
+Requires: @pc_req_public@
+Requires.private: @pc_req_private@
+Cflags: -I"${includedir}"

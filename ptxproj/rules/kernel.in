@@ -31,7 +31,7 @@ config KERNEL_URL_TEMPLATE
 	string
 	depends on KERNEL
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/kernel-generic-prod/wago/linux/release/am3xxx_pfc_generic/am3xxx_pfc_generic-%KERNEL_VERSION_COMPL%/.build/deploy/linux-source.tgz"
+	default "%ARTIFACTORY_BASE_URL%/kernel-generic-prod/wago/linux-kernel/release/am3xxx_pfc_generic/am3xxx_pfc_generic-%KERNEL_VERSION_COMPL%/.build/deploy/linux-source.tgz"
 	help
 	  Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
 	  See Confluence for further details.

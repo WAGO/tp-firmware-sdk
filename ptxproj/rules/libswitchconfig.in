@@ -1,0 +1,12 @@
+## SECTION=wago_specific
+
+config LIBSWITCHCONFIG
+	bool
+	select HOST_CT_BUILD
+	select GOOGLETEST
+	select GLIB
+	select NLOHMANN_JSON
+	prompt "libswitchconfig"
+	help
+	  library to configure network switch properties like 
+	  broad- and multicast storm protection and port mirroring

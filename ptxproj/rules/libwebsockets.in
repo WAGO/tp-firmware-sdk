@@ -1,18 +1,56 @@
-## SECTION=system_libraries
+## SECTION=networking
 
 menuconfig LIBWEBSOCKETS
 	tristate
 	select HOST_CMAKE
 	select ZLIB
-	select OPENSSL
+	select LIBCAP
+	select OPENSSL		if LIBWEBSOCKETS_TLS
+	select LIBEV		if LIBWEBSOCKETS_LIBEV
+	select LIBUV		if LIBWEBSOCKETS_LIBUV
+	select LIBEVENT		if LIBWEBSOCKETS_LIBEVENT
+	select GLIB		if LIBWEBSOCKETS_GLIB
 	prompt "libwebsockets                 "
 	help
-	  Libwebsockets is a lightweight pure C library built to use minimal CPU and memory resources, and provide fast throughput in both directions as client or server.
+	  Libwebsockets is a lightweight pure C library for both
+	  websockets clients and servers built to use minimal CPU
+	  and memory resources and provide fast throughput in both
+	  directions.
 
 if LIBWEBSOCKETS
 
-config LIBWEBSOCKETS_TESTS
+config LIBWEBSOCKETS_TLS
 	bool
-	prompt "install test applications"
+	prompt "TLS (SSL) support"
+	help
+	  Turn on to include TLS (SSL) support.
+
+menuconfig LIBWEBSOCKETS_EVLIB
+	bool
+	prompt "Event library options          "
+	help
+	  Turn on to enable various event library plug-ins.
+
+if LIBWEBSOCKETS_EVLIB
+
+config LIBWEBSOCKETS_LIBEV
+	bool
+	prompt "compile with support for libev"
+
+config LIBWEBSOCKETS_LIBUV
+	bool
+	prompt "compile with support for libuv"
+
+config LIBWEBSOCKETS_LIBEVENT
+	bool
+	prompt "compile with support for libevent"
+
+config LIBWEBSOCKETS_GLIB
+	bool
+	prompt "compile with support for glib event loop"
 
 endif
+
+endif
+
+# vim: ft=kconfig noet tw=72

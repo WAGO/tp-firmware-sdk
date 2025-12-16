@@ -1,0 +1,8 @@
+## SECTION=hosttools_noprompt
+
+config HOST_XORG_SERVER
+	tristate
+	select HOST_XORG_UTIL_MACROS
+	select HOST_XORG_FONT_UTIL
+	select HOST_XORG_LIB_XTRANS
+	default y if ALLYES

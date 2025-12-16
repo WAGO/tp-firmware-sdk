@@ -292,7 +292,7 @@ function get_parent_device()
 
 function acquire_lock()
 {
-    local timeout=10 # seconds
+    local timeout=20 # seconds
     local acquired=0
 
     # Open lock file

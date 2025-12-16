@@ -7,11 +7,11 @@ config PP_BACNET
 	select GOOGLETEST
 	select GLIB
 	select LIBCOMMONHEADER
-	select WAGO_PARAMETER_SERVICE_CORE
-	select WAGO_PARAMETER_SERVICE_COM
-	select WAGO_LOGGING
-	select WAGO_PARAMETER_SERVICE_CLIENT_LIB
-	select WAGO_WDX_FILE
+	select WDX_CORE
+	select WDX_LINUX
+	select WDX_LINUX_CLIENT_LIB
+	select WAGO_DAEMON_UTILS
+	select WDX_FILE
 	select LIBBACNETCONFIG
 	select LIBBACNETSTACK
 	prompt "pp_bacnet"
@@ -75,7 +75,7 @@ config PP_BACNET_ARTIFACTORY_DEV_URL_TEMPLATE
 	string
 	depends on PP_BACNET
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FPP_BACnet%2Fmain&a=PP_BACnet-Source&repos=pl_controller-generic-dev-local&v=*"
+	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FPP_BACnet%2Fdev&a=PP_BACnet-Source&repos=pl_controller-generic-dev-local&v=*"
 	help
 	  Searches for the current dev artifact.
 

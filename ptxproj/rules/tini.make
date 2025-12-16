@@ -23,6 +23,7 @@ TINI_URL			:= https://github.com/krallin/tini/archive/refs/tags/v$(TINI_VERSION)
 TINI_SOURCE		:= $(SRCDIR)/$(TINI).$(TINI_SUFFIX)
 TINI_DIR			:= $(BUILDDIR)/$(TINI)
 TINI_LICENSE	:= MIT
+TINI_DEVPKG     := NO
 
 TINI_INSTALLDIR := $(TINI_PKGDIR)/bin/docker
 

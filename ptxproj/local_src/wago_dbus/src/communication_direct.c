@@ -300,7 +300,7 @@ DBusMessage * DIRECT_HandleContextMessage(com_tConnection * con, DBusMessage * m
   tDirectObject * dObj = NULL;
   com_tComMessage msg;
 
-  dbus_error_init(&con->error);
+  memset(&msg, 0, sizeof msg);
   msg.msg = message;
 
   dObj = g_hash_table_lookup(objectTable,dbus_message_get_path(message));
@@ -315,6 +315,7 @@ DBusMessage * DIRECT_HandleContextMessage(com_tConnection * con, DBusMessage * m
   }
   else
   {
+    dbus_error_free(&con->error);
     dObj->object->callback(con, &msg, dObj->object->user_data);
   }
   return con->directReply;

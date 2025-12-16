@@ -1,0 +1,3 @@
+# Config tools used by WBM plugIn to configure WAGO Parameter Service
+www ALL=NOPASSWD:   /etc/config-tools/get_wda \
+                  , /etc/config-tools/config_wda

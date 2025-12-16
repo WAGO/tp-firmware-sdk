@@ -23,15 +23,15 @@ DRM_BUILDCONFIG     := Release
 DRM_SRC_DIR         := $(PTXDIST_WORKSPACE)/wago_intern/$(DRM)
 DRM_BUILDROOT_DIR   := $(BUILDDIR)/$(DRM)
 DRM_DIR             := $(DRM_BUILDROOT_DIR)
-DRM_BUILD_DIR       := $(DRM_BUILDROOT_DIR)/bin/$(DRM_BUILDCONFIG)
+DRM_BIN_DIR         := $(DRM_BUILDROOT_DIR)/bin/$(DRM_BUILDCONFIG)
 DRM_LICENSE         := unknown
 DRM_BIN             := $(DRM)
 DRM_CONF_TOO        := NO
 DRM_MAKE_ENV        := $(CROSS_ENV) \
     BUILDCONFIG=$(DRM_BUILDCONFIG) \
-    BIN_DIR=$(DRM_BUILD_DIR) \
-    SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
-
+    BIN_DIR=$(DRM_BIN_DIR) \
+    SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
+DRM_DEVPKG          := NO
 
 DRM_PACKAGE_NAME                := $(DRM)_$(DRM_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)
 DRM_PLATFORMCONFIGPACKAGEDIR    := $(PTXDIST_PLATFORMCONFIGDIR)/packages
@@ -132,7 +132,7 @@ else
 # TODO: Add here all files that should be copied to the target
 # Note: Add everything before(!) call to macro install_finish
 #
-	@$(call install_copy, drm, 0, 0, 0755, $(DRM_BUILD_DIR)/drm.elf, /usr/bin/drm)
+	@$(call install_copy, drm, 0, 0, 0755, $(DRM_BIN_DIR)/drm.elf, /usr/bin/drm)
 
 	@$(call install_copy, drm, 0, 0, 0444, \
 		$(PTXDIST_WORKSPACE)/projectroot/usr/share/drm/drm.pub, \

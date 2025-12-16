@@ -64,6 +64,22 @@ EOF
 
 }
 
+function ReReadPartitions
+{
+    local deviceName=$1
+
+    # try to reread partitions 10 times
+    local attempts=10
+
+    while ! blockdev --rereadpt $deviceName > /dev/null 2> /dev/null; do
+        sleep 1
+        attempts=$((attempts - 1))
+        if [ $attempts -le 0 ]; then
+            break
+        fi
+    done
+}
+
 # show help-text if requested
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo
@@ -102,8 +118,14 @@ fi
 
 # check if filesystem type is valid
 case "$fsType" in
-  ext4) part_type="83" ;;
-  fat)  part_type="b"  ;;
+  ext4)
+    # select hex value "0x83" for "Linux" partition type to partiton the device with sfdisk
+    # hex values can be looked up at for example https://github.com/util-linux/util-linux/blob/stable/v2.40/include/pt-mbr-partnames.h
+    part_type="83" ;;
+  fat)
+    # select hex value "0x0b" for "W95 FAT32" partition type to partiton the device with sfdisk
+    # hex values can be looked up at for example https://github.com/util-linux/util-linux/blob/stable/v2.40/include/pt-mbr-partnames.h
+    part_type="b"  ;;
   *)
     status=$INVALID_PARAMETER
     SetLastError "Invalid value for filesystem type. Must be 'fat' or 'ext4'"
@@ -155,32 +177,45 @@ else
       SetLastError "Error while execution"
     fi
 
+    # try to reread partitions
+    ReReadPartitions $deviceName
+
     # format the device with new volume name
-    partitionName=$(DevToPart ${deviceName} 1)
+    partitionName=${deviceName}p1
 
     # check if the kernel has already created the new partition device
     # before creating the filesystem
     status=$EXECUTABLE_ERROR
     for i in $(seq 1 5); do
         if [[ -e "${partitionName}" ]]; then
-            if [ "$fsType" = "fat" ];then
-              mkfs.msdos -F 32 -n ${volumeName} ${partitionName} > /dev/null 2> /dev/null
-              status=$?
-            elif [ "$fsType" = "ext4" ]; then
-              mkfs.ext4 -E "root_owner=0:114" -L ${volumeName} ${partitionName} > /dev/null 2> /dev/null
-              status=$?
-
-              # postprocess: adjust access rights of root directory (see WAT-30114)
-              dir=$(mktemp -d /var/tmp/format-medium-XXXXXX)
-              mount -t ext4 ${partitionName} ${dir} 2>&1 > /dev/null
-              chmod 0775 ${dir}
-              umount ${dir} 2>&1 > /dev/null
-              rm -r ${dir}
-            fi
+            status=$SUCCESS
             break
         fi
         sleep 1
     done
+
+    if [ "$status" != "$SUCCESS" ]; then
+        status=$EXECUTABLE_ERROR
+        ReportError $status "(test -e ${partitionName})"
+        SetLastError "Error while execution"
+        exit $status    
+    fi
+    
+    status=$EXECUTABLE_ERROR
+    if [ "$fsType" = "fat" ];then
+        mkfs.msdos -F 32 -n ${volumeName} ${partitionName} > /dev/null 2> /dev/null
+        status=$?
+    elif [ "$fsType" = "ext4" ]; then
+        mkfs.ext4 -E "root_owner=0:114" -L ${volumeName} ${partitionName} > /dev/null 2> /dev/null
+        status=$?
+
+        # postprocess: adjust access rights of root directory (see WAT-30114)
+        dir=$(mktemp -d /var/tmp/format-medium-XXXXXX)
+        mount -t ext4 ${partitionName} ${dir} 2>&1 > /dev/null
+        chmod 0775 ${dir}
+        umount ${dir} 2>&1 > /dev/null
+        rm -r ${dir}
+    fi
 
     if [ "$status" != "$SUCCESS" ]; then
       status=$EXECUTABLE_ERROR
@@ -195,16 +230,8 @@ else
     # even though the udev daemon receives the kernel udev events
     echo add > /sys/$(udevadm info --query=path --name=${partitionName})/uevent
 
-    # try to remount 10 times
-    attempts=10
-
-    while ! blockdev --rereadpt $deviceName > /dev/null 2> /dev/null; do
-      sleep 1
-      attempts=$((attempts - 1))
-      if [ $attempts -le 0 ]; then
-        break
-      fi
-    done
+    # try to remount
+    ReReadPartitions $deviceName
 
     # write buffered filesystem-blocks to disk
     # FIXME (AGa): needed?

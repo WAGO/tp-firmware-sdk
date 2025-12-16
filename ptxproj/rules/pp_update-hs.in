@@ -3,7 +3,9 @@
 config PP_UPDATE_HS
 	bool
 	select HOST_CT_BUILD
-	select WAGO_PARAMETER_SERVICE_CORE
+	select WDX_CORE
+	select WDX_WDM
+	select WDX_WDM_CPP_HEADERS
 	select GOOGLETEST
 	select JANSSON
 	select GLIB

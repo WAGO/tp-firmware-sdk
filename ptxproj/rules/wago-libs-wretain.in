@@ -30,11 +30,11 @@ choice
 	help
 	  Direct variant should be selected for platforms with direct, GPMC-NVRAM hardware connection.
 
-	config WRETAIN_LINK_TYPE_SERIAL
+	config WRETAIN_LINK_TYPE_BUFFERED
 	bool
-	prompt "serial"
+	prompt "buffered"
 	help
-	  Serial variant should be selected for platforms with serial, SPI-NVRAM hardware connection.
+	  Buffered variant should be selected for platforms where direct access is problematic (e.g. PFC300)
 endchoice
 
 config WRETAIN_BUILD_TESTING

@@ -67,9 +67,9 @@ IsMinTargetVersion()
   local MIN_MINOR=$2
   local MIN_BUGFIX=$3
   local RESULT=1
-  
+
   if [[ -n "${WAGO_BACKUP_TARGET_VERSION:-}" ]] ; then
-  
+
     local MAJOR
     MAJOR=$(echo -n $WAGO_BACKUP_TARGET_VERSION | cut -d'.' -f1)
     local MINOR
@@ -83,7 +83,7 @@ IsMinTargetVersion()
   else
     RESULT=0
   fi
-  
+
   return $RESULT
 }
 
@@ -124,10 +124,6 @@ configParam+=(
   "codesys-version;           /etc/config-tools/get_runtime_config running-version;             /etc/config-tools/config_runtime --wait force-new-version=yes runtime-version="
   "codesys-homedir-sdcard;    /etc/config-tools/get_runtime_config homedir-on-sdcard;           /etc/config-tools/config_runtime homedir-on-sdcard="
 
-  "switch-port-mirror;        /etc/config-tools/get_switch_settings port-mirror;                /etc/config-tools/config_switch --port-mirror="
-  "switch-bcast-protect;      /etc/config-tools/get_switch_settings bcast-protect;              /etc/config-tools/config_switch --bcast-protect="
-  "switch-rate-limit;         /etc/config-tools/get_switch_settings rate-limit;                 /etc/config-tools/config_switch --rate-limit="
-
   "ntp-port;                  /etc/config-tools/get_ntp_config port;                            /etc/config-tools/config_sntp port="
   "ntp-timeserver;            /etc/config-tools/get_ntp_config time-server-1;                   /etc/config-tools/config_sntp time-server-1="
   "ntp-timeserver-2;          /etc/config-tools/get_ntp_config time-server-2;                   /etc/config-tools/config_sntp time-server-2="
@@ -160,6 +156,7 @@ configParam+=(
 
   "opcua-state;               /etc/config-tools/config_opcua state;                             /etc/config-tools/config_opcua state="
 
+  "webserver-certificate;     /etc/config-tools/get_webserver_config certificate;               /etc/config-tools/config_webserver certificate "
   "default-webserver;         /etc/config-tools/get_coupler_details default-webserver;          /etc/config-tools/config_runtime default-webpage="
   "snmp-general-state;        /etc/config-tools/get_port_state snmp;                            /etc/config-tools/config_snmp set-snmp="
   "snmp-device-name;          /etc/config-tools/get_snmp_data device-name;                      /etc/config-tools/config_snmp device-name="
@@ -181,9 +178,9 @@ configParam+=(
   "modbus-alt-watchdog-options; /etc/config-tools/modbus_config get alternative-watchdog options; /etc/config-tools/modbus_config set alternative-watchdog options "
 
   "profibus-dp-ssa-user;      /etc/config-tools/pbdp_config get ssa.user ssa_released;          /etc/config-tools/pbdp_config set ssa.user ssa_released "
-  
+
   "iocheck-port;              /etc/config-tools/get_iocheckport_config state;                   /etc/config-tools/config_iocheckport state="
-  
+
   "inotify-max-queued-events; /etc/config-tools/config_inotify backup max_queued_events;        /etc/config-tools/config_inotify restore max_queued_events "
   "inotify-max-user-instances;/etc/config-tools/config_inotify backup max_user_instances;       /etc/config-tools/config_inotify restore max_user_instances "
   "inotify-max-user-watches;  /etc/config-tools/config_inotify backup max_user_watches;         /etc/config-tools/config_inotify restore max_user_watches "
@@ -193,6 +190,7 @@ configParam+=(
   "backlight-backlightoff;      /etc/config-tools/get_backlight backlightoff;                   /etc/config-tools/config_backlight backlightoff="
   "backlight-backlightonnight;  /etc/config-tools/get_backlight backlightonnight;               /etc/config-tools/config_backlight backlightonnight="
   "backlight-backlightoffnight; /etc/config-tools/get_backlight backlightoffnight;              /etc/config-tools/config_backlight backlightoffnight="
+  "backlight-backlightminvalue; /etc/config-tools/get_backlight backlightminvalue;              /etc/config-tools/config_backlight backlightminvalue="
   "backlight-daynightswitch;    /etc/config-tools/get_backlight daynightswitch;                 /etc/config-tools/config_backlight daynightswitch="
   "backlight-nighttime;         /etc/config-tools/get_backlight nighttime;                      /etc/config-tools/config_backlight nighttime="
   "backlight-daytime;           /etc/config-tools/get_backlight daytime;                        /etc/config-tools/config_backlight daytime="
@@ -327,13 +325,13 @@ GetPortsList ()
 
 # Function to process of an error after restory operation.
 #
-# If returned value of the last restore operation is not SUCCESS, then error text, 
-# name of erroneous parameter and last error text (if it is found) will be logged 
-# and global error counter will be incremented. 
+# If returned value of the last restore operation is not SUCCESS, then error text,
+# name of erroneous parameter and last error text (if it is found) will be logged
+# and global error counter will be incremented.
 #
-# Param 1: returned value of last restore operation 
+# Param 1: returned value of last restore operation
 # Param 2: error text
-# Param 3: name of erroneous parameter 
+# Param 3: name of erroneous parameter
 #
 # Return: 0 (success)
 #-----------------------------------------------------------------------------#
@@ -351,7 +349,7 @@ ProcessErrRestoreOperation ()
         ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
      else
         ReportError $errorCode "$errorText  \"$errorParam\""
-     fi   
+     fi
      restore_error_count=$((restore_error_count+1))
   fi
   return 0
@@ -359,13 +357,13 @@ ProcessErrRestoreOperation ()
 
 # Function to process of an error after backup operation.
 #
-# If returned value of the last backup operation is not SUCCESS, then error text, 
-# name of erroneous parameter and last error text (if it is found) will be logged 
-# and global error counter will be incremented. 
+# If returned value of the last backup operation is not SUCCESS, then error text,
+# name of erroneous parameter and last error text (if it is found) will be logged
+# and global error counter will be incremented.
 #
-# Param 1: returned value of last restore operation 
+# Param 1: returned value of last restore operation
 # Param 2: error text
-# Param 3: name of erroneous parameter 
+# Param 3: name of erroneous parameter
 #
 # Return: 0 (succsess)
 #-----------------------------------------------------------------------------#
@@ -375,8 +373,8 @@ ProcessErrBackupOperation ()
   local errorText="$2"
   local errorParam="$3"
   local lastError=""
-  
-  if [[ "$errorCode" != "$SUCCESS" ]]; then 
+
+  if [[ "$errorCode" != "$SUCCESS" ]]; then
      if [[ -f "$LAST_ERROR_FILENAME" ]]; then
         read lastError < "$LAST_ERROR_FILENAME"
      fi
@@ -384,7 +382,7 @@ ProcessErrBackupOperation ()
         ReportError $errorCode "$errorText  \"$errorParam\" \"$lastError\""
      else
         ReportError $errorCode "$errorText  \"$errorParam\""
-     fi  
+     fi
      backup_error_count=$((backup_error_count+1))
   fi
   return 0
@@ -405,7 +403,7 @@ BackupKnownFile()
   local RESULT=0
   local KEY=$1
   local FILE="$2"
-  
+
   if [[ -f "$FILE" ]]; then
       base64 "$FILE" | awk "\$0=\"$KEY=\"\$0"
   else

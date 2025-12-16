@@ -14,7 +14,7 @@
 PACKAGES-$(PTXCONF_ELREST_CUSTOM_INSTALL) += elrest-custom-install
  
 # dummy to make ipkg happy
-ELREST_CUSTOM_INSTALL_VERSION	:= 1.0.4
+ELREST_CUSTOM_INSTALL_VERSION	:= 1.0.5
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -73,111 +73,47 @@ endif
 
 ifdef PTXCONF_ELREST_CUSTOM_CC100_UDEV_RULES_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/63-gpio-keys.rules)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /lib/udev/rules.d/50-wago-cc100-uio-shm.rules)
+endif
+
+ifdef PTXCONF_CC100_M4_FIRMWARE_LOAD
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/init.d/load_m4_firmware)
+	@$(call install_link, elrest-custom-install, ../init.d/load_m4_firmware, /etc/rc.d/S10_load_m4_firmware)
+	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /lib/firmware)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_XORG_CONFIG_INSTALL
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /etc/X11/emptyCursor.xbm)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_480_272_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_640_480.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_640_480_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_640_480_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_640_480_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_800_480.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_800_480_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_800_480_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_800_480_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1280_800_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_1920_1080_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_800_480_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1280_800_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_cap_1920_1080_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1600_1024.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1600_1024_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1600_1024_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1600_1024_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1280_1024.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1280_1024_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1280_1024_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1280_1024_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1024_768.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1024_768_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1024_768_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1024_768_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_800_480.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_800_480_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_800_480_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_800_480_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1920_1080.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1920_1080_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1920_1080_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1920_1080_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1600_1024.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1600_1024_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1600_1024_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1600_1024_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1280_1024.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1280_1024_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1280_1024_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1280_1024_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1024_768.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1024_768_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1024_768_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1024_768_UD.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_800_480.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_800_480_CW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_800_480_CCW.conf)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_800_480_UD.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1920_1080.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1600_1024.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1280_1024.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_1024_768.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_800_480.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1920_1080.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1600_1024.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1280_1024.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_1024_768.conf)
+	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /etc/X11/xorg_hdmi_cap_800_480.conf)
 	@$(call install_link, elrest-custom-install, /etc/X11/xorg_800_480.conf, /etc/X11/xorg.conf)
 	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /usr/bin/startx)
-endif
-
-ifdef PTXCONF_ELREST_CUSTOM_PEKWM_CONFIG_INSTALL
-	@$(call install_copy, elrest-custom-install, ${PTXCONF_ROOTFS_PASSWD_USER_UID}, ${PTXCONF_ROOTFS_PASSWD_USER_GID}, 0755, /home/user)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/autoproperties)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/config)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/desktop)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/history)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/keys)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/menu)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/mouse)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /home/.pekwm/start)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0644, /home/.pekwm/vars)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /home/.xinitrc)
-	@$(call install_copy, elrest-custom-install, 0, 0, 0700, /root)
-	@$(call install_link, elrest-custom-install, /home/.xinitrc, /root/.xinitrc)
-	rm -Rf $(BUILDDIR)/../root-debug/etc/pekwm && rm -Rf $(BUILDDIR)/../root-debug/.pekwm && rm -Rf $(BUILDDIR)/../root-debug/root/.pekwm && \
-	rm -Rf $(ROOTDIR)/etc/pekwm && rm -Rf $(ROOTDIR)/.pekwm && rm -Rf $(ROOTDIR)/root/.pekwm
-	@$(call install_link, elrest-custom-install, /home/.pekwm, /.pekwm)
-	@$(call install_link, elrest-custom-install, /home/.pekwm, /etc/pekwm)
-	@$(call install_link, elrest-custom-install, /home/.pekwm, /root/.pekwm) 
-endif
-
-ifdef PTXCONF_ELREST_CUSTOM_FLUXBOX_CONFIG_INSTALL
-	@$(call install_copy, elrest-custom-install, 0, 0, 0700, /root)
-	@$(call install_alternative, elrest-custom-install, 0, 0, 0755, /root/.xinitrc)
-	@$(call install_alternative_tree, elrest-custom-install, 0, 0,  /root/.fluxbox)
 endif
 
 ifdef PTXCONF_ELREST_CUSTOM_ICEWM_CONFIG_INSTALL

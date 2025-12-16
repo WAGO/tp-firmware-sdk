@@ -4,20 +4,28 @@ menuconfig MESALIB
 	tristate
 	prompt "mesa                          "
 	select HOST_MESALIB
+	select HOST_MESALIB_INTEL_CLC	if MESALIB_INTEL_CLC
 	select HOST_MESON
 	select HOST_MAKEDEPEND
 	select HOST_SYSTEM_PYTHON3
 	select HOST_SYSTEM_PYTHON3_MAKO
+	select HOST_SYSTEM_PYTHON3_PYCPARSER	if MESALIB_DRI_ETNAVIV
 	select HOST_GLSLANG		if MESALIB_VULKAN_AMD
 	select HOST_GLSLANG		if MESALIB_VULKAN_INTEL
 	select HOST_GLSLANG		if MESALIB_VULKAN_OVERLAY
 	select GCCLIBS
 	select GCCLIBS_CXX
 	select LIBDRM
+	select LIBVA			if MESALIB_VA
+	select LIBDRM_AMDGPU		if MESALIB_DRI_RADEONSI
 	select LIBDRM_RADEON		if MESALIB_DRI_R300
 	select LIBDRM_RADEON		if MESALIB_DRI_R600
 	select LIBDRM_RADEON		if MESALIB_DRI_RADEONSI
 	select LIBDRM_NOUVEAU		if MESALIB_DRI_NOUVEAU
+	select LIBELF			if MESALIB_DRI_RADEONSI
+	select LLVM			if MESALIB_LLVM
+	select LLVM_TARGET_TARGET	if MESALIB_DRI_LLVMPIPE
+	select LLVM_TARGET_AMDGPU	if MESALIB_DRI_RADEONSI
 	select VULKAN_LOADER		if MESALIB_DRI_ZINK
 	select LM_SENSORS		if MESALIB_LMSENSORS
 	select XORGPROTO		if MESALIB_GLX
@@ -43,11 +51,22 @@ if MESALIB
 config MESALIB_DRI3
 	bool
 
+config MESALIB_INTEL_CLC
+	bool
+
+config MESALIB_LLVM
+	bool
+
 comment "Drivers"
 
-config MESALIB_DRI_SWRAST
+config MESALIB_DRI_SOFTPIPE
 	bool
-	prompt "Software Rasterizer"
+	prompt "Software Rasterizer (softpipe)"
+
+config MESALIB_DRI_LLVMPIPE
+	bool
+	select MESALIB_LLVM
+	prompt "Software Rasterizer (llvmpipe)"
 
 config MESALIB_DRI_R300
 	bool
@@ -59,8 +78,7 @@ config MESALIB_DRI_R600
 
 config MESALIB_DRI_RADEONSI
 	bool
-	# needs LLVM
-	depends on BROKEN
+	select MESALIB_LLVM
 	prompt "AMD RadeonSI"
 
 config MESALIB_DRI_NOUVEAU
@@ -103,6 +121,7 @@ config MESALIB_DRI_PANFROST
 
 config MESALIB_DRI_IRIS
 	bool
+	select MESALIB_INTEL_CLC
 	select MESALIB_XMLCONFIG
 	prompt "iris"
 
@@ -116,10 +135,13 @@ config MESALIB_DRI_ZINK
 
 config MESALIB_DRI_ASAHI
 	bool
+	# needs libclc
+	depends on BROKEN
 	prompt "asahi"
 
 config MESALIB_DRI_CROCUS
 	bool
+	select MESALIB_INTEL_CLC
 	select MESALIB_XMLCONFIG
 	prompt "crocus"
 
@@ -183,6 +205,18 @@ config MESALIB_VIDEO_H265ENC
 	bool
 	prompt "H.265 encoding"
 
+config MESALIB_VIDEO_AV1DEC
+	bool
+	prompt "AV1 decoding"
+
+config MESALIB_VIDEO_AV1ENC
+	bool
+	prompt "AV1 encoding"
+
+config MESALIB_VIDEO_VP9DEC
+	bool
+	prompt "VP9 decoding"
+
 endmenu
 
 endif
@@ -220,8 +254,6 @@ comment "Vulkan drivers"
 
 config MESALIB_VULKAN_AMD
 	bool
-	# needs LLVM
-	depends on BROKEN
 	prompt "AMD (Radv)"
 
 config MESALIB_VULKAN_BROADCOM
@@ -231,11 +263,13 @@ config MESALIB_VULKAN_BROADCOM
 
 config MESALIB_VULKAN_INTEL
 	bool
+	select MESALIB_INTEL_CLC
 	select MESALIB_XMLCONFIG
 	prompt "Intel (Anvil)"
 
 config MESALIB_VULKAN_INTEL_HASVK
 	bool
+	select MESALIB_INTEL_CLC
 	select MESALIB_XMLCONFIG
 	prompt "Intel (hasvk)"
 
@@ -249,10 +283,13 @@ config MESALIB_VULKAN_PANFROST
 
 config MESALIB_VULKAN_SWRAST
 	bool
-	# needs LLVM
-	depends on BROKEN
-	select MESALIB_DRI_SWRAST
+	select MESALIB_DRI_LLVMPIPE
 	prompt "Software Rasterizer"
+
+config MESALIB_VULKAN_VIRTIO
+	bool
+	select MESALIB_XMLCONFIG
+	prompt "Virtio-GPU Venus"
 
 comment "Vulkan layers"
 
@@ -271,6 +308,10 @@ config MESALIB_VULKAN_OVERLAY
 config MESALIB_SHADER_CACHE
 	bool
 	prompt "enable shader cache"
+
+config MESALIB_TEFLON
+	bool
+	prompt "enable TensorFlow Lite delegate"
 
 config MESALIB_XMLCONFIG
 	bool

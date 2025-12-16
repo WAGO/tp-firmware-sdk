@@ -1,0 +1,111 @@
+//------------------------------------------------------------------------------
+// Copyright (c) 2022-2025 WAGO GmbH & Co. KG
+//
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+///  \file
+///
+///  \brief    Mock of file_provider_extended_i
+///
+///  \author   Röh : WAGO GmbH & Co. KG
+//------------------------------------------------------------------------------
+#ifndef TEST_SRC_LIBWDXLINUXOSFILE_MOCK_FILE_PROVIDER_EXTENDED_HPP_
+#define TEST_SRC_LIBWDXLINUXOSFILE_MOCK_FILE_PROVIDER_EXTENDED_HPP_
+
+//------------------------------------------------------------------------------
+// include files
+//------------------------------------------------------------------------------
+#include "wago/wdx/linuxos/file/file_provider_extended_i.hpp"
+
+#include <wc/compiler.h>
+#include <wc/structuring.h>
+
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+//------------------------------------------------------------------------------
+// defines; structure, enumeration and type definitions
+//------------------------------------------------------------------------------
+
+namespace wago {
+namespace wdx {
+namespace linuxos {
+namespace file {
+
+GNUC_DIAGNOSTIC_PUSH
+GNUC_DIAGNOSTIC_IGNORE("-Wsuggest-override")
+
+class mock_file_provider_extended : public file_provider_extended_i
+{
+public:
+    ~mock_file_provider_extended() override = default;
+
+    MOCK_CONST_METHOD0(is_complete, future<bool>());
+    MOCK_CONST_METHOD1(validate, future<void>(file_validator validator));
+    MOCK_METHOD0(finish, future<void>());
+
+    /// Mock implementation of wago::wdx::file_provider_i::read
+    /// \copydoc wago::wdx::file_provider_i::read
+    MOCK_METHOD2(read, future<wdx::file_read_response>(uint64_t offset, size_t length));
+
+    /// Mock implementation of wago::wdx::file_provider_i::write
+    /// \copydoc wago::wdx::file_provider_i::write
+    MOCK_METHOD2(write, future<wdx::response>(uint64_t offset, std::vector<uint8_t> data));
+
+    /// Mock implementation of wago::wdx::file_provider_i::get_file_info
+    /// \copydoc wago::wdx::file_provider_i::get_file_info
+    MOCK_METHOD0(get_file_info, future<wdx::file_info_response>());
+
+    /// Mock implementation of wago::wdx::file_provider_i::create
+    /// \copydoc wago::wdx::file_provider_i::create
+    MOCK_METHOD1(create, future<wdx::response>(uint64_t capacity));
+
+    /// Expect mocked methods not to be called.
+    void set_default_expectations()
+    {
+        EXPECT_CALL(*this, is_complete())
+            .Times(0);
+        EXPECT_CALL(*this, validate(testing::_))
+            .Times(0);
+        EXPECT_CALL(*this, finish())
+            .Times(0);
+        EXPECT_CALL(*this, read(testing::_, testing::_))
+            .Times(0);
+        EXPECT_CALL(*this, write(testing::_, testing::_))
+            .Times(0);
+        EXPECT_CALL(*this, get_file_info())
+            .Times(0);
+        EXPECT_CALL(*this, create(testing::_))
+            .Times(0);
+    }
+};
+GNUC_DIAGNOSTIC_POP
+
+} // Namespace file
+} // Namespace linuxos
+} // Namespace wdx
+} // Namespace wago
+
+#endif // TEST_SRC_LIBWDXLINUXOSFILE_MOCK_FILE_PROVIDER_EXTENDED_HPP_
+//---- End of source file ------------------------------------------------------
+

@@ -20,6 +20,7 @@ class IDeviceTypeLabel {
   IDeviceTypeLabel& operator=(IDeviceTypeLabel&&) = delete;
 
   virtual ::std::string GetOrderNumber() const = 0;
+  virtual ::std::string GetDHCPVendorClassID() const = 0;
   virtual MacAddress GetMac() const = 0;
   virtual uint32_t GetMacCount() const = 0;
 

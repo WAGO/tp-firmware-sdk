@@ -274,10 +274,10 @@ start)
 	fi
 
 	# The /run is used by udev and must be mounted at this early stage
-  if ! mountpoint -q /run; then
-    echo "mounting tmpfs at /run"
-    mount -n -t tmpfs tmpfs /run -o mode=755
-  fi
+	if ! mountpoint -q /run; then
+		echo "mounting tmpfs at /run"
+		mount -n -t tmpfs tmpfs /run -o mode=755
+	fi
 
 	# udev handles uevents itself, so we don't need to have
 	# the kernel call out to any binary in response to them
@@ -297,8 +297,8 @@ start)
 	show_bootscreen
 	echo 255 > /sys/class/backlight/backlight/brightness 
 
-    # Load module LEDs
-    load_pca955x
+	# Load module LEDs
+	load_pca955x
 
 	# Start the udev daemon to continually
 	# watch for, and act on, uevents

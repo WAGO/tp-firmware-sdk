@@ -4,14 +4,20 @@ menuconfig LIBARCHIVE
 	tristate
 	select GCCLIBS_GCC_S
 	select ZLIB
+	select OPENSSL		if LIBARCHIVE_OPENSSL
 	select BZIP2		if LIBARCHIVE_BZIP2
 	select BZIP2_LIBBZ2	if LIBARCHIVE_BZIP2
 	select XZ		if LIBARCHIVE_LZMA
+	select ZSTD		if LIBARCHIVE_ZSTD
 	prompt "libarchive                    "
 	help
 	  Multi-format archive and compression library.
 
 if LIBARCHIVE
+
+config LIBARCHIVE_OPENSSL
+	bool
+	prompt "openssl support"
 
 config LIBARCHIVE_BZIP2
 	bool
@@ -20,6 +26,10 @@ config LIBARCHIVE_BZIP2
 config LIBARCHIVE_LZMA
 	bool
 	prompt "xz support"
+
+config LIBARCHIVE_ZSTD
+	bool
+	prompt "zstd support"
 
 config LIBARCHIVE_BSDTAR
 	bool
@@ -32,5 +42,9 @@ config LIBARCHIVE_BSDCAT
 config LIBARCHIVE_BSDCPIO
 	bool
 	prompt "install bsdcpio"
+
+config LIBARCHIVE_BSDUNZIP
+	bool
+	prompt "install bsdunzip"
 
 endif

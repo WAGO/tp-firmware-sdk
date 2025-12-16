@@ -1,0 +1,189 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of PTXdist package wdx-linux.
+#
+# Copyright (c) 2021-2025 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   /etc/init.d/apitest
+#
+# Brief:    System V init script for WDx (WAGO Parameter Service) API-Test client.
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+
+# General definitions
+readonly FAILEXIT=1
+readonly SELF=apitest_client
+readonly WAGO_SYSTEM_MODULE="WAGO Parameter Service API-Test client"
+readonly SERVICE_BIN="/usr/sbin/apitest"
+readonly PARAMUSER_NAME="apitest"
+readonly PARAMUSER_GROUP="apitest"
+
+# Function to print usage to stdout.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+usage()
+{
+    echo "$SELF usage: $0 <start|stop|restart|status> [log-level for apitest [support error parameter]]"
+}
+
+# Function to start service functionality.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+pp_client_start()
+{
+    local result=0
+    local log_option=""
+    local err_param_option=""
+
+    if [[ "$LOG_LEVEL" != "" ]]; then
+        log_option="--log-level $LOG_LEVEL"
+    fi
+
+    if [[ "$ERR_PARAM" != "" ]]; then
+        err_param_option="--error-parameter $ERR_PARAM"
+    fi
+
+    # Start daemon process
+    if ! /sbin/start-stop-daemon --start --background --quiet --oknodo --exec "$SERVICE_BIN" -- --user "$PARAMUSER_NAME" --group "$PARAMUSER_GROUP" ${log_option} ${err_param_option}; then
+        result=$FAILEXIT
+    # Check status of daemon: --background causes the start-stop-deamon not beeing able to detect any errors
+    elif ! pp_client_status_check; then
+        result=$FAILEXIT
+    fi
+
+    return $result
+}
+
+# Function to stop service functionality.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+pp_client_stop()
+{
+    local result=0
+
+    # Stop daemon process
+    if ! /sbin/start-stop-daemon --stop --quiet --oknodo --exec "$SERVICE_BIN"; then
+        result=$FAILEXIT
+    elif ! pp_client_status_check "stopped"; then
+        result=$FAILEXIT
+    fi
+
+    return $result
+}
+
+# Function to check status of service functionality.
+#
+# Param 1: Optional parameter to check "started" or "stopped", default is check for "started"
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+pp_client_status()
+{
+    local result=1
+    local check="${1:-started}"
+    local own_pid="$BASHPID"
+    local pids
+    pids="$(pidof "$(/usr/bin/basename "$SERVICE_BIN")")"
+    for pid in $pids; do
+        if [[ "$pid" != "$own_pid" ]]; then
+            result=0
+        fi
+    done
+
+    if [[ "$check" != "started" && $result -eq 0 ]]; then
+        return 1
+    elif [[ "$check" != "started" && $result -ne 0 ]]; then
+        return 0
+    fi
+
+    return $result
+}
+
+# Function to check repeatedly status of service functionality.
+#
+# Param 1: Optional parameter to check "started" or "stopped", default is check for "started"
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+pp_client_status_check()
+{
+    local result=0
+    local check="${1:-started}"
+    local check_count=5
+    while ! pp_client_status "$check"
+    do
+        if [[ $check_count -gt 0 ]]; then
+            /usr/bin/sleep 1
+        else
+            result=$FAILEXIT
+            break
+        fi
+        check_count=$((check_count-1))
+    done
+
+    return $result
+}
+
+# Main switch
+#-----------------------------------------------------------------------------#
+LOG_LEVEL="${2:-}"
+ERR_PARAM="${3:-}"
+case $1 in
+        start)
+            echo "Starting ${WAGO_SYSTEM_MODULE}..."
+            if ! pp_client_start; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                echo "done"
+            fi
+            ;;
+
+        stop)
+            echo "Stopping ${WAGO_SYSTEM_MODULE}..."
+            if ! pp_client_stop; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                echo "done"
+            fi
+            ;;
+
+        restart)
+            echo "Restarting ${WAGO_SYSTEM_MODULE}..."
+            if ! pp_client_stop; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                if ! pp_client_start; then
+                    echo "failed"
+                    exit $FAILEXIT
+                else
+                    echo "done"
+                fi
+            fi
+            ;;
+
+        status)
+            echo "Check status for ${WAGO_SYSTEM_MODULE}..."
+            if ! pp_client_status; then
+                echo "stopped"
+            else
+                echo "running"
+            fi
+            ;;
+
+        *)
+            usage
+            exit $FAILEXIT
+            ;;
+esac

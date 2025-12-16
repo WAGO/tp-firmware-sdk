@@ -5,6 +5,8 @@
 #include <boost/format.hpp>
 
 #include "DeviceType.hpp"
+#include "EventManager.hpp"
+#include "IEventManager.hpp"
 #include "IInterfaceInformation.hpp"
 #include "Logger.hpp"
 #include "LinkModeConversion.hpp"
@@ -22,11 +24,11 @@ using ::std::transform;
 
 InterfaceConfigManager::InterfaceConfigManager(INetDevManager &netdev_manager,
                                                IPersistence<InterfaceConfigs> &persistence_provider,
-                                               IEthernetInterfaceFactory &eth_factory)
-    : netdev_manager_ { netdev_manager },
-      persistence_provider_ { persistence_provider },
-      ethernet_interface_factory_ { eth_factory } {
-
+                                               IEthernetInterfaceFactory &eth_factory, IEventManager &event_manager)
+    : netdev_manager_{netdev_manager},
+      persistence_provider_{persistence_provider},
+      ethernet_interface_factory_{eth_factory},
+      event_manager_(event_manager) {
   InterfaceConfigs peristet_configs;
   auto read_persistence_data_status = persistence_provider.Read(peristet_configs);
   if (read_persistence_data_status.IsNotOk()) {
@@ -67,6 +69,7 @@ Status InterfaceConfigManager::Configure(const InterfaceConfigs &port_configs) {
     InterfaceConfigs old_port_configs;
     ApplyPortConfigs(old_port_configs);
   } else {
+    event_manager_.NotifyNetworkChanges(EventLayer::EVENT_FOLDER);
     persistence_provider_.Write(current_config_);
   }
 

@@ -15,14 +15,13 @@ PACKAGES-$(PTXCONF_LIBGPG_ERROR) += libgpg-error
 #
 # Paths and names
 #
-LIBGPG_ERROR_VERSION	:= 1.36
-LIBGPG_ERROR_MD5	:= eff437f397e858a9127b76c0d87fa5ed
+LIBGPG_ERROR_VERSION	:= 1.50
+LIBGPG_ERROR_MD5	:= 80e905ce798553c766e3384467dc55ea
 LIBGPG_ERROR		:= libgpg-error-$(LIBGPG_ERROR_VERSION)
 LIBGPG_ERROR_SUFFIX	:= tar.bz2
 LIBGPG_ERROR_URL	:= \
 	http://artfiles.org/gnupg.org/libgpg-error/$(LIBGPG_ERROR).$(LIBGPG_ERROR_SUFFIX) \
-	https://www.gnupg.org/ftp/gcrypt/libgpg-error/$(LIBGPG_ERROR).$(LIBGPG_ERROR_SUFFIX) \
-	ftp://ftp.gnupg.org/gcrypt/libgpg-error/$(LIBGPG_ERROR).$(LIBGPG_ERROR_SUFFIX)
+	https://www.gnupg.org/ftp/gcrypt/libgpg-error/$(LIBGPG_ERROR).$(LIBGPG_ERROR_SUFFIX)
 LIBGPG_ERROR_SOURCE	:= $(SRCDIR)/$(LIBGPG_ERROR).$(LIBGPG_ERROR_SUFFIX)
 LIBGPG_ERROR_DIR	:= $(BUILDDIR)/$(LIBGPG_ERROR)
 LIBGPG_ERROR_LICENSE	:= GPL-2.0-only AND LGPL-2.0-only

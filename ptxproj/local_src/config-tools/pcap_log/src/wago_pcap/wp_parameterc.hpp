@@ -44,6 +44,8 @@ namespace wp {
   #define STORAGE_MEMORY_CARD "Memory Card"
   #define STORAGE_INTERNAL_FLASH "RAM Disk"
 
+  #define DEVICE_ANY "any"
+
   #define KB_TO_BYTE(value) ((value) * (1024u))
   #define BYTE_TO_KB(value) ((value) / (1024u))
 

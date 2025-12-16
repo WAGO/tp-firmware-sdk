@@ -7,6 +7,7 @@ menuconfig STRONGSWAN
 	select LIBCURL if STRONGSWAN_LIBCURL
 	select OPENSSL if STRONGSWAN_OPENSSL
 	select SYSTEMD if STRONGSWAN_SYSTEMD_UNIT
+	select HOST_SYSTEM_PYTHON
 	help
 	  strongSwan is a complete IPsec implementation.
 	  Please keep in mind to configure the kernel accordingly to fulfill
@@ -26,7 +27,6 @@ config STRONGSWAN_LIBCURL
 
 config STRONGSWAN_OPENSSL
 	bool
-	default n
 	prompt "OpenSSL crypto library for IKE"
 	help
 	  This will add Elliptic Curve support in IKE Diffie-Hellman key exchange.

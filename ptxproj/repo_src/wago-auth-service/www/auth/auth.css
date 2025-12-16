@@ -1,0 +1,414 @@
+/*
+//------------------------------------------------------------------------------
+// Copyright (c) 2024-2025 WAGO GmbH & Co. KG
+//
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//------------------------------------------------------------------------------
+*/
+/************************
+/* general wago styling *
+/************************/
+* {
+  font-family: "Aktiv Grotesk", "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  color: var(--main-anthracite, #1F2837)
+}
+
+#context-info {
+  line-height: 175%;
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 116.667%;
+}
+
+h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+/*******************
+/* viewport layout *
+/*******************/
+div {
+  box-sizing: border-box;
+}
+
+.viewport {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--background-background, #EFF0F1);
+}
+
+.header {
+  width: 100%;
+  height: 72px;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--neutral-neutral-15, #DEDFE1);
+  background: var(--main-light, #FFF);
+}
+
+/* hide header (with logo) on small screnns to fit more content */
+@media only screen and (max-height: 680px) {
+  .header {
+    height: 0px;
+    padding: 0px;
+    overflow: hidden;
+  }
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.center {
+  max-width: 448px;
+  flex-grow: 1;
+  overflow: auto;
+  padding: 30px;
+  gap: 24px;
+  background: var(--main-light, #FFF);
+}
+
+.center,
+.center form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px
+}
+
+/* smaller layout for smaller screens */
+@media only screen and (max-height: 680px) {
+
+  /* smaller font size */
+  h1 {
+    font-size: 24px;
+  }
+
+  /* less padding for the centered box*/
+  .center {
+    padding: 10px;
+  }
+
+  /* less distance between form elements*/
+  .center,
+  .center form {
+    gap: 12px;
+  }
+}
+
+/* smaller layout for even smaller screens */
+@media only screen and (max-height: 680px) {
+
+  /* less padding for the centered box*/
+  .center {
+    padding: 5px;
+  }
+
+  /* less distance between form elements*/
+  .center,
+  .center form {
+    gap: 0px;
+  }
+}
+
+/* reduce font size on tiny screens */
+@media only screen and (max-height: 360px) {
+  * {
+    font-size: 12px;
+  }
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 3px 30px;
+  align-self: stretch;
+  justify-content: space-between;
+
+  border-top: 1px solid var(--neutral-neutral-15, #DEDFE1);
+  background: var(--main-light, #FFF);
+}
+
+.footer * {
+  color: var(--neutral-neutral-70, #616A73);
+  font-size: 12px;
+}
+
+@media only screen and (max-width: 680px) {
+  .footer {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/************
+/* Messages *
+/************/
+#messages-container > div {
+  background: var(--neutral-neutral-7, #EFF0F1);
+  padding: 8px 13px;
+  margin: 2px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-image: url(images/warning.svg);
+  background-position: 7px center;
+  background-repeat: no-repeat;
+  border-left: 6px solid;
+  padding-left: 34px;
+}
+
+#messages-container > .success-message {
+  background-image: url(images/check.svg);
+  border-color: var(--main-success, #6EC800);
+}
+
+#messages-container > .error-message {
+  border-color: #BB0522;
+}
+
+#messages-container > .info-message {
+  border-color: #fbfc2d;
+}
+
+#messages-container > .system-use-message {
+  background-image: url(images/info.svg);
+  border-color: #A5A8AF;
+}
+
+/* close button for message modal on smaller displays */
+#messages-container > div .close-message-btn {
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border: none;
+  cursor: pointer;
+
+  background-image: url(images/btn-close.svg);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+}
+
+.message-content {
+  width: 85%;
+  word-wrap: break-word;
+  max-height: 100px;
+  overflow: auto;
+}
+
+/* render modal on smaller displays*/
+@media only screen and (max-height: 440px) {
+  #messages-container {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: #00000088;
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #messages-container > div {
+    min-height: 50px;
+  }
+
+}
+
+/*****************
+/* form elements *
+/*****************/
+div.textfield {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+div.textfield input {
+  height: 24px;
+  padding: 12px 9px;
+  border: 1px solid var(--neutral-neutral-70, #616A73);
+  border-radius: 1px;
+}
+
+/* remove default edge browser styles (hide option display password as plain text) */
+input::-ms-reveal {
+  display: none;
+}
+
+/* smaller textfields */
+@media only screen and (max-height: 360px) {
+  div.smaller-textfield input {
+    padding: 0px 9px;
+  }
+}
+
+div.textfield input:focus-visible {
+  border-color: var(--main-primary, #6EC800);
+  outline: 0;
+}
+
+div.textfield input:invalid:not(:empty) {
+  border-color: var(--warning, #BB0522);
+}
+
+.buttons {
+  height: 48px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttons > * {
+  padding: 12px 15px;
+  padding-left: 45px;
+  border-radius: 1px;
+  border: 1px solid transparent;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 160%;
+}
+
+.buttons > :only-child {
+  margin: 0 0 0 auto;
+}
+
+.buttons input[type=submit],
+.buttons .continue-link {
+  background-color: var(--main-primary, #6EC800);
+  background-image: url(images/chevron-right.svg);
+  background-position: 15px center;
+  background-repeat: no-repeat;
+
+  color: var(--neutral-black, #000);
+  text-decoration: none;
+}
+
+.buttons input[type=submit]:hover:not(:disabled),
+.buttons .continue-link:hover:not(:disabled) {
+  border-color: transparent;
+  border-bottom-color: var(--neutral-black, #000);
+  border-right-color: var(--neutral-black, #000);
+}
+
+.buttons input[type=submit]:active:not(:disabled),
+.buttons .continue-link:active:not(:disabled) {
+  border-color: transparent;
+  border-top-color: var(--neutral-black, #000);
+  border-left-color: var(--neutral-black, #000);
+}
+
+.buttons .cancel-link {
+  background-image: url(images/chevron-left.svg);
+  background-position: 15px center;
+  background-repeat: no-repeat;
+
+  text-decoration: none;
+}
+
+span.on-invalid {
+  height: 0;
+  position: relative;
+  bottom: 3px;
+  color: #BB0522;
+}
+
+@media only screen and (max-height: 680px) {
+  span.on-invalid {
+    bottom: 50px;
+    z-index: 1;
+
+    font-size: 12px;
+    text-align: right;
+    padding-right: 5px;
+  }
+}
+
+@media only screen and (max-height: 360px) {
+  span.on-invalid {
+    bottom: 45px;
+  }
+}
+
+/******************
+/* helper classes *
+/******************/
+
+.hidden {
+  display: none !important;
+}
+
+.sending {
+  background-image: url(images/spinner.gif);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.sending > * {
+  user-select: none;
+  opacity: 0;
+}
+
+/* silent mode */
+.silent-mode .header img.logo,
+.silent-mode .footer span.app-info,
+.silent-mode .footer span.copyright-info,
+.silent-mode .silent-mode {
+  display: none;
+}
+.silent-mode {
+  --main-primary: #EFF0F1;
+  --main-success: #198754;
+}
+
+.silent-mode div.textfield input:focus-visible {
+  border-color: #000;
+}

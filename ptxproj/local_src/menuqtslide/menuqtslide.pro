@@ -5,7 +5,7 @@
 QT       += core gui 
 LIBS     += -lmsgtool -lm
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets x11extras
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = app
 TARGET = menuqtslide

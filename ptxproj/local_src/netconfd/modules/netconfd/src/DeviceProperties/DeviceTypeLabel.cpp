@@ -57,6 +57,13 @@ DeviceTypeLabel::DeviceTypeLabel(CommandExecutor& command_executer) :
       LogError("Failed to read ORDER from typelabel: using fallback " + order_number_ + " instead.");
     }
 
+    auto vendor_class_id = type_label_values.get_optional<::std::string>("DHCP_VENDORCLASSID");
+    if (vendor_class_id) {
+      vendor_class_id_ = vendor_class_id.value();
+    } else {
+      LogInfo("DHCP_VENDORCLASSID is not part of the typelabel.");
+    }
+
     auto mac = type_label_values.get_optional<::std::string>("MAC");
     if (mac) {
       auto tl_mac = MacAddress::FromString(mac.value());
@@ -85,6 +92,10 @@ MacAddress DeviceTypeLabel::GetMac() const {
 
 uint32_t DeviceTypeLabel::GetMacCount() const {
   return mac_count_;
+}
+
+::std::string DeviceTypeLabel::GetDHCPVendorClassID() const {
+  return vendor_class_id_;
 }
 
 }  // namespace netconf

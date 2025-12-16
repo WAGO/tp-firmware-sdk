@@ -1,0 +1,804 @@
+{
+  "Name": "APITest",
+  "Prefix": 2,
+  "WDMMVersion": "1.0.0",
+  "Features": [
+    {
+      "ID": "APITest",
+      "Parameters": [
+        {
+          "ID": 536871012,
+          "Path": "APITest/Ready",
+          "Type": "Boolean",
+          "Writeable": false,
+          "OnlyOnline": true
+        }
+      ],
+      "Includes": [
+        "Basic",
+        "Array",
+        "Files",
+        "FrontendCallback",
+        "FileApiCallback",
+        "Methods",
+        "CoreStatusCode",
+        "DomainStatusCode",
+        "DeferredParameter",
+        "UnavailableStatusValue",
+        "Beta",
+        "Deprecated",
+        "AdjustedParameter",
+        "Exception",
+        "Terminate",
+        "Classes",
+        "References"
+      ]
+    },
+    {
+      "ID": "Basic",
+      "Parameters": [
+        {
+          "ID": 536871013,
+          "Path": "APITest/Basic/String",
+          "Type": "String",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871014,
+          "Path": "APITest/Basic/Bool",
+          "Type": "Boolean",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871015,
+          "Path": "APITest/Basic/Float32",
+          "Type": "Float32",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871016,
+          "Path": "APITest/Basic/Float64",
+          "Type": "Float64",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871017,
+          "Path": "APITest/Basic/Bytes",
+          "Type": "Bytes",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871018,
+          "Path": "APITest/Basic/UInt8",
+          "Type": "UInt8",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871019,
+          "Path": "APITest/Basic/UInt16",
+          "Type": "UInt16",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871020,
+          "Path": "APITest/Basic/UInt32",
+          "Type": "UInt32",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871021,
+          "Path": "APITest/Basic/UInt64",
+          "Type": "UInt64",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871022,
+          "Path": "APITest/Basic/Int8",
+          "Type": "Int8",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871023,
+          "Path": "APITest/Basic/Int16",
+          "Type": "Int16",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871024,
+          "Path": "APITest/Basic/Int32",
+          "Type": "Int32",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871025,
+          "Path": "APITest/Basic/Int64",
+          "Type": "Int64",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871026,
+          "Path": "APITest/Basic/Enum",
+          "Type": "Enum",
+          "Enum": "APITestBasicEnum",
+          "Writeable": true,
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "Array",
+      "Parameters": [
+        {
+          "ID": 536871063,
+          "Path": "APITest/Array/String",
+          "Type": "String",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871064,
+          "Path": "APITest/Array/Bool",
+          "Type": "Boolean",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871065,
+          "Path": "APITest/Array/Float32",
+          "Type": "Float32",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871066,
+          "Path": "APITest/Array/Float64",
+          "Type": "Float64",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871067,
+          "Path": "APITest/Array/Bytes",
+          "Type": "Bytes",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871068,
+          "Path": "APITest/Array/UInt8",
+          "Type": "UInt8",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871069,
+          "Path": "APITest/Array/UInt16",
+          "Type": "UInt16",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871070,
+          "Path": "APITest/Array/UInt32",
+          "Type": "UInt32",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871071,
+          "Path": "APITest/Array/UInt64",
+          "Type": "UInt64",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871072,
+          "Path": "APITest/Array/Int8",
+          "Type": "Int8",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871073,
+          "Path": "APITest/Array/Int16",
+          "Type": "Int16",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871074,
+          "Path": "APITest/Array/Int32",
+          "Type": "Int32",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871075,
+          "Path": "APITest/Array/Int64",
+          "Type": "Int64",
+          "Rank": "Array",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871076,
+          "Path": "APITest/Array/Enum",
+          "Type": "Enum",
+          "Rank": "Array",
+          "Enum": "APITestBasicEnum",
+          "Writeable": true,
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "Files",
+      "Parameters": [
+        {
+          "ID": 536871113,
+          "Path": "APITest/File/StaticReadonly",
+          "Type": "FileID",
+          "Writeable": false,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871114,
+          "Path": "APITest/File/StaticWriteable",
+          "Type": "FileID",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871115,
+          "Path": "APITest/File/StaticFailedValidation",
+          "Type": "FileID",
+          "Writeable": true,
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "FrontendCallback",
+      "Parameters": [
+        {
+          "ID": 536871213,
+          "Path": "APITest/FrontendCallback/Read",
+          "Type": "Int16",
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871214,
+          "Path": "APITest/FrontendCallback/Write",
+          "Type": "Int16",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536871215,
+          "Path": "APITest/FrontendCallback/Method",
+          "Type": "Method",
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "FileApiCallback",
+      "Parameters": [
+        {
+          "ID": 536871413,
+          "Path": "APITest/FileApiCallback/FileRead",
+          "Type": "Method",
+          "InArgs": [
+            {
+              "Name": "FileID",
+              "Type": "FileID"
+            },
+            {
+              "Name": "Offset",
+              "Type": "UInt64"
+            },
+            {
+              "Name": "Length",
+              "Type": "UInt32"
+            }
+          ],
+          "OutArgs": [
+            {
+              "Name": "Data",
+              "Type": "UInt8",
+              "Rank": "Array"
+            }
+          ]
+        },
+        {
+          "ID": 536871414,
+          "Path": "APITest/FileApiCallback/FileWrite",
+          "Type": "Method",
+          "InArgs": [
+            {
+              "Name": "FileID",
+              "Type": "FileID"
+            },
+            {
+              "Name": "Offset",
+              "Type": "UInt64"
+            },
+            {
+              "Name": "Data",
+              "Type": "UInt8",
+              "Rank": "Array"
+            }
+          ],
+          "OutArgs": []
+        },
+        {
+          "ID": 536871415,
+          "Path": "APITest/FileApiCallback/FileGetInfo",
+          "Type": "Method",
+          "InArgs": [
+            {
+              "Name": "FileID",
+              "Type": "FileID"
+            }
+          ],
+          "OutArgs": [
+            {
+              "Name": "FileSize",
+              "Type": "UInt64"
+            }
+          ]
+        },
+        {
+          "ID": 536871416,
+          "Path": "APITest/FileApiCallback/FileCreate",
+          "Type": "Method",
+          "InArgs": [
+            {
+              "Name": "FileID",
+              "Type": "FileID"
+            },
+            {
+              "Name": "Capacity",
+              "Type": "UInt64"
+            }
+          ],
+          "OutArgs": []
+        }
+      ]
+    },
+    {
+      "ID": "Methods",
+      "Parameters": [
+        {
+          "ID": 536871313,
+          "Path": "APITest/Methods/Simple",
+          "Type": "Method",
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871314,
+          "Path": "APITest/Methods/Multiply",
+          "Type": "Method",
+          "OnlyOnline": true,
+          "InArgs": [
+            {
+              "Type": "Float32",
+              "Name": "A"
+            },
+            {
+              "Type": "Float32",
+              "Name": "B"
+            }
+          ],
+          "OutArgs": [
+            {
+              "Type": "Float32",
+              "Name": "Product"
+            }
+          ]
+        },
+        {
+          "ID": 536871315,
+          "Path": "APITest/Methods/NotProvided",
+          "Type": "Method",
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536871316,
+          "Path": "APITest/Methods/Wait",
+          "Type": "Method",
+          "OnlyOnline": true,
+          "InArgs": [
+            {
+              "Type": "UInt16",
+              "Name": "Seconds"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ID": "CoreStatusCode",
+      "Parameters": [
+        {
+          "ID": 536935314,
+          "Path": "APITest/CoreStatusCode/NotProvided",
+          "Type": "Boolean",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935315,
+          "Path": "APITest/CoreStatusCode/NotWritable",
+          "Type": "Boolean",
+          "OnlyOnline": true,
+          "Writeable": false
+        }
+      ]
+    },
+    {
+      "ID": "DomainStatusCode",
+      "Parameters": [
+        {
+          "ID": 536935513,
+          "Path": "APITest/DomainStatusCode/Read",
+          "Type": "Boolean",
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536935514,
+          "Path": "APITest/DomainStatusCode/Write",
+          "Type": "Boolean",
+          "Writeable": true,
+          "OnlyOnline": true
+        },
+        {
+          "ID": 536935515,
+          "Path": "APITest/DomainStatusCode/Method",
+          "Type": "Method"
+        }
+      ]
+    },
+    {
+      "ID": "DeferredParameter",
+      "Parameters": [
+        {
+          "ID": 536935613,
+          "Path": "APITest/DeferredParameter",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        }
+      ]
+    },
+    {
+      "ID": "UnavailableStatusValue",
+      "Parameters": [
+        {
+          "ID": 536935614,
+          "Path": "APITest/UnavailableStatusValue",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": false
+        }
+      ]
+    },
+    {
+      "ID": "Beta",
+      "Beta": true,
+      "Parameters": [
+        {
+          "ID": 536935615,
+          "Path": "APITest/BetaParameter",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935616,
+          "Path": "APITest/BetaMethod",
+          "Type": "Method",
+          "InArgs": [],
+          "OutArgs": []
+        }
+      ]
+    },
+    {
+      "ID": "Deprecated",
+      "Deprecated": true,
+      "Parameters": [
+        {
+          "ID": 536935617,
+          "Path": "APITest/DeprecatedParameter",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935618,
+          "Path": "APITest/DeprecatedMethod",
+          "Type": "Method",
+          "InArgs": [],
+          "OutArgs": []
+        }
+      ]
+    },
+    {
+      "ID": "AdjustedParameter",
+      "Parameters": [
+        {
+          "ID": 536935619,
+          "Path": "APITest/AdjustedParameter",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        }
+      ]
+    },
+    {
+      "ID": "Exception",
+      "Parameters": [
+        {
+          "ID": 536935713,
+          "Path": "APITest/Exception/ThrowRead",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": false
+        },
+        {
+          "ID": 536935714,
+          "Path": "APITest/Exception/ThrowWrite",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935715,
+          "Path": "APITest/Exception/ThrowMethod",
+          "Type": "Method",
+          "InArgs": [],
+          "OutArgs": []
+        },
+        {
+          "ID": 536935723,
+          "Path": "APITest/Exception/NotifyRead",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": false
+        },
+        {
+          "ID": 536935724,
+          "Path": "APITest/Exception/NotifyWrite",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935725,
+          "Path": "APITest/Exception/NotifyMethod",
+          "Type": "Method",
+          "InArgs": [],
+          "OutArgs": []
+        }
+      ]
+    },
+    {
+      "ID": "Terminate",
+      "Parameters": [
+        {
+          "ID": 536935813,
+          "Path": "APITest/Terminate/ConcurrentParameterSync",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935814,
+          "Path": "APITest/Terminate/ConcurrentParameterAsync",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935815,
+          "Path": "APITest/Terminate/ConcurrentMethodSync",
+          "Type": "Method"
+        },
+        {
+          "ID": 536935816,
+          "Path": "APITest/Terminate/ConcurrentMethodAsync",
+          "Type": "Method"
+        },
+        {
+          "ID": 536935817,
+          "Path": "APITest/Terminate/SerializedParameterSync",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935818,
+          "Path": "APITest/Terminate/SerializedParameterAsync",
+          "Type": "String",
+          "OnlyOnline": true,
+          "Writeable": true
+        },
+        {
+          "ID": 536935819,
+          "Path": "APITest/Terminate/SerializedMethodSync",
+          "Type": "Method"
+        },
+        {
+          "ID": 536935820,
+          "Path": "APITest/Terminate/SerializedMethodAsync",
+          "Type": "Method"
+        }
+      ]
+    },
+    {
+      "ID": "Classes",
+      "Classes": ["APITestStaticClass", "APITestDynamicClass"],
+      "Parameters": []
+    },
+    {
+      "ID": "References",
+      "Classes": ["APITestReferencesClass", "APITestReferencesOtherClass"],
+      "Parameters": [
+        {
+          "ID": 536871613,
+          "Path": "APITest/References/RefParam",
+          "Type": "InstanceIdentityRef",
+          "RefClasses": ["APITestReferencesClass"]
+        },
+        {
+          "ID": 536871614,
+          "Path": "APITest/References/DanglingRefParam",
+          "Type": "InstanceIdentityRef",
+          "RefClasses": ["APITestReferencesClass"]
+        },
+        {
+          "ID": 536871615,
+          "Path": "APITest/References/RefParamArray",
+          "Type": "InstanceIdentityRef",
+          "Rank": "Array",
+          "RefClasses": [
+            "APITestReferencesClass",
+            "APITestReferencesOtherClass"
+          ]
+        }
+      ]
+    }
+  ],
+  "Classes": [
+    {
+      "ID": "APITestStaticClass",
+      "BaseID": 536871522,
+      "BasePath": "APITest/Classes/Static",
+      "Dynamic": false,
+      "Parameters": [
+        {
+          "ID": 536871523,
+          "Path": "Parameter",
+          "Type": "Boolean"
+        },
+        {
+          "ID": 536871524,
+          "Path": "Method",
+          "Type": "Method"
+        },
+        {
+          "ID": 536871525,
+          "Path": "String",
+          "Type": "String"
+        },
+        {
+          "ID": 536871526,
+          "Path": "NoFourtyTwoOnInstanceNumberTwo",
+          "Type": "UInt8",
+          "Writeable": true,
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "APITestDynamicClass",
+      "BaseID": 536871532,
+      "BasePath": "APITest/Classes/Dynamic",
+      "Dynamic": true,
+      "Parameters": [
+        {
+          "ID": 536871533,
+          "Path": "Parameter",
+          "Type": "Boolean"
+        },
+        {
+          "ID": 536871534,
+          "Path": "Method",
+          "Type": "Method"
+        },
+        {
+          "ID": 536871535,
+          "Path": "String",
+          "Type": "String",
+          "Writeable": true,
+          "Pattern": "★ .*",
+          "OnlyOnline": true
+        }
+      ]
+    },
+    {
+      "ID": "APITestReferencesClass",
+      "BaseID": 536871622,
+      "BasePath": "APITest/References/Class",
+      "Dynamic": false,
+      "Parameters": [
+        {
+          "ID": 536871623,
+          "Path": "InstanceKey",
+          "Type": "String",
+          "Writeable": false,
+          "InstanceKey": true
+        }
+      ]
+    },
+    {
+      "ID": "APITestReferencesOtherClass",
+      "BaseID": 536871632,
+      "BasePath": "APITest/References/OtherClass",
+      "Dynamic": false,
+      "Parameters": [
+        {
+          "ID": 536871633,
+          "Path": "InstanceKey",
+          "Type": "String",
+          "Writeable": false,
+          "InstanceKey": true
+        }
+      ]
+    }
+  ],
+  "Enums": [
+    {
+      "Name": "APITestBasicEnum",
+      "Members": [
+        {
+          "ID": 1,
+          "Name": "A"
+        },
+        {
+          "ID": 2,
+          "Name": "B"
+        },
+        {
+          "ID": 3,
+          "Name": "C"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+diff -Naur gdk-pixbuf-2.42.10_org/gdk-pixbuf/meson.build gdk-pixbuf-2.42.10/gdk-pixbuf/meson.build
+--- gdk-pixbuf-2.42.10_org/gdk-pixbuf/meson.build	2022-10-25 18:53:28.000000000 +0200
++++ gdk-pixbuf-2.42.10/gdk-pixbuf/meson.build	2025-07-29 07:10:26.227315948 +0200
+@@ -12,19 +12,19 @@
+   },
+   'bmp': {
+     'sources': [ 'io-bmp.c' ],
+-    'enabled': not native_windows_loaders,
++    'enabled': enabled_loaders.contains('bmp') and not native_windows_loaders,
+   },
+   'gif': {
+     'sources': [ 'io-gif.c', 'io-gif-animation.c', 'lzw.c' ],
+-    'enabled': not native_windows_loaders,
++    'enabled': enabled_loaders.contains('gif') and not native_windows_loaders,
+   },
+   'ico': {
+     'sources': [ 'io-ico.c' ],
+-    'enabled': not native_windows_loaders,
++    'enabled': enabled_loaders.contains('ico') and not native_windows_loaders,
+   },
+   'ani': {
+     'sources': [ 'io-ani.c', 'io-ani-animation.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('ani'),
+   },
+   'jpeg': {
+     'sources': [ 'io-jpeg.c' ],
+@@ -32,7 +32,7 @@
+   },
+   'pnm': {
+     'sources': [ 'io-pnm.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('pnm'),
+   },
+   'tiff': {
+     'sources': [ 'io-tiff.c' ],
+@@ -40,23 +40,23 @@
+   },
+   'xpm': {
+     'sources': [ 'io-xpm.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('xpm'),
+   },
+   'xbm': {
+     'sources': [ 'io-xbm.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('xbm'),
+   },
+   'tga': {
+     'sources': [ 'io-tga.c', 'gdk-pixbuf-buffer-queue.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('tga'),
+   },
+   'icns': {
+     'sources': [ 'io-icns.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('icns'),
+   },
+   'qtif': {
+     'sources': [ 'io-qtif.c' ],
+-    'enabled': true,
++    'enabled': enabled_loaders.contains('qtif'),
+   },
+ }
+ 
+diff -Naur gdk-pixbuf-2.42.10_org/meson.build gdk-pixbuf-2.42.10/meson.build
+--- gdk-pixbuf-2.42.10_org/meson.build	2022-10-25 18:53:28.000000000 +0200
++++ gdk-pixbuf-2.42.10/meson.build	2025-07-29 07:12:30.548138552 +0200
+@@ -275,6 +275,28 @@
+   endif
+ endif
+ 
++gif_opt = get_option('gif')
++if not gif_opt.disabled()
++  enabled_loaders += 'gif'
++endif
++
++others_opt = get_option('others')
++if not others_opt.disabled()
++  # Keep sorted alphabetically
++  enabled_loaders += [
++    'ani',
++    'bmp',
++    'icns',
++    'ico',
++    'pnm',
++    'qtif',
++    'tga',
++    'xbm',
++    'xpm',
++  ]
++endif
++
++
+ # On Windows, check whether we are building the native Windows loaders
+ # (it is an "all-or-nothing" option for BMP, EMF, GIF, ICO, JPEG, TIFF and WMF)
+ # Note that we currently do not use the native Windows loaders to handle PNG and
+diff -Naur gdk-pixbuf-2.42.10_org/meson_options.txt gdk-pixbuf-2.42.10/meson_options.txt
+--- gdk-pixbuf-2.42.10_org/meson_options.txt	2022-10-25 18:53:28.000000000 +0200
++++ gdk-pixbuf-2.42.10/meson_options.txt	2025-07-29 07:12:25.364106645 +0200
+@@ -10,6 +10,14 @@
+        description: 'Enable JPEG loader (requires libjpeg), disabled on Windows if "native_windows_loaders" is used',
+        type: 'feature',
+        value: 'enabled')
++option('gif',
++       description: 'Enable GIF loader, disabled on Windows if "native_windows_loaders" is used',
++       type: 'feature',
++       value: 'enabled')
++option('others',
++       description: 'Enable other loaders, which are weakly maintained',
++       type: 'feature',
++       value: 'disabled')
+ option('builtin_loaders',
+        description: 'Comma-separated list of loaders to build into gdk-pixbuf',
+        type: 'array',

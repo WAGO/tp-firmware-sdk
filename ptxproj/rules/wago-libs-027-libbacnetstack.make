@@ -14,27 +14,27 @@
 PACKAGES-$(PTXCONF_LIBBACNETSTACK) += libbacnetstack
 
 #
-#--- paths and names --------------------------------------------------------- 
+#--- paths and names ---------------------------------------------------------
 #
 LIBBACNETSTACK                   := libbacnetstack
 LIBBACNETSTACK_FOLDER            := libbacnetstack_git
- 
+
 ifdef PTXCONF_LIBBACNETSTACK_SOURCE_DEV
 LIBBACNETSTACK_REVISION          := 25
-LIBBACNETSTACK_SO_VERSION        := 3.3.5
+LIBBACNETSTACK_SO_VERSION        := 3.3.12
 LIBBACNETSTACK_GIT_URL           := git@svgithub01001.wago.local:BU-Automation/bacnet-ptxdist-libbacnetstack.git
 LIBBACNETSTACK_ENVIRON           := DEVELOP
 endif
 
 ifdef PTXCONF_LIBBACNETSTACK_SOURCE_RELEASED
 LIBBACNETSTACK_REVISION          := 25
-LIBBACNETSTACK_SO_VERSION        := 3.3.5
+LIBBACNETSTACK_SO_VERSION        := 3.3.12
 LIBBACNETSTACK_ENVIRON           := RELEASE
 endif
 
 ifdef PTXCONF_LIBBACNETSTACK_ARTIFACTORY_DEV
 LIBBACNETSTACK_REVISION          := 25
-LIBBACNETSTACK_SO_VERSION        := 3.3.5
+LIBBACNETSTACK_SO_VERSION        := 3.3.12
 LIBBACNETSTACK_ENVIRON           := RELEASE
 endif
 
@@ -69,18 +69,18 @@ LIBBACNETSTACK_DIR               := $(LIBBACNETSTACK_BUILDROOT_DIR)/$(LIBBACNETS
 LIBBACNETSTACK_LICENSE           := unknown
 
 LIBBACNETSTACK_BUILDCONFIG       := Release
-LIBBACNETSTACK_BUILD_DIR         := $(LIBBACNETSTACK_BUILDROOT_DIR)/bin/$(LIBBACNETSTACK_BUILDCONFIG)
+LIBBACNETSTACK_BIN_DIR           := $(LIBBACNETSTACK_BUILDROOT_DIR)/bin/$(LIBBACNETSTACK_BUILDCONFIG)
 LIBBACNETSTACK_LICENSE           := unknown
 LIBBACNETSTACK_BIN               := $(LIBBACNETSTACK).a
 LIBBACNETSTACK_CONF_TOOL         := NO
 LIBBACNETSTACK_MAKE_ENV          := $(CROSS_ENV) \
               BUILDCONFIG=$(LIBBACNETSTACK_BUILDCONFIG) \
-              BIN_DIR=$(LIBBACNETSTACK_BUILD_DIR) \
+              BIN_DIR=$(LIBBACNETSTACK_BIN_DIR) \
               TARGET_ARCH=$(PTXCONF_ARCH_STRING) \
               ARM_ARCH_VERSION=7 \
               LIBBACNETSTACK_BUILD_ENV=$(LIBBACNETSTACK_ENV_VENDOR) \
               LIBBACNETSTACK_BUILD_CONFIG=$(LIBBACNETSTACK_ENVIRON) \
-              SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+              SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 LIBBACNETSTACK_PATH              := PATH=$(CROSS_PATH)
 LIBBACNETSTACK_PACKAGE_NAME      := $(LIBBACNETSTACK)_$(LIBBACNETSTACK_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)
@@ -204,7 +204,7 @@ ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
 #   BSP mode: install by extracting tgz file
 	@mkdir -p $(LIBBACNETSTACK_PKGDIR) && \
   	tar xvzf $(LIBBACNETSTACK_PLATFORMCONFIGPACKAGEDIR)/$(LIBBACNETSTACK_PACKAGE_NAME).tgz -C $(LIBBACNETSTACK_PKGDIR)
-else	
+else
 # 	normal mode, call "make install"
 
 	@$(call world/install, LIBBACNETSTACK)
@@ -225,7 +225,7 @@ endif
 
 $(STATEDIR)/libbacnetstack.targetinstall:
 	@$(call targetinfo)
-	@$(call install_init, libbacnetstack)	
+	@$(call install_init, libbacnetstack)
 
 	@$(call install_fixup, libbacnetstack,PRIORITY,optional)
 	@$(call install_fixup, libbacnetstack,SECTION,base)
@@ -237,7 +237,7 @@ $(STATEDIR)/libbacnetstack.targetinstall:
 
 ifeq ($(LIBBACNETSTACK_ENV_VENDOR), WAGO)
 	@$(call install_copy, libbacnetstack, 0, 0, 0750, -, /etc/config-tools/events/networking/update_zzz_bacnet)
-	
+
 	@mkdir -p $(LIBBACNETSTACK_PKGDIR)/etc/bacnet
 	@$(call install_tree, libbacnetstack, 0, 0, -, /etc/bacnet)
 
@@ -246,7 +246,7 @@ ifeq ($(LIBBACNETSTACK_ENV_VENDOR), WAGO)
 endif
 
 	@$(call install_finish, libbacnetstack)
-	
+
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -263,11 +263,11 @@ $(STATEDIR)/libbacnetstack.clean:
 	fi
 	@$(call clean_pkg, LIBBACNETSTACK)
 	@rm -rf $(LIBBACNETSTACK_BUILDROOT_DIR)
-	@echo Deleting default bacnet folder:	
+	@echo Deleting default bacnet folder:
 	@echo $(PTXDIST_PLATFORMDIR)/root/home/user/bacnet
 	@rm -rf $(PTXDIST_PLATFORMDIR)/root/home/user/bacnet
 	@echo $(PTXCONF_SYSROOT_TARGET)/home/user/bacnet
 	@rm -rf $(PTXCONF_SYSROOT_TARGET)/home/user/bacnet
-	
+
 # vim: syntax=make
 

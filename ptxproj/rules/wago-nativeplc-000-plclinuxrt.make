@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_DALSHELL) += dalshell
 
-DALSHELL_VERSION    := 1.0
+DALSHELL_VERSION    := 1.0.2
 DALSHELL            := dalshell
 DALSHELL_DIR        := $(BUILDDIR)/$(DALSHELL)
 DALSHELL_URL        := file://$(PTXDIST_WORKSPACE)/wago_intern/plc/$(DALSHELL)

@@ -52,6 +52,10 @@ menu "WAGO Parameter Service        "
 source "generated/wago_specific_config_parameterservice.in"
 endmenu
 
+menu "WAGO Daemon Utils             "
+source "generated/wago_specific_daemonutils.in"
+endmenu
+
 menu "Rocket Specific"
 source "generated/wago_specific_rocket_specific.in"
 endmenu

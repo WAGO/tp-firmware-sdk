@@ -20,8 +20,8 @@ config WBM_NG_PLUGIN_WDA
 	prompt "WDA Plugin"
 
 	depends on WBM_NG
-	depends on WAGO_PARAMETER_SERVICE
-	depends on WAGO_PARAMETER_SERVICE_DAEMON
+	depends on WDX_LINUX
+	depends on WDX_LINUX_SERVICE_DAEMON
 
 	help
 	 "Plugin to the Modular WBM that contains the 'WAGO Device Access' Page."

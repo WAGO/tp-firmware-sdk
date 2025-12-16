@@ -1,0 +1,13 @@
+## SECTION=wago_specific_config
+
+config CONFIG_SWITCH
+	bool
+	select HOST_CT_BUILD
+	select GLIB
+	select GOOGLETEST
+	select LIBSWITCHCONFIG
+	select NETCONFD
+	select NLOHMANN_JSON
+	prompt "config_switch"
+	help
+	  Config tool to write the switch configuration containing broadcast, multicast and port-mirror features.

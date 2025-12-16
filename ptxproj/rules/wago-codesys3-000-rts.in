@@ -10,6 +10,7 @@ config CODESYS3
 	select GOOGLETEST
 	select HOST_CT_BUILD
 	select OPENSSL
+	select PAM
 	select WAGO_DBUS if CDS3_RTS_PRODUCT_VTPCTP
 	select QT5 if CDS3_RTS_PRODUCT_VTPCTP
 	help
@@ -60,7 +61,7 @@ if CODESYS3_SOURCE_GIT
 config CODESYS3_SOURCE_GIT_BRANCH
 	string
 	prompt "Branch to be checked-out"
-	default "master"
+	default "main"
 	help
 	  Name of branch which should be checked out from wago codesys repository or empty for default.
 

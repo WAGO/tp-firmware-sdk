@@ -21,7 +21,7 @@
 #include <fff.h>
 
 DECLARE_FAKE_VALUE_FUNC1(int, close, int);
-DECLARE_FAKE_VALUE_FUNC3(long int,lseek,int,long int,int);
+DECLARE_FAKE_VALUE_FUNC3(off_t,lseek,int,off_t,int);
 DECLARE_FAKE_VALUE_FUNC3(ssize_t,read,int,void *,size_t);
 
 

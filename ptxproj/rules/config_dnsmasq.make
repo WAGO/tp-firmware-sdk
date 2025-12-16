@@ -23,13 +23,13 @@ CONFIG_DNSMASQ_BUILDCONFIG    := Release
 CONFIG_DNSMASQ_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(CONFIG_DNSMASQ)
 CONFIG_DNSMASQ_BUILDROOT_DIR  := $(BUILDDIR)/$(CONFIG_DNSMASQ)
 CONFIG_DNSMASQ_DIR            := $(CONFIG_DNSMASQ_BUILDROOT_DIR)/src
-CONFIG_DNSMASQ_BUILD_DIR      := $(CONFIG_DNSMASQ_BUILDROOT_DIR)/bin/$(CONFIG_DNSMASQ_BUILDCONFIG)
+CONFIG_DNSMASQ_BIN_DIR        := $(CONFIG_DNSMASQ_BUILDROOT_DIR)/bin/$(CONFIG_DNSMASQ_BUILDCONFIG)
 CONFIG_DNSMASQ_LICENSE        := WAGO
 CONFIG_DNSMASQ_CONF_TOOL      := NO
 CONFIG_DNSMASQ_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(CONFIG_DNSMASQ_BUILDCONFIG) \
-BIN_DIR=$(CONFIG_DNSMASQ_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(CONFIG_DNSMASQ_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 
 # ----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ $(STATEDIR)/config_dnsmasq.targetinstall:
 	@$(call install_fixup, config_dnsmasq,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, config_dnsmasq,DESCRIPTION,missing)
 
-	@$(call install_copy, config_dnsmasq, 0, 0, 0755, $(CONFIG_DNSMASQ_BUILD_DIR)/config_dnsmasq_c.elf,/etc/config-tools/config_dnsmasq_c) 
+	@$(call install_copy, config_dnsmasq, 0, 0, 0755, $(CONFIG_DNSMASQ_BIN_DIR)/config_dnsmasq_c.elf,/etc/config-tools/config_dnsmasq_c) 
 
 	# Does not install /etc/dnsmasq.conf because dnsmasq packet has already installed or will install our config file.
 	@$(call install_copy,        config_dnsmasq, 0, 0, 0750, /etc/dnsmasq.d)

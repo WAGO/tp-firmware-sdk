@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/convert.hpp>
 #include <boost/convert/stream.hpp>
+#include <fstream>
 
 namespace netconf {
 
@@ -19,7 +20,7 @@ DipSwitch::DipSwitch(const std::string& dip_switch_device_value_file)
     fs::path dip_sw_path { dip_switch_device_value_file };
     if (fs::exists(dip_sw_path)) {
       std::string dip_value;
-      fs::ifstream stream { dip_sw_path };
+      std::ifstream stream { dip_sw_path };
       stream >> dip_value;
       value_ = static_cast<std::uint8_t>(convert<int>( dip_value, ccnv(std::hex)).value_or(0));
       hw_available_ = true;

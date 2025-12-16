@@ -30,12 +30,6 @@ LIBCTCALLHELPER_PACKAGE_NAME := $(LIBCTCALLHELPER)_$(LIBCTCALLHELPER_VERSION)_$(
 LIBCTCALLHELPER_PLATFORMCONFIGPACKAGEDIR := $(PTXDIST_PLATFORMCONFIGDIR)/packages
 LIBCTCALLHELPER_PACKAGE_DIR := $(PTXDIST_TEMPDIR)/package/$(LIBCTCALLHELPER_PACKAGE_NAME)
 
-# parameters passed from ptxdist
-# override the configured optimization when building the release version.
-ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
-	PTXCONF_LIBCTCALLHELPER_BUILD_CFG_OPTIMIZATION=O2
-endif
-
 # ----------------------------------------------------------------------------
 # Get
 # ----------------------------------------------------------------------------
@@ -68,27 +62,17 @@ $(STATEDIR)/libctcallhelper.prepare:
 # Compile
 # ----------------------------------------------------------------------------
 
-LIBCTCALLHELPER_PATH:= PATH=$(CROSS_PATH)
-LIBCTCALLHELPER_ENV:= $(CROSS_ENV) CROSS_LIBTOOL=$(LIBTOOL_CROSS)
+LIBCTCALLHELPER_MAKE_ENV:= $(CROSS_ENV) CROSS_LIBTOOL=$(LIBTOOL_CROSS)
 
 ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
-	LIBCTCALLHELPER_ENV+=CFLAGS="$(CROSS_CFLAGS) -DNDEBUG"
+	LIBCTCALLHELPER_MAKE_ENV+=CFLAGS="$(CROSS_CFLAGS) -DNDEBUG"
 endif
 
-LIBCTCALLHELPER_BUILD_PARAMS := \
-	LIBCTCALLHELPER_DEBUG_LEVEL=$(PTXCONF_LIBCTCALLHELPER_BUILD_CFG_DEBUG_LEVEL) \
-    LIBCTCALLHELPER_COMPILER_OPTIMIZATION=$(PTXCONF_LIBCTCALLHELPER_BUILD_CFG_OPTIMIZATION)
-
+ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
 $(STATEDIR)/libctcallhelper.compile:
 	@$(call targetinfo)
-ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
-	cd $(LIBCTCALLHELPER_DIR) && \
-		$(LIBCTCALLHELPER_PATH) \
-		$(LIBCTCALLHELPER_ENV) \
-		$(LIBCTCALLHELPER_BUILD_PARAMS) \
-		$(MAKE)
-endif
 	@$(call touch)
+endif
 
 # ----------------------------------------------------------------------------
 # Install
@@ -110,6 +94,7 @@ ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
 	usr/lib/libctcallhelper.so  \
 	usr/lib/libctcallhelper.so.0  \
 	usr/lib/libctcallhelper.so.0.0.0 && \
+	mkdir -p $(LIBCTCALLHELPER_PLATFORMCONFIGPACKAGEDIR) && \
 	mv $(LIBCTCALLHELPER_PACKAGE_NAME).tgz $(LIBCTCALLHELPER_PLATFORMCONFIGPACKAGEDIR)
 endif
 endif

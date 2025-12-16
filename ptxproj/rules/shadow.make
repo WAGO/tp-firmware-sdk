@@ -22,6 +22,7 @@ SHADOW_URL	:= https://github.com/shadow-maint/shadow/releases/download/$(SHADOW_
 SHADOW_SOURCE	:= $(SRCDIR)/$(SHADOW).$(SHADOW_SUFFIX)
 SHADOW_DIR	:= $(BUILDDIR)/$(SHADOW)
 SHADOW_LICENSE	:= BSD-3-Clause
+SHADOW_DEVPKG   := NO
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -103,10 +104,11 @@ SHADOW_PAMD-$(PTXCONF_SHADOW_CHAGE)   += chage
 SHADOW_PAMD-$(PTXCONF_SHADOW_LOGIN)   += login
 SHADOW_PAMD-$(PTXCONF_SHADOW_PASSWD)  += passwd
 SHADOW_PAMD-$(PTXCONF_SHADOW_SU)      += su
-SHADOW_PAMD-$(PTXCONF_SHADOW_USERMOD) += groupadd
-SHADOW_PAMD-$(PTXCONF_SHADOW_USERMOD) += groupdel
-SHADOW_PAMD-$(PTXCONF_SHADOW_USERMOD) += useradd
-SHADOW_PAMD-$(PTXCONF_SHADOW_USERMOD) += userdel
+SHADOW_PAMD-$(PTXCONF_SHADOW_GROUPADD) += groupadd
+SHADOW_PAMD-$(PTXCONF_SHADOW_GROUPDEL) += groupdel
+SHADOW_PAMD-$(PTXCONF_SHADOW_GROUPMOD) += groupmod
+SHADOW_PAMD-$(PTXCONF_SHADOW_USERADD) += useradd
+SHADOW_PAMD-$(PTXCONF_SHADOW_USERDEL) += userdel
 SHADOW_PAMD-$(PTXCONF_SHADOW_USERMOD) += usermod
 endif # PTXCONF_SHADOW_PAM
 
@@ -163,26 +165,9 @@ ifdef PTXCONF_SHADOW_NEWGIDMAP
 	@$(call install_alternative, shadow, 0, 0, 0644, /etc/subgid)
 endif # PTXCONF_SHADOW_NEWGIDMAP
 
-ifdef PTXCONF_SHADOW_GROUPADD
-	@$(call install_alternative, shadow, 0, 0, 0644, /etc/pam.d/groupadd)
-endif # PTXCONF_SHADOW_GROUPADD
-
-ifdef PTXCONF_SHADOW_GROUPDEL
-	@$(call install_alternative, shadow, 0, 0, 0644, /etc/pam.d/groupdel)
-endif # PTXCONF_SHADOW_GROUPDEL
-
 ifdef PTXCONF_SHADOW_USERADD
-	@$(call install_alternative, shadow, 0, 0, 0644, /etc/pam.d/useradd)
 	@$(call install_alternative, shadow, 0, 0, 0644, /etc/default/useradd)
 endif # PTXCONF_SHADOW_USERADD
-
-ifdef PTXCONF_SHADOW_USERDEL
-	@$(call install_alternative, shadow, 0, 0, 0644, /etc/pam.d/userdel)
-endif # PTXCONF_SHADOW_USERDEL
-
-ifdef PTXCONF_SHADOW_USERMOD
-	@$(call install_alternative, shadow, 0, 0, 0644, /etc/pam.d/usermod)
-endif # PTXCONF_SHADOW_USERMOD
 
 	#
 	# install Linux-PAM configuration files

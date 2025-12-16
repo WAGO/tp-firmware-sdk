@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -36,8 +34,10 @@ HOST_E2FSPROGS_CONF_OPT		:= \
 	--disable-jbd-debug \
 	--disable-blkid-debug \
 	--disable-testio-debug \
+	--disable-developer-features \
 	--enable-libuuid \
 	--enable-libblkid \
+	--disable-subset \
 	--disable-backtrace \
 	--disable-debugfs \
 	--disable-imager \
@@ -52,10 +52,14 @@ HOST_E2FSPROGS_CONF_OPT		:= \
 	--disable-bmap-stats \
 	--disable-bmap-stats-ops \
 	--disable-nls \
-	--enable-threads=posix \
 	--disable-rpath \
 	--disable-fuse2fs \
-	--without-included-gettext
+	--disable-lto \
+	--disable-ubsan \
+	--disable-addrsan \
+	--disable-threadsan \
+	--disable-fuzzing \
+	--with-pthread
 
 # ----------------------------------------------------------------------------
 # Install
@@ -63,13 +67,27 @@ HOST_E2FSPROGS_CONF_OPT		:= \
 
 HOST_E2FSPROGS_INSTALL_OPT	:= install install-libs
 
+$(STATEDIR)/host-e2fsprogs.install:
+	@$(call targetinfo)
+	@$(call world/install, HOST_E2FSPROGS)
+	@mkdir -vp $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/real
+	@mv -v $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/{mke2fs,mkfs.*} \
+		$(HOST_E2FSPROGS_PKGDIR)/usr/sbin/real/
+	@echo '#!/bin/sh'							>  $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/mke2fs
+	@echo 'export MKE2FS_CONFIG="$$(dirname "$${0}")/../etc/mke2fs.conf"'	>> $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/mke2fs
+	@echo 'exec "$$(dirname "$${0}")/real/$$(basename "$${0}")" "$${@}"'	>> $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/mke2fs
+	@chmod +x $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/mke2fs
+	@$(foreach mkfs,mkfs.ext2 mkfs.ext3 mkfs.ext4, \
+		ln -s mke2fs $(HOST_E2FSPROGS_PKGDIR)/usr/sbin/$(mkfs)$(ptx/nl))
+	@$(call touch)
+
 $(STATEDIR)/host-e2fsprogs.install.post:
 	@$(call targetinfo)
 	@$(call world/install.post, HOST_E2FSPROGS)
-	@sed -i -e 's,/share,$(PTXCONF_SYSROOT_HOST)/share,' \
-		$(PTXCONF_SYSROOT_HOST)/bin/compile_et
-	@sed -i -e 's,/share,$(PTXCONF_SYSROOT_HOST)/share,' \
-		$(PTXCONF_SYSROOT_HOST)/bin/mk_cmds
+	@sed -i -e 's,/usr/share,$(PTXDIST_SYSROOT_HOST)/usr/share,' \
+		$(PTXDIST_SYSROOT_HOST)/usr/bin/compile_et
+	@sed -i -e 's,/usr/share,$(PTXDIST_SYSROOT_HOST)/usr/share,' \
+		$(PTXDIST_SYSROOT_HOST)/usr/bin/mk_cmds
 	@$(call touch)
 
 # vim: syntax=make

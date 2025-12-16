@@ -34,6 +34,7 @@ AZURE		    := azure-iot-sdk-c-$(AZURE_VERSION)
 AZURE_SOURCE        := $(SRCDIR)/$(AZURE).$(AZURE_SUFFIX)
 AZURE_DIR           := $(BUILDDIR)/$(AZURE)
 AZURE_LICENSE       := unknown
+AZURE_DEVPKG        := NO
 
 # ----------------------------------------------------------------------------
 # Get
@@ -60,7 +61,7 @@ AZURE_CONF_ENV	:= $(CROSS_ENV)
 # cmake
 AZURE_CONF_TOOL	:= cmake
 
-AZURE_CONF_OPT	:= $(CROSS_CMAKE_USR) -v --jobs=1 \
+AZURE_CONF_OPT	:= $(CROSS_CMAKE_USR) \
 	-D"run_e2e_tests:BOOL=OFF" \
 	-D"run_longhaul_tests:BOOL=OFF" \
 	-D"skip_unittests:BOOL=ON" \

@@ -1,0 +1,19 @@
+## SECTION=wago_specific_config_parameterservice
+
+config WDX_CORE
+	bool
+	default n
+	prompt "WAGO Parameter Service (WDx) Core"
+	select HOST_CMAKE
+	select LIBCOMMONHEADER
+	select NLOHMANN_JSON
+	help
+	  WAGO Parameter Service common core library.
+
+config WDX_CORE_TEST_LIB
+	bool
+	select WDX_CORE
+	default n
+	prompt "WAGO Parameter Service (WDx) Test Library"
+	help
+	  Static library to provide common test functionality for Google Test/Mock.

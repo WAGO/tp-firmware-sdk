@@ -2,7 +2,7 @@
 
 menuconfig ELREST_CUSTOM_INSTALL
 	bool "Elrest Custom Install          "
-	select ICEWM if ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
+#	select ICEWM if ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
 	select KERNEL if ELREST_CUSTOM_ROOT_DIRECTORIES_INSTALL
 #	select BLSPEC_PFC if ELREST_CUSTOM_BLSPEC_DIRECTORIES_INSTALL
 	default n
@@ -82,20 +82,6 @@ config ELREST_CUSTOM_XORG_CONFIG_INSTALL
 	prompt "install custom Xorg config"
 	help
 	  This installs elrest custom Xorg config to /etc, /usr/bin.
-
-config ELREST_CUSTOM_PEKWM_CONFIG_INSTALL
-	bool
-	default n
-	prompt "install custom pekwm configuration"
-	help
-	  This installs elrest custom pekwm configuration to /home and /root.
-
-config ELREST_CUSTOM_FLUXBOX_CONFIG_INSTALL
-	bool
-	default n
-	prompt "install custom fluxbox configuration"
-	help
-	  This installs elrest custom fluxbox configuration to /root.
 
 config ELREST_CUSTOM_ICEWM_CONFIG_INSTALL
 	bool

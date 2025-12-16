@@ -2,8 +2,20 @@
 
 config CLEAR_SCREEN
 	tristate
+	select QT5 if CLEAR_SCREEN_USE_QT5
 	prompt "clear_screen"
-	select QT5
 	help
-	  FIXME
+		qt based clear screen util
 
+if CLEAR_SCREEN
+choice
+	prompt "QT_VERSION_USED"
+		config CLEAR_SCREEN_USE_QT5
+			bool
+			prompt "QT5"
+
+		config CLEAR_SCREEN_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

@@ -1,0 +1,38 @@
+## SECTION=wago_specific_config_parameterservice
+
+menuconfig WDX_WDM
+	bool
+	default n
+	prompt "WAGO Parameter Service (WDx) WDM"
+	select HOST_PYTHON3
+	depends on WDX_LINUX
+	help
+	  WAGO Parameter Service model files used by the WAGO Parameter Service.
+
+config WDX_WDM_DIR
+	string
+	depends on WDX_WDM
+	prompt "directory to contain the main WDM artifact"
+	default "/etc/wdx/wdm"
+
+config WDX_WDE_DIR
+	string
+	depends on WDX_WDM
+	prompt "directory to contain the extension artifacts"
+	default "/etc/wdx/wde"
+
+config WDX_WDM_URL_TEMPLATE
+	string
+	depends on WDX_WDM
+	prompt "URL template"
+	default "%ARTIFACTORY_BASE_URL%/wdx-generic-prod-local/wago/wdx/wdx-%VERSION%/wdx.zip"
+	help
+	  Source URL template for model files.
+
+config WDX_WDM_CPP_HEADERS
+	bool
+	prompt "Install WDM C++ Header files"
+	default n
+	depends on WDX_WDM
+	help
+	  Installs C++ header files with constants generated from the WDM files into /usr/include/wago/wdm.

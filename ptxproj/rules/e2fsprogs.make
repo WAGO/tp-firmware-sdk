@@ -3,8 +3,6 @@
 # Copyright (C) 2002-2008 by Pengutronix e.K., Hildesheim, Germany
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,16 +15,16 @@ PACKAGES-$(PTXCONF_E2FSPROGS) += e2fsprogs
 #
 # Paths and names
 #
-E2FSPROGS_VERSION	:= 1.45.6
-E2FSPROGS_MD5		:= 22cc85579c5ac4b8c1959e6d4d98755d
+E2FSPROGS_VERSION	:= 1.47.1
+E2FSPROGS_MD5		:= 75e6d1353cbe6d5728a98fb0267206cb
 E2FSPROGS		:= e2fsprogs-$(E2FSPROGS_VERSION)
 E2FSPROGS_SUFFIX	:= tar.gz
-E2FSPROGS_URL		:= $(call ptx/mirror, SF, e2fsprogs/$(E2FSPROGS).$(E2FSPROGS_SUFFIX))
+E2FSPROGS_URL		:= $(call ptx/mirror, SF, e2fsprogs/e2fsprogs/v$(E2FSPROGS_VERSION)/$(E2FSPROGS).$(E2FSPROGS_SUFFIX))
 E2FSPROGS_SOURCE	:= $(SRCDIR)/$(E2FSPROGS).$(E2FSPROGS_SUFFIX)
 E2FSPROGS_DIR		:= $(BUILDDIR)/$(E2FSPROGS)
-E2FSPROGS_LICENSE	:= GPL-2.0+, LGPL-2.0+, BSD-3-Clause, MIT
+E2FSPROGS_LICENSE	:= GPL-2.0-or-later AND LGPL-2.0-or-later AND BSD-3-Clause AND MIT
 E2FSPROGS_LICENSE_FILES	:= \
-	file://NOTICE;md5=b48f21d765b875bd10400975d12c1ca2 \
+	file://NOTICE;md5=d50be0580c0b0a7fbc7a4830bbe6c12b \
 	file://lib/uuid/gen_uuid.c;startline=4;endline=31;md5=697cf5d1be275fa2588beaaf2bb481bd
 
 # ----------------------------------------------------------------------------
@@ -39,6 +37,7 @@ E2FSPROGS_LICENSE_FILES	:= \
 E2FSPROGS_CONF_TOOL	:= autoconf
 E2FSPROGS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-symlink-install \
 	--disable-relative-symlinks \
 	--disable-symlink-build \
@@ -51,6 +50,7 @@ E2FSPROGS_CONF_OPT	:= \
 	--disable-jbd-debug \
 	--disable-blkid-debug \
 	--disable-testio-debug \
+	--disable-developer-features \
 	--disable-libuuid \
 	--disable-libblkid \
 	--disable-backtrace \
@@ -67,10 +67,15 @@ E2FSPROGS_CONF_OPT	:= \
 	--disable-bmap-stats \
 	--disable-bmap-stats-ops \
 	--disable-nls \
-	--enable-threads=posix \
 	--disable-rpath \
 	--disable-fuse2fs \
-	--without-included-gettext
+	--disable-lto \
+	--disable-ubsan \
+	--disable-addrsan \
+	--disable-threadsan \
+	--disable-fuzzing \
+	--with-pthread \
+	--without-libarchive
 
 E2FSPROGS_MAKE_OPT	:= $(if $(filter 1,$(strip $(PTXDIST_VERBOSE))),V=1)
 E2FSPROGS_INSTALL_OPT	:= install install-libs

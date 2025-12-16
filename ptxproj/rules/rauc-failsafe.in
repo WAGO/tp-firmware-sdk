@@ -1,0 +1,8 @@
+## SECTION=applications
+
+config RAUC_FAILSAFE
+	tristate
+	prompt "rauc-failsafe"
+	select RAUC
+	help
+	  "rauc" wrapper with retries in case of blocked resources

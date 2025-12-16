@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/transform.hpp>
+#include <sstream>
 #include "JsonConverter.hpp"
 #include "TypesHelper.hpp"
 #include "BridgeConfigValidator.hpp"

@@ -38,11 +38,15 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QWidget>
+#include <QScreen>
+#else
 #include <QDesktopWidget>
+#endif
+
 #include <QRect>
 #include <QSettings>
-//#include <QProcess>
-//#include <QX11Info>
 #include <QDebug>
 
 #include <unistd.h>
@@ -101,8 +105,11 @@ int main(int argc, char **argv)
   QApplication app(argc, argv);
 
   //screen width and height
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rDesk = QApplication::primaryScreen()->geometry();
+#else
   QRect rDesk = QApplication::desktop()->screenGeometry();
-
+#endif
 
   QString sQtStyleForm = DEFAULT_FORM_STYLE;
 

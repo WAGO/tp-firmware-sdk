@@ -2,7 +2,7 @@
 menuconfig SHADOW
 	tristate
 	select LIBC_CRYPT
-	select LIBSELINUX	if GLOBAL_SELINUX
+#	select LIBSELINUX	if GLOBAL_SELINUX
 	select PAM        if SHADOW_PAM
 	select WAGO_CUSTOM_ROOTFS_SHELLS
 	select HOST_GETTEXT

@@ -5,6 +5,7 @@ menuconfig PHP_SELECTION
 	tristate
 	prompt "php-selection                 "
 	select PHP8                        if PHP_SELECTION_PREFER_PHP8
+#	select PHP9                        if PHP_SELECTION_PREFER_PHP9
 	help
 	  Meta package for PHP, selecting one of multiple available versions.
 
@@ -12,19 +13,19 @@ if PHP_SELECTION
 
 choice
   prompt "Select preferred PHP version."
-  default PHP_SELECTION_PREFER_PHP7
-
-config PHP_SELECTION_PREFER_PHP7
-	bool
-	prompt "install PHP7 as default PHP"
-	help
-	  Installs PHP7 and sets symbolic links.
+  default PHP_SELECTION_PREFER_PHP8
 
 config PHP_SELECTION_PREFER_PHP8
 	bool
 	prompt "install PHP8 as default PHP"
 	help
 	  Installs PHP8 and sets symbolic links.
+
+#config PHP_SELECTION_PREFER_PHP9
+#	bool
+#	prompt "install PHP9 as default PHP"
+#	help
+#	  Installs PHP9 and sets symbolic links.
 
 endchoice
 

@@ -1,0 +1,49 @@
+diff -Naur qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/event_converter_evdev.cc qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/event_converter_evdev.cc
+--- qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/event_converter_evdev.cc	2020-03-24 10:16:30.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/event_converter_evdev.cc	2025-08-06 16:17:01.082183936 +0200
+@@ -176,8 +176,13 @@
+ base::TimeTicks EventConverterEvdev::TimeTicksFromInputEvent(
+     const input_event& event) {
+   base::TimeTicks timestamp =
++#ifndef input_event_sec
+       ui::EventTimeStampFromSeconds(event.time.tv_sec) +
+       base::TimeDelta::FromMicroseconds(event.time.tv_usec);
++#else
++      ui::EventTimeStampFromSeconds(event.input_event_sec) +
++      base::TimeDelta::FromMicroseconds(event.input_event_usec);
++#endif
+   ValidateEventTimeClock(&timestamp);
+   return timestamp;
+ }
+diff -Naur qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/touch_evdev_debug_buffer.cc qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/touch_evdev_debug_buffer.cc
+--- qt-everywhere-src-5.14.2_org/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/touch_evdev_debug_buffer.cc	2020-03-24 10:16:30.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtwebengine/src/3rdparty/chromium/ui/events/ozone/evdev/touch_evdev_debug_buffer.cc	2025-08-06 16:11:05.211736473 +0200
+@@ -5,6 +5,7 @@
+ #include "ui/events/ozone/evdev/touch_evdev_debug_buffer.h"
+ 
+ #include <stdio.h>
++#include <linux/input.h>
+ 
+ #include "base/files/file.h"
+ #include "base/files/file_util.h"
+@@ -59,11 +60,20 @@
+   for (int i = 0; i < kDebugBufferSize; ++i) {
+     struct TouchEvent* te =
+         &logged_events_[(debug_buffer_tail_ + i) % kDebugBufferSize];
++#ifndef input_event_sec
+     if (te->ev.time.tv_sec == 0 && te->ev.time.tv_usec == 0)
++#else
++    if (te->ev.input_event_sec == 0 && te->ev.input_event_usec == 0)
++#endif
+       continue;
+     std::string event_string = base::StringPrintf(
++#ifndef input_event_sec
+         "E: %ld.%06ld %04x %04x %d %d\n", te->ev.time.tv_sec,
+         te->ev.time.tv_usec, te->ev.type, te->ev.code, te->ev.value, te->slot);
++#else
++        "E: %ld.%06ld %04x %04x %d %d\n", te->ev.input_event_sec,
++        te->ev.input_event_usec, te->ev.type, te->ev.code, te->ev.value, te->slot);
++#endif
+     report_content += event_string;
+   }
+   file.Write(0, report_content.c_str(), report_content.length());

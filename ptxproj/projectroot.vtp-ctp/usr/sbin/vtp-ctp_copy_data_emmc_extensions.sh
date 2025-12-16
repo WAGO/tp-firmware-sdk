@@ -190,7 +190,7 @@ function do_mkfs
         vfat)
             # Follow sfdisk's advice and delete 1st sector of a dos partition
             dd if=/dev/zero of="${device}" bs=512 count=1 && \
-            /sbin/mkfs.vfat -n "${label}" "${VFAT_OPTIONS[@]}" "${device}"
+            /sbin/mkfs.vfat -n "${label}" ${VFAT_OPTIONS[@]} "${device}"
             ;;
         ext3)
             /sbin/mke2fs "${device}" -L "${label}" -F && \

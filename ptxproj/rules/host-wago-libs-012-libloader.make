@@ -79,7 +79,7 @@ endif
 $(STATEDIR)/hostlibloader.install:
 	@$(call targetinfo)
 #	@$(call world/install, hostlibloader)
-	cp $(HOSTLIBLOADER_DIR)/include/LibraryLoader.h $(PTXCONF_SYSROOT_HOST)/include/LibraryLoader.h
+	cp $(HOSTLIBLOADER_DIR)/include/LibraryLoader.h $(PTXCONF_SYSROOT_HOST)/usr/include/LibraryLoader.h
 	cp $(HOSTLIBLOADER_DIR)/lib/.libs/lib* $(PTXCONF_SYSROOT_HOST)/lib/
 	@$(call touch)
 

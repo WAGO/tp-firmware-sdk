@@ -13,7 +13,7 @@ if [ -z "$SCRIPT_DIR" ]; then
   PTXCONF_SYSROOT_HOST="$(source $PTXDIST_PLATFORMCONFIG && echo "$PTXCONF_SYSROOT_HOST")"
   SYSROOT_HOST="${SYSROOT_HOST:-$PTXCONF_SYSROOT_HOST}"
 
-  SCRIPT_DIR="$SYSROOT_HOST/lib/ct-build"
+  SCRIPT_DIR="$SYSROOT_HOST/usr/lib/ct-build"
 fi
 
 exec "$SCRIPT_DIR/bin/ptxdist-make" "$@"

@@ -83,7 +83,7 @@ config LIBBACNETSTACK_ARTIFACTORY_DEV_URL_TEMPLATE
 	string
 	depends on LIBBACNETSTACK
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FBACnet_Stack%2Fmain&a=BACnet_Stack-Source&repos=pl_controller-generic-dev-local&v=*"
+	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FBACnet_Stack%2Fdev&a=BACnet_Stack-Source&repos=pl_controller-generic-dev-local&v=*"
 	help
 	  Searches for the current dev artifact.
 

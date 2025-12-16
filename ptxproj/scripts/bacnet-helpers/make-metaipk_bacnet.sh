@@ -16,6 +16,9 @@ while [[ $# -gt 0 ]]; do
     -u|--url)
       PTXCONF_OPKG_OPKG_CONF_URL="$2"
       ;;
+    --isarm64)
+      IS_ARM64="$2"
+      ;;
     --libwebsockets)
       WITH_LIBWEBSOCKETS="$2"
       ;;
@@ -153,6 +156,11 @@ PACKAGES="$LIB_BACNET_IPK $LIB_BACNET_CONFIG_IPK $CDS3_TSCIO_BACNET_IPK $CDS3_IO
 VERSION="${BACNET_VERSION}"
 REPO_NAME="bacnet_rev${BACNET_REV}_${VERSION}_FW${FW_VERSION}.repo"
 
+ARCH_STRING=armhf
+if [ "$IS_ARM64" = "y" ]; then
+  ARCH_STRING=arm64
+fi
+
 #--------------------------------------
 # Print variables
 #--------------------------------------
@@ -171,6 +179,7 @@ echo FW_VERSION=$FW_VERSION
 echo PACKAGES=$PACKAGES
 echo VERSION=$VERSION
 echo REPO_NAME=$REPO_NAME
+echo ARCH_STRING=$ARCH_STRING
 
 #--------------------------------------
 # Cleanup function
@@ -258,7 +267,7 @@ echo "Package: bacnet_repo"                                      > ${BUILD_DIR}b
 echo "Priority: optional"                                       >> ${BUILD_DIR}bacnet-repo-src/control/control
 echo "Version:  $VERSION"                                       >> ${BUILD_DIR}bacnet-repo-src/control/control
 echo "Section:    base"                                         >> ${BUILD_DIR}bacnet-repo-src/control/control
-echo "Architecture: armhf"                                      >> ${BUILD_DIR}bacnet-repo-src/control/control
+echo "Architecture: $ARCH_STRING"                               >> ${BUILD_DIR}bacnet-repo-src/control/control
 echo "Maintainer: \"WAGO GmbH & Co. KG (SEp)\" " >> ${BUILD_DIR}bacnet-repo-src/control/control
 echo "Depends: "                                                >> ${BUILD_DIR}bacnet-repo-src/control/control
 echo "Source: "                                                 >> ${BUILD_DIR}bacnet-repo-src/control/control

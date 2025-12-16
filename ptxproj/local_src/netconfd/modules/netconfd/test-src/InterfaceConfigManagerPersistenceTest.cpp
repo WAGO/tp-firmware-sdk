@@ -11,6 +11,7 @@
 #include "MockIEthernetInterface.hpp"
 #include "MockINetDevManager.hpp"
 #include "MockIPersistencePortConfigs.hpp"
+#include "MockIEventManager.hpp"
 
 namespace netconf {
 
@@ -26,6 +27,7 @@ class InterfaceConfigManagerPersistenceTest : public InterfaceConfigManagerBaseT
  public:
   NiceMock<MockINetDevManager> netdev_manager_;
   NiceMock<MockIPersistencePortConfigs> persist_portconfig_mock;
+  NiceMock<MockIEventManager> event_manager_mock;
   MockIEthernetInterface ethernet_interface_mock;
   std::unique_ptr<InterfaceConfigManager> sut;
 
@@ -91,7 +93,7 @@ class InterfaceConfigManagerPersistenceTest : public InterfaceConfigManagerBaseT
   }
 
   void InstantiateSut() {
-    sut = ::std::make_unique<InterfaceConfigManager>(netdev_manager_, persist_portconfig_mock, *fake_fac_);
+    sut = ::std::make_unique<InterfaceConfigManager>(netdev_manager_, persist_portconfig_mock, *fake_fac_, event_manager_mock);
     sut->InitializePorts();
     EXPECT_EQ(netdevs_.size(), created_ethernet_interfaces.size());
   }

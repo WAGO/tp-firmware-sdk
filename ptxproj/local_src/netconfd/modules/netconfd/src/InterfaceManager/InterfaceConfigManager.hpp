@@ -12,6 +12,7 @@
 #include "IPersistence.hpp"
 #include "INetDevManager.hpp"
 #include "InterfaceInformation.hpp"
+#include "IEventManager.hpp"
 
 namespace netconf {
 
@@ -21,7 +22,8 @@ class InterfaceConfigManager : public IInterfaceInformation{
 
   InterfaceConfigManager(INetDevManager& netdev_manager,
       IPersistence<InterfaceConfigs>& persistence_provider,
-      IEthernetInterfaceFactory& eth_factory);
+      IEthernetInterfaceFactory& eth_factory,
+      IEventManager &event_manager);
   ~InterfaceConfigManager() override = default;
 
   InterfaceConfigManager(const InterfaceConfigManager &other) = delete;
@@ -46,6 +48,8 @@ class InterfaceConfigManager : public IInterfaceInformation{
   INetDevManager& netdev_manager_;
   IPersistence<InterfaceConfigs>& persistence_provider_;
   IEthernetInterfaceFactory& ethernet_interface_factory_;
+  IEventManager &event_manager_;
+
   ::std::map<Interface, ::std::unique_ptr<IEthernetInterface>> ethernet_interfaces_;
   InterfaceConfigs current_config_;
 };

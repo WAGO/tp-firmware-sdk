@@ -12,12 +12,13 @@
 #include "DipSwitch.hpp"
 
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 namespace netconf {
 
 using namespace std::string_literals;
 
-using boost::filesystem::ofstream;
+using std::ofstream;
 using boost::filesystem::path;
 
 static void PrepareDipFile(std::string const& file, std::string const& value)

@@ -16,20 +16,21 @@ PACKAGES-$(PTXCONF_PRINT_LOG) += print_log
 #
 # Paths and names
 #
-PRINT_LOG_VERSION        := 1.0.0
+PRINT_LOG_VERSION        := 1.1.0
 PRINT_LOG                := print_log
 PRINT_LOG_MD5            :=
 PRINT_LOG_BUILDCONFIG    := Release
 PRINT_LOG_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(PRINT_LOG)
 PRINT_LOG_BUILDROOT_DIR  := $(BUILDDIR)/$(PRINT_LOG)
 PRINT_LOG_DIR            := $(PRINT_LOG_BUILDROOT_DIR)/src
-PRINT_LOG_BUILD_DIR      := $(PRINT_LOG_BUILDROOT_DIR)/bin/$(PRINT_LOG_BUILDCONFIG)
+PRINT_LOG_BIN_DIR        := $(PRINT_LOG_BUILDROOT_DIR)/bin/$(PRINT_LOG_BUILDCONFIG)
 PRINT_LOG_LICENSE        := WAGO
 PRINT_LOG_CONF_TOOL      := NO
 PRINT_LOG_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(PRINT_LOG_BUILDCONFIG) \
-BIN_DIR=$(PRINT_LOG_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(PRINT_LOG_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
+PRINT_LOG_DEVPKG         := NO
 
 
 # ----------------------------------------------------------------------------
@@ -94,7 +95,7 @@ $(STATEDIR)/print_log.targetinstall:
 	@$(call install_fixup, print_log,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, print_log,DESCRIPTION,missing)
 
-	@$(call install_copy, print_log, 0, 0, 0755, $(PRINT_LOG_BUILD_DIR)/print_log.elf, /etc/config-tools/print_log) 
+	@$(call install_copy, print_log, 0, 0, 0755, $(PRINT_LOG_BIN_DIR)/print_log.elf, /etc/config-tools/print_log) 
 	@$(call install_copy, print_log, 0, 0, 0444, $(PRINT_LOG_DIR)/etc/sudoers.d/print_log, /etc/sudoers.d/print_log)
 
 	@$(call install_finish, print_log)

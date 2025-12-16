@@ -130,7 +130,6 @@ void com_GEN_Close(com_tConnection* con)
       {
         SERV_StopServerThread();
       }
-      dbus_error_free(&con->error);
       break;
     case COM_CONNECTION_DIRECT:
       dbus_connection_unref(con->bus);
@@ -139,7 +138,25 @@ void com_GEN_Close(com_tConnection* con)
     default:
       break;
   }
-
+  if(con->lastMessage != NULL)
+  {
+    dbus_message_unref(con->lastMessage);
+    con->lastMessage = NULL;
+  }
+  if(con->lastReply != NULL)
+  {
+    dbus_message_unref(con->lastReply);
+    con->lastReply = NULL;
+  }
+  if(con->directReply != NULL)
+  {
+    dbus_message_unref(con->directReply);
+    con->directReply = NULL;
+  }
+  if (dbus_error_is_set(&con->error))
+  {
+    dbus_error_free(&con->error);
+  }
 }
 
 

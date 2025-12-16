@@ -222,46 +222,53 @@ static void RemoveLogs()
 }
 
 //------------------------------------------------------------------------------
-static bool InjectSecrets(const std::string & arg, std::vector<std::string> & pcapngFiles)
+static bool InjectSecrets(const std::vector<std::string> & args, std::vector<std::string> & pcapngFiles)
 {
-  Debug_Printf("InjectSecrets(%s) \n", arg.c_str());
-
-  std::string arg_type;
-  std::string arg_path;
-  std::stringstream arg_stream{arg};
-
-  // expect format like "tls,/a/path.log"
-  if (!std::getline(arg_stream, arg_type, ',') || arg_type.empty())
-  {
-    Debug_Printf("Invalid argument formatting\n");
-    return false;
-  }
-  if (!std::getline(arg_stream, arg_path, ',') || arg_path.empty())
-  {
-    Debug_Printf("Invalid argument formatting\n");
-    return false;
-  }
-  if (!canonicalise_file_path(arg_path) || !check_allowed_extra_file_path(arg_path))
-  {
-    Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "No valid secrets log found at \"%s\".", arg_path.c_str());
-    return false;
-  }
-
-  pcpp::DecryptionSecretType secret_type;
-  if (!wp::SecretsHandler::parse_secrets_type(arg_type, secret_type))
-  {
-    Debug_Printf("Invalid secret type \"%s\"\n", arg_type.c_str());
-    return false;
-  }
+  Debug_Printf("InjectSecrets(%d,%d) \n", args.size(), pcapngFiles.size());
 
   std::vector<pcpp::DecryptionSecret> secrets;
-  pcpp::DecryptionSecret secret(secret_type, 0, nullptr);
-  if (!wp::SecretsHandler::parse_secrets_file(arg_path, secret_type, secret))
+  bool result = true;
+
+  for (const auto & arg : args)
   {
-    Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "Failed to parse secrets log file \"%s\".", arg_path.c_str());
-    return false;
+    Debug_Printf("Secret file argument: %s\n", arg.c_str());
+    std::string arg_type;
+    std::string arg_path;
+    std::stringstream arg_stream{arg};
+
+    // expect format like "tls,/a/path.log"
+    if (!std::getline(arg_stream, arg_type, ',') || arg_type.empty())
+    {
+      Debug_Printf("Invalid argument formatting\n");
+      return false;
+    }
+    if (!std::getline(arg_stream, arg_path, ',') || arg_path.empty())
+    {
+      Debug_Printf("Invalid argument formatting\n");
+      return false;
+    }
+    if (!canonicalise_file_path(arg_path) || !check_allowed_extra_file_path(arg_path))
+    {
+      Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "No valid secrets log found at \"%s\".\n", arg_path.c_str());
+      result = false;
+      continue;
+    }
+
+    pcpp::DecryptionSecretType secret_type;
+    if (!wp::SecretsHandler::parse_secrets_type(arg_type, secret_type))
+    {
+      Debug_Printf("Invalid secret type \"%s\"\n", arg_type.c_str());
+      return false;
+    }
+
+    pcpp::DecryptionSecret secret(secret_type, 0, nullptr);
+    if (!wp::SecretsHandler::parse_secrets_file(arg_path, secret_type, secret))
+    {
+      Debug_PrintAndLogToFile(INJECT_SECRETS_LOG_PATH, "Failed to parse secrets log file \"%s\".\n", arg_path.c_str());
+      return false;
+    }
+    secrets.emplace_back(secret);
   }
-  secrets.emplace_back(secret);
 
   // if no pcaps given, use any existing in capture dir
   if (pcapngFiles.empty())
@@ -279,7 +286,6 @@ static bool InjectSecrets(const std::string & arg, std::vector<std::string> & pc
     }
   }
 
-  bool result = true;
   for (const auto & pcapngFile : pcapngFiles)
   {
     if (!wp::SecretsHandler::inject_secrets(secrets, pcapngFile))
@@ -501,7 +507,7 @@ int main(int    argc,
   std::string filter_optarg = "";
   std::string archive_optarg = "";
   std::vector<std::string> archive_extra_files;
-  std::string inject_optarg = "";
+  std::vector<std::string> inject_optargs;
 
   while((oc = getopt_long(argc, argv, "drhic::t::f:a:j:", &longopts[0], &ocIndex)) != -1)
   {
@@ -560,7 +566,7 @@ int main(int    argc,
         break;
       case 'j':
         option_actions |= opt_actions::inject_secrets;
-        inject_optarg = optarg;
+        inject_optargs.emplace_back(optarg);
         break;
       // invalid options, missing option argument or show help
       case '?':
@@ -637,7 +643,7 @@ int main(int    argc,
       usleep(100 * 1000); // wait 100ms to finish killing the pcap logger before accessing the files
     }
 
-    if (!InjectSecrets(inject_optarg, archive_extra_files))
+    if (!InjectSecrets(inject_optargs, archive_extra_files))
     {
       Debug_Printf("Could not inject secrets into at least one file.\n");
     }

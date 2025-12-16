@@ -21,6 +21,7 @@ NETCONFD_MD5            :=
 NETCONFD                := netconfd
 NETCONFD_URL            := file://local_src/netconfd
 NETCONFD_LICENSE        := GPLv2,LGPLv3
+NETCONFD_DEVPKG         := NO
 
 NETCONFD_BUILDCONFIG    := Release
 NETCONFD_SRC_DIR        := $(call ptx/in-path, PTXDIST_PATH, local_src/netconfd)
@@ -30,13 +31,13 @@ endif
 
 NETCONFD_BUILDROOT_DIR  := $(BUILDDIR)/$(NETCONFD)-$(NETCONFD_VERSION)
 NETCONFD_DIR            := $(NETCONFD_BUILDROOT_DIR)/src
-NETCONFD_BUILD_DIR      := $(NETCONFD_BUILDROOT_DIR)/bin/$(NETCONFD_BUILDCONFIG)
+NETCONFD_BIN_DIR        := $(NETCONFD_BUILDROOT_DIR)/bin/$(NETCONFD_BUILDCONFIG)
 
 NETCONFD_CONF_TOOL      := NO
 NETCONFD_MAKE_ENV       := $(CROSS_ENV) \
                             BUILDCONFIG=$(NETCONFD_BUILDCONFIG) \
-                            BIN_DIR=$(NETCONFD_BUILD_DIR) \
-                            SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build \
+                            BIN_DIR=$(NETCONFD_BIN_DIR) \
+                            SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build \
 							PTXDIST_PACKAGE_MK_FILE=$(call ptx/in-path, PTXDIST_PATH, rules/netconfd.make)
 
 
@@ -106,7 +107,7 @@ $(STATEDIR)/netconfd.targetinstall:
 	@$(call install_fixup, netconfd,AUTHOR,"Wago")
 	@$(call install_fixup, netconfd,DESCRIPTION,missing)
 
-	@$(call install_copy, netconfd, 0, 0, 0755, $(NETCONFD_BUILD_DIR)/netconfd.elf, /usr/bin/netconfd)
+	@$(call install_copy, netconfd, 0, 0, 0755, $(NETCONFD_BIN_DIR)/netconfd.elf, /usr/bin/netconfd)
 
 	@$(call install_copy, netconfd, 0, 0, 0750, $(NETCONFD_DIR)/root/etc/init.d/netconfd, /etc/init.d/netconfd)
 	@$(call install_link, netconfd, ../init.d/netconfd, /etc/rc.d/S13_netconfd)

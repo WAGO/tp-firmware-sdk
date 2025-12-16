@@ -1,0 +1,30 @@
+/** \example  example_file_api_client.cpp
+
+The following file shows the implementation of an example file api client.\n 
+This example uses
+\ref wago::wdx::linuxos::com::parameter_service_file_api_proxy
+to request a list of available devices.
+
+Function main():\n 
+At begin of the main() function a handler for the SIGINT signal is set up to allow the main loop to exit on request.
+In this example we use syslog as a predefined solution for the log output of libwdxlinuxoscom's components.
+Log initialization/deinitialization is done by \ref wago::logging::init() and \ref wago::logging::close().
+To allow early log output during component initialization it is highly recommended to configure logging 
+(with help of \ref wago::logging::set_log_function() and \ref wago::logging::set_log_level()) before first component
+instantiation (in this example \ref wago::wdx::linuxos::com::parameter_service_file_api_proxy).\n 
+
+In the main loop the driver method
+\ref wago::wdx::linuxos::com::driver_i::run_once()
+is called with a timeout of 1000 ms. This way the method returns at least after 1000 ms when no work has to be done or
+after one remaining task was done. Alternatively a program may use
+\ref wago::wdx::linuxos::com::driver_i::run()
+to avoid a turn around after a given amount of time.\n 
+
+Function wc_Fail():\n 
+This symbol is declared in header file <wc/assertion.h>. If an assertion fails this function is called as handler.
+The libwdxlinuxoscom library contain with a "weak" implementation of this symbol and a default handling.
+In this example executable we replace the default handling:
+A fatal error is logged and afterwards the default assertion is triggered.
+
+\see example_providers.cpp for an example how to register/unregister providers.
+*/

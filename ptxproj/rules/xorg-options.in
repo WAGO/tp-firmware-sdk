@@ -1,0 +1,37 @@
+## SECTION=multimedia_xorg
+
+menu "options                       "
+
+config XORG_KEYBOARD_MAPPING_SUPPORT
+	bool
+	prompt "support keyboard mappings"
+	select XORG_DRIVER_INPUT
+	select XORG_DRIVER_INPUT_KEYBOARD
+	select XORG_APP_XKBCOMP
+	help
+	  If you like to use a keyboard with your X server (mostly wanted)
+	  enable this entry. Its required when you want to configure specific
+	  keyboard layouts and key settings. Mostly needed on non-US keyboards.
+	  Note: A german keyboard does not support the '@¤\[]{}|' keys when
+	  disabled!
+
+config XORG_OPTIONS_TRANS_UNIX
+	bool
+	prompt "unix domain socket transport"
+	depends on XORG_LIB_X11
+	default y
+	help
+	  UNIX domain socket transport. You will need this feature if your
+	  X server and all X clients are running on the same host.
+
+config XORG_OPTIONS_TRANS_TCP
+	bool
+	prompt "tcp socket transport"
+	depends on XORG_LIB_X11
+	default y
+	help
+	  TCP socket transport. You will need this feature if your X server
+	  runs on one host and at least one X client on another host.
+
+endmenu
+

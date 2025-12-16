@@ -29,6 +29,7 @@ LIBSPARKPLUG_BUILD_C_DIR := $(LIBSPARKPLUG_DIR)/client_libraries/c
 LIBSPARKPLUG_LICENSE	 := EPL
 LIBSPARKPLUG_PATH        := PATH=$(CROSS_PATH)
 LIBSPARKPLUG_MAKE_ENV	 := $(CROSS_ENV)
+LIBSPARKPLUG_DEVPKG      := NO
 
 # ----------------------------------------------------------------------------
 # Get

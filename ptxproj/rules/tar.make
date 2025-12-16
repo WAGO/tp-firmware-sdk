@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,11 +18,11 @@ TAR_VERSION	:= 1.35
 TAR_MD5		:= a2d8042658cfd8ea939e6d911eaf4152
 TAR		:= tar-$(TAR_VERSION)
 TAR_SUFFIX	:= tar.xz
-TAR_URL		:= $(call ptx/mirror, GNU, tar/$(TAR).$(TAR_SUFFIX)) \
-			   https://ftp.gnu.org/gnu/tar/$(TAR).$(TAR_SUFFIX)
+TAR_URL		:= $(call ptx/mirror, GNU, tar/$(TAR).$(TAR_SUFFIX))
 TAR_SOURCE	:= $(SRCDIR)/$(TAR).$(TAR_SUFFIX)
 TAR_DIR		:= $(BUILDDIR)/$(TAR)
-TAR_LICENSE	:= unknown
+TAR_LICENSE	:= GPL-3.0-or-later
+TAR_LICENSE_FILES := file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -38,11 +36,16 @@ TAR_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-acl \
+	--disable-gcc-warnings \
 	--disable-rpath \
 	--disable-nls \
 	--disable-backup-scripts \
+	--$(call ptx/endis, PTXDIST_Y2038)-year2038 \
 	--with-included-regex \
 	--without-selinux \
+	--with-packager \
+	--with-packager-version \
+	--with-packager-bug-reports \
 	--with-xattrs
 
 # tar has a silent dependency to libacl! if libacl was build and

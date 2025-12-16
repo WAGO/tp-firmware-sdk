@@ -23,13 +23,13 @@ CONFIG_SNMP_BUILDCONFIG    := Release
 CONFIG_SNMP_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(CONFIG_SNMP)
 CONFIG_SNMP_BUILDROOT_DIR  := $(BUILDDIR)/$(CONFIG_SNMP)
 CONFIG_SNMP_DIR            := $(CONFIG_SNMP_BUILDROOT_DIR)/src
-CONFIG_SNMP_BUILD_DIR      := $(CONFIG_SNMP_BUILDROOT_DIR)/bin/$(CONFIG_SNMP_BUILDCONFIG)
+CONFIG_SNMP_BIN_DIR      := $(CONFIG_SNMP_BUILDROOT_DIR)/bin/$(CONFIG_SNMP_BUILDCONFIG)
 CONFIG_SNMP_LICENSE        := MPL-2.0
 CONFIG_SNMP_CONF_TOOL      := NO
 CONFIG_SNMP_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(CONFIG_SNMP_BUILDCONFIG) \
-BIN_DIR=$(CONFIG_SNMP_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(CONFIG_SNMP_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 
 # ----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ $(STATEDIR)/config_snmp.targetinstall:
 	@$(call install_fixup, config_snmp,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, config_snmp,DESCRIPTION,missing)
 
-	@$(call install_copy, config_snmp, 0, 0, 0755, $(CONFIG_SNMP_BUILD_DIR)/config_snmp.elf, /etc/config-tools/config_snmp)
+	@$(call install_copy, config_snmp, 0, 0, 0755, $(CONFIG_SNMP_BIN_DIR)/config_snmp.elf, /etc/config-tools/config_snmp)
 
 	@$(call install_finish, config_snmp)
 

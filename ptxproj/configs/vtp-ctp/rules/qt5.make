@@ -71,7 +71,7 @@ QT5_WRAPPER_BLACKLIST := \
 # use "/." for PKG_CONFIG_SYSROOT_DIR. Otherwise the resulting "//..."
 # paths are treated as relative to the source dir by chromium
 QT5_PKG_CONFIG_ENV := \
-	$(CROSS_ENV_PKG_CONFIG) \
+	$(CROSS_ENV_PKGCONF) \
 	PKG_CONFIG_SYSROOT_DIR=$(PTXCONF_SYSROOT_TARGET) \
 	PKG_CONFIG_LIBDIR=$(PTXCONF_SYSROOT_TARGET)/usr/lib/pkgconfig \
 
@@ -460,11 +460,8 @@ QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_GUI)			+= platforms/libqoffscreen
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_VNC)				+= platforms/libqvnc
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= platforms/libqxcb
 QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS_KMS)			+= egldeviceintegrations/libqeglfs-kms-integration
-
-# not compatible with QT5.14.2
 #QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_EGLFS_X11)			+= egldeviceintegrations/libqeglfs-x11-integration
 #QT5_PLUGINS-$(PTXCONF_QT5_PLATFORM_XCB)				+= xcbglintegrations/libqxcb-egl-integration
-
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL)		+= sqldrivers/libqsqlmysql
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)		+= sqldrivers/libqsqlite
 
@@ -728,6 +725,7 @@ ifdef PTXCONF_QT5_MODULE_QTDECLARATIVE_QMLSCENE
 	@$(call install_copy, qt5, 0, 0, 0755, -, /usr/bin/qmlscene)
 endif
 
+	@$(call install_copy, qt5, 0, 0, 0644, $(LICENSES_PATH)/qt5/license.qt5_$(QT5_VERSION).txt, $(LICENSES_TARGET_DIR)/oss/license.qt5_$(QT5_VERSION).txt)
 	@$(call install_finish, qt5)
 
 	@$(call touch)

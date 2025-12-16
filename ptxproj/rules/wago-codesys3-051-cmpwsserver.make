@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CDS3_CMPWSSERVER) += cds3-cmpwsserver
 
-CDS3_CMPWSSERVER_VERSION   := 2.0.19
+CDS3_CMPWSSERVER_VERSION   := 2.0.20
 CDS3_CMPWSSERVER           := CmpWSServer
 CDS3_CMPWSSERVER_DIR       := $(BUILDDIR)/$(CDS3_CMPWSSERVER)
 CDS3_CMPWSSERVER_URL       := file://$(PTXDIST_WORKSPACE)/wago_intern/codesys3-Component/$(CDS3_CMPWSSERVER)
@@ -145,7 +145,7 @@ else
 	
 	@$(call install_link, cds3-cmpwsserver, ../$(CDS3_CMPWSSERVER_BIN), /usr/lib/cds3-custom-components/lib$(CDS3_CMPWSSERVER).so);
 	
-	@$(call install_alternative, cds3-cmpwsserver , 0, 0, 0644, $(PTXCONF_CDS3_PLCCONFIGDIR)/$(CDS3_CMPWSSERVER).cfg)
+	@$(call install_copy, cds3-cmpwsserver, 0, 0, 0644, $(CDS3_CMPWSSERVER_DIR)/$(CDS3_CMPWSSERVER).cfg, $(PTXCONF_CDS3_PLCCONFIGDIR)/$(CDS3_CMPWSSERVER).cfg, n)
 	
 	@$(call install_copy, cds3-cmpwsserver, 0, 0, 0755, $(CDS3_CMPWSSERVER_WS_DIR))
 	@$(call install_copy, cds3-cmpwsserver, 0, 0, 0644, $(CDS3_CMPWSSERVER_DIR)/eWS.js,  $(CDS3_CMPWSSERVER_WS_DIR)/eWS.js)

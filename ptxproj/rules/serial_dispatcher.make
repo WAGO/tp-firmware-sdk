@@ -28,6 +28,7 @@ SERIAL_DISPATCHER_DIR		:= $(BUILDDIR)/$(SERIAL_DISPATCHER)
 SERIAL_DISPATCHER_BUILD_OOT	:= NO
 SERIAL_DISPATCHER_LICENSE	:= GPLv2
 SERIAL_DISPATCHER_DEVICE	:= $(call remove_quotes,$(PTXCONF_SERIAL_DISPATCHER_DEVICE))
+SERIAL_DISPATCHER_DEVPKG    := NO
 
 # ----------------------------------------------------------------------------
 # Extract

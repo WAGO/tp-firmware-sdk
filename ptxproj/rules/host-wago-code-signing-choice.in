@@ -1,0 +1,5 @@
+## SECTION=code_signing_provider
+
+config CODE_SIGNING_PROVIDER_WAGO
+	bool
+	prompt "wago"

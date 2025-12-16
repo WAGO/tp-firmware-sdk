@@ -1,0 +1,18 @@
+{
+    "broadcast-protection": {
+        "ports": [],
+        "unit": "",
+        "value": 1000
+    },
+    "multicast-protection": {
+        "ports": [],
+        "unit": "",
+        "value": 2000
+    },
+    "port-mirror": {
+        "destination": "X2",
+        "enabled": false,
+        "source": "X1"
+    },
+    "version": 11
+}

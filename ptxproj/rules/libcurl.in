@@ -59,6 +59,9 @@ config LIBCURL_VERBOSE
 config LIBCURL_SSL
 	bool "ssl"
 
+config LIBCURL_RTSP
+	bool "rtsp"
+
 if LIBCURL_SSL
 
 choice

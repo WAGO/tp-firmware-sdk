@@ -19,7 +19,7 @@ PACKAGES-$(PTXCONF_BACNETNATIVE) += bacnetnative
 BACNETNATIVE                   := bacnetnative
 BACNETNATIVE_FOLDER            := bacnetnative_git
 
-BACNETNATIVE_VERSION           := 1.1.0
+BACNETNATIVE_VERSION           := 1.1.1
 BACNETNATIVE_ELF_VERSION       := $(BACNETNATIVE_VERSION)
 BACNETNATIVE_REL_PATH          := wago_intern/device/bacnet/$(BACNETNATIVE_FOLDER)
 BACNETNATIVE_SRC_DIR           := $(PTXDIST_WORKSPACE)/$(BACNETNATIVE_REL_PATH)
@@ -53,11 +53,11 @@ BACNETNATIVE_DIR               := $(BACNETNATIVE_BUILDROOT_DIR)/$(BACNETNATIVE)
 BACNETNATIVE_LICENSE           := unknown
 
 BACNETNATIVE_BUILDCONFIG       := Release
-BACNETNATIVE_BUILD_DIR         := $(BACNETNATIVE_BUILDROOT_DIR)/bin/$(BACNETNATIVE_BUILDCONFIG)
+BACNETNATIVE_BIN_DIR           := $(BACNETNATIVE_BUILDROOT_DIR)/bin/$(BACNETNATIVE_BUILDCONFIG)
 BACNETNATIVE_BIN               := $(BACNETNATIVE).so.$(BACNETNATIVE_VERSION)
 BACNETNATIVE_MAKE_ENV          := $(CROSS_ENV) \
                                   BUILDCONFIG=$(BACNETNATIVE_BUILDCONFIG) \
-                                  BIN_DIR=$(BACNETNATIVE_BUILD_DIR) \
+                                  BIN_DIR=$(BACNETNATIVE_BIN_DIR) \
                                   TARGET_ARCH=$(PTXCONF_ARCH_STRING) \
                                   ARM_ARCH_VERSION=7 \
                                   SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
@@ -194,6 +194,7 @@ ifdef PTXCONF_WAGO_TOOLS_BUILD_VERSION_RELEASE
 	@cd $(BACNETNATIVE_PKGDIR) && tar cvzf $(BACNETNATIVE_PLATFORMCONFIGPACKAGEDIR)/$(BACNETNATIVE_PACKAGE_NAME).tgz *
 endif
 endif
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install

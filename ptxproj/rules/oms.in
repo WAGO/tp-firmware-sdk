@@ -4,12 +4,23 @@ config OMS
 	bool
 	select HOST_CT_BUILD
 	select GOOGLETEST
+	select LIBEVDEV		if OMS_DISABLE_CONTROLS
 	prompt "oms (oprating mode switch)"
 	default n
 	help
 	  This Package is used for the handling of the operting mode switch
 
 if OMS
+
+config OMS_DISABLE_CONTROLS
+	bool
+	prompt "Enable/Disable OMS controls"
+	default n
+	help
+	  This sub-feature will install components to load a virtual input device if needed,
+	  which will be virtual version of the OMS input device but only with switch option "RUN".
+	  That virtual device will be used by any component based on liboms to disable
+	  any interaction with the real OMS.
 
 config OMS_TRUNK
 	bool

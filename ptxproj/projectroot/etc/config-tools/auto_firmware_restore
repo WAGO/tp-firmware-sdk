@@ -422,13 +422,19 @@ if [ "$rebootFlag" = "1" ]; then
   
 # no reboot - restart codesys if necessary
 elif [ "$restartCodesys" = 1 ]; then
-    echo "Erase retain data..."
-    print_dbg "delete retain data before restart PLC runtime"
-    /usr/sbin/retain_data -d  &>/dev/null
-    if [[ $? -ne $SUCCESS ]]; then
-        report_error "error while deleting retain data"
-        status=$SHELL_ERROR
-        ReportError $status "(/usr/sbin/retain_data)"
+
+    # retain_data available?
+    /usr/sbin/retain_data -s > /dev/null 2>&1
+    if [[ $? -ne 255 ]]; then
+    
+      echo "Erase retain data..."
+      print_dbg "delete retain data before restart PLC runtime"
+      /usr/sbin/retain_data -d  &>/dev/null
+      if [[ $? -ne $SUCCESS ]]; then
+          report_error "error while deleting retain data"
+          status=$SHELL_ERROR
+          ReportError $status "(/usr/sbin/retain_data)"
+      fi
     fi
         
     echo "Restart PLC runtime..."

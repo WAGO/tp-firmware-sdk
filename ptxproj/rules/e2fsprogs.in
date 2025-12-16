@@ -1,0 +1,277 @@
+## SECTION=disk_and_file
+
+menuconfig E2FSPROGS
+	tristate
+	prompt "e2fsprogs                     "
+	select LIBC_DL if E2FSPROGS_LIBSS
+	select LIBC_PTHREAD if E2FSPROGS_LIBCOM_ERR
+	select LIBBLKID
+	select LIBUUID
+	help
+	  The e2fsprogs package provides the filesystem utilities for use
+	  with the ext2 filesystem. It also supports the ext3 and ext4
+	  filesystems.
+
+if E2FSPROGS
+
+# -----------------------------------
+menu "build options                 "
+# -----------------------------------
+
+config E2FSPROGS_IMAGER
+	bool
+	# no prompt
+	default y if E2FSPROGS_INSTALL_E2IMAGE
+	help
+	  Enable support for e2image program.
+
+config E2FSPROGS_RESIZER
+	bool
+	# no prompt
+	default y if E2FSPROGS_INSTALL_RESIZE2FS
+	help
+	  Enable support for e2resize program.
+
+endmenu
+
+# -----------------------------------
+menu "libraries                     "
+# -----------------------------------
+
+config E2FSPROGS_LIBCOM_ERR
+	bool
+	prompt "libcom_err"
+	help
+	  Install libcom_err.
+
+config E2FSPROGS_LIBE2P
+	bool
+	prompt "libe2p"
+	help
+	  Install libe2p.
+
+config E2FSPROGS_LIBEXT2FS
+	bool
+	prompt "libext2fs"
+	select E2FSPROGS_LIBCOM_ERR
+	help
+	  Install libext2fs.
+
+config E2FSPROGS_LIBSS
+	bool
+	prompt "libss"
+	select E2FSPROGS_LIBCOM_ERR
+	help
+	  Install libss.
+
+endmenu
+
+# -----------------------------------
+menu "binaries                      "
+# -----------------------------------
+
+config E2FSPROGS_INSTALL_CHATTR
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	prompt "chattr"
+	help
+	  Enable support for chattr program.
+
+config E2FSPROGS_INSTALL_LSATTR
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	prompt "lsattr"
+	help
+	  Enable support for lsattr program.
+
+# -----
+
+config E2FSPROGS_INSTALL_BADBLOCKS
+	bool
+	select E2FSPROGS_LIBEXT2FS
+	select E2FSPROGS_LIBCOM_ERR
+	prompt "badblocks"
+	help
+	  Enable support for badblocks program.
+
+
+config E2FSPROGS_INSTALL_DUMPE2FS
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "dumpe2fs"
+	help
+	  Enable support for dumpe2fs program.
+
+
+
+config E2FSPROGS_INSTALL_E2FSCK
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "e2fsck"
+	help
+	  Enable support for e2fsck program.
+
+config E2FSPROGS_INSTALL_FSCK_EXT2
+	bool
+	prompt "fsck.ext2"
+	select E2FSPROGS_INSTALL_E2FSCK
+	help
+	  Create link to fsck.ext2 program.
+
+
+config E2FSPROGS_INSTALL_FSCK_EXT3
+	bool
+	prompt "fsck.ext3"
+	select E2FSPROGS_INSTALL_E2FSCK
+	help
+	  Enable support for fsck.ext3 program.
+
+config E2FSPROGS_INSTALL_FSCK_EXT4
+	bool
+	prompt "fsck.ext4"
+	select E2FSPROGS_INSTALL_E2FSCK
+	help
+	  Create link to fsck.ext4 program.
+
+
+config E2FSPROGS_INSTALL_DEBUGFS
+	bool
+	select E2FSPROGS_LIBEXT2FS
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBSS
+	select E2FSPROGS_LIBCOM_ERR
+	prompt "debugfs"
+	help
+	  Enable support for debugfs program.
+
+config E2FSPROGS_INSTALL_E2IMAGE
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBEXT2FS
+	prompt "e2image"
+	help
+	  Enable support for e2image program.
+
+
+config E2FSPROGS_INSTALL_E2LABEL
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "e2label"
+	help
+	  Enable support for e2label program.
+
+config E2FSPROGS_INSTALL_E2UNDO
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBEXT2FS
+	prompt "e2undo"
+	help
+	  Enable support for e2undo program.
+
+config E2FSPROGS_INSTALL_E4CRYPT
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	prompt "e4crypt"
+	help
+	  Enable support for e4crypt, an ext4 filesystem encryption
+	  utility.
+
+config E2FSPROGS_INSTALL_E4DEFRAG
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	prompt "e4defrag"
+	help
+	  Enable support for e4defrag, an online defragmenter for the
+	  ext4 filesystem.
+
+config E2FSPROGS_INSTALL_FILEFRAG
+	bool
+	prompt "filefrag"
+	help
+	  Enable support for filefrag program.
+
+config E2FSPROGS_INSTALL_LOGSAVE
+	bool
+	prompt "logsave"
+	help
+	  Enable support for logsave program.
+
+
+
+comment "BusyBox' mke2fs is selected!"
+	depends on BUSYBOX_MKE2FS
+
+if !BUSYBOX_MKE2FS || ALLYES
+
+config E2FSPROGS_INSTALL_MKE2FS
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "mke2fs"
+	help
+	  Enable support for mke2fs program.
+
+config E2FSPROGS_INSTALL_MKFS_EXT2
+	bool
+	prompt "mkfs.ext2"
+	select E2FSPROGS_INSTALL_MKE2FS
+	help
+	  Create link to mkfs.ext2 program.
+
+config E2FSPROGS_INSTALL_MKFS_EXT3
+	bool
+	prompt "mkfs.ext3"
+	select E2FSPROGS_INSTALL_MKE2FS
+	help
+	  Create link to mkfs.ext3 program.
+
+config E2FSPROGS_INSTALL_MKFS_EXT4
+	bool
+	prompt "mkfs.ext4"
+	select E2FSPROGS_INSTALL_MKE2FS
+	help
+	  Create link to mkfs.ext4 program.
+
+endif
+
+config E2FSPROGS_INSTALL_MKLOSTANDFOUND
+	bool
+	prompt "mklost+found"
+	help
+	  Enable support for mklost+found program.
+
+config E2FSPROGS_INSTALL_RESIZE2FS
+	bool
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "resize2fs"
+	help
+	  Enable support for resize2fs program.
+
+comment "BusyBox' tune2fs is selected!"
+	depends on BUSYBOX_TUNE2FS
+
+config E2FSPROGS_INSTALL_TUNE2FS
+	bool
+	depends on !BUSYBOX_TUNE2FS || ALLYES
+	select E2FSPROGS_LIBCOM_ERR
+	select E2FSPROGS_LIBE2P
+	select E2FSPROGS_LIBEXT2FS
+	prompt "tune2fs"
+	help
+	  Enable support for tune2fs program.
+
+endmenu
+
+endif
+

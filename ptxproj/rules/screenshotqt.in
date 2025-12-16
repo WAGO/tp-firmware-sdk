@@ -3,7 +3,19 @@
 config SCREENSHOTQT
 	tristate
 	prompt "screenshotqt"
-	select QT5
+	select QT5 if SCREENSHOTQT_USE_QT5
 	help
-	  FIXME
+	  QT based screenshot utility
 
+if SCREENSHOTQT
+choice
+	prompt "QT_VERSION_USED"
+		config SCREENSHOTQT_USE_QT5
+			bool
+			prompt "QT5"
+
+		config SCREENSHOTQT_USE_QT6
+			bool
+			prompt "QT6"
+endchoice
+endif

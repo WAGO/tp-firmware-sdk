@@ -1,0 +1,37 @@
+/** \example  example_method_provider.hpp
+
+The following file shows the header file for the example method provider.\n 
+This \ref ::wago::wdx::examples::example_method_provider implements the parameter provider interface
+by inheritance of all necessary methods from the base class \ref ::wago::wdx::base_parameter_provider.
+
+The example provider serves only one method, calculating the sum and the product of two unsigned 32 bit integer values
+for demonstration. To return the requested calculation values the method
+::wago::wdx::parameter_provider_i::invoke_method()
+is overwritten accordingly.
+
+Additionally, the parameter service needs to know which parameters oder methods are provided by this provider,
+therefore the method ::wago::wdx::parameter_provider_i::get_provided_parameters() is overwritten.
+
+\see example_method_provider.cpp for implementation of this class.
+*/
+
+
+/** \example  example_method_provider.cpp
+
+The following file shows the implementation file for the example method provider.\n 
+This example provider responds to every request to calculate the sum and the product of two unsigned 32 bit integers in
+\ref wago::wdx::examples::example_method_provider::invoke_method().
+When no device collection is selected, as it is done here, this refers to the headstation device.
+
+The implementation of 
+\ref wago::wdx::examples::example_method_provider::invoke_method()
+delegates each verified request to an internal asynchronous function to calculate sum and product.
+This function satisfies the promise with a response.
+
+Notice that all code possibly throw inside the asynchronous function have to wrapped into a try/catch block.
+Otherwise a thrown exception here would terminate the whole application.
+
+\see example_method_provider.hpp for definition of this class.
+\see example_model_extension_provider.hpp for for an example that provides the model for the method used.
+\see example_parameter_provider.hpp for more examples about providing parameters.
+*/

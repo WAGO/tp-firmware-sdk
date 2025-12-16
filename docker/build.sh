@@ -6,7 +6,7 @@ TOOLCHAIN_PATH="/opt/gcc-Toolchain-2022.08-wago.1/LINARO.Toolchain-2022.08-wago.
 
 print_usage() {
     cat << EOF
-build, (c) 2023 WAGO GmbH & Co. KG
+build, (c) 2025 WAGO GmbH & Co. KG
 Usage:
     build init | build | images | help
 Commands:

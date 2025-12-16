@@ -91,3 +91,14 @@ Index: googletest-1.12.1/googletest/src/gtest-death-test.cc
  }  // namespace internal
  
  #endif  // GTEST_HAS_DEATH_TEST
+Index: googletest-1.12.1/googletest/cmake/gtest.pc.in
+===================================================================
+--- googletest-1.12.1.orig/googletest/cmake/gtest.pc.in
++++ googletest-1.12.1/googletest/cmake/gtest.pc.in
+@@ -5,5 +5,5 @@
+ Description: GoogleTest (without main() function)
+ Version: @PROJECT_VERSION@
+ URL: https://github.com/google/googletest
+-Libs: -L${libdir} -lgtest @CMAKE_THREAD_LIBS_INIT@
++Libs: -L${libdir} -lgtest -lgcov @CMAKE_THREAD_LIBS_INIT@
+ Cflags: -I${includedir} @GTEST_HAS_PTHREAD_MACRO@

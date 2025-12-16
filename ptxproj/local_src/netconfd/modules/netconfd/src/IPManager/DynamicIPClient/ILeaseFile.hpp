@@ -2,11 +2,8 @@
 
 #pragma once
 
-#include "IDynamicIPClient.hpp"
 #include <string>
 #include "BaseTypes.hpp"
-#include "DynamicIPType.hpp"
-#include "Status.hpp"
 
 namespace netconf {
 
@@ -16,9 +13,9 @@ class ILeaseFile {
   virtual ~ILeaseFile() = default;
 
   ILeaseFile(const ILeaseFile&) = default;
-  ILeaseFile& operator=(const ILeaseFile&) = delete;
+  ILeaseFile& operator=(const ILeaseFile&) = default;
   ILeaseFile(const ILeaseFile&&) = delete;
-  ILeaseFile& operator=(const ILeaseFile&&) = delete;
+  ILeaseFile& operator=(ILeaseFile&&) = default;
 
   virtual void Parse(const ::std::string &lease_file_path) = 0;
   virtual Address GetAddress() = 0;

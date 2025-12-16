@@ -1,4 +1,5 @@
 ## SECTION=networking
+
 menuconfig NTPCLIENT
 	tristate
 	prompt "ntpclient                     "
@@ -61,6 +62,16 @@ comment "runtime options   ---"
 config NTPCLIENT_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/ntpclient"
+
+config NTPCLIENT_NTPSERVER_NAME
+	depends on NTPCLIENT_STARTSCRIPT
+	string
+	prompt "NTP server name"
+	default ""
+	help
+	  This will replace the string @HOST@ in the startup script to the given name.
+	  ntpclient will connect this host to read the current time.
 
 endif

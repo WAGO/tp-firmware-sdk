@@ -21,7 +21,7 @@ PACKAGES-$(PTXCONF_LIGHTTPD) += lighttpd
 # Paths and names
 #
 LIGHTTPD_BASE_VERSION  := 1.4.76
-LIGHTTPD_WAGO_VERSION  := wago1
+LIGHTTPD_WAGO_VERSION  := wago2
 LIGHTTPD_VERSION       := $(LIGHTTPD_BASE_VERSION)+$(LIGHTTPD_WAGO_VERSION)
 LIGHTTPD_ARCHIVE_NAME  := lighttpd-$(LIGHTTPD_BASE_VERSION)
 LIGHTTPD               := lighttpd-$(LIGHTTPD_VERSION)
@@ -89,8 +89,8 @@ SUBJ=/C='DE'/ST='NRW'/L='Minden'/O='WAGO GmbH & Co. KG'/OU='AUTOMATION'/CN='Self
 	cp $(LIGHTTPD_DIR)/server.key $(LIGHTTPD_DIR)/server.key.org && \
 	openssl rsa -in $(LIGHTTPD_DIR)/server.key.org -out $(LIGHTTPD_DIR)/server.key -passin env:PASSPHRASE && \
 	openssl req -new -x509 -subj "$${SUBJ}" -days $${DAYS_VALID} -extensions v3_req -key $(LIGHTTPD_DIR)/server.key -out $(LIGHTTPD_DIR)/server.crt -sha256 && \
-	cat $(LIGHTTPD_DIR)/server.crt $(LIGHTTPD_DIR)/server.key > $(LIGHTTPD_DIR)/https-cert.pem && echo $${DAYS_VALID} && \
-	openssl x509 -text -noout -in $(LIGHTTPD_DIR)/https-cert.pem && \
+	cat $(LIGHTTPD_DIR)/server.crt $(LIGHTTPD_DIR)/server.key > $(LIGHTTPD_DIR)/default-cert.pem && echo $${DAYS_VALID} && \
+	openssl x509 -text -noout -in $(LIGHTTPD_DIR)/default-cert.pem && \
 	openssl dhparam -out $(LIGHTTPD_DIR)/dh3072.pem -outform PEM -2 3072
 endif
 
@@ -172,6 +172,24 @@ endif
 	@$(call install_copy, lighttpd, 0, 0, 0755, \
 		/etc/lighttpd/apps.confd);
 
+# Settings file
+	@$(call install_alternative, lighttpd, 0, 0, 0600, \
+		/etc/lighttpd/settings.conf);
+
+# Snippets directory for reusable config files
+	@$(call install_copy, lighttpd, 0, 0, 0755, \
+		/etc/lighttpd/snippets);
+	@$(call install_copy, lighttpd, 0, 0, 0755, \
+		/etc/lighttpd/snippets/cors_policies);
+	@$(call install_alternative, lighttpd, 0, 0, 0600, \
+		/etc/lighttpd/snippets/cors_policies/all_origins_and_null.conf);
+	@$(call install_alternative, lighttpd, 0, 0, 0600, \
+		/etc/lighttpd/snippets/cors_policies/all_origins.conf);
+	@$(call install_alternative, lighttpd, 0, 0, 0600, \
+		/etc/lighttpd/snippets/cors_policies/none.conf);
+	@$(call install_alternative, lighttpd, 0, 0, 0600, \
+		/etc/lighttpd/snippets/cors_policies/whitelist.conf);
+
 ifdef PTXCONF_LIGHTTPD_MOD_FASTCGI_PHP
 	@$(call install_alternative, lighttpd, 0, 0, 0600, \
 		/etc/lighttpd/apps.confd/php.conf)
@@ -203,19 +221,25 @@ endif
 
 endif # PTXCONF_LIGHTTPD_HTTPS
 
+#   # Certificate config tools
+	@$(call install_alternative, lighttpd, 0, 0, 0700, \
+		/etc/config-tools/get_webserver_config)
+	@$(call install_alternative, lighttpd, 0, 0, 0700, \
+		/etc/config-tools/config_webserver)
+
 #	#
 #	# Certificates and keys
 #	#
 ifdef PTXCONF_LIGHTTPD_HTTPS_GEN_CERT
 	@$(call install_copy, lighttpd, 0, 0, 0400, \
-		$(LIGHTTPD_DIR)/https-cert.pem, \
-		/etc/lighttpd/https-cert.pem, n)
+		$(LIGHTTPD_DIR)/default-cert.pem, \
+		/etc/lighttpd/default-cert.pem, n)
 	@$(call install_copy, lighttpd, 0, 0, 0400, \
 		$(LIGHTTPD_DIR)/dh3072.pem, \
 		/etc/lighttpd/dh3072.pem, n)
 else
 	@$(call install_alternative, lighttpd, 0, 0, 0400, \
-		/etc/lighttpd/https-cert.pem, n)
+		/etc/lighttpd/default-cert.pem, n)
 	@$(call install_alternative, lighttpd, 0, 0, 0400, \
 		/etc/lighttpd/dh3072.pem, n)
 endif

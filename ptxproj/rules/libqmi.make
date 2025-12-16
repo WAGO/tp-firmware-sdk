@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,15 +14,18 @@ PACKAGES-$(PTXCONF_LIBQMI) += libqmi
 #
 # Paths and names
 #
-LIBQMI_VERSION	:= 1.24.4
-LIBQMI_MD5	:= be6539fde54fec1fc9d852db201c8560
+LIBQMI_VERSION	:= 1.34.0
+LIBQMI_MD5	:= 677b5d1ab763a7b7285b82d1798ff93d
 LIBQMI		:= libqmi-$(LIBQMI_VERSION)
-LIBQMI_SUFFIX	:= tar.xz
-LIBQMI_URL	:= http://www.freedesktop.org/software/libqmi/$(LIBQMI).$(LIBQMI_SUFFIX)
+LIBQMI_SUFFIX	:= tar.bz2
+LIBQMI_URL	:= https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/archive/$(LIBQMI_VERSION)/$(LIBQMI).$(LIBQMI_SUFFIX)
 LIBQMI_SOURCE	:= $(SRCDIR)/$(LIBQMI).$(LIBQMI_SUFFIX)
 LIBQMI_DIR	:= $(BUILDDIR)/$(LIBQMI)
-LIBQMI_LICENSE	:= GPL-2.0+, LGPL-2.1+
-
+LIBQMI_LICENSE	:= GPL-2.0-or-later AND LGPL-2.1-or-later
+LIBQMI_LICENSE_FILES := \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c
+LIBQMI_DEVPKG := NO
 #Filename for license text of libqmi-glib (LGPL)
 LIBQMI_LICENSE_FILE_LIB :=  COPYING.LIB
 #Filename for license text of qmicli and qmi-network (GPL)
@@ -38,19 +39,24 @@ LIBQMI_AUTHORS := AUTHORS
 # ----------------------------------------------------------------------------
 
 #
-# autoconf
+# meson
 #
-LIBQMI_CONF_TOOL	:= autoconf
+LIBQMI_CONF_TOOL	:= meson
 LIBQMI_CONF_OPT		:= \
-	$(CROSS_AUTOCONF_USR) \
-        CFLAGS="$(CFLAGS) -g -Os" \
-	--disable-more-warnings \
-	--disable-gtk-doc \
-	--disable-gtk-doc-html \
-	--disable-gtk-doc-pdf \
-	--disable-firmware-update \
-	--disable-mm-runtime-check \
-	--with-udev-base-dir=/lib/udev 
+	$(CROSS_MESON_USR) \
+	-Dc_flags="$(CFLAGS) -g -Os" \
+	-Dfirmware_update=$(call ptx/truefalse, PTXCONF_LIBQMI_FIRMWARE_UPDATE) \
+	-Dcollection=full \
+	-Dmbim_qmux=$(call ptx/truefalse, PTXCONF_LIBQMI_MBIM_QMUX) \
+	-Dmm_runtime_check=false \
+	-Dqrtr=false \
+	-Drmnet=false \
+	-Dudev=false \
+	-Dudevdir=/usr/lib/udev \
+	-Dintrospection=false \
+	-Dgtk_doc=false \
+	-Dman=false \
+	-Dbash_completion=false
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -65,26 +71,17 @@ $(STATEDIR)/libqmi.targetinstall:
 	@$(call install_fixup, libqmi,AUTHOR,"Michael Olbrich <m.olbrich@pengutronix.de>")
 	@$(call install_fixup, libqmi,DESCRIPTION,missing)
 
-	@#Binaries are unused
-	@#@$(call install_copy, libqmi, 0, 0, 0755, -, /usr/bin/qmicli)
-	@#@$(call install_copy, libqmi, 0, 0, 0755, -, /usr/bin/qmi-network)
-	@#@$(call install_copy, libqmi, 0, 0, 0755, -, /usr/libexec/qmi-proxy)
-	
-	@#Combine authors and license for libqmi-glib
+ifdef PTXCONF_LIBQMI_FIRMWARE_UPDATE
+	@$(call install_copy, libqmi, 0, 0, 0755, -, /usr/bin/qmi-firmware-update)
+endif
+
 	@cat $(LIBQMI_DIR)/$(LIBQMI_AUTHORS) $(LIBQMI_DIR)/$(LIBQMI_LICENSE_FILE_LIB) > $(LIBQMI_DIR)/libqmi-license
 	@$(call install_copy, libqmi, 0, 0, 0644, $(LIBQMI_DIR)/libqmi-license, /usr/share/licenses/oss/license.libqmi_$(LIBQMI_VERSION).txt)
+
 	@$(call install_lib, libqmi, 0, 0, 0644, libqmi-glib)
-	
+
 	@$(call install_finish, libqmi)
+
 	@$(call touch)
-	
-	# ----------------------------------------------------------------------------
-# Clean
-# ----------------------------------------------------------------------------
 
-$(STATEDIR)/libqmi.clean:
-	@$(call targetinfo)
-	@$(call clean_pkg, libqmi)
-	
 # vim: syntax=make
-

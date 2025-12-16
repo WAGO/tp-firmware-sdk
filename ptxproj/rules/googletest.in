@@ -1,7 +1,7 @@
 ## SECTION=debug_tools
 
 config GOOGLETEST
-	bool
+	tristate
 	prompt "googletest"
 	select HOST_CMAKE
 	help

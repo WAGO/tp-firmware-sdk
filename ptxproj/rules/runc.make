@@ -23,6 +23,7 @@ RUNC_URL			:= https://github.com/opencontainers/runc/archive/refs/tags/v$(RUNC_V
 RUNC_SOURCE		:= $(SRCDIR)/$(RUNC).$(RUNC_SUFFIX)
 RUNC_DIR			:= $(BUILDDIR)/$(RUNC)
 RUNC_LICENSE	:= Apache-2.0
+RUNC_DEVPKG     := NO
 
 RUNC_INSTALLDIR := $(RUNC_PKGDIR)/bin/docker
 

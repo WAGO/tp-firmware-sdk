@@ -38,7 +38,13 @@
 
 #include "tools.h"
 #include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#include <QFontMetrics>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QDebug>
 
 //------------------------------------------------------------------------------
@@ -62,8 +68,11 @@
 /// \retval DISPLAY_ORIENTATION
 DISPLAY_ORIENTATION GetDisplayOrientation()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rScreen = QApplication::primaryScreen()->geometry();
+#else
   QRect rScreen = QApplication::desktop()->screenGeometry();
-
+#endif
   //Auflösungen der WAGO Displays
   // 4,3“  480 x 272 Pixel Small
   // 5,7“  640 x 480 Pixel Small
@@ -87,7 +96,11 @@ DISPLAY_ORIENTATION GetDisplayOrientation()
 /// \retval DISPLAY_SIZE
 DISPLAY_SIZE GetDisplaySize()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rScreen = QApplication::primaryScreen()->geometry();
+#else
   QRect rScreen = QApplication::desktop()->screenGeometry();
+#endif
 
   //Auflösungen der WAGO Displays
   // 4,3“  480 x 272 Pixel Small
@@ -151,7 +164,11 @@ DISPLAY_SIZE GetDisplaySize()
 int CalculatePixelWidth(QString sText, QFont fnt)
 {
   QFontMetrics fm(fnt);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  int pixelsWide = fm.horizontalAdvance(sText);
+#else
   int pixelsWide = fm.width(sText);
+#endif
   return (pixelsWide);
 }
 
@@ -162,7 +179,11 @@ int CalculatePixelWidth(QString sText, QFont fnt)
 int CalculatePixelHeight(QFont fnt)
 {
   QFontMetrics fm(fnt);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  int pixelsHigh = fm.xHeight();
+#else
   int pixelsHigh = fm.height();
+#endif
   return (pixelsHigh);
 }
 

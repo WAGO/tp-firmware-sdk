@@ -65,7 +65,7 @@ std::string format(const char * fmt, ...)
   std::vsnprintf(&formatted[0], static_cast<size_t>(formatted_length) + 1, fmt, args_copy);
   va_end(args_copy);
 
-  return { formatted.data(), formatted.size() };
+  return { formatted.data(), static_cast<size_t>(formatted_length) };
 }
 
 void LogToFile(const std::string & file_path, const std::string & msg)

@@ -82,6 +82,8 @@ start_vpn ()
     logger "$NAME"
     STATUS=0
 
+    [ ! -d "/run/openvpn" ] && mkdir -p "/run/openvpn"
+
     start-stop-daemon --start --quiet --oknodo \
         --pidfile /run/openvpn/$NAME.pid \
         --exec $DAEMON -- $OPTARGS --writepid /run/openvpn/$NAME.pid \

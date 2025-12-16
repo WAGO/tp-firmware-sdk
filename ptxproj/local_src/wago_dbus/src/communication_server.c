@@ -48,6 +48,8 @@ struct stDbusWorker{
 	char * name;
 	unsigned int priority;
 	mqd_t  fdq;
+	bool   shutdown;
+	pthread_barrier_t  thread_wait;
 };
 
 typedef struct stWorkerList tWorkerList;
@@ -563,7 +565,8 @@ void SERV_AppentToWorkingQueue(tObject * object,
 static void * ObjectWorker(void * user_data)
 {
 	tDbusWorker * pThis = (tDbusWorker*) user_data;
-	while(1)
+	pthread_barrier_wait(&pThis->thread_wait); //entry sync point
+	while(pThis->shutdown == false)
 	{
 		struct pollfd fdrec;
 		fdrec.fd = pThis->fdq;
@@ -586,11 +589,18 @@ static void * ObjectWorker(void * user_data)
 			  con.bus = stMessage.DBusCon;
 			  dbus_error_init(&con.error);
 			  msg.msg = stMessage.DBusMsg;
-			  stMessage.object->callback(&con,&msg,stMessage.object->user_data);
-			  dbus_message_unref(stMessage.DBusMsg);
+		    if (stMessage.DBusMsg != NULL)
+		    {
+		      if (stMessage.object != NULL)
+		      {
+		        stMessage.object->callback(&con,&msg,stMessage.object->user_data);
+		      }
+		      dbus_message_unref(stMessage.DBusMsg);
+		    }
 		  }
 		}
 	}
+	pthread_barrier_wait(&pThis->thread_wait);  //exit sync point
 	pthread_exit(NULL);
 	return NULL;
 }
@@ -612,7 +622,7 @@ static void SERV_OpenQueue(tDbusWorker*  worker, char * workername, long int msg
     mq_unlink(queueName);
     worker->fdq = mq_open(queueName, (O_RDWR|O_CREAT|O_EXCL|O_NONBLOCK), (S_IWUSR|S_IRUSR), &mqAttr );
   }
-
+  free(queueName);
 }
 
 tDbusWorker * com_SERV_CreateNewWorker(unsigned char priority,char * name)
@@ -655,6 +665,7 @@ tDbusWorker * com_SERV_CreateNewWorker(unsigned char priority,char * name)
 	}
 	newWorker = malloc(sizeof(struct stDbusWorker));
 	newWorker->priority = priority;
+	newWorker->shutdown = false;
 	//newWorker->name = strdup(name);
 	newWorker->name = malloc(WORKER_NAME_LEN(name));
 	sprintf(newWorker->name,"%s%s" ID_TEMPLATE,WORKER_PREFIX,name);
@@ -672,6 +683,7 @@ tDbusWorker * com_SERV_CreateNewWorker(unsigned char priority,char * name)
 
 	SERV_OpenQueue(newWorker, newWorker->name, sizeof(tWorkerMsgQ), 10);
 
+	pthread_barrier_init(&newWorker->thread_wait, NULL, 2);
 	if(pthread_create(&newWorker->id, &attr,(void * )ObjectWorker,newWorker))
 	{
 	  perror("pthread create");
@@ -686,6 +698,8 @@ tDbusWorker * com_SERV_CreateNewWorker(unsigned char priority,char * name)
 	list->pNext=pWorkerRoot;
 	list->worker = newWorker;
 	pWorkerRoot=list;
+	pthread_barrier_wait(&newWorker->thread_wait);  //entry sync point
+	pthread_barrier_destroy(&newWorker->thread_wait);
 	return newWorker;
 }
 
@@ -723,7 +737,62 @@ tDbusWorker * com_SERV_GetWorker(unsigned char priority,char * name)
 	{
 		free(extName);
 	}
+	if (pAct == NULL)
+	{
+		//worker does not exist
+		return NULL;
+	}
 	return pAct->worker;
+}
+
+void com_SERV_DestroyWorker(tDbusWorker * pWorker)
+{
+  tWorkerList * pAct = pWorkerRoot;
+  tWorkerList * pPrev = NULL;
+  tWorkerMsgQ stMessage;
+
+  if (pWorker == NULL)
+  {
+    return;
+  }
+
+  //find and remove worker in list
+  while(pAct != NULL)
+  {
+    if(pWorker == pAct->worker)
+    {
+      if (pPrev != NULL)
+      {
+        pPrev->pNext = pAct->pNext;
+      }
+      else
+      {
+        pWorkerRoot = pAct->pNext;
+      }
+      break;
+    }
+    pPrev = pAct;
+    pAct = pAct->pNext;
+  }
+
+  if (pAct == NULL)
+  {
+    //worker not found
+    return;
+  }
+
+  pWorker->shutdown = true;
+  pthread_barrier_init(&pWorker->thread_wait, NULL, 2);
+  //send empty message to trigger receiving worker thread
+  memset(&stMessage, 0, sizeof(stMessage));
+  mq_send(pWorker->fdq, (const char *)&stMessage, sizeof(tWorkerMsgQ), 0);
+  pthread_barrier_wait(&pWorker->thread_wait);  //exit sync point
+  pthread_barrier_destroy(&pWorker->thread_wait);
+  pthread_join(pWorker->id, NULL);
+  mq_close(pWorker->fdq);
+  free(pWorker->name);
+  free(pWorker);
+  free(pAct);
 }
 
 int com_SERV_SetListenerPriority(unsigned char priority)

@@ -39,11 +39,12 @@ EventManager::EventManager() : trigger_event_folder_{false} {
 }
 
 void EventManager::ProcessPendingEvents() {
-  LOG_DEBUG("--------------> EventManager::ProcessEventsPendingEvents");
+  LOG_DEBUG("EventManager: process pendig events if queued in gmainloop (START");
+
   /*
-   * Pending events were previously queued into the gmain loop as a gtask.
-   * We prefer this task in the processing to ensure that the event folder has been called before a dbus call returned.
-   * g_main_context_iteration processes all tasks currently pending in the gmainloop
+  * Pending events were previously queued into the gmain loop as a gtask.
+  * We prefer this task in the processing to ensure that the event folder has been called before a dbus call returned.
+  * g_main_context_iteration processes all tasks currently pending in the gmainloop
    *
    * Pending tasks (e.g. Netlink address change) are given priority in order to see
    * whether they lead to an event folder call.
@@ -60,7 +61,7 @@ void EventManager::ProcessPendingEvents() {
     g_main_context_iteration(nullptr, TRUE);
   }
 
-  LOG_DEBUG("--------------> EventManager::ProcessEventsPendingEvents finished");
+  LOG_DEBUG("EventManager: process pendig events if queued in gmainloop (FINISH");
 }
 
 void EventManager::PublishNetworkChangesToSystem() {
@@ -99,11 +100,13 @@ void EventManager::NotifyNetworkChanges(EventLayer event_layer) {
 void EventManager::NotifyNetworkChanges(EventLayer event_layer, ::std::optional<Interface> interface) {
   switch (event_layer) {
     case EventLayer::EVENT_FOLDER:
+      LOG_DEBUG("EventManager: queueing event (EVENT_FOLDER");
       trigger_event_folder_ = true;
       break;
 
-    case EventLayer::IP_CHANGE_FILES:
+      case EventLayer::IP_CHANGE_FILES:
       if (interface.has_value()) {
+        LOG_DEBUG("EventManager: queueing event (IP_CHANGE_FILES");
         ip_interface_update_pending_.emplace(interface.value());
       }
       break;
@@ -187,7 +190,7 @@ void EventManager::CallEventFolderSync() {
                    &exit_status, &error) != 0) {
     LOG_DEBUG("EventManager: called run-parts on /etc/config-tools/events/networking");
   } else {
-    LogError("Failed to trigger /etc/config-tools/events/networking folder");
+    LogError("EventManager: called run-parts on /etc/config-tools/events/networking FAILED");
     g_error_free(error);
   }
 }
@@ -198,6 +201,7 @@ void EventManager::UpdateIpChangeFiles() {
     ::std::string file = IPV4_CHANGE_DIR "/ipconchg-" + interface.GetName();
 
     TouchFile(file);
+    LOG_DEBUG("EventManager: called update ip change file: " + file);
   }
   ip_interface_update_pending_.clear();
 }

@@ -1,5 +1,5 @@
 ARG REGISTRY_PREFIX='wagoautomation/'
-ARG SDK_BUILDER_VERSION='3.0.1'
+ARG SDK_BUILDER_VERSION='4.0.0'
 
 FROM ${REGISTRY_PREFIX}sdk-builder:${SDK_BUILDER_VERSION} as tp-firmware-sdk
 
@@ -19,6 +19,7 @@ RUN apt update \
     gcc-multilib \
     g++-multilib \   
     python3-mako \ 
+    python3-yaml \
     libmpc-dev \
     libgmp3-dev \
     python3-setuptools \ 

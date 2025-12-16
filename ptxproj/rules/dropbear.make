@@ -1,4 +1,4 @@
-# -*-makefile--
+# -*-makefile-*-
 #
 # Copyright (C) 2003 by Marc Kleine-Budde <kleine-budde@gmx.de> for
 #                       Pengutronix e.K. <info@pengutronix.de>, Germany
@@ -16,11 +16,13 @@ PACKAGES-$(PTXCONF_DROPBEAR) += dropbear
 #
 # Paths and names
 #
-DROPBEAR_VERSION	:= 2022.83
-DROPBEAR_MD5		:= a75a34bcc03cacf71a2db9da3b7c94a5
+DROPBEAR_VERSION	:= 2025.88
+DROPBEAR_MD5		:= 510165167b102589d64144cab4477b6c
 DROPBEAR		:= dropbear-$(DROPBEAR_VERSION)
 DROPBEAR_SUFFIX		:= tar.bz2
-DROPBEAR_URL		:= http://matt.ucc.asn.au/dropbear/releases/$(DROPBEAR).$(DROPBEAR_SUFFIX)
+DROPBEAR_URL		:= \
+	https://matt.ucc.asn.au/dropbear/releases/$(DROPBEAR).$(DROPBEAR_SUFFIX) \
+	https://dropbear.nl/mirror/releases/$(DROPBEAR).$(DROPBEAR_SUFFIX)
 DROPBEAR_SOURCE		:= $(SRCDIR)/$(DROPBEAR).$(DROPBEAR_SUFFIX)
 DROPBEAR_DIR		:= $(BUILDDIR)/$(DROPBEAR)
 DROPBEAR_LICENSE	:= \
@@ -29,7 +31,7 @@ DROPBEAR_LICENSE_FILES	:= \
 	file://LICENSE;md5=25cf44512b7bc8966a48b6b1a9b7605f \
 	file://libtomcrypt/LICENSE;md5=71baacc459522324ef3e2b9e052e8180 \
 	file://libtommath/LICENSE;md5=23e7e0a32e53a2b1d35f5fd9ef053402 \
-	file://loginrec.c;startline=1;endline=26;md5=0d785ee11fab1cead2c7fee9c35574f1
+	file://src/loginrec.c;startline=1;endline=26;md5=0d785ee11fab1cead2c7fee9c35574f1
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -42,6 +44,7 @@ DROPBEAR_CONF_TOOL	:= autoconf
 DROPBEAR_CONF_OPT 	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-harden \
+	--disable-werror \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--$(call ptx/endis, PTXCONF_DROPBEAR_ZLIB)-zlib \
 	--$(call ptx/endis, PTXCONF_DROPBEAR_PAM)-pam \
@@ -109,15 +112,6 @@ else
 	@echo "#define DROPBEAR_CLI_AGENTFWD 1" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
-ifdef PTXCONF_DROPBEAR_DIS_SFTPSERVER
-	@echo "ptxdist: disabling ftps server"
-	@echo "#define DROPBEAR_SFTPSERVER 0" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: enabling ftps server"
-	@echo "#define DROPBEAR_SFTPSERVER 1" >> $(DROPBEAR_LOCALOPTIONS)
-	@echo "#define SFTPSERVER_PATH \"$(PTXCONF_DROPBEAR_SFTPSERVER)\"" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
 # encryption
 ifdef PTXCONF_DROPBEAR_AES128
 	@echo "ptxdist: enabling aes128"
@@ -143,60 +137,12 @@ else
 	@echo "#define DROPBEAR_AES256 0" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
-ifdef PTXCONF_DROPBEAR_TWOFISH256
-	@echo "ptxdist: enabling twofish256"
-	@echo "#define DROPBEAR_TWOFISH256 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling twofish256"
-	@echo "#define DROPBEAR_TWOFISH256 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
-ifdef PTXCONF_DROPBEAR_TWOFISH128
-	@echo "ptxdist: enabling twofish128"
-	@echo "#define DROPBEAR_TWOFISH128 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling twofish128"
-	@echo "#define DROPBEAR_TWOFISH128 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
 ifdef PTXCONF_DROPBEAR_CHACHA20POLY1305
-	@echo "ptxdist: enabling chacha20poly1305"
+	@echo "ptxdist: enabling chacha20-poly1305"
 	@echo "#define DROPBEAR_CHACHA20POLY1305 1" >> $(DROPBEAR_LOCALOPTIONS)
 else
-	@echo "ptxdist: disabling chacha20poly1305"
+	@echo "ptxdist: disabling chacha20-poly1305"
 	@echo "#define DROPBEAR_CHACHA20POLY1305 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
-ifdef PTXCONF_DROPBEAR_DH_GROUP14_SHA1
-	@echo "ptxdist: enabling dh group14 sha1"
-	@echo "#define DROPBEAR_DH_GROUP14_SHA1 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling dh group14 sha1"
-	@echo "#define DROPBEAR_DH_GROUP14_SHA1 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
-ifdef PTXCONF_DROPBEAR_DH_GROUP14_SHA256
-	@echo "ptxdist: enabling dh group14 sha256"
-	@echo "#define DROPBEAR_DH_GROUP14_SHA256 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling dh group14 sha256"
-	@echo "#define DROPBEAR_DH_GROUP14_SHA256 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
-ifdef PTXCONF_DROPBEAR_DH_GROUP16_SHA256
-	@echo "ptxdist: enabling dh group16 sha256"
-	@echo "#define DROPBEAR_DH_GROUP16 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling dh group16 sha256"
-	@echo "#define DROPBEAR_DH_GROUP16 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
-
-ifdef PTXCONF_DROPBEAR_DH_GROUP1_SHA1
-	@echo "ptxdist: enabling dh group1 sha1"
-	@echo "#define DROPBEAR_DH_GROUP1 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
-	@echo "ptxdist: disabling dh group1 sha1"
-	@echo "#define DROPBEAR_DH_GROUP1 0" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
 # ciphers
@@ -229,13 +175,9 @@ endif
 ifdef PTXCONF_DROPBEAR_SHA1
 	@echo "ptxdist: enabling sha1"
 	@echo "#define DROPBEAR_SHA1_HMAC 1" >> $(DROPBEAR_LOCALOPTIONS)
-	@echo "#define DROPBEAR_DH_GROUP1 1" >> $(DROPBEAR_LOCALOPTIONS)
-	@echo "#define DROPBEAR_DH_GROUP14_SHA1 1" >> $(DROPBEAR_LOCALOPTIONS)
 else
 	@echo "ptxdist: disabling sha1"
 	@echo "#define DROPBEAR_SHA1_HMAC 0" >> $(DROPBEAR_LOCALOPTIONS)
-	@echo "#define DROPBEAR_DH_GROUP1 0" >> $(DROPBEAR_LOCALOPTIONS)
-	@echo "#define DROPBEAR_DH_GROUP14_SHA1 0" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
 ifdef PTXCONF_DROPBEAR_SHA1_96
@@ -263,13 +205,8 @@ else
 endif
 
 # host key / public key
-ifdef PTXCONF_DROPBEAR_DSS
-	@echo "ptxdist: enabling dss"
-	@echo "#define DROPBEAR_DSS 1" >> $(DROPBEAR_LOCALOPTIONS)
-else
 	@echo "ptxdist: disabling dss"
 	@echo "#define DROPBEAR_DSS 0" >> $(DROPBEAR_LOCALOPTIONS)
-endif
 
 ifdef PTXCONF_DROPBEAR_RSA
 	@echo "ptxdist: enabling rsa"
@@ -295,7 +232,34 @@ else
 	@echo "#define DROPBEAR_ED25519 0" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
+	@echo "ptxdist: disabling u2f security key support"
+	@echo "#define DROPBEAR_SK_KEYS 0" >> $(DROPBEAR_LOCALOPTIONS)
+
 # key exchange algorithm
+ifdef PTXCONF_DROPBEAR_DH_GROUP14_SHA256
+	@echo "ptxdist: enabling dh_group14_sha256"
+	@echo "#define DROPBEAR_DH_GROUP14_SHA256 1" >> $(DROPBEAR_LOCALOPTIONS)
+else
+	@echo "ptxdist: disabling dh_group14_sha256"
+	@echo "#define DROPBEAR_DH_GROUP14_SHA256 0" >> $(DROPBEAR_LOCALOPTIONS)
+endif
+
+ifdef PTXCONF_DROPBEAR_DH_GROUP14_SHA1
+	@echo "ptxdist: enabling dh_group14_sha1"
+	@echo "#define DROPBEAR_DH_GROUP14_SHA1 1" >> $(DROPBEAR_LOCALOPTIONS)
+else
+	@echo "ptxdist: disabling dh_group14_sha1"
+	@echo "#define DROPBEAR_DH_GROUP14_SHA1 0" >> $(DROPBEAR_LOCALOPTIONS)
+endif
+
+ifdef PTXCONF_DROPBEAR_DH_GROUP16
+	@echo "ptxdist: enabling dh_group16"
+	@echo "#define DROPBEAR_DH_GROUP16 1" >> $(DROPBEAR_LOCALOPTIONS)
+else
+	@echo "ptxdist: disabling dh_group16"
+	@echo "#define DROPBEAR_DH_GROUP16 0" >> $(DROPBEAR_LOCALOPTIONS)
+endif
+
 ifdef PTXCONF_DROPBEAR_ECDH
 	@echo "ptxdist: enabling ecdh"
 	@echo "#define DROPBEAR_ECDH 1" >> $(DROPBEAR_LOCALOPTIONS)
@@ -351,6 +315,10 @@ else
 	@echo "#define DROPBEAR_CLI_PUBKEY_AUTH 0" >> $(DROPBEAR_LOCALOPTIONS)
 endif
 
+# match ptxdist sftp-server installation path
+	@echo "ptxdist: setting sftp-server path"
+	@echo '#define SFTPSERVER_PATH "/usr/sbin/sftp-server"' >> $(DROPBEAR_LOCALOPTIONS)
+
 	@echo "ptxdist: disabling support for U2F-/FIDO2-backed keys"
 	@echo "#define DROPBEAR_SK_ECDSA 0" >> $(DROPBEAR_LOCALOPTIONS)
 	@echo "#define DROPBEAR_SK_ED25519 0" >> $(DROPBEAR_LOCALOPTIONS)
@@ -367,9 +335,6 @@ DROPBEAR_INSTALL_OPT	:= install inst_scp
 # Target-Install
 # ----------------------------------------------------------------------------
 
-ifdef PTXCONF_DROPBEAR_DSS
-DROPBEAR_KEY_TYPES	+= dss
-endif
 ifdef PTXCONF_DROPBEAR_RSA
 DROPBEAR_KEY_TYPES	+= rsa
 endif

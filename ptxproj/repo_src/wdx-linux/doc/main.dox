@@ -1,0 +1,20 @@
+/** \mainpage
+
+\section summary Overview
+This is the documentation for the WAGO Parameter Service Communication project.<br>
+This project realizes inter process communication (IPC) to WAGO Parameter Service for the WAGO PFC device family.
+
+The following picture shows the primary interfaces for libwdxlinuxoscom:
+\image html libwdxlinuxoscom-overview.svg
+
+\section intro Introduction
+For an introduction how to use the public C/C++ API take a look at the
+<a href="md_doc_introduction.html">introduction page</a>.<br>
+For an example parameter provider take a look at the
+<a href="examples.html">examples page</a>.
+
+\section links Additional information
+Confluence overview page for PFC based devices: <a href="https://waw/display/EA/Parameterdienst">https://waw/display/EA/Parameterdienst</a><br>
+Confluence overview page for WAGO system service WDx: <a href="https://waw/display/ENGSOFT/WDx">https://waw/display/ENGSOFT/WDx</a>
+
+*/

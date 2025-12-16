@@ -23,13 +23,14 @@ PCAP_LOG_BUILDCONFIG    := Release
 PCAP_LOG_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(PCAP_LOG)
 PCAP_LOG_BUILDROOT_DIR  := $(BUILDDIR)/$(PCAP_LOG)
 PCAP_LOG_DIR            := $(PCAP_LOG_BUILDROOT_DIR)/src
-PCAP_LOG_BUILD_DIR      := $(PCAP_LOG_BUILDROOT_DIR)/bin/$(PCAP_LOG_BUILDCONFIG)
+PCAP_LOG_BIN_DIR        := $(PCAP_LOG_BUILDROOT_DIR)/bin/$(PCAP_LOG_BUILDCONFIG)
 PCAP_LOG_LICENSE        := WAGO
 PCAP_LOG_CONF_TOOL      := NO
 PCAP_LOG_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(PCAP_LOG_BUILDCONFIG) \
-BIN_DIR=$(PCAP_LOG_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(PCAP_LOG_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
+PCAP_LOG_DEVPKG         := NO
 
 
 # ----------------------------------------------------------------------------
@@ -94,7 +95,7 @@ $(STATEDIR)/pcap_log.targetinstall:
 	@$(call install_fixup, pcap_log,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, pcap_log,DESCRIPTION,missing)
 
-	@$(call install_copy, pcap_log, 0, 0, 0755, $(PCAP_LOG_BUILD_DIR)/pcap_log.elf, /etc/config-tools/pcap_log)
+	@$(call install_copy, pcap_log, 0, 0, 0755, $(PCAP_LOG_BIN_DIR)/pcap_log.elf, /etc/config-tools/pcap_log)
 	@$(call install_copy, pcap_log, 0, 0, 0444, $(PCAP_LOG_DIR)/etc/sudoers.d/pcap_log, /etc/sudoers.d/pcap_log)
 
 	@$(call install_finish, pcap_log)

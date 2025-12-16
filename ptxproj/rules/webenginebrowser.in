@@ -2,11 +2,12 @@
 
 config WEBENGINEBROWSER
 	bool
-	prompt "webenginebrowser"
+	prompt "webenginebrowser qt5"
 	select QT5
 	select MUSTACHE
+	select LIBMSGTOOL
 	help
-	  FIXME
+	  qt5 webengine based browser
 
 if WEBENGINEBROWSER
 

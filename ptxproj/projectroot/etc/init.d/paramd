@@ -1,0 +1,243 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of project parameter-service (PTXdist package wago-parameter-service).
+#
+# Copyright (c) 2018-2021 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   /etc/init.d/paramd
+#
+# Brief:    System V init script for WAGO Parameter Service.
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+
+get_order_number()
+{
+    local order_number_raw
+    local order_number
+    order_number_raw="$(/etc/config-tools/get_coupler_details order-number)"
+    IFS='/' read -ra ORDER_PARTS <<< "$order_number_raw"
+    for part in "${ORDER_PARTS[@]}"; do
+        local unified_part
+        unified_part="$(printf "%4s-%4s" "$(echo -n "$part" | cut -d'-' -f1)" "$(echo -n "$part" | cut -d'-' -f2)" | tr ' ' 0)"
+        if [[ -z "$order_number" ]]; then
+            order_number="$unified_part"
+        else
+            order_number="${order_number}/${unified_part}"
+        fi
+    done
+    printf "%s" "$order_number"
+}
+
+# General definitions
+readonly FAILEXIT=1
+readonly SELF="paramd"
+readonly WAGO_SYSTEM_MODULE="WAGO Parameter Service"
+readonly SERVICE_BIN="/usr/sbin/paramd"
+readonly REST_API_BASE_PATH="/wda"
+readonly FILE_API_BASE_PATH="/files"
+readonly REST_API_SOCKET="/tmp/paramserv.fcgi.socket"
+readonly FILE_API_SOCKET="/tmp/paramserv.files.fcgi.socket"
+readonly PARAMD_FRONTEND_SOCKET_DIR="/var/run/paramd/wdaadm"
+readonly PARAMD_FRONTEND_SOCKET_PATH="${PARAMD_FRONTEND_SOCKET_DIR}/frontend.socket"
+readonly PARAMD_FRONTEND_SOCKET_GROUP="wdaadm"
+readonly PARAMD_BACKEND_SOCKET_DIR="/var/run/paramd/wdxprov"
+readonly PARAMD_BACKEND_SOCKET_PATH="${PARAMD_BACKEND_SOCKET_DIR}/backend.socket"
+readonly PARAMD_BACKEND_SOCKET_GROUP="wdxprov"
+readonly NAMEPLATE_ORDER="$(get_order_number)"
+readonly VERSION_ID="$(grep 'FIRMWARE=' /etc/REVISIONS | grep -oe '[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]' | tr -d '\n')"
+
+# Check if online documentation is available
+if [[ -f "/var/www/openapi/wda.openapi.html" ]]; then
+    readonly DOCUMENTATION_BASE_URL="/openapi/wda.openapi.html"
+else
+    readonly DOCUMENTATION_BASE_URL=""
+fi
+
+# Function to print usage to stdout.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+usage()
+{
+    echo "$SELF usage: $0 <start|stop|restart|status> [log-level for paramd]"
+}
+
+# Function to start service functionality.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+parameter_service_start()
+{
+    local result=0
+    local log_option=""
+
+    if [[ "$LOG_LEVEL" != "" ]]; then
+        log_option="--log-level $LOG_LEVEL"
+    fi
+
+    # Create socket directories
+    if   ! /usr/bin/mkdir -p "${PARAMD_FRONTEND_SOCKET_DIR}"; then
+        result=$FAILEXIT
+    elif ! /usr/bin/mkdir -p "${PARAMD_BACKEND_SOCKET_DIR}"; then
+        result=$FAILEXIT
+    # Set groups for socket directories
+    elif ! /usr/bin/chgrp "${PARAMD_FRONTEND_SOCKET_GROUP}" "${PARAMD_FRONTEND_SOCKET_DIR}"; then
+        result=$FAILEXIT
+    elif ! /usr/bin/chgrp "${PARAMD_BACKEND_SOCKET_GROUP}" "${PARAMD_BACKEND_SOCKET_DIR}"; then
+        result=$FAILEXIT
+    # Start daemon process
+    elif ! /sbin/start-stop-daemon --start --background --quiet --oknodo --exec "${SERVICE_BIN}" -- \
+            ${log_option} \
+            --rest-api-base "${REST_API_BASE_PATH}" \
+            --file-api-base "${FILE_API_BASE_PATH}" \
+            --rest-api-socket "${REST_API_SOCKET}" \
+            --file-api-socket "${FILE_API_SOCKET}" \
+            --frontend-socket "${PARAMD_FRONTEND_SOCKET_PATH}" \
+            --backend-socket "${PARAMD_BACKEND_SOCKET_PATH}" \
+            --log-channel syslog \
+            --ordernumber $NAMEPLATE_ORDER \
+            --firmware-version $VERSION_ID \
+            --doc-base "${DOCUMENTATION_BASE_URL}"; then
+        result=$FAILEXIT
+    # Check status of daemon: --background causes the start-stop-deamon not beeing able to detect any errors
+    elif ! parameter_service_status_check; then
+        result=$FAILEXIT
+    fi
+
+    return $result
+}
+
+# Function to stop service functionality.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+parameter_service_stop()
+{
+    local result=0
+
+    # Stop daemon process
+    if ! /sbin/start-stop-daemon --stop --quiet --oknodo --exec "$SERVICE_BIN"; then
+        result=$FAILEXIT
+    elif ! parameter_service_status_check "stopped"; then
+        result=$FAILEXIT
+    fi
+
+    # Cleanup socket directories
+    /usr/bin/rm -rf "${PARAMD_FRONTEND_SOCKET_DIR:?}/"*
+    /usr/bin/rm -rf "${PARAMD_BACKEND_SOCKET_DIR:?}/"*
+
+    return $result
+}
+
+# Function to check status of service functionality.
+#
+# Param 1: Optional parameter to check "started" or "stopped", default is check for "started"
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+parameter_service_status()
+{
+    local result=1
+    local check="${1:-started}"
+    local own_pid="$BASHPID"
+    local pids
+    pids="$(pidof "$(/usr/bin/basename "$SERVICE_BIN")")"
+    for pid in $pids; do
+        if [[ "$pid" != "$own_pid" ]]; then
+            result=0
+        fi
+    done
+
+    if [[ "$check" != "started" && $result -eq 0 ]]; then
+        return 1
+    elif [[ "$check" != "started" && $result -ne 0 ]]; then
+        return 0
+    fi
+
+    return $result
+}
+
+# Function to check repeatedly status of service functionality.
+#
+# Param 1: Optional parameter to check "started" or "stopped", default is check for "started"
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+parameter_service_status_check()
+{
+    local result=0
+    local check="${1:-started}"
+    local check_count=3
+    while ! parameter_service_status "$check"
+    do
+        if [[ $check_count -gt 0 ]]; then
+            /usr/bin/sleep 1
+        else
+            result=$FAILEXIT
+            break
+        fi
+        check_count=$((check_count-1))
+    done
+
+    return $result
+}
+
+# Main switch
+#-----------------------------------------------------------------------------#
+LOG_LEVEL="${2:-}"
+case $1 in
+        start)
+            echo "Starting ${WAGO_SYSTEM_MODULE}..."
+            if ! parameter_service_start; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                echo "done"
+            fi
+            ;;
+
+        stop)
+            echo "Stopping ${WAGO_SYSTEM_MODULE}..."
+            if ! parameter_service_stop; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                echo "done"
+            fi
+            ;;
+
+        restart)
+            echo "Restarting ${WAGO_SYSTEM_MODULE}..."
+            if ! parameter_service_stop; then
+                echo "failed"
+                exit $FAILEXIT
+            else
+                if ! parameter_service_start; then
+                    echo "failed"
+                    exit $FAILEXIT
+                else
+                    echo "done"
+                fi
+            fi
+            ;;
+
+        status)
+            echo "Check status for ${WAGO_SYSTEM_MODULE}..."
+            if ! parameter_service_status; then
+                echo "stopped"
+            else
+                echo "running"
+            fi
+            ;;
+
+        *)
+            usage
+            exit $FAILEXIT
+            ;;
+esac

@@ -1,0 +1,131 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of PTXdist package lighttpd.
+#
+# Copyright (c) 2025 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   /etc/config-tools/config_wda
+#
+# Brief:    Tool to write webserver config (currently only certificate).
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+
+# General definitions
+readonly FAILEXIT=64
+readonly SELF="$(/usr/bin/basename "$0")"
+readonly WAGO_SYSTEM_MODULE="Webserver"
+readonly WAGO_CT_TITLE="* Command line interface tool to write $WAGO_SYSTEM_MODULE config parameters *"
+readonly CUSTOM_CERT="/etc/lighttpd/custom-cert.pem"
+
+if [ ! -f "/etc/config-tools/config_tool_lib" ]; then
+    echo "config_tool_lib missing"
+    exit $FAILEXIT
+fi
+source "/etc/config-tools/config_tool_lib"
+
+
+# Main tool/script function.
+#
+# Param 1..n: Script parameters
+#
+# Return: Exit code, 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+main()
+{
+    local result=0
+
+    if [[ $# -lt 1 ]]; then
+        print_info
+        exit $FAILEXIT
+    fi
+
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        usage
+        exit 0
+    fi
+
+    if [[ $# -lt 2 ]]; then
+        SetLastError "Missing parameter value for parameter \"$1\""
+        exit $MISSING_PARAMETER
+    fi
+
+    if [[ "$1" == certificate ]]; then
+        write_certificate "$2"
+        result=$?
+    else
+        result=$INVALID_PARAMETER
+        SetLastError "Invalid parameter \"$1\""
+    fi
+
+    return $result
+}
+
+# Function to print general tool/script information.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+print_info()
+{
+    echo "$WAGO_CT_TITLE"
+    echo
+    echo "For detailed usage information use:"
+    echo "  $SELF --help"
+    echo
+
+    return 0
+}
+
+# Function to print usage to stdout.
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+usage()
+{
+    echo "$WAGO_CT_TITLE"
+    echo
+    echo "Usage:"
+    echo "  $SELF <config param name|-h|--help> [param value]"
+    echo
+    echo "Example:"
+    echo "  $SELF certificate abc"
+    echo "    Writes config value (abc) for \"certificate\""
+    echo
+}
+
+# Function to write certificate.
+#
+# Param 1: Certificate value to write
+#
+# Return: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+write_certificate()
+{
+    local result
+    local param_value="$1"
+
+    if [[ -z "$param_value" ]]; then
+        rm -f "$CUSTOM_CERT"
+        result=$SUCCESS
+    else
+        umask 0337
+        base64 -d <<< "$param_value" > $CUSTOM_CERT
+        if [[ $? -ne 0 ]]; then
+            result=$INVALID_PARAMETER
+            SetLastError "Failed to decode certificate file \"$CUSTOM_CERT\" from given value"
+        else
+            result=$SUCCESS
+        fi
+    fi
+
+    return $result
+}
+
+# Start main function
+main "$@"
+exit $?

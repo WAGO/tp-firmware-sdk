@@ -4,13 +4,16 @@
 
 mainmenu "PTXdist $(PTXDIST_VERSION_FULL)"
 
+if 0
+source "generated/ptxdist_options.in"
+endif
+
 source "generated/platform_version.in"
 
 menu "architecture                  "
 source "generated/architecture_options.in"
 endmenu
 source "generated/base_kernel.in"
-source "generated/devicetree.in"
 source "platforms/console.in"
 
 menu "extra kernel                  "
@@ -40,3 +43,7 @@ source "generated/hosttools_noprompt.in"
 source "generated/hosttools_platform.in"
 
 source "generated/platform_project_specific.in"
+
+menu "non-free firmware blobs       "
+source "generated/non_free_firmware.in"
+endmenu

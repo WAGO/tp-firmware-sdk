@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_GET_BACKLIGHT) += get_backlight
 #
 # Paths and names
 #
-GET_BACKLIGHT_VERSION	:= 0.0.1
+GET_BACKLIGHT_VERSION	:= 0.0.2
 GET_BACKLIGHT_MD5		:=
 GET_BACKLIGHT		:= get_backlight
 GET_BACKLIGHT_URL		:= file://local_src/$(GET_BACKLIGHT)

@@ -2,6 +2,7 @@
 
 #include <semaphore.h>
 
+#include <cstdint>
 #include <string>
 
 namespace netconf {

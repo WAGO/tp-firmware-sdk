@@ -279,6 +279,15 @@ tDbusWorker * com_SERV_CreateNewWorker(unsigned char priority,char * name);
 ///  \return the  tDBus worker instance or NULL if nothing found
 tDbusWorker * com_SERV_GetWorker(unsigned char priority,char * name);
 
+//-- Function: com_SERV_DestroyWorker ---------------------------------------------
+///
+///  Destroy a previously created tDBus worker instance
+///
+/// \param worker   tDBus worker instance
+///
+//------------------------------------------------------------------------------
+void com_SERV_DestroyWorker(tDbusWorker * worker);
+
 //-- Function: com_SERV_SetListenerPriority ---------------------------------------------
 ///
 ///  set the priority of the DBUS listener / main-Worker

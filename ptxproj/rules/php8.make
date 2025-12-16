@@ -20,16 +20,17 @@ PACKAGES-$(PTXCONF_PHP8) += php8
 #
 # Paths and names
 #
-PHP8_BASE_VERSION  := 8.3.8
+PHP8_BASE_VERSION  := 8.4.10
 PHP8_VERSION       := $(PHP8_BASE_VERSION)+wago1
 PHP8_ARCHIVE_NAME  := php-$(PHP8_BASE_VERSION)
-PHP8_MD5           := 3a731ebd24cd36c70148416703ba2f0e
+PHP8_MD5           := b73a7c365a7e75905745528d218cf128
 PHP8               := php-$(PHP8_VERSION)
 PHP8_SUFFIX        := tar.xz
 PHP8_SOURCE        := $(SRCDIR)/$(PHP8_ARCHIVE_NAME).$(PHP8_SUFFIX)
 PHP8_DIR           := $(BUILDDIR)/$(PHP8)
 PHP8_LICENSE       := PHP-3.01
 PHP8_LICENSE_FILES := file://LICENSE;md5=5ebd5be8e2a89f634486445bd164bef0
+PHP8_DEVPKG        := NO
 
 #
 # Note: older releases are moved to the 'museum', but the 'de.php.net'
@@ -91,7 +92,6 @@ PHP8_AUTOCONF := \
 	--disable-address-sanitizer \
 	--disable-undefined-sanitizer \
 	--disable-all \
-	--without-kerberos \
 	--without-system-ciphers \
 	--without-external-pcre \
 	--without-pcre-jit \
@@ -118,7 +118,6 @@ PHP8_AUTOCONF := \
 	--disable-exif \
 	--$(call ptx/endis, PTXCONF_PHP8_FILTER)-filter \
 	--disable-ftp \
-	--without-openssl-dir \
 	--without-external-gd \
 	--without-avif \
 	--without-webp \
@@ -128,15 +127,12 @@ PHP8_AUTOCONF := \
 	--without-gmp \
 	--without-mhash \
 	--without-iconv \
-	--without-imap \
-	--without-imap-ssl \
 	--disable-intl \
 	--without-ldap \
 	--without-ldap-sasl \
 	--disable-mbregex \
 	--without-mysqli \
 	--without-mysql-sock \
-	--without-oci8 \
 	--without-odbcver \
 	--without-adabas \
 	--without-sapdb \
@@ -154,14 +150,11 @@ PHP8_AUTOCONF := \
 	--without-pdo-dblib \
 	--without-pdo-firebird \
 	--without-pdo-mysql \
-	--without-zlib-dir \
-	--without-pdo-oci \
 	--without-pdo-odbc \
 	--without-pdo-pgsql \
 	--without-pgsql \
 	--disable-phar \
 	--disable-posix \
-	--without-pspell \
 	--without-libedit \
 	--without-readline \
 	--$(call ptx/endis, PTXCONF_PHP8_SESSION)-session \

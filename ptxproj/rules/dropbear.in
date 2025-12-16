@@ -32,13 +32,6 @@ config DROPBEAR_KEY_DIR
 	help
 	  This is the directory where dropbear stores the keys.
 
-config DROPBEAR_MOTD
-	bool
-	default n
-	prompt "print message of the day (MOTD)"
-	help
-	  Whether to print the message of the day (MOTD).
-
 config DROPBEAR_ZLIB
 	bool
 	prompt "zlib support"
@@ -119,7 +112,7 @@ config DROPBEAR_DIS_PUTUTXLINE
 	help
 	  pututxline is needed to write to the utmpx structure.
 
-comment "features"
+menu "Features                     "
 
 config DROPBEAR_DIS_X11
 	bool
@@ -143,26 +136,11 @@ config DROPBEAR_DIS_AGENT
 	  Authentication agent is a program to automate the
 	  use of authentication private keys.
 
-config DROPBEAR_DIS_SFTPSERVER
-	bool
-	default n
-	prompt "disable running an sftp server"
-	help
-	  If you want to enable running an sftp server (such as the
-	  one included with OpenSSH), set the path below and set
-	  DROPBEAR_SFTPSERVER. The sftp-server program is not provided
-	  by Dropbear itself
+endmenu
 
-config DROPBEAR_SFTPSERVER
-	string
-	depends on !DROPBEAR_DIS_SFTPSERVER
-	default "/usr/sbin/sftp-server"
-	prompt "set the path to the sftp-server program"
-	help
-	  Set the path to the sftp-server program. The
-	  sftp-server program is not provided by Dropbear itself
+menu "Encryption                   "
 
-comment "Encryption, at least one required --- RFC Draft requires 3DES and recommends AES128"
+comment "at least one required --- RFC Draft requires 3DES and recommends AES128"
 
 config DROPBEAR_AES128
 	bool
@@ -176,7 +154,7 @@ config DROPBEAR_AES128
 
 config DROPBEAR_3DES
 	bool
-	prompt "3DES"
+	prompt "3DES (legacy)"
 	help
 	  DES is an IBM algorithm designed during the 1970s.
 	  In 1976, NIST has officially adopted it as an encryption
@@ -196,84 +174,22 @@ config DROPBEAR_AES256
 	  algorithm that may be used by U.S. Government organizations
 	  (and others) to protect sensitive information.
 
-
-config DROPBEAR_TWOFISH128
-	bool
-	prompt "Twofish128"
-	help
-	  Another great algorithm designed by Bruce Schneier.
-	  This block cipher was designed as a successor to
-	  the 64-bit Blowfish block cipher.
-	  Twofish combines a 16-round Feistel network with a
-	  bijective f function made by four key-dependent
-	  8x8-bit S-boxes.
-
-config DROPBEAR_TWOFISH256
-	bool
-	prompt "Twofish256"
-	help
-	  Another great algorithm designed by Bruce Schneier.
-	  This block cipher was designed as a successor to
-	  the 64-bit Blowfish block cipher.
-	  Twofish combines a 16-round Feistel network with a
-	  bijective f function made by four key-dependent
-	  8x8-bit S-boxes.
-
 config DROPBEAR_CHACHA20POLY1305
 	bool
-	prompt "ChaCha20Poly1305"
+	prompt "Chacha20-Poly1305"
+	default y
 	help
-	  Enable Chacha20-Poly1305 authenticated encryption mode. This
-	  is generally faster than AES256 on CPU w/o dedicated AES
-	  instructions, having the same key size. Recommended.
-	  Compiling in will add ~5,5kB to binary size on x86-64
+	  Enable Chacha20-Poly1305 authenticated encryption mode.
+	  This is generally faster than AES256 on CPU w/o dedicated AES
+	  instructions, having the same key size.
+	  Recommended.
 
-config DROPBEAR_DH_GROUP14_SHA1
-	bool
-	prompt "dh group14 sha1"
-	help
-	  Diffie-Hellman (DH) groups determine the strength of the key
-	  used in the key exchange process.
-	  This method uses [RFC3526] group14 (a 2048-bit MODP group).
-	  DH group14 with SHA-1 is supported by most implementations.
-
-config DROPBEAR_DH_GROUP14_SHA256
-	bool
-	prompt "dh group14 sha256"
-	help
-	  Diffie-Hellman (DH) groups determine the strength of the key used
-	  in the key exchange process.
-	  This key exchange uses the group14 (a 2048-bit MODP group) along
-	  with a SHA-2 (SHA2-256) hash.
-
-config DROPBEAR_DH_GROUP16_SHA256
-	bool
-	prompt "dh group16 sha256"
-	help
-	  Diffie-Hellman (DH) groups determine the strength of the key used
-	  in the key exchange process.
-	  This modulus (4096-bit) is larger than that required by [CNSA-SUITE]
-	  and should be sufficient to inter-operate with more paranoid
-	  nation-states.
-
-config DROPBEAR_DH_GROUP1_SHA1
-	bool
-	prompt "dh group1 sha1"
-	default n
-	help
-	  Diffie-Hellman (DH) groups determine the strength of the key used in
-	  the key exchange process. This method uses [RFC7296] Oakley Group 2
-	  (a 1024-bit MODP group) and SHA-1 [RFC3174]. Due to recent security
-	  concerns with SHA-1 [RFC6194] and with MODP groups with less than 2048
-	  bits (see [LOGJAM] and [NIST-SP-800-131Ar1]), this method is considered
-	  insecure.
-	  This option is for compatibility with old server implementations. There
-	  are many old implementations out there that may still need to use this key
-	  exchange.
+comment "WARNING: No encryption method selected!"
+	depends on !DROPBEAR_AES128 && !DROPBEAR_3DES && !DROPBEAR_AES256 && !DROPBEAR_CHACHA20POLY1305
 
 config DROPBEAR_CBC_CIPHERS
 	bool
-	prompt "CBC mode ciphers"
+	prompt "CBC mode ciphers (legacy)"
 	help
 	  Enable CBC mode for ciphers. This has security issues though
 	  is the most compatible with older SSH implementations.
@@ -292,17 +208,21 @@ config DROPBEAR_GCM_CIPHERS
 	prompt "Galois/Counter mode ciphers"
 	default n
 	help
-          Enable "Galois/Counter Mode" for ciphers. This authenticated
-          encryption mode is combination of CTR mode and GHASH. Recommended
-          for security and forwards compatibility, but slower than CTR on
-          CPU w/o dedicated AES/GHASH instructions.
-          Compiling in will add ~6kB to binary size on x86-64
+	  Enable "Galois/Counter Mode" for ciphers. This authenticated
+	  encryption mode is combination of CTR mode and GHASH. Recommended
+	  for security and forwards compatibility, but slower than CTR on
+	  CPU w/o dedicated AES/GHASH instructions.
+	  Compiling in will add ~6kB to binary size on x86-64
 
-comment "Integrity, at least one required --- sha2-256 is recommended as a default, sha1 for compatibility"
+endmenu
+
+menu "Message Integrity (HMAC)     "
+
+comment "at least one required ---"
 
 config DROPBEAR_SHA1
 	bool
-	prompt "sha1"
+	prompt "sha1 (compat)"
 	help
 	  The Secure Hash Algorithm (SHA) was developed by NIST and
 	  is specified in the Secure Hash Standard (SHS, FIPS 180).
@@ -314,7 +234,7 @@ config DROPBEAR_SHA1
 
 config DROPBEAR_SHA1_96
 	bool
-	prompt "sha1-96"
+	prompt "sha1-96 (legacy)"
 	help
 	  The Secure Hash Algorithm (SHA) was developed by NIST and
 	  is specified in the Secure Hash Standard (SHS, FIPS 180).
@@ -326,7 +246,7 @@ config DROPBEAR_SHA1_96
 
 config DROPBEAR_SHA256
 	bool
-	prompt "sha256"
+	prompt "sha256 (recommended)"
 	default y
 	help
 	  SHA-2 is a set of cryptographic hash functions (SHA-224, SHA-256,
@@ -350,16 +270,14 @@ config DROPBEAR_SHA512
 	  SHA-1. SHA-2 consists of a set of four hash functions with digests
 	  that are 224, 256, 384 or 512 bits.
 
-comment "Hostkey/public key algorithms, at least one required ---"
+comment "WARNING: No Message Integrity method selected!"
+	depends on !DROPBEAR_SHA1 && !DROPBEAR_SHA1_96 && !DROPBEAR_SHA256 && !DROPBEAR_SHA512
 
-config DROPBEAR_DSS
-	bool
-	prompt "dss"
-	default y
-	help
-	  DSS (Digital Signature Standard), aka DSA (D.S. Algorithm), may be
-	  necessary to connect to some systems though is not recommended for
-	  new keys
+endmenu
+
+menu "Hostkey/public key algorithms"
+
+comment "at least one required ---"
 
 config DROPBEAR_RSA
 	bool
@@ -381,12 +299,46 @@ config DROPBEAR_ECDSA
 config DROPBEAR_ED25519
 	bool
 	prompt "ed25519"
+	default y
 	help
-	  Ed25519 is faster than ECDSA.
-	  Compiling in Ed25519 code increases binary size - around
-	  7,5kB on x86-64
+	  Ed25519 is the EdDSA signature scheme using SHA-512 (SHA-2)
+	  and Curve25519.
+	  Ed25519 is intended to provide attack resistance comparable to
+	  quality 128-bit symmetric ciphers.
+	  Public keys are 256 bits long and signatures are 512 bits
+	  long.
 
-comment "Key exchange algorithm ---"
+comment "WARNING: No Hostkey/public key algorithm selected!"
+	depends on !DROPBEAR_RSA && !DROPBEAR_ECDSA && !DROPBEAR_ED25519
+
+endmenu
+
+menu "Key exchange algorithm       "
+
+comment "at least one required ---"
+
+config DROPBEAR_DH_GROUP14_SHA256
+	bool
+	prompt "group14_sha256"
+	default y
+	help
+	  2048 bit, sha2-256.
+	  group14 is supported by most implementations.
+
+config DROPBEAR_DH_GROUP14_SHA1
+	bool
+	prompt "group14_sha1"
+	help
+	  2048 bit, sha1.
+	  group14 is supported by most implementations.
+
+config DROPBEAR_DH_GROUP16
+	bool
+	prompt "group16"
+	help
+	  4096 bit, sha2-512.
+	  group16 provides a greater strength level but is slower and
+	  increases binary size.
 
 config DROPBEAR_ECDH
 	bool
@@ -394,27 +346,40 @@ config DROPBEAR_ECDH
 	help
 	  ECDH stands for Elliptic Curve Diffie-Hellman.
 
+	  Small systems should generally include either curve25519 or
+	  ecdh for performance.
+
 config DROPBEAR_CURVE25519
 	bool
-	depends on DROPBEAR_ECDSA || DROPBEAR_ECDH
-	prompt "curve25519-donna"
+	prompt "curve25519"
 	help
-	  Enable curve25519-donna for key exchange.
+	  Enable curve25519 for key exchange.
 	  This is another elliptic curve method with good security properties.
 	  This algorithm does not rely on NIST-based curves
 	  and gives us more security confidence against a possible
 	  backdoor in nistp-256 curve.
 
-config DROPBEAR_KEXGUESS2
-	bool
-	prompt "kexguess2 extension"
-	default y
-	help
-	  Protocol extension to allow \"first follows\" to succeed more frequently.
-	  This is currently Dropbear-specific but will gracefully fallback when
-	  connecting to other implementations.
+	  Small systems should generally include either curve25519 or
+	  ecdh for performance.
 
-comment "Authentication types, at least one required --- RFC Draft requires pubkey auth"
+config DROPBEAR_DH_GROUP1
+	bool
+	prompt "group1 (legacy, client only)"
+	help
+	  1024 bit, sha1.
+	  This is too small for security though is necessary if you need
+	  compatibility with some implementations such as Dropbear
+	  versions < 0.53.
+	  Client only!
+
+comment "WARNING: No key exchange algorithm selected!"
+	depends on !DROPBEAR_DH_GROUP14_SHA256 && !DROPBEAR_DH_GROUP14_SHA1 && !DROPBEAR_DH_GROUP16 && !DROPBEAR_ECDH && !DROPBEAR_CURVE25519 && !DROPBEAR_DH_GROUP1
+
+endmenu
+
+menu "Authentication types         "
+
+comment "at least one required --- RFC Draft requires pubkey auth"
 
 config DROPBEAR_PASSWD
 	bool
@@ -439,7 +404,12 @@ config DROPBEAR_PUBKEY
 	help
 	  Use public key authentication
 
-comment "installation options   ---"
+comment "WARNING: No authentication type selected!"
+	depends on !DROPBEAR_PASSWD && !DROPBEAR_PUBKEY
+
+endmenu
+
+comment "Installation options           ---"
 
 config DROPBEAR_DROPBEAR
 	bool
@@ -447,7 +417,6 @@ config DROPBEAR_DROPBEAR
 	default y
 	select DROPBEAR_DROPBEAR_KEY
 	select DROPBEAR_RSA
-	select BUSYBOX_START_STOP_DAEMON if BUSYBOX
 	help
 	  Installs the dropbar server in /usr/sbin/dropbear on the target
 
@@ -475,7 +444,7 @@ config DROPBEAR_SCP
 comment "OpenSSH scp is selected!"
 	depends on OPENSSH_SCP
 
-comment "runtime options        ---"
+comment "Runtime options                ---"
 
 config DROPBEAR_STARTSCRIPT
 	bool

@@ -4,9 +4,11 @@ config PP_DOCKER
 	bool
 	select HOST_CT_BUILD
 	select GOOGLETEST
-  select WAGO_PARAMETER_SERVICE_CORE
+  select WDX_CORE
   select WAGO_SYSTEM
 	select LIBCOMMONHEADER
+	select WDX_WDM
+	select WDX_WDM_CPP_HEADERS
 	select NLOHMANN_JSON
 	select LIBARCHIVE
 	prompt "pp_docker"

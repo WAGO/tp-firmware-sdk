@@ -15,6 +15,7 @@ config LIBBACNETCONFIG
 	select BOOST_FILESYSTEM
 	select LIBCURL
 	select NLOHMANN_JSON
+	select LIBXML2
 	prompt "BACnet configuration library"
 	help
 	  BACnet configuration library
@@ -76,7 +77,7 @@ config LIBBACNETCONFIG_ARTIFACTORY_DEV_URL_TEMPLATE
 	string
 	depends on LIBBACNETCONFIG
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FLibbacnetConfig%2Fmain&a=LibbacnetConfig-Source&repos=pl_controller-generic-dev-local&v=*"
+	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FLibbacnetConfig%2Fdev&a=LibbacnetConfig-Source&repos=pl_controller-generic-dev-local&v=*"
 	help
 	  Searches for the current dev artifact.
 

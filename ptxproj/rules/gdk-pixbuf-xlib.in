@@ -1,0 +1,13 @@
+## SECTION=multimedia_gtk
+
+config GDK_PIXBUF_XLIB
+	tristate
+	prompt "gdk-pixbuf-xlib                  "
+	select HOST_GLIB
+	select HOST_MESON
+	select GLIB
+	select GDK_PIXBUF
+	select HOST_CMAKE
+	select XORG_LIB_X11
+	help
+	  GTK helper xlib library for pixel handling.

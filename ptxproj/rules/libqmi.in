@@ -1,8 +1,21 @@
 ## SECTION=networking
 
-config LIBQMI
+menuconfig LIBQMI
 	tristate
+	select HOST_MESON
 	select GLIB
-	prompt "libqmi"
+	select LIBMBIM if LIBQMI_MBIM_QMUX
+	prompt "libqmi                        "
 	help
 	  Support library to use the Qualcomm MSM Interface (QMI) protocol
+
+if LIBQMI
+
+config LIBQMI_MBIM_QMUX
+	bool "enable mbim-qmux support"
+	default y if MODEMMANAGER
+
+config LIBQMI_FIRMWARE_UPDATE
+	bool "Add firmware update tool for QMI devices"
+
+endif

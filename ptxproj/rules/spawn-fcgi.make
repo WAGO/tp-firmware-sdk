@@ -24,6 +24,7 @@ SPAWN_FCGI_SOURCE	:= $(SRCDIR)/$(SPAWN_FCGI).$(SPAWN_FCGI_SUFFIX)
 SPAWN_FCGI_DIR		:= $(BUILDDIR)/$(SPAWN_FCGI)
 SPAWN_FCGI_LICENSE	:= Custom License
 SPAWN_FCGI_MD5      := 59ca35229f5ffd287979752965d2971f
+SPAWN_FCGI_DEVPKG   := NO
 
 # ----------------------------------------------------------------------------
 # Get

@@ -168,6 +168,7 @@ typedef struct BrightnessData
   int minBrightness4Slave;          ///< UL 0 is allowed, Benelux minvalue has to be visible
   int adcHysteresisDiff;            ///< configured hysteresis difference, ADC input value
   char useOffset;                   ///< use +/- keys 
+  unsigned char backlightminvalue;  ///< backlight min value 0..255 adjustable from the front panel buttons
 } tBrightnessData;
 
 /// data struct used by the cmd thread function
@@ -298,6 +299,8 @@ static tDisplayData g_displayData;
 //critical section cs_
 static pthread_mutex_t cs_sysfs = PTHREAD_MUTEX_INITIALIZER; // PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 static pthread_mutex_t mutex_offset = PTHREAD_MUTEX_INITIALIZER; // PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+
+static char edge = 0; // is edge controller
 
 //------------------------------------------------------------------------------
 // function implementation
@@ -493,6 +496,7 @@ void ThreadFctEventListener(void * ptr)
   int fd;
   int i = 0, k;
   int n, num, pollincount, inotify_fd = -1;
+  int mousedevice = -1;
   char updateDevices = 1;
   
   memset(&pollfds, 0x00, sizeof(pollfds));  
@@ -581,7 +585,7 @@ void ThreadFctEventListener(void * ptr)
       }
          
       
-      if (g_brightnessData.sensormotion)
+      if ((g_brightnessData.sensormotion) && (edge == 0))
       {
         if (inotify_fd != -1)
           close(inotify_fd);
@@ -627,12 +631,20 @@ void ThreadFctEventListener(void * ptr)
         SetLastError(szErrorText);
       }    
       
-      
       //only available if usb mouse is present
-      strcpy(szDevice, "/dev/input/mouse1");
+      if (edge == 1)
+      {
+        strcpy(szDevice, "/dev/input/mouse0");
+      }
+      else
+      {
+        strcpy(szDevice, "/dev/input/mouse1");
+      }
+      
       if ((fd = open (szDevice, O_RDONLY)) > 0)
       {
-        //printf ("device %s open successful \n", device);
+        //printf ("device %s open successful \n", szDevice);
+        mousedevice = i;
         pollfds[i].fd = fd;
         pollfds[i].events=POLL_IN;
         //Print Device Name
@@ -648,7 +660,7 @@ void ThreadFctEventListener(void * ptr)
         sprintf(szDevice, "/dev/input/%s", szUsbDevice);
         if ((fd = open (szDevice, O_RDONLY)) > 0)
         {
-          //printf ("device %s open successful \n", device);
+          //printf ("device %s open successful \n", szDevice);
           pollfds[i].fd = fd;
           pollfds[i].events=POLL_IN;
           //Print Device Name
@@ -700,11 +712,11 @@ void ThreadFctEventListener(void * ptr)
       if(pollfds[k].revents & POLL_IN)
       {
         pollincount++;
-        if (pollfds[k].fd == inotify_fd) {
+        if ((pollfds[k].fd == inotify_fd) && (edge == 0))
+        {
           char buf[16];
           int len;
           struct inotify_event ev;
-
           /* Read and ignore the inotify data. We only watch one file. */
           read(inotify_fd, &ev, sizeof ev);
           /* ReadSysFs() is buggy and does not \0 terminate the buffer. */
@@ -731,9 +743,12 @@ void ThreadFctEventListener(void * ptr)
         //printf("read (pollfds[%d]\n", k);
         if ((rd = read (pollfds[k].fd, ev, size * 64)) < size)
         {
-          //data->thread_running = 0;
-          //perror_exit ("read()");
-          //printf ("listener thread poll read: rd %d errno %d \n", rd, errno);
+          if ( k == mousedevice) 
+          {
+              data->event_received = 1;
+              data->event_type = 2;
+          }
+          //printf ("poll read: rd %d errno %d size %d\n", rd, errno, size);
           usleep(10);
         }
         else
@@ -1009,8 +1024,15 @@ int main(int argc, char *argv[])
   else 
   {
     //printf("this is the first instance\n");
-  }  
+  }
   
+  if (FileExistsWithoutSizeCheck(BACKLIGHT_SYSFS_PATH) != 0)
+  {
+      //backlight path does not exists
+      //EC 752-8303
+      edge = 1;
+  }
+
   // Fork off the parent process 
   pid = fork();
   if (pid < 0) {
@@ -1044,7 +1066,7 @@ int main(int argc, char *argv[])
     
  
   //int iServerId = -1;
-    
+
   //hook in sighandler
   signal(SIGTERM, sig_handler_term); //killall
   signal(SIGINT, sig_handler_int);   //ctrl-c
@@ -1258,6 +1280,15 @@ int InitBrightnessControl()
   if (ConfGetValue(pListBacklight, "backlightoffnight", szOut, sizeof(szOut)) == SUCCESS)
   {
     g_brightnessData.backlightoffnight = atoi(szOut);
+  }
+  
+  if (ConfGetValue(pListBacklight, "backlightminvalue", szOut, sizeof(szOut)) == SUCCESS)
+  {
+    g_brightnessData.backlightminvalue = atoi(szOut);
+  }
+  else
+  {
+    g_brightnessData.backlightminvalue = 0;
   }
   
   if (ConfGetValue(pListBacklight, "plusminusstep", szOut, sizeof(szOut)) == SUCCESS)
@@ -1650,6 +1681,9 @@ int SetBacklightValue(int iValue)
   char szValue[64] = "";           
   int iNewValue;
   
+  if (edge == 1)
+    return ERROR;
+  
   if (g_brightnessData.useOffset > 0)
   { 
     //use offset +/- keys
@@ -1661,9 +1695,15 @@ int SetBacklightValue(int iValue)
       iNewValue = 255;       
       threadDataEventListener.offset = 255 - iValue;   
     }
+    else if (iNewValue < g_brightnessData.backlightminvalue)
+    {
+      //check min value adjustable from the panel buttons
+      iNewValue = g_brightnessData.backlightminvalue;
+      threadDataEventListener.offset = (iValue - iNewValue) * -1;
+    }
     else if (iNewValue < 0)
     {
-      iNewValue = 0;
+      iNewValue = g_brightnessData.backlightminvalue;
       threadDataEventListener.offset = (iValue * -1) ;
     }
     //UNLOCK
@@ -1793,6 +1833,9 @@ int GetBacklightValue()
   char szOut[256] = "";
   char c;
   
+  if (edge == 1)
+    return ERROR;
+  
   /* Enter the critical section */
   pthread_mutex_lock( &cs_sysfs );
       
@@ -1844,7 +1887,10 @@ int RefreshBacklightSettings()
 {
   int state = SUCCESS;
   int iSensorValue, k;  
-         
+
+  if (edge == 1)
+    return ERROR;
+
   //BACKLIGHT 
   if (g_brightnessData.mastermode == AIO_SLAVE)
   {
@@ -1966,7 +2012,7 @@ int RefreshBacklightSettings()
     state = ERROR;
     
     iSensorValue = GetSensorBrightnessValue();
-    printf("SensorBrightnessValue: %d\n", iSensorValue);
+    //printf("SensorBrightnessValue: %d\n", iSensorValue);
     if (iSensorValue >= 0)
     {
       for (k=0; k < g_brightnessData.rangeCounter; k++)

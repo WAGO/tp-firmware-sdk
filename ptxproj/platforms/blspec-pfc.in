@@ -4,7 +4,7 @@ menuconfig BLSPEC_PFC
 	tristate
 	select KERNEL
 	select KERNEL_INSTALL
-	select DTC_INSTALL_OFTREE if DTC
+#	select DTC_INSTALL_OFTREE if DTC
 	prompt "pfc bootloader spec entrys"
 
 if BLSPEC_PFC

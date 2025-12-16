@@ -62,7 +62,7 @@ GCOVR_EXCLUDE += $(PROJECT_ROOT)/test-src/.*
 #######################################################################################################################
 # Settings shared between build targets
 
-SHARED_CFLAGS += $(call option_std,gnu99)
+SHARED_CFLAGS += $(call option_std,gnu99) -D_GNU_SOURCE
 SHARED_CXXFLAGS += $(call option_std,gnu++14)
 SHARED_INCLUDES += -isystem $(SYSROOT)/usr/include
 

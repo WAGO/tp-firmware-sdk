@@ -104,7 +104,23 @@ void EthTool::DetermineLinkModeMasksNwords(){
   }
 
   struct {
-    ethtool_link_settings s;
+    struct ethtool_link_settings {
+      __u32	cmd;
+      __u32	speed;
+      __u8	duplex;
+      __u8	port;
+      __u8	phy_address;
+      __u8	autoneg;
+      __u8	mdio_support;
+      __u8	eth_tp_mdix;
+      __u8	eth_tp_mdix_ctrl;
+      __s8	link_mode_masks_nwords;
+      __u8	transceiver;
+      __u8	master_slave_cfg;
+      __u8	master_slave_state;
+      __u8	rate_matching;
+      __u32	reserved[7];
+    } s;
     uint32_t link_mode_masks[SCHAR_MAX * 3];
   }ls;
 

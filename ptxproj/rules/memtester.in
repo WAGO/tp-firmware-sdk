@@ -1,0 +1,22 @@
+## SECTION=debug_tools
+
+menuconfig MEMTESTER
+	tristate
+	prompt "memtester"
+	help
+	  Memory tester written by Charles Cazabon. See
+	  http://pyropus.ca/software/memtester/ for more
+	  info. This test has much more sophisticated
+	  test patterns than the one above.
+
+if MEMTESTER
+
+config MEMTESTER_SKIP_TARGETINSTALL
+	bool "skip memtester targetinstall stage"
+	default y
+	help
+	  Skip memtester targetinstall stage in order to save memory
+	  inside the target device. The install stage will create the package
+	  files into $(PTXDIST_PLATFORMDIR)/packages.
+
+endif

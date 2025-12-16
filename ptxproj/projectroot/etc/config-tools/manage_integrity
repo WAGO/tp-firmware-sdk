@@ -91,7 +91,7 @@ aide_check_or_update ()
   ret=$?
 
   if [ ${ret} -lt 14 ] && [ "update" = "${cmd}" ]; then
-    cp "${AIDE_NEW_DB}" "${AIDE_REF_DB}"
+    mv "${AIDE_NEW_DB}" "${AIDE_REF_DB}"
   fi
 
   return 0

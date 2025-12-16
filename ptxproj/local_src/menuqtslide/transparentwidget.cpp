@@ -38,8 +38,12 @@
 #include "globals.h"
 #include "transparentwidget.h"
 #include <QResizeEvent>
-
-
+#include <QWidget>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#else
+#include <QDesktopWidget>
+#endif
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions
@@ -88,7 +92,11 @@ TransparentWidget::TransparentWidget(QWidget *parent) : QWidget(parent)
     m_toolBar.startCmdThread();
   }
   
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QRect rScreen = QApplication::primaryScreen()->geometry();
+#else
   QRect rScreen = QApplication::desktop()->screenGeometry();
+#endif
 
   if (m_toolBar.m_menu.orientation == TOOLBAR_BOTTOM)
   {

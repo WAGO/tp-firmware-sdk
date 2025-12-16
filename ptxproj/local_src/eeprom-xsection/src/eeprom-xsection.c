@@ -49,7 +49,6 @@ static char *eeprom_device = NULL;
 static struct pac_eeprom_xload_section pac_xsection;
 
 #define PAC_EEPROM__SECTION_OFFSET       0x0
-#define EEPROM_GPIO__WP_PIN         170
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -100,28 +99,6 @@ u8 get_current_root(void)
 
 	}
 	return current_root_nr;
-}
-
-void eeprom_wp(int protect)
-{
-	static int exported = 0;
-
-	if (!exported) {
-		sysfs_gpio_export(EEPROM_GPIO__WP_PIN);
-		exported = 1;
-	}
-	sysfs_gpio_direction(EEPROM_GPIO__WP_PIN, SYSFS_GPIO_DOUT);
-	sysfs_gpio_set(EEPROM_GPIO__WP_PIN, protect ? 1 : 0);
-
-#ifdef DEBUG
-	/* just for testing */
-	pac_debug("%s: %d.\n", __func__, sysfs_gpio_get_value(EEPROM_GPIO__WP_PIN));
-#endif
-
-	if (exported && protect) {
-		sysfs_gpio_unexport(EEPROM_GPIO__WP_PIN);
-		exported = 0;
-	}
 }
 
 static struct boot_table_entry *pac_boot_table_lookup(u8 boot_id)
@@ -307,10 +284,8 @@ int eeprom(enum pac_eeprom_op op, unsigned int offset, u8 *buf, int size)
 			ret += read(fd, buf + ret, size - ret);
 		break;
 	case PAC_WRITE:
-		eeprom_wp(0);
 		while (ret >= 0 && ret != size)
 			ret += write(fd, buf + ret, size - ret);
-		eeprom_wp(1);
 		break;
 	default:
 		fprintf(stderr, "%s: Unknown eeprom operation!\n", __func__);

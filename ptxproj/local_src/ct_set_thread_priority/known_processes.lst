@@ -16,6 +16,7 @@ kworker/gpio-ke;f;90
 \birq/[[:digit:]]+-kbus\b;f;86
 \bspi[[:digit:]]+\b;f;86
 \birq/[[:digit:]]+-485c0000\b;f;85
+\birq/[[:digit:]]+-20100000\b;f;86
 \birq/[[:digit:]]+-44e07000\b;f;86
 \birq/[[:digit:]]+-49054000\b;f;86
 \birq/[[:digit:]]+-UIO_DPC[[:digit:]]+\b;f;70

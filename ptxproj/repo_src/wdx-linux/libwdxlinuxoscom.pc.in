@@ -1,0 +1,13 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: @wdxlinuxoscom_lib_target@
+Description: @wdxlinuxoscom_lib_description@
+Version: @PROJECT_VERSION@
+Requires: @wdxlinuxoscom_pc_req_public@
+Requires.private: @wdxlinuxoscom_pc_req_private@
+Cflags: -I"${includedir}"
+Libs: -L"${libdir}" -l@wdxlinuxoscom_lib_target@ -Wl,-Bdynamic
+Libs.private: -L"${libdir}" -l@wdxlinuxoscom_lib_target@ -Wl,-Bdynamic

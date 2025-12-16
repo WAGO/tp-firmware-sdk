@@ -16,18 +16,28 @@
 #
 PACKAGES-$(PTXCONF_SQLITE) += sqlite
 
+define sqlite/expand
+$(if $(1),$(if $(filter $(1),0 1 2 3 4 5 6 7 8 9),0)$(1),00)
+endef
+define sqlite/file-version2
+$(word 1,$(1))$(call sqlite/expand,$(word 2,$(1)))$(call sqlite/expand,$(word 3,$(1)))$(call sqlite/expand,$(word 4,$(1)))
+endef
+define sqlite/file-version
+$(call sqlite/file-version2,$(subst ., ,$(strip $(1))))
+endef
+
 #
 # Paths and names
 #
-SQLITE_VERSION	:= 3400100
-SQLITE_MD5	:= 42175b1a1d23529cb133bbd2b5900afd
-SQLITE		:= sqlite-autoconf-$(SQLITE_VERSION)
+SQLITE_VERSION	:= 3.50.4
+SQLITE_MD5	:= d74bbdca4ab1b2bd46d3b3f8dbb0f3db
+SQLITE		:= sqlite-autoconf-$(call sqlite/file-version,$(SQLITE_VERSION))
 SQLITE_SUFFIX	:= tar.gz
-SQLITE_URL	:= https://www.sqlite.org/2019/$(SQLITE).$(SQLITE_SUFFIX)
+SQLITE_URL	:= https://www.sqlite.org/2025/$(SQLITE).$(SQLITE_SUFFIX)
 SQLITE_SOURCE	:= $(SRCDIR)/$(SQLITE).$(SQLITE_SUFFIX)
 SQLITE_DIR	:= $(BUILDDIR)/$(SQLITE)
 SQLITE_LICENSE	:= public_domain
-SQLITE_LICENSE_FILES	:= file://sqlite3.c;startline=29;endline=30;md5=43af35cab122fd0eed4d5469d0507788
+SQLITE_LICENSE_FILES	:= file://sqlite3.c;startline=35;endline=36;md5=43af35cab122fd0eed4d5469d0507788
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,7 +50,8 @@ SQLITE_LICENSE_FILES	:= file://sqlite3.c;startline=29;endline=30;md5=43af35cab12
 # our CPPFLAGS would explode).
 SQLITE_CONF_ENV := \
 	$(CROSS_ENV) \
-	ac_cv_header_zlib_h=no \
+	CCACHE=none \
+	CFLAGS="-DzlibVersion=force-syntax-error" \
 	CPPFLAGS=" \
 	-DSQLITE_ENABLE_COLUMN_METADATA=1 \
 	-DSQLITE_ENABLE_FTS3_PARENTHESIS=1 \
@@ -53,18 +64,26 @@ SQLITE_CONF_TOOL	:= autoconf
 SQLITE_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--soname=legacy \
 	--disable-static \
 	--disable-editline \
 	--$(call ptx/endis,PTXCONF_SQLITE_READLINE)-readline \
 	--$(call ptx/endis,PTXCONF_SQLITE_THREADSAFE)-threadsafe \
-	--$(call ptx/endis,PTXCONF_SQLITE_LOAD_EXTENSION)-dynamic-extensions \
+	--$(call ptx/endis,PTXCONF_SQLITE_LOAD_EXTENSION)-load-extension \
+	--disable-math \
 	--enable-fts4 \
 	--enable-fts3 \
 	--disable-fts5 \
 	--enable-rtree \
 	--disable-session \
 	--disable-debug \
-	--disable-static-shell
+	--disable-static-shell \
+	\
+	--with-readline-cflags="-I$(SYSROOT)/usr/include"
+
+# linking sqlite3 to libsqlite3.so (--disable-static-shell) is broken without this
+SQLITE_MAKE_ENV	:= \
+	LDFLAGS=-lm
 
 # ----------------------------------------------------------------------------
 # Target-Install

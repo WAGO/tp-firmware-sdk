@@ -1,2 +1,3 @@
 b050c72d52c4e30d5b978ab6758f8dcdbe5c690c-compiler.h-add-uint-typedef.patch
 external_image_h.diff -p1
+0001-rename-sha1-header-to-unique-name.patch

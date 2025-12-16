@@ -66,6 +66,8 @@ int main()
   puts("now close");
   com_MSG_DeregisterObject(&con,"/test/B/ping");
   com_MSG_DeregisterObject(&con,"/test/B/pong");
+  com_SERV_DestroyWorker(worker1);
+  com_SERV_DestroyWorker(worker2);
   com_GEN_Close(&con);
   sleep(1);
 

@@ -38,11 +38,15 @@
 
 #include "screensaver.h"
 #include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#include <QRect>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QRect>
 #include <QDebug>
 #include <QSharedMemory>
-
 
 //------------------------------------------------------------------------------
 // defines; structure, enumeration and type definitions

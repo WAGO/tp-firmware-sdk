@@ -5,6 +5,7 @@ config NSS
 	prompt "nss"
 	select NSPR
 	select SQLITE
+	select ZLIB
 	help
 	  Network Security Services (NSS) is a set of libraries designed to
 	  support cross-platform development of security-enabled client and

@@ -1,0 +1,29 @@
+## SECTION=applications
+
+if RAUC
+
+if RAUC_CONFIGURATION
+
+menu "RAUC Key Selection"
+
+config RAUC_KEY
+	string
+	default "config/rauc/WAGO_BU_Automation_Development_Certificate.pem"
+	prompt "RAUC key"
+	help
+	  Workspace relative path to development key to use for RAUC image signing.
+	  (May alternatively be provided as environment variable RAUC_KEY for build process)
+
+config RAUC_CERT
+	string
+	default "config/rauc/WAGO_BU_Automation_Development_Certificate.crt"
+	prompt "RAUC certificate"
+	help
+	  Workspace relative path to development certificate to use for RAUC in FW and on image signing.
+	  (May alternatively be provided as environment variable RAUC_CERT for build process)
+
+endmenu
+
+endif
+
+endif

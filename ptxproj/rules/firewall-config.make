@@ -26,25 +26,17 @@ FIREWALL_CONFIG_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/fi
 #FIREWALL_CONFIG_BUILDROOT_DIR  := $(BUILDDIR)/config-tools/firewall
 FIREWALL_CONFIG_BUILDROOT_DIR  := $(BUILDDIR)/firewall-config
 FIREWALL_CONFIG_DIR            := $(FIREWALL_CONFIG_BUILDROOT_DIR)/src
-FIREWALL_CONFIG_BUILD_DIR      := $(FIREWALL_CONFIG_BUILDROOT_DIR)/bin/$(FIREWALL_CONFIG_BUILDCONFIG)
+FIREWALL_CONFIG_BIN_DIR        := $(FIREWALL_CONFIG_BUILDROOT_DIR)/bin/$(FIREWALL_CONFIG_BUILDCONFIG)
 FIREWALL_CONFIG_LICENSE        := unknown
 FIREWALL_CONFIG_CONF_TOOL      := NO
 FIREWALL_CONFIG_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(FIREWALL_CONFIG_BUILDCONFIG) \
-BIN_DIR=$(FIREWALL_CONFIG_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(FIREWALL_CONFIG_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
-# ptxdist update: ptx/get_alternative has been renamed to ptx/get-alternative.
-# FIXME PTXDIST_UPDATE
-ifeq ($(PTXCONF_CONFIGFILE_VERSION),"2020.08.0")
 FIREWALL_CONFIG_IPTABLES        := $(call ptx/get-alternative, projectroot, etc/firewall/iptables)
 FIREWALL_CONFIG_SERVICES        := $(call ptx/get-alternative, projectroot, etc/firewall/services)
 FIREWALL_CONFIG_TEMPLATES       := $(call ptx/get-alternative, projectroot, etc/firewall/templates)
-else
-FIREWALL_CONFIG_IPTABLES        := $(call ptx/get_alternative, projectroot, etc/firewall/iptables)
-FIREWALL_CONFIG_SERVICES        := $(call ptx/get_alternative, projectroot, etc/firewall/services)
-FIREWALL_CONFIG_TEMPLATES       := $(call ptx/get_alternative, projectroot, etc/firewall/templates)
-endif
 
 # ----------------------------------------------------------------------------
 # Extract

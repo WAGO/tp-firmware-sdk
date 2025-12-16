@@ -135,6 +135,9 @@ namespace wp {
         }
       }
     }
+
+    // add pseudo interface "any" in front
+    devices.emplace(devices.begin(), DEVICE_ANY);
     return devices;
   }
 

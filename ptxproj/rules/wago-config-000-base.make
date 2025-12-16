@@ -95,6 +95,5 @@ $(STATEDIR)/config-tool-base.clean:
 
 	rm -rf $(PTXCONF_SYSROOT_TARGET)/usr/include/ct_error_handling.h
 	@$(call clean_pkg, CONFIG_TOOL_BASE)
-	@rm -rf $(WAGO_PARAMETER_SERVICE_BUILDROOT_DIR)
 
 # vim: syntax=make

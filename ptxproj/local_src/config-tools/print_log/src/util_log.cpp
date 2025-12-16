@@ -20,6 +20,7 @@
 #include "util_log.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <boost/range.hpp>
 #include <string>
 #include "boost/filesystem.hpp"
@@ -84,7 +85,8 @@ std::vector<boost::filesystem::path> GetFilePaths(const boost::filesystem::path 
 
     // add regular and no empty file path to vector
     for(const auto& file  : files) {
-      if(boost::filesystem::is_regular(file)) {
+      boost::filesystem::path const path = file.path();
+      if(boost::filesystem::is_regular_file(file)) {
         if(!boost::filesystem::is_empty(file)) {
           filePaths.push_back(file.path());
         }
@@ -101,7 +103,6 @@ std::vector<std::string> GetFilenames(const boost::filesystem::path & folderPath
   std::vector<boost::filesystem::path> filePaths = GetFilePaths(folderPath);
   std::vector<std::string> fileNames;
 
-  
   // add filename to vector
   fileNames.reserve(filePaths.size());
   for(const auto& filePath : filePaths) {
@@ -160,7 +161,7 @@ unsigned int ReadFileLineByLine(const boost::filesystem::path & filePath,
   return outCounter;
 }
 
-eStatusCode PrintHelpText(std::ostream & out)
+eStatusCode PrintHelpText(std::ostream & out, const std::string & archive_dest_path)
 {
   out << "\n";
   out << "Print logging files command line tool\n";
@@ -168,7 +169,7 @@ eStatusCode PrintHelpText(std::ostream & out)
   out << "options:\n";
   out << "  -h [--help]                   - show help text\n";
   out << "  -s [--scan]                   - scan all available file\n";
-  out << "  -a [--archive]  <path>        - create log archive to destination path\n";
+  out << "  -a [--archive]                - create log archive to " << archive_dest_path << "\n";
   out << "  -j [--json]                   - json output format\n";
   out << "  -r [--read]     <filename>    - read content of file\n";
   out << "  -l [--limit]    <value>       - limit read output\n";

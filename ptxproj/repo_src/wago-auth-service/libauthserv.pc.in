@@ -1,0 +1,13 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${prefix}"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: @authserv_lib_target@
+Description: @authserv_lib_description@
+Version: @PROJECT_VERSION@
+Requires: @authserv_pc_req_public@
+Requires.private: @authserv_pc_req_private@
+Cflags: -I"${includedir}"
+Libs: -L"${libdir}" -Wl,-Bstatic -l@authserv_lib_target@ -Wl,-Bdynamic -lcurl
+Libs.private: -L"${libdir}" -Wl,-Bstatic -l@authserv_lib_target@ -Wl,-Bdynamic

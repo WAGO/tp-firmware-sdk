@@ -35,6 +35,7 @@ NLOHMANN_JSON_SOURCE       := $(SRCDIR)/$(NLOHMANN_JSON_ARCHIVE_NAME).$(NLOHMANN
 NLOHMANN_JSON_DIR          := $(BUILDDIR)/$(NLOHMANN_JSON)
 NLOHMANN_JSON_LICENSE      := MIT
 NLOHMANN_JSON_LICENSE_FILE := LICENSE.MIT
+NLOHMANN_JSON_DEVPKG       := NO
 
 # ----------------------------------------------------------------------------
 # Get

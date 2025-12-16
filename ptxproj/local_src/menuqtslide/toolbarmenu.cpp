@@ -42,21 +42,23 @@
 #include "tools.h"
 
 #include <QDebug>
+#include <QWidget>
+#include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+#include <QScreen>
+#else
+#include <QDesktopWidget>
+#endif
 #include <QFontDatabase>
 #include <QFile>
-
 #include <QMouseEvent>
 #include <QDragEnterEvent>
 #include <QMimeData>
-
 #include <QDrag>
 #include <QDropEvent>
-
 #include <QEvent>
 #include <QTouchEvent>
 #include <QProcess>
-#include <QX11Info>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -117,7 +119,12 @@ ToolBarMenu::ToolBarMenu(QWidget *parent) : QWidget(parent)
   m_iFadeHeight = 0;
   m_iBtnCount = 0;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  m_DesktopRect = QApplication::primaryScreen()->geometry();
+#else
   m_DesktopRect = QApplication::desktop()->screenGeometry();
+#endif
+
   m_WndRect = m_DesktopRect;
   
   int iLine = 1; //Mehrzeiligkeit bzw. Zeilenumbruch Portrait
@@ -903,11 +910,13 @@ void ToolBarMenu::parseXML()
 
       if (bSection)
       {
-        if (xml.name() == "item")
+        //if (xml.name() == "item")
+        if (xml.name().compare(QLatin1String("item")) == 0)
         {
           parseItem(xml);
         }
-        else if (xml.name() == "menu_slide_px_height")
+        //else if (xml.name() == "menu_slide_px_height")
+        else if (xml.name().compare(QLatin1String("menu_slide_px_height")) == 0)
         {
           xml.readNext();
           if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -916,7 +925,8 @@ void ToolBarMenu::parseXML()
             //qDebug() << "menuqtslide: " << "m_iInitialWndHeight " << m_iInitialWndHeight;
           }
         }
-        else if (xml.name() == "qt_form_style")
+        //else if (xml.name() == "qt_form_style")
+        else if (xml.name().compare(QLatin1String("qt_form_style")) == 0)
         {
           xml.readNext();
           if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -928,11 +938,13 @@ void ToolBarMenu::parseXML()
       }
       else
       {
-        if (xml.name() == "globals")
+        //if (xml.name() == "globals")
+        if (xml.name().compare(QLatin1String("globals")) == 0)
         {
           parseGlobals(xml);
         }
-        else if (xml.name() == "translation")
+        //else if (xml.name() == "translation")
+        else if (xml.name().compare(QLatin1String("translation")) == 0)
         {
           parseTranslation(xml);
         }
@@ -972,7 +984,7 @@ void ToolBarMenu::parseXML()
 void ToolBarMenu::parseItem(QXmlStreamReader &xml)
 {
   if (xml.tokenType() != QXmlStreamReader::StartElement
-      && xml.name() == "item")
+      && xml.name().compare(QLatin1String("item")) == 0)
   {
     return;
   }
@@ -983,9 +995,9 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
   ToolbarButton * pItemButton = new ToolbarButton("", this);
   m_menu.m_btnList.append(pItemButton);
 
-  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "item"))
+  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name().compare(QLatin1String("item")) == 0))
   {
-    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "width")
+    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("width")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -994,7 +1006,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_iWidth: " << pItemButton->m_iWidth;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "height")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("height")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1003,7 +1015,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_iHeight: " << pItemButton->m_iHeight;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "leftspacing")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("leftspacing")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1012,7 +1024,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_iLeftSpacing: " << pItemButton->m_iLeftSpacing;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "text")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("text")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1041,7 +1053,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_sText: " << pItemButton->m_sText;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "style")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("style")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1050,7 +1062,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_sStyle: " << pItemButton->m_sStyle;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "icon")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("icon")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1059,7 +1071,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
         //qDebug() << "m_sIconFilename: " << pItemButton->m_sIconFilename;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "action")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("action")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1086,7 +1098,7 @@ void ToolBarMenu::parseItem(QXmlStreamReader &xml)
 void ToolBarMenu::parseGlobals(QXmlStreamReader &xml)
 {
   if (xml.tokenType() != QXmlStreamReader::StartElement
-      && xml.name() == "globals")
+      && xml.name().compare(QLatin1String("globals")) == 0)
   {
     return;
   }
@@ -1096,9 +1108,9 @@ void ToolBarMenu::parseGlobals(QXmlStreamReader &xml)
 
   QString s;
 
-  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "globals"))
+  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name().compare(QLatin1String("globals")) == 0))
   {
-    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "menu_timeout")
+    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("menu_timeout")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1107,7 +1119,7 @@ void ToolBarMenu::parseGlobals(QXmlStreamReader &xml)
         //qDebug() << "iMenuTimeout: " << m_menu.iMenuTimeout;
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "margin_left")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("margin_left")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1115,7 +1127,7 @@ void ToolBarMenu::parseGlobals(QXmlStreamReader &xml)
         m_menu.iMarginLeft = qBound(0, xml.text().toString().toInt(), 90); //between 0 and 90 %
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "margin_right")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("margin_right")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1123,7 +1135,7 @@ void ToolBarMenu::parseGlobals(QXmlStreamReader &xml)
         m_menu.iMarginRight = qBound(10, xml.text().toString().toInt(), 100); //between 10 and 100 %
       }
     }
-    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "orientation")
+    else if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("orientation")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1299,19 +1311,18 @@ QString ToolBarMenu::ReadPlcListUrl(QString sFile)
 void ToolBarMenu::parseTranslation(QXmlStreamReader &xml)
 {
   if (xml.tokenType() != QXmlStreamReader::StartElement
-      && xml.name() == "translation")
+      && xml.name().compare(QLatin1String("translation")) == 0)
   {
     return;
   }
-
   // Next element...
   xml.readNext();
 
   QString s;
 
-  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "translation"))
+  while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name().compare(QLatin1String("translation")) == 0))
   {
-    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "textid")
+    if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name().compare(QLatin1String("textid")) == 0)
     {
       xml.readNext();
       if (xml.tokenType() == QXmlStreamReader::Characters)
@@ -1546,7 +1557,8 @@ void ToolBarMenu::OnAction()
            }
 
            QByteArray ba;
-           ba.append(m_sUrlWbm);
+           //ba.append(m_sUrlWbm);
+           ba = m_sUrlWbm.toUtf8();
            //browser already running
            sprintf(szCmd, "load=%s\n", ba.data());
            Write2PipedFifo(DEV_WEBENGINEBROWSER, szCmd);
@@ -1562,7 +1574,8 @@ void ToolBarMenu::OnAction()
         if (FindProcess("webenginebrowser") == true)
         {
           QByteArray ba;
-          ba.append(m_sUrlPlc);
+          //ba.append(m_sUrlPlc);
+          ba = m_sUrlPlc.toUtf8();
           //browser already running
           sprintf(szCmd, "load=%s\n", ba.data());
           Write2PipedFifo(DEV_WEBENGINEBROWSER, szCmd);

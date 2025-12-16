@@ -54,6 +54,7 @@ config WAGO_CUSTOM_ROOTFS_MOUNTVARLOG_STARTSCRIPT
 config WAGO_CUSTOM_FINALIZE_ROOT_STARTSCRIPT
        bool
        default n
+       select RAUC_FAILSAFE
        prompt "install /etc/init.d/finalize_root"
 
 config WAGO_CUSTOM_DEVICE_SETUP_STARTSCRIPT
@@ -140,7 +141,7 @@ config WAGO_CUSTOM_ROOTFS_SHELLS
        bool
        default n
        prompt "install /etc/shells"
-       
+
 config WAGO_CUSTOM_CRONJOBS_ROOT
        bool
        depends on BUSYBOX_CROND
@@ -156,20 +157,27 @@ config WAGO_CUSTOM_ROOTFS_COPY_SD_INTERN
        bool
        default n
        prompt "init script copying the sd card to internal flash"
-       
+
 config WAGO_CUSTOM_DIAGNOSTICS
        bool
        depends on WAGO_PFC_DIAGNOSTIC
        default n
        prompt "install /etc/diagnostic.xml"
 
+config WAGO_DALI_SERVICE_DAEMON
+       bool
+       default n
+       prompt "install /etc/init.d/DALIService"
+       help
+              Install DALI Service Daemon
+
 config WAGO_CUSTOM_RUNTIME_STARTSCRIPT
        bool
        depends on CODESYS3
-       select WAGO_CUSTOM_INSTALL_RTSVERSION 
+       select WAGO_CUSTOM_INSTALL_RTSVERSION
        default n
        prompt "install /etc/init.d/runtime"
-       
+
 config WAGO_CUSTOM_OMS_CONFIG_STARTSCRIPT
        bool
        depends on OMS_OMSD
@@ -193,7 +201,7 @@ config WAGO_CUSTOM_INSTALL_LINKIN_DEVS
     prompt "install /etc/init.d/link_devices"
     help
  	 Install script to create links to devices in sys-fs.
-	 E.g. eeprom is located in /sys/class/.../eeprom. The 
+	 E.g. eeprom is located in /sys/class/.../eeprom. The
 	 script will create a link in /dev/eeprom.
 
 if WAGO_CUSTOM_INSTALL_LINKIN_DEVS
@@ -212,25 +220,6 @@ config WAGO_CUSTOM_INSTALL_SERIAL_FEATURES
     prompt "install /etc/init.d/serial_features"
     help
     Install script to discover features of serial interface.
-
-config WAGO_CUSTOM_INSTALL_3G_MODEM_VERSION_INFO_FILE
-    bool
-    default n
-    prompt "install /etc/specific/modem_version"
-    help
-	 Install info file that holds the actual 3g modem version
-	 for PFC200 3G Telecontrol (750-8207)
-
-if WAGO_CUSTOM_INSTALL_3G_MODEM_VERSION_INFO_FILE
-
-config WAGO_CUSTOM_INSTALL_3G_MODEM_VERSION
-    string
-    prompt "modem-version" 
-    default "UC20EQAR03A04M1024"
-    help
-	 The modem version that is stored in /etc/specific/modem_version file
-
-endif
 
 config WAGO_CUSTOM_INSTALL_DETERMINE_HOSTNAME
     bool
@@ -262,27 +251,27 @@ config WAGO_ADJUST_DEFAULT_SETTINGS
     help
       Install a script that adjusts default settings based on the order number.
       Needed if a product variant is to be shipped with non-standard defaults.
-      
+
 config WAGO_CUSTOM_INSTALL_BACKUP_ACCOUNT_SETTINGS
     bool
     default n
     prompt "backup and restore account settings and groups"
     help
     Install a script that performs backup and restore account settings and groups.
-    
+
 config WAGO_CUSTOM_INSTALL_BACKUP_SETTINGS
     bool
     default n
     prompt "backup and restore settings"
     help
-    Install a script that performs backup and restore settings.    
+    Install a script that performs backup and restore settings.
 
 config WAGO_CUSTOM_INSTALL_BOOT_WDG
     bool
     default n
     prompt "install /etc/init.d/boot_wdg"
     help
- 	 Install script to disable the interal soc watchdog, that is used by the 
+ 	 Install script to disable the interal soc watchdog, that is used by the
 	 bootloader during boot up from bootloader -> kernel -> userspace.
 
 if WAGO_CUSTOM_INSTALL_BOOT_WDG

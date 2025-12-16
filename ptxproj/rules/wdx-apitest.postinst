@@ -1,0 +1,31 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# This file is part of PTXdist package wdx-apitest.
+#
+# Copyright (c) 2025 WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+# Script:   wdx-apitest.postinst
+#
+# Brief:    WAGO Parameter Service post install script.
+#
+# Author:   PEn: WAGO GmbH & Co. KG
+#           Röh: WAGO GmbH & Co. KG
+#-----------------------------------------------------------------------------#
+
+# Main: Prepare newly installed package to run.
+#
+# Exit: 0 on success, unequal to 0 otherwise
+#-----------------------------------------------------------------------------#
+if [ ! "$PTXDIST" ]; then
+	useradd apitest --no-create-home
+	groupadd wdx-apitest-rw
+	/usr/sbin/usermod -a -G 'wdx-apitest-rw' 'apitest'
+	/usr/sbin/usermod -a -G 'wdxprov' 'apitest'
+	/usr/sbin/usermod -a -G 'wdaadm' 'apitest'
+fi
+exit 0

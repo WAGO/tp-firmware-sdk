@@ -1,0 +1,83 @@
+## SECTION=wago_specific_config_parameterservice
+
+config WDX_LINUX
+	bool
+	default n
+	select HOST_CMAKE
+	select GOOGLETEST
+	select LIBCOMMONHEADER
+	select WAGO_DAEMON_UTILS
+	select WDX_CORE
+	select NLOHMANN_JSON
+	select BOOST                   if WDX_LINUX_COM_LIB
+	select BOOST_SYSTEM            if WDX_LINUX_COM_LIB
+	select FCGI                    if WDX_LINUX_SERVICE_LIB
+	select LIBCURL                 if WDX_LINUX_SERVICE_LIB
+	select WDX_WDD                 if WDX_LINUX_SERVICE_LIB
+	select WDX_WDM                 if WDX_LINUX_SERVICE_LIB
+	select WDX_WDM_CPP_HEADERS     if WDX_LINUX_SERVICE_LIB
+	select WAGO_CRYPTO             if WDX_LINUX_SERVICE_LIB
+
+config WDX_LINUX_COM_LIB
+	bool
+	select WDX_LINUX
+	default n
+	prompt "WAGO Parameter Service (WDx) Communication Library"
+	help
+	  WDx (WAGO Parameter Service) communication library to connect processes to parameter service daemon.
+
+config WDX_LINUX_CLIENT_LIB
+	bool
+	select WDX_LINUX
+	default n
+	prompt "WAGO Parameter Service (WDx) Client Library"
+	help
+	  Static library to provide daemon functionality for providers.
+
+config WDX_FILE
+	bool
+	select WDX_LINUX
+	default n
+	prompt "WAGO Parameter Service (WDx) File Library"
+	help
+	  This file library allows atomic Read/Write access to files
+	  with fixed (non-user modifiable) file name, maximum size,
+	  owner and access mode.
+	  This library supports realization of
+	  WDx (WAGO Parameter Service) File Providers.
+
+config WDX_LINUX_SERVICE_LIB
+	bool
+	select WDX_LINUX
+	select WDX_LINUX_COM_LIB
+	default n
+	prompt "WAGO Parameter Service (WDx) Target Library"
+	help
+	  Library for Linux controller devices to build parameter services.
+
+config WDX_LINUX_SERVICE_DAEMON
+	bool
+	select WDX_LINUX
+	select WDX_LINUX_SERVICE_LIB
+	default n
+	prompt "WAGO Parameter Service (WDx) Daemon"
+	help
+	  WDx (WAGO Parameter Service) daemon for Linux controller devices.
+
+config WDX_LINUX_SERVICE_DAEMON_STARTSCRIPT
+	bool
+	select WDX_LINUX
+	default y
+	prompt "Install WAGO Parameter Service (WDx) Daemon init script into /etc/init.d/"
+	depends on INITMETHOD_BBINIT
+	depends on WDX_LINUX_SERVICE_DAEMON
+
+config WDX_LINUX_SERVICE_LIGHTTPD_INTEGRATION
+	bool
+	select WDX_LINUX
+	select WDX_LINUX_SERVICE_LIB
+	depends on LIGHTTPD
+	default n
+	prompt "WAGO Parameter Service (WDx) lighttpd integration"
+	help
+	  WDx (WAGO Parameter Service) integration for lighttpd webserver.

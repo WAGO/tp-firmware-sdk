@@ -31,6 +31,7 @@ JSONCPP_SOURCE       := $(SRCDIR)/$(JSONCPP).$(JSONCPP_SUFFIX)
 JSONCPP_DIR          := $(BUILDDIR)/$(JSONCPP)
 JSONCPP_LICENSE      := MIT
 JSONCPP_LICENSE_FILE := LICENSE
+JSONCPP_DEVPKG       := NO
 
 # ----------------------------------------------------------------------------
 # Get

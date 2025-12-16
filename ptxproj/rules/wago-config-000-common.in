@@ -62,16 +62,6 @@ config CT_FEATURE_ETH_SWITCH_DSA
   help
     Ethernet configuration: enable if the switch ports may be configured as separate NICs.
 
-config CT_FEATURE_ETH_SWITCH_ADVANCED
-  bool
-  default n
-  depends on CT_FEATURE_ETH_SWITCH
-  select CT_GET_SWITCH_SETTINGS
-  select CT_CONFIG_SWITCH
-  prompt "Device has a switch with advanced configuration support"
-  help
-    Installs tools for advanced switch configuration: fast aging, broadcast protection etc. Requires a device that supports it.
-
 config CT_FEATURE_DISPLAY
   bool
   default n
@@ -142,7 +132,6 @@ menuconfig CONFIG_TOOLS
   select CT_CONFIG_TOOL_LIB_C
   select CT_CONFIG_TOOL_LIB_BASH
   select CT_CONFIG_TOOL_DEFINES
-  select SWCONFIG if CT_FEATURE_ETH_SWITCH_ADVANCED
   select CT_URLENCODE
   select WAGO_DBUS
   select EEPROM_XSECTION if (CDS3_RTS_PRODUCT_VTPCTP || CDS3_RTS_PRODUCT_CC100)
@@ -330,22 +319,6 @@ config CT_SET_DSA_MODE
   select CT_NETWORK_CONFIG
   help
    Toggle dual ethernet mode.
-
-config CT_GET_SWITCH_SETTINGS
-  bool
-  default n
-  depends on CONFIG_TOOLS && CT_FEATURE_ETH_SWITCH_ADVANCED
-  select CT_LIBCTNETWORK
-  help
-   Get advanced switch settings (security-related like broadcast protection, ingress rate limiting etc.)
-
-config CT_CONFIG_SWITCH
-  bool
-  default n
-  depends on CONFIG_TOOLS && CT_FEATURE_ETH_SWITCH_ADVANCED
-  select CT_LIBCTNETWORK
-  help
-   Set advanced switch settings (security-related like broadcast protection, ingress rate limiting etc.)
 
 config CT_GET_DNS_SERVER
   bool
@@ -750,15 +723,6 @@ config CT_GET_CLOCK_DATA
 ###############################################################
 comment "Users"
 depends on CONFIG_TOOLS
-
-config CT_CONFIG_USER
-  bool
-  default n
-  depends on CONFIG_TOOLS
-  prompt "config_user"
-  help
-   Change Webserver user passwords.
-
 
 config CT_CRYPT
   bool

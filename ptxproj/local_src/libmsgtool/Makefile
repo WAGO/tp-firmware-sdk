@@ -6,17 +6,19 @@
 # add more flags here,
 # but don't remove the "+="
 #
-CFLAGS += -O2 -g -Wall -fpic #-Wsign-compare -Wfloat-equal -Wformat-security #-Werror
-CPPFLAGS +=
-DYNLDFLAGS += -shared
 
 LIB_OBJS = libmsgtool.o
 LIB_FILE = libmsgtool.so
 
+#CFLAGS += -O2 -g -Wall -fpic #-Wsign-compare -Wfloat-equal -Wformat-security #-Werror
+CFLAGS += -O2 -g -Wall -fpic -Wfloat-equal -Wformat-security
+CPPFLAGS +=
+DYNLDFLAGS += -shared
+
 all: $(LIB_FILE)
 
 $(LIB_FILE): $(LIB_OBJS)
-	$(LD) $(DYNLDFLAGS) $(LIB_OBJS) -o $(LIB_FILE)
+	$(CC) $(DYNLDFLAGS) -o $(LIB_FILE) $(LIB_OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<

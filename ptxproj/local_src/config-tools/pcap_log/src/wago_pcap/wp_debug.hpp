@@ -36,7 +36,8 @@ void Debug_SetEnable();
 void Debug_SetDisable();
 bool Debug_GetState();
 
-template<typename ...Args> void Debug_Printf(const std::string & msg, Args... args)
+template<typename ...Args>
+void Debug_Printf(const std::string & msg, Args... args)
 {
   if (Debug_GetState())
   {
@@ -44,7 +45,8 @@ template<typename ...Args> void Debug_Printf(const std::string & msg, Args... ar
   }
 }
 
-template<typename ...Args> void Debug_PrintAndLogToFile(
+template<typename ...Args>
+void Debug_PrintAndLogToFile(
   const std::string & file_path,
   const std::string & msg,
   Args... args)

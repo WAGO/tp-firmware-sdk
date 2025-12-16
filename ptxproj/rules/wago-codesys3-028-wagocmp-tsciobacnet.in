@@ -70,7 +70,7 @@ config CDS3_TSCIOBACNET_ARTIFACTORY_DEV_URL_TEMPLATE
 	string
 	depends on CDS3_TSCIOBACNET
 	prompt "URL template"
-	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FTscIoBacnet%2Fmain&a=TscIoBacnet-Source&repos=pl_controller-generic-dev-local&v=*"
+	default "%ARTIFACTORY_BASE_URL%/artifactory/api/search/latestVersion?g=wago_intern%2FTscIoBacnet%2Fdev&a=TscIoBacnet-Source&repos=pl_controller-generic-dev-local&v=*"
 	help
 	  Searches for the current dev artifact.
 

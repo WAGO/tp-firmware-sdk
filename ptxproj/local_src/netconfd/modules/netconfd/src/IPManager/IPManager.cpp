@@ -14,6 +14,8 @@
 #include "Logger.hpp"
 #include "TypesHelper.hpp"
 
+#include <regex>
+
 namespace netconf {
 
 namespace {
@@ -34,6 +36,15 @@ DynamicIPType IPSourceToDynamicIPClient(IPSource source) {
     return "[" + info_name + ": " + old_value + " -> " + new_value + "] ";
   }
   return "";
+}
+
+bool isDockerBridge(IPLinkPtr link){
+  if(link && link->GetInterface().GetType() == DeviceType::Bridge){
+    if(not std::regex_match(link->GetInterface().GetName(), std::regex("^br\\d$"))){
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace
@@ -148,16 +159,22 @@ Status IPManager::Configure(const IPConfigs &configs) {
   return status;
 }
 
+
+
 IPConfigs IPManager::GetIPConfigs() const {
   IPConfigs ip_configs;
   ip_configs.reserve(ip_links_.size());
 
   for (auto &link : ip_links_) {
+    if(isDockerBridge(link)){
+      continue;
+    }
     auto ip = link->GetIPConfig();
+    auto name = link->GetInterface().GetName();
     if(ip){
       ip_configs.emplace_back(ip.value());
     } else {
-      ip_configs.emplace_back(link->GetInterface().GetName());
+      ip_configs.emplace_back(name);
     }
   }
   return ip_configs;
@@ -167,6 +184,9 @@ IPConfigs IPManager::GetCurrentIPConfigs() const {
   IPConfigs ip_configs;
   ip_configs.reserve(ip_links_.size());
   for (auto &link : ip_links_) {
+    if(isDockerBridge(link)){
+      continue;
+    }
     ip_configs.emplace_back(link->GetCurrentIPConfig());
   }
 

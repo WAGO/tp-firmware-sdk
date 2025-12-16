@@ -34,7 +34,7 @@ source /usr/sbin/settings_backup_lib
 # Save the value of a parameter to config backup file.
 #
 # Param 1:  parameterName: name of the parameter
-# Param 2:  parameterValue: value of the parameter 
+# Param 2:  parameterValue: value of the parameter
 # Param 3:  backupFile:  backup filename
 #
 # Return: status of I/O operation
@@ -46,15 +46,15 @@ SaveBackupValue ()
   local backupFile="$3"
   local status=$SUCCESS
   local stringToSave="$parameterName=$parameterValue"
-    
+
   if [ -n "$backupFile" ]; then
     echo "$stringToSave" >> "$backupFile"
     if [[ $? != $SUCCESS ]]; then
       status=$WRITE_FILE_ERROR
-    fi  
+    fi
   else
     status=$CONFIG_FILE_MISSING
-  fi  
+  fi
   return $status
 }
 
@@ -70,7 +70,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo
   echo "* save all configuration settings to backup file *"
   echo
-  echo "Usage: $(basename "$0")  < backup file name >" 
+  echo "Usage: $(basename "$0")  < backup file name >"
   echo
   echo "Note: after restoring a reboot is necessary to make the changes active"
   echo
@@ -108,7 +108,7 @@ createBackupFile()
     ProcessErrBackupOperation $? "Cannot save firmware revision" "$firmwareRevision"
 
     SaveBackupValue "firmware-revision" "$firmwareRevision" "$backupFile"
-    
+
     #-------------------------------------------------------------
     # process the values from the global list in a loop
     configParamIndex=0
@@ -123,19 +123,19 @@ createBackupFile()
       paramValue="$(UriEncode "$paramValue")"
       if [ "$read_status" = "$SUCCESS" ]; then
         SaveBackupValue "$paramName" "$paramValue" "$backupFile"
-      elif [ "$read_status" = "$UNKNOWN_PARAMETER" ]; then  
-        ReportError "$read_status" "Unknown parameter \"$paramName\" " 
-        backup_error_count=$((backup_error_count+1)) 
+      elif [ "$read_status" = "$UNKNOWN_PARAMETER" ]; then
+        ReportError "$read_status" "Unknown parameter \"$paramName\" "
+        backup_error_count=$((backup_error_count+1))
       else
         ReportError $read_status "Error: \"$read_status\" by reading of parameter \"$paramName\" "
-        backup_error_count=$((backup_error_count+1)) 
+        backup_error_count=$((backup_error_count+1))
       fi
 
       configParamIndex=$[$configParamIndex + 1]
 
     done
     sync
-    
+
     # add other single values to save - read from coupler and save in backup file
     #
     # example:
@@ -154,7 +154,7 @@ createBackupFile()
       dnsServer=$(/etc/config-tools/get_dns_server $dnsServerNo)
       ProcessErrBackupOperation $? "Failed to get dns server" $dnsServerNo
     done
-    
+
     #-------------------------------------------------------------
     # save network settings
     BACKUP_TARGET_VERSION_PARAM=
@@ -164,7 +164,7 @@ createBackupFile()
 
     /etc/config-tools/network_config --backup $backupFile $BACKUP_TARGET_VERSION_PARAM
     ProcessErrRestoreOperation $? "Failed to get network parameters by " "/etc/config-tools/network_config"
-    
+
     #-------------------------------------------------------------
     # stp settings
     BACKUP_TARGET_VERSION_PARAM=
@@ -176,20 +176,18 @@ createBackupFile()
 
     #-------------------------------------------------------------
     # switch settings
-    if IsSwitchConfigV2; then 
-      BACKUP_TARGET_VERSION_PARAM=
-      if [ -n "${WAGO_BACKUP_TARGET_VERSION:-}" ]; then
-        BACKUP_TARGET_VERSION_PARAM="--backup-targetversion=${WAGO_BACKUP_TARGET_VERSION:-}"
-      fi
-      /etc/config-tools/get_switch_config --backup $BACKUP_TARGET_VERSION_PARAM >> "$backupFile"
-      ProcessErrRestoreOperation $? "Failed to get switch parameters by " "/etc/config-tools/get_switch_config"
+    BACKUP_TARGET_VERSION_PARAM=
+    if [ -n "${WAGO_BACKUP_TARGET_VERSION:-}" ]; then
+      BACKUP_TARGET_VERSION_PARAM="--backup-targetversion=${WAGO_BACKUP_TARGET_VERSION:-}"
     fi
+    /etc/config-tools/get_switch_config --backup $BACKUP_TARGET_VERSION_PARAM >> "$backupFile"
+    ProcessErrRestoreOperation $? "Failed to get switch parameters by " "/etc/config-tools/get_switch_config"
 
     #-------------------------------------------------------------
     # save dhcp server settings
     /etc/config-tools/config_dnsmasq_c --store-config "$backupFile"
     ProcessErrRestoreOperation $? "Failed to get config_dnsmasq by " "/etc/config-tools/config_dnsmasq_c"
-         
+
     #-------------------------------------------------------------
     # save dns service settings
     state=$(/etc/config-tools/get_dns_service_config -g dns-state)
@@ -226,7 +224,7 @@ createBackupFile()
     communityName=$(/etc/config-tools/get_snmp_data v1-v2c-community-name "$index")
     while [ -n "$communityName" ]; do
       communityAccess=$(/etc/config-tools/get_snmp_data v1-v2c-community-access "$index")
-      
+
       SaveBackupValue "v1-v2c-community-name-${index}" "$communityName" "$backupFile"
       SaveBackupValue "v1-v2c-community-access-${index}" "$communityAccess" "$backupFile"
 
@@ -302,7 +300,7 @@ createBackupFile()
       SaveBackupValue "${userKeyPrefix}-privacy-${currentIndex}" "$privacy" "$backupFile"
       SaveBackupValue "${userKeyPrefix}-privacy-key-${currentIndex}" "$privacyKey" "$backupFile"
       SaveBackupValue "${userKeyPrefix}-notification-receiver-${currentIndex}" "" "$backupFile"
-      
+
       index=$((index + 1))
       authName=$(/etc/config-tools/get_snmp_data v3-user-auth-name $index)
     done
@@ -318,7 +316,7 @@ createBackupFile()
         ProcessErrBackupOperation $? "Failed to backup firewall settings"
     else
         ReportError $INTERNAL_ERROR "Invalid firewall config tool"
-        backup_error_count=$((backup_error_count+1))          
+        backup_error_count=$((backup_error_count+1))
     fi
 
     # backup general firewall state
@@ -328,36 +326,36 @@ createBackupFile()
         SaveBackupValue "general-firewall-state" $general_firewall_state "$backupFile"
     else
         ReportError $INTERNAL_ERROR "Invalid firewall config tool"
-        backup_error_count=$((backup_error_count+1))       
+        backup_error_count=$((backup_error_count+1))
     fi
-    
+
     # backup VPN settings
     if [[ -x /etc/config-tools/settings_backup_vpn ]]; then
         /etc/config-tools/settings_backup_vpn backup >> "$backupFile"
         ProcessErrBackupOperation $? "Failed to backup vpn settings"
-    else 
+    else
         ReportError $INTERNAL_ERROR "Invalid vpn config tool"
         backup_error_count=$((backup_error_count+1))
     fi
-    
+
     # backup Check-System settings
     if [[ -x /usr/sbin/settings_backup_checksys ]]; then
         /usr/sbin/settings_backup_checksys backup >> "$backupFile"
         ProcessErrBackupOperation $? "Failed to backup Check-System settings"
-    else 
+    else
         ReportError $INTERNAL_ERROR "Invalid Check-System config tool /usr/sbin/settings_backup_checksys"
         backup_error_count=$((backup_error_count+1))
     fi
-    
+
     # backup Docker-Daemon settings
     if [[ -x /usr/sbin/settings_backup_docker ]]; then
         /usr/sbin/settings_backup_docker backup >> "$backupFile"
         ProcessErrBackupOperation $? "Failed to backup Docker-Daemon settings"
-    else 
+    else
         ReportError $INTERNAL_ERROR "Invalid Docker-Deaemon config tool /usr/sbin/settings_backup_docker"
         backup_error_count=$((backup_error_count+1))
     fi
-    
+
     # Save parameters of modular backup scripts
     for file in "$BACKUP_RESTORE_SCRIPT_DIR/"*; do
         if [[ -x $file ]]; then

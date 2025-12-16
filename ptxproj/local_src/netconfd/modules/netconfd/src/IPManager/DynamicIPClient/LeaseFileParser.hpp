@@ -15,9 +15,10 @@ class LeaseFileParser {
   virtual ~LeaseFileParser() = default;
 
   LeaseFileParser(const LeaseFileParser&) = default;
-  LeaseFileParser& operator=(const LeaseFileParser&) = delete;
-  LeaseFileParser(const LeaseFileParser&&) = delete;
-  LeaseFileParser& operator=(const LeaseFileParser&&) = delete;
+  LeaseFileParser& operator=(const LeaseFileParser&) = default;
+
+  LeaseFileParser(LeaseFileParser&&) = default;
+  LeaseFileParser& operator=(LeaseFileParser&&) = default;
 
   void Parse(const ::std::string &content);
 

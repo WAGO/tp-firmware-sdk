@@ -49,18 +49,18 @@ endef
 
 ## Dependencies to make autotools use PTXdist's host tools instead of the build host's build tools
 $(call add-order,host-flex,autogen-tools)
-$(call add-order,host-pkg-config,autogen-tools)
+$(call add-order,host-pkgconf,autogen-tools)
 $(call add-order,dataagent,autogen-tools)
 $(call add-order,memedit,autogen-tools)
 
 $(call add-order,host-libkmod,host-libxslt)
 $(call add-order,libkmod,host-libxslt)
-$(call add-order,host-util-linux-ng,host-libxslt)
-$(call add-order,util-linux-ng,host-libxslt)
+$(call add-order,host-util-linux,host-libxslt)
+$(call add-order,util-linux,host-libxslt)
 
 $(call add-order,host-flex,host-m4)
 $(call add-order,flex,host-flex)
-$(call add-order,glib,host-pkg-config)
+$(call add-order,glib,host-pkgconf)
 $(call add-order,host-glib,host-libxml2)
 
 
@@ -69,7 +69,6 @@ $(call add-order,host-glib,host-libxml2)
 $(call add-order,host-libkmod,host-glib)
 $(call add-order,host-cmake,host-acl)
 $(call add-order,pureftpd,libcap)
-$(call add-order,host-e2fsprogs,host-attr)
 $(call add-order,host-e2fsprogs,host-acl)
 
 
@@ -120,7 +119,7 @@ $(call add-order,strongswan,host-gperf)
 $(call add-order,sudo,host-flex)
 $(call add-order,syslogng,flex)
 $(call add-order,syslogng,libcap)
-$(call add-order,host-util-linux-ng,host-ncurses)
+$(call add-order,host-util-linux,host-ncurses)
 
 # Todo'
 # host-libxslt depends on host-libxml2, but host-libxml2 uses host-libxslt's xsltproc. Is it a problem?
@@ -128,20 +127,17 @@ $(call add-order,host-util-linux-ng,host-ncurses)
 
 
 $(call add-order,ebtables,kernel)
-$(call add-order,swconfig,kernel)
 $(call add-order,libcgroup,flex)
 $(call add-order,host-cmake,flex)
-$(call add-order,host-cmake,host-e2fsprogs)
 $(call add-order,net-snmp,e2fsprogs)
 $(call add-order,net-snmp,libelf)
 $(call add-order,net-snmp,openssl)
 $(call add-order,net-snmp,valgrind)
 
-$(call add-order,python,sqlite)
-$(call add-order,python,bzip2)
-$(call add-order,python,ncurses)
-$(call add-order,python,readline)
-$(call add-order,pekwm,xorg-lib-xinerama)
+$(call add-order,python3,sqlite)
+$(call add-order,python3,bzip2)
+$(call add-order,python3,ncurses)
+$(call add-order,python3,readline)
 $(call add-order,dbus,xorg-lib-x11)
 $(call add-order,dbus,xorg-lib-sm)
 $(call add-order,dbus,xorg-lib-ice)

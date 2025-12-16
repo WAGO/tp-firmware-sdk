@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_STRONGSWAN) += strongswan
 #
 # Paths and names
 #
-STRONGSWAN_VERSION	:= 5.9.13
-STRONGSWAN_MD5		:= 9ada6be0c89846fb7ded1787a17cfbb2
+STRONGSWAN_VERSION	:= 5.9.14
+STRONGSWAN_MD5		:= 21ca3fc7c18456405d03b77266ba630a
 STRONGSWAN		:= strongswan-$(STRONGSWAN_VERSION)
 STRONGSWAN_SUFFIX	:= tar.bz2
 STRONGSWAN_URL		:= https://download.strongswan.org/$(STRONGSWAN).$(STRONGSWAN_SUFFIX)
@@ -37,7 +37,6 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-static \
 	--enable-aes \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_AFALG)-af-alg \
-	--disable-asan \
 	--disable-bliss \
 	--disable-blowfish \
 	--disable-botan \
@@ -49,7 +48,6 @@ STRONGSWAN_CONF_OPT	:= \
 	--enable-drbg \
 	--enable-fips-prf \
 	--enable-gcm \
-	--disable-git-version \
 	--disable-gcrypt \
 	--enable-gmp \
 	--disable-curve25519 \
@@ -184,7 +182,6 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-systime-fix \
 	--disable-test-vectors \
 	--enable-updown \
-	--disable-warnings \
 	--disable-aikgen \
 	--$(call ptx/disen, PTXCONF_STRONGSWAN_SYSTEMD_UNIT)-charon \
 	--disable-cmd \
@@ -226,6 +223,8 @@ STRONGSWAN_CONF_OPT	:= \
 	--enable-kdf \
 	--enable-dependency-tracking \
 	--enable-shared \
+	--disable-warnings \
+	--disable-asan \
 	--$(call ptx/endis, PTXCONF_GLOBAL_SELINUX)-selinux \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_SWANCTL)-swanctl \
 	--with-ipseclibdir=/usr/lib \
@@ -238,6 +237,7 @@ STRONGSWAN_LDFLAGS	:= -Wl,-rpath,/usr/lib/plugins
 # ----------------------------------------------------------------------------
 
 STRONGSWAN_PLUGINS := \
+	libstrongswan-acert.so \
 	libstrongswan-aes.so \
 	libstrongswan-attr.so \
 	libstrongswan-cmac.so \

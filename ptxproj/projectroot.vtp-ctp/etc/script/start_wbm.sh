@@ -39,6 +39,22 @@ if [ -z "$QT_IM_MODULE" ]; then
   export QT_IM_MODULE=vkim
 fi
 
+function wait4virtualkeyboard
+{
+  #TP600
+  local COUNTER=0
+  while [ ! -e "/dev/virtualkeyboard" ]; do
+    ((COUNTER++))
+    #sleep 500 ms
+    usleep 500000
+    if [ $COUNTER -gt 50 ]; then
+      echo "Timeout waiting for virtualkeyboard device"
+      break;
+    fi
+  done
+  sleep 1
+}
+
 function ShowUrl
 {
   local PINCH_GESTURE=`getconfvalue /etc/specific/webengine/webengine.conf zoom`
@@ -51,6 +67,11 @@ function ShowUrl
     /usr/bin/webenginebrowser $NOSANDBOX $URL > /dev/null 2>&1 &
   fi
 }
+
+VIRTUALKEYBOARD=$(getconfvalue /etc/specific/virtualkeyboard.conf state -l)
+if [ "$VIRTUALKEYBOARD" == "enabled" ]; then
+    wait4virtualkeyboard
+fi
 
 PIDVKB=`pidof virtualkeyboard`
 if [ ! -z $PIDVKB ]; then

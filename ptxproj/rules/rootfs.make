@@ -197,6 +197,9 @@ ifdef PTXCONF_ROOTFS_GROUP
 	@$(call install_replace, rootfs, /etc/group, \
 		@GROUP_CODESYS3@, \
 		$(call remove_quotes,$(PTXCONF_ROOTFS_GROUP_CODESYS3_ENTRY)))
+	@$(call install_replace, rootfs, /etc/group, \
+		@GROUP_CODESYSCONTROLADMIN@, \
+		$(call remove_quotes,$(PTXCONF_ROOTFS_GROUP_CODESYSCONTROLADMIN_ENTRY)))
 
 endif
 

@@ -24,13 +24,13 @@ CONFIG_STP_BUILDCONFIG    := Release
 CONFIG_STP_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/$(CONFIG_STP)
 CONFIG_STP_BUILDROOT_DIR  := $(BUILDDIR)/$(CONFIG_STP)
 CONFIG_STP_DIR            := $(CONFIG_STP_BUILDROOT_DIR)/src
-CONFIG_STP_BUILD_DIR      := $(CONFIG_STP_BUILDROOT_DIR)/bin/$(CONFIG_STP_BUILDCONFIG)
+CONFIG_STP_BIN_DIR      := $(CONFIG_STP_BUILDROOT_DIR)/bin/$(CONFIG_STP_BUILDCONFIG)
 CONFIG_STP_LICENSE        := MPL-2.0
 CONFIG_STP_CONF_TOOL      := NO
 CONFIG_STP_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(CONFIG_STP_BUILDCONFIG) \
-BIN_DIR=$(CONFIG_STP_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build \
+BIN_DIR=$(CONFIG_STP_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build \
 #PTXDIST_PACKAGE_MK_FILE=$(call ptx/in-path, PTXDIST_PATH, rules/config_stp.make)
 
 
@@ -96,7 +96,7 @@ $(STATEDIR)/config_stp.targetinstall:
 	@$(call install_fixup, config_stp,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, config_stp,DESCRIPTION,missing)
 
-	@$(call install_copy, config_stp, 0, 0, 0755, $(CONFIG_STP_BUILD_DIR)/config_stp.elf, /etc/config-tools/config_stp)
+	@$(call install_copy, config_stp, 0, 0, 0755, $(CONFIG_STP_BIN_DIR)/config_stp.elf, /etc/config-tools/config_stp)
 
 	@$(call install_finish, config_stp)
 

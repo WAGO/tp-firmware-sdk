@@ -23,13 +23,13 @@ DATAAGENT_BUILDCONFIG   := Release
 DATAAGENT_SRC_DIR       := $(PTXDIST_WORKSPACE)/wago_intern/$(DATAAGENT)
 DATAAGENT_BUILDROOT_DIR := $(BUILDDIR)/$(DATAAGENT)
 DATAAGENT_DIR           := $(DATAAGENT_BUILDROOT_DIR)/src
-DATAAGENT_BUILD_DIR     := $(DATAAGENT_BUILDROOT_DIR)/bin/$(DATAAGENT_BUILDCONFIG)
+DATAAGENT_BIN_DIR       := $(DATAAGENT_BUILDROOT_DIR)/bin/$(DATAAGENT_BUILDCONFIG)
 DATAAGENT_LICENSE	:= unknown
 DATAAGENT_CONF_TOOL	:= NO
 DATAAGENT_MAKE_ENV	:= $(CROSS_ENV) \
 BUILDCONFIG=$(DATAAGENT_BUILDCONFIG) \
-BIN_DIR=$(DATAAGENT_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(DATAAGENT_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 
 DATAAGENT_PACKAGE_NAME := dataagent_$(DATAAGENT_VERSION)_$(PTXDIST_IPKG_ARCH_STRING)
@@ -45,12 +45,12 @@ DATAAGENT_PLATFORMCONFIGPACKAGEDIR := $(PTXDIST_PLATFORMCONFIGDIR)/packages
 # ----------------------------------------------------------------------------
 # Extract
 # ----------------------------------------------------------------------------
-$(STATEDIR)/dataagent.extract: 
+$(STATEDIR)/dataagent.extract:
 	@$(call targetinfo)
 
 	@mkdir -p $(DATAAGENT_BUILDROOT_DIR)
 
-ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES	
+ifndef PTXCONF_WAGO_TOOLS_BUILD_VERSION_BINARIES
 	@if [ ! -L $(DATAAGENT_DIR) ]; then \
 		ln -s $(DATAAGENT_SRC_DIR) $(DATAAGENT_DIR); \
 	fi
@@ -124,8 +124,8 @@ $(STATEDIR)/dataagent.targetinstall:
 	@$(call install_fixup, dataagent,AUTHOR,"M\&M Software GmbH")
 	@$(call install_fixup, dataagent,DESCRIPTION,missing)
 
-	@$(call install_copy, dataagent, 0, 118, 0770, /etc/dataagent/)
-	@$(call install_copy, dataagent, 118, 118, 0640, -, /etc/dataagent/dataagent.config)
+	@$(call install_copy, dataagent, 0, 5018, 0770, /etc/dataagent/)
+	@$(call install_copy, dataagent, 5018, 5018, 0640, -, /etc/dataagent/dataagent.config)
 	@$(call install_copy, dataagent, 0, 0, 0755, -, /usr/bin/dataagent)
 	@$(call install_copy, dataagent, 0, 0, 0750, /etc/specific/features/)
 	@$(call install_copy, dataagent, 0, 0, 0644, -, /etc/specific/features/feature_dataagent)
@@ -150,8 +150,8 @@ endif # PTXCONF_DATAAGENT_PARAMETER_PROVIDER_DAEMON_STARTSCRIPT
 endif # PTXCONF_INITMETHOD_BBINIT
 endif # PTXCONF_DATAAGENT_PARAMETER_PROVIDER_DAEMON
 
-	
-	
+
+
 
 	@$(call install_finish, dataagent)
 	@$(call touch)

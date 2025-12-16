@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBARCHIVE) += libarchive
 #
 # Paths and names
 #
-LIBARCHIVE_VERSION	:= 3.6.1
-LIBARCHIVE_MD5		:= 802a56ef9eaa0b8776296ba78a6d0c2c
+LIBARCHIVE_VERSION	:= 3.7.9
+LIBARCHIVE_MD5		:= c6492564cd3aa0374e3f562dace6268f
 LIBARCHIVE		:= libarchive-$(LIBARCHIVE_VERSION)
 LIBARCHIVE_SUFFIX	:= tar.gz
 LIBARCHIVE_URL		:= https://www.libarchive.org/downloads/$(LIBARCHIVE).$(LIBARCHIVE_SUFFIX)
@@ -44,6 +44,7 @@ LIBARCHIVE_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_LIBARCHIVE_BSDTAR)-bsdtar \
 	--$(call ptx/endis, PTXCONF_LIBARCHIVE_BSDCAT)-bsdcat \
 	--$(call ptx/endis, PTXCONF_LIBARCHIVE_BSDCPIO)-bsdcpio \
+	--$(call ptx/endis, PTXCONF_LIBARCHIVE_BSDUNZIP)-bsdunzip \
 	--disable-rpath \
 	--enable-posix-regex-lib=libc \
 	--disable-xattr \
@@ -54,13 +55,13 @@ LIBARCHIVE_CONF_OPT	:= \
 	--without-libb2 \
 	--without-iconv \
 	--without-lz4 \
-	--without-zstd \
+	--$(call ptx/wwo, PTXCONF_LIBARCHIVE_ZSTD)-zstd \
 	--$(call ptx/wwo, PTXCONF_LIBARCHIVE_LZMA)-lzma \
 	--without-lzo2 \
 	--without-cng \
 	--without-mbedtls \
 	--without-nettle \
-	--without-openssl \
+	--$(call ptx/wwo, PTXCONF_LIBARCHIVE_OPENSSL)-openssl \
 	--without-xml2 \
 	--without-expat
 
@@ -86,6 +87,9 @@ ifdef PTXCONF_LIBARCHIVE_BSDCAT
 endif
 ifdef PTXCONF_LIBARCHIVE_BSDCPIO
 	@$(call install_copy, libarchive, 0, 0, 0755, -, /usr/bin/bsdcpio)
+endif
+ifdef PTXCONF_LIBARCHIVE_BSDUNZIP
+	@$(call install_copy, libarchive, 0, 0, 0755, -, /usr/bin/bsdunzip)
 endif
 
 	@$(call install_finish, libarchive)

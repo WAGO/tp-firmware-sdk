@@ -6,14 +6,7 @@
 #
 # Copyright (c) 2018-2022 WAGO GmbH & Co. KG
 
-
-order=$(/etc/config-tools/get_typelabel_value ORDER)
-mac_addr_count=$(/etc/config-tools/get_typelabel_value MAC_ID_INC)
-board_variant=$(< /sys/class/wago/system/board_variant)
-switch_model=$(/sbin/swconfig list | awk 'NF>1{print $NF}')
-
 DIPSWITCHDIR=/dev/dip-switch
-
 
 function log
 {
@@ -22,7 +15,11 @@ function log
 
 function has_marvell_switch
 {
-    [[ $switch_model == "mv88e6321" ]]
+    if devlink dev info | grep -q '88E6321'; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 function marvell_update_eeprom
@@ -38,6 +35,8 @@ function marvell_update_eeprom
 function networking_finish
 {
     log "networking finish"
+
+    [ -e  /etc/config-tools/config_switch ] && /etc/config-tools/config_switch --init
 
     if has_marvell_switch; then
         log "found marvell switch"

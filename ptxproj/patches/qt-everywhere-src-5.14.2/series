@@ -12,4 +12,8 @@
 0010-add-dependeny-to-generated-resources.patch
 0011-fix-includes-for-gcc11.patch
 0012-fix-drag-drop-vkeyb.patch
-# 0339a08cc8ad82af4c6542508057d7e7  - git-ptx-patches magic
+0300-fix-input-evdev-handler-for-use-with__USE_TIME_BITS64.patch
+0301-fix-ozone-event-handling-for-TIME_BITS_64.patch
+0302-fix-webengine-zlibfor-use-with__USE_TIME_BITS64.patch
+0303-fix-missing-cstdint-includes.patch
+# 832c0a962eb8f75102d4393679b646d2  - git-ptx-patches magic

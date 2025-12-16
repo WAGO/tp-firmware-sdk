@@ -236,6 +236,8 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "parity-after-reboot: get the new configured parity"
   echo "services-after-reboot: get the services which are active after reboot"
   echo ""
+  echo "returns 1 if device is blocked"
+  echo ""
   exit $status
 fi
 
@@ -306,8 +308,14 @@ then
 fi
 
 
+# timeout returns 137 (128 + 9 -> KILL) if timeout hits
+timeout -s KILL 5s stty -aF $(readlink /dev/service) > /tmp/serviceSettings 2>/dev/null
+if [ "$?" = "137" ]
+then
+	rm /tmp/serviceSettings &> /dev/null
+	exit 1
+fi
 
-stty -aF $(readlink /dev/service) > /tmp/serviceSettings 2>/dev/null
 SETTINGS=$(cat /tmp/serviceSettings)
 rm /tmp/serviceSettings &> /dev/null
 

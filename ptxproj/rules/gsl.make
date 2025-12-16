@@ -25,6 +25,7 @@ GSL_SOURCE	:= $(SRCDIR)/$(GSL).$(GSL_SUFFIX)
 GSL_DIR	    := $(BUILDDIR)/$(GSL)
 GSL_LICENSE	:= MIT
 GSL_LICENSE_FILE	:= LICENSE
+GSL_DEVPKG  := NO
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -403,7 +403,7 @@ void NetDevManager::LinkChange(LinkInfo new_link, InterfaceEventAction action) {
     Delete(netdev);
   }
 
-  if (netdev && (action == InterfaceEventAction::NEW || action == InterfaceEventAction::DEL)) {
+  if (netdev && (action == InterfaceEventAction::NEW || action == InterfaceEventAction::DEL || action == InterfaceEventAction::CHANGE)) {
     event_manager_.NotifyNetworkChanges(EventLayer::EVENT_FOLDER, netdev->GetInterface());
   }
 }

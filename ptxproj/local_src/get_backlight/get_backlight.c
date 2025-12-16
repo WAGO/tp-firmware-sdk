@@ -202,6 +202,15 @@ int main(int argc, char **argv)
               status = SUCCESS;
             }
           }
+          else if (stricmp(pStr, "backlightminvalue") == 0) 
+          {
+            if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
+            {
+              //printf("%s=%s\n", pStr, szOut);
+              printf("%s", szOut);
+              status = SUCCESS;
+            }
+          }
           else if (stricmp(pStr, "mastermode") == 0) 
           {
             if (ConfGetValue(g_pList, pStr, &szOut[0], sizeof(szOut)) == SUCCESS)
@@ -308,6 +317,7 @@ void ShowHelpText()
   printf("backlightoff         0..255 (configured value)\n");  
   printf("backlightonnight     0..255 (configured value)\n");
   printf("backlightoffnight    0..255 (configured value)\n");  
+  printf("backlightminvalue    0..255 (configured value)\n");
   printf("nighttime            timestamp in format [hh:mm:ss] f.e. 21:00:00\n");
   printf("daytime              timestamp in format [hh:mm:ss] f.e. 06:00:00\n");
   printf("daynightswitch       enabled | disabled\n");  

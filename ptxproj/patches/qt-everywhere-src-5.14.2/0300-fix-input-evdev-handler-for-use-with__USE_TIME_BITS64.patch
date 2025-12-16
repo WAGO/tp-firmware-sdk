@@ -1,0 +1,43 @@
+diff -Naur qt-everywhere-src-5.14.2_org/qtbase/src/platformsupport/input/evdevkeyboard/qevdevkeyboardhandler.cpp qt-everywhere-src-5.14.2/qtbase/src/platformsupport/input/evdevkeyboard/qevdevkeyboardhandler.cpp
+--- qt-everywhere-src-5.14.2_org/qtbase/src/platformsupport/input/evdevkeyboard/qevdevkeyboardhandler.cpp	2020-03-27 10:49:31.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtbase/src/platformsupport/input/evdevkeyboard/qevdevkeyboardhandler.cpp	2025-08-06 11:28:08.119774072 +0200
+@@ -56,6 +56,7 @@
+ #include <dev/evdev/input.h>
+ #else
+ #include <linux/input.h>
++#include <sys/time.h>
+ #endif
+ 
+ QT_BEGIN_NAMESPACE
+@@ -150,7 +151,15 @@
+     qCDebug(qLcEvdevKey, "switchLed %d %d", led, int(state));
+ 
+     struct ::input_event led_ie;
+-    ::gettimeofday(&led_ie.time, 0);
++    struct timeval tv;
++    ::gettimeofday(&tv, 0);
++#ifndef input_event_sec
++    led_ie.time.tv_sec = tv.tv_sec;
++    led_ie.time.tv_usec = tv.tv_usec;
++#else
++    led_ie.input_event_sec = tv.tv_sec;
++    led_ie.input_event_usec = tv.tv_usec;
++#endif
+     led_ie.type = EV_LED;
+     led_ie.code = led;
+     led_ie.value = state;
+diff -Naur qt-everywhere-src-5.14.2_org/qtbase/src/platformsupport/input/evdevtouch/qevdevtouchhandler.cpp qt-everywhere-src-5.14.2/qtbase/src/platformsupport/input/evdevtouch/qevdevtouchhandler.cpp
+--- qt-everywhere-src-5.14.2_org/qtbase/src/platformsupport/input/evdevtouch/qevdevtouchhandler.cpp	2020-03-27 10:49:31.000000000 +0100
++++ qt-everywhere-src-5.14.2/qtbase/src/platformsupport/input/evdevtouch/qevdevtouchhandler.cpp	2025-08-06 14:07:10.800222095 +0200
+@@ -576,7 +576,11 @@
+ 
+         // update timestamps
+         m_lastTimeStamp = m_timeStamp;
++#ifndef input_event_sec
+         m_timeStamp = data->time.tv_sec + data->time.tv_usec / 1000000.0;
++#else
++        m_timeStamp = data->input_event_sec + data->input_event_usec / 1000000.0;
++#endif
+ 
+         m_lastTouchPoints = m_touchPoints;
+         m_touchPoints.clear();

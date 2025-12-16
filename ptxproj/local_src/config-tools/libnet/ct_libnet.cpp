@@ -29,9 +29,6 @@
 #include "ct_xml.h"
 #include "ct_xml_xpath.h"
 #include "ct_xslt.h"
-#ifdef __ENABLE_SWCONFIG
-#include "ct_swconfig.h"
-#endif
 
 using namespace netconf;
 namespace napi = netconf::api;
@@ -1562,48 +1559,18 @@ int ct_libnet_calculate_broadcast(const char *ipAddr,
     return status;
 }
 
-#ifdef __ENABLE_SWCONFIG
-bool ct_libnet_swconfig_is(const char* alias)
-{
-  swconfigSession_t *sessionHandle = NULL;
-  int status = ct_swconfig_start_session(SWCONFIG_SWITCH_NAME, &sessionHandle);
-  bool is_equal = false;
 
-  if(SUCCESS == status)
-  {
-    const char *found_alias = ct_swconfig_get_switch_alias(sessionHandle);
-    is_equal = strcmp(alias, found_alias) == 0;
-  }
-
-  if(NULL != sessionHandle)
-  {
-      ct_swconfig_finish_session(sessionHandle);
-  }
-
-  return is_equal;
-}
-
-static bool ct_libnet_swconfig_is_unsupported_switch(void)
-{
-  return ct_libnet_swconfig_is("mv88e6321");
-}
-
-bool ct_libnet_swconfig_default_for_unsupported_switch(const char* default_value, char *value, size_t valueLen)
-{
-  if (ct_libnet_swconfig_is_unsupported_switch())
-  {
-    g_strlcpy(value, default_value, valueLen);
-    return true;
-  }
-  return false;
-}
-#endif
-
-static int get_dsa_state__(char * const value, size_t const valueLen, const napi::BridgeConfig& bridge_config)
+static int get_dsa_state__(char * const value, size_t const valueLen, const napi::InterfaceConfigs& interface_configs,
+                           const napi::BridgeConfig& bridge_config)
 {
     if(valueLen < 2)
     {
         return NOT_ENOUGH_SPACE_ERROR;
+    }
+
+    if(interface_configs.GetConfig().size() < 2)
+    {
+        return INVALID_PARAMETER;
     }
 
     auto areinsamebridge = bridge_config.AreInSameBridge({"ethX1", "ethX2"});
@@ -1624,8 +1591,15 @@ int ct_libnet_set_dsa_state(const char *value, libnetSession_t *)
         return INVALID_PARAMETER;
     }
 
+    napi::InterfaceConfigs interface_configs;
+    auto error = napi::GetInterfaceConfigs(interface_configs);
+    if (error.IsNotOk())
+    {
+        return INVALID_PARAMETER;
+    }
+
     napi::BridgeConfig bridge_config;
-    auto error = napi::GetBridgeConfig(bridge_config);
+    error = napi::GetBridgeConfig(bridge_config);
     if (error.IsNotOk())
     {
         return INVALID_PARAMETER;
@@ -1633,28 +1607,35 @@ int ct_libnet_set_dsa_state(const char *value, libnetSession_t *)
 
     // Only change switch hw if old and new dsa state differ.
     char oldValue[2] = {'\0'};
-    get_dsa_state__(oldValue, sizeof(oldValue), bridge_config);
-    if(0 == strcmp(value, oldValue))
+    int ret = get_dsa_state__(oldValue, sizeof(oldValue), interface_configs, bridge_config);
+    if(ret == SUCCESS)
     {
-        return SUCCESS;
-    }
-
-    if (strcmp("0", value) == 0) {
-        bridge_config.AddBridge("br0");
-        bridge_config.AssignInterfaceToBridge("ethX1", "br0");
-        bridge_config.AssignInterfaceToBridge("ethX2", "br0");
-        if (bridge_config.BridgeIsEmpty("br1")) {
-            bridge_config.DeleteBridge("br1");
+        if(0 == strcmp(value, oldValue))
+        {
+            return SUCCESS;
         }
-    } else if (strcmp("1", value) == 0) {
-        bridge_config.AddBridge("br0");
-        bridge_config.AssignInterfaceToBridge("ethX1", "br0");
-        bridge_config.AddBridge("br1");
-        bridge_config.AssignInterfaceToBridge("ethX2", "br1");
-    }
 
-    error = napi::SetBridgeConfig(bridge_config);
-    if (error.IsNotOk())
+        if (strcmp("0", value) == 0) {
+            bridge_config.AddBridge("br0");
+            bridge_config.AssignInterfaceToBridge("ethX1", "br0");
+            bridge_config.AssignInterfaceToBridge("ethX2", "br0");
+            if (bridge_config.BridgeIsEmpty("br1")) {
+                bridge_config.DeleteBridge("br1");
+            }
+        } else if (strcmp("1", value) == 0) {
+            bridge_config.AddBridge("br0");
+            bridge_config.AssignInterfaceToBridge("ethX1", "br0");
+            bridge_config.AddBridge("br1");
+            bridge_config.AssignInterfaceToBridge("ethX2", "br1");
+        }
+
+        error = napi::SetBridgeConfig(bridge_config);
+        if (error.IsNotOk())
+        {
+            return INVALID_PARAMETER;
+        }
+    }
+    else
     {
         return INVALID_PARAMETER;
     }
@@ -1664,450 +1645,27 @@ int ct_libnet_set_dsa_state(const char *value, libnetSession_t *)
 
 int ct_libnet_get_dsa_state(char *value, size_t valueLen, libnetSession_t *)
 {
-    assert(NULL != value);
-    napi::BridgeConfig bridge_config;
-    napi::GetBridgeConfig(bridge_config);
-    return get_dsa_state__(value, valueLen, bridge_config);
+    return ct_libnet_get_actual_dsa_state(value, valueLen);
 }
 
 int ct_libnet_get_actual_dsa_state(char * const value, size_t const valueLen)
 {
     assert(NULL != value);
+
+    napi::InterfaceConfigs interface_configs;
+    auto error = napi::GetInterfaceConfigs(interface_configs);
+    if (error.IsNotOk())
+    {
+        return INVALID_PARAMETER;
+    }
+
     napi::BridgeConfig bridge_config;
-    napi::GetBridgeConfig(bridge_config);
-    return get_dsa_state__(value, valueLen, bridge_config);
-}
-
-#ifdef __ENABLE_SWCONFIG
-namespace {
-
-int swconfig_set_attr(const char *dev, const char *attr, const char *value, const char *valid_arg_list[])
-{
-    assert(NULL != value);
-
-    int status = SUCCESS;
-
-    swconfigSession_t *sessionHandle = NULL;
-
-    status = isValidArg(value, valid_arg_list);
-
-    if(SUCCESS == status)
+    error = napi::GetBridgeConfig(bridge_config);
+    if (error.IsNotOk())
     {
-        status = ct_swconfig_start_session(dev, &sessionHandle);
+        return INVALID_PARAMETER;
     }
 
-    if(SUCCESS == status)
-    {
-        status = ct_swconfig_set_attr(attr, value, -1, sessionHandle);
-    }
-
-    if(NULL != sessionHandle)
-    {
-        ct_swconfig_finish_session(sessionHandle);
-    }
-
-    return status;
+    return get_dsa_state__(value, valueLen, interface_configs, bridge_config);
 }
 
-int swconfig_get_attr(const char *dev, const char *attr, char *value, size_t valueLen)
-{
-    int status = SUCCESS;
-
-    swconfigSession_t *sessionHandle = NULL;
-
-    status = ct_swconfig_start_session(dev, &sessionHandle);
-
-    if(SUCCESS == status)
-    {
-        status = ct_swconfig_get_attr(attr, value, valueLen, sessionHandle);
-    }
-
-    if(NULL != sessionHandle)
-    {
-        ct_swconfig_finish_session(sessionHandle);
-    }
-
-    return status;
-}
-
-#define BCAST_DEFAULT "0"
-const char *bcast_protect_arg_list[] = {"0","1","2","3","4","5",NULL};
-
-} // namespace -> static linkage
-
-int ct_libnet_set_bcast_protect(const char *dev, const char *value)
-{
-    if (ct_libnet_swconfig_is_unsupported_switch())
-      return strcmp(BCAST_DEFAULT, value);
-    return swconfig_set_attr(dev, "bcast_protect", value, bcast_protect_arg_list);
-}
-
-void ct_libnet_print_bcast_protect_args(void)
-{
-    printValidArgs(bcast_protect_arg_list);
-}
-
-int ct_libnet_get_bcast_protect(const char *dev, char *value, size_t valueLen)
-{
-    assert(NULL != value);
-    assert(valueLen > 2);
-
-    if (ct_libnet_swconfig_default_for_unsupported_switch(BCAST_DEFAULT, value, valueLen))
-      return 0;
-
-    return swconfig_get_attr(dev, "bcast_protect", value, valueLen);
-}
-
-namespace {
-int ct_libnet_is_pfc100(void){
-    int retVal = 0;
-    tTypeLabel typelabel;
-
-    typelabel = typelabel_OBJECT_New();
-    if(TYPELABEL_RETURN_OK == typelabel_OBJECT_Open(typelabel))
-    {
-        typelabel_OBJECT_Sync(typelabel);
-        char *orderNr=typelabel_OBJECT_GetValue(typelabel,"ORDER");
-        if (orderNr != NULL)
-        {
-            //Compare only the beginning of the order-number
-            //all PFC100 start with "750-81"
-            if (strncmp(orderNr, "750-81xx", 6) == 0)
-            {
-                //printf("PFC100 Series\n");
-                retVal = 1;
-            }
-            free(orderNr);
-        }
-        typelabel_OBJECT_Destroy(typelabel);
-    }
-    return retVal;
-}
-
-#define PORT_MIRROR_DEFAULT "0"
-const char *port_mirror_arg_list[] = {"0","1","2","3", NULL};
-} // namespace -> static linkage
-
-
-int ct_libnet_set_port_mirror(const char *dev, const char *value)
-{
-    //A workaround is needed here because on PFC100 the ports X1 and X2
-    //are crosswise connected as on PFC200
-    //---BEGIN WORKAROUND---
-    // If hostname starts with "PFC100" we have to swap the values 1 and 2
-    int iValue = atoi(value);
-    char newValue[2];
-    newValue[0]='0';
-    newValue[1]='\0';
-
-    if (ct_libnet_swconfig_is_unsupported_switch())
-      return strcmp(PORT_MIRROR_DEFAULT, value);
-
-    if (ct_libnet_is_pfc100())
-    {
-        //printf("WORKAROUND FOR PFC100 - VALUE: %s - SETTO:", value);
-        switch (iValue)
-        {
-         case 1:
-          newValue[0]='2';
-          break;
-         case 2:
-          newValue[0]='1';
-          break;
-         default:
-          break;
-        }
-        //printf("%s\n", newValue);
-        return swconfig_set_attr(dev, "port_mirror", (const char*) newValue, port_mirror_arg_list);
-    }
-    //---END WORKAROUND---
-
-
-    return swconfig_set_attr(dev, "port_mirror", value, port_mirror_arg_list);
-}
-
-void ct_libnet_print_port_mirror_args(void)
-{
-    printValidArgs(port_mirror_arg_list);
-}
-
-int ct_libnet_get_port_mirror(const char *dev, char *value, size_t valueLen)
-{
-    assert(NULL != value);
-    assert(valueLen > 1);
-
-    if (ct_libnet_swconfig_default_for_unsupported_switch(PORT_MIRROR_DEFAULT,
-                                                          value, valueLen))
-      return 0;
-
-    //Original has to be commented out!
-    //return __swconfig_get_attr(dev, "port_mirror", value, valueLen);
-    //---BEGIN WORKAROUND---
-    int status = swconfig_get_attr(dev, "port_mirror", value, valueLen);
-
-    if (SUCCESS == status)
-    {
-        if (ct_libnet_is_pfc100())
-        {
-            //If value is "0" we have to do nothing
-            if (strncmp(value, "0",1) != 0)
-            {
-                if (strncmp(value, "1", 1) == 0)
-                {
-                    g_strlcpy(value, "2", 2);
-                }
-                else if (strncmp(value, "2", 1) == 0)
-                {
-                    g_strlcpy(value, "1", 2);
-                }
-                else
-                {
-                    status = ERROR;
-                }
-            }
-        }
-    }
-
-    return status;
-    //---END WORKAROUND---
-
-}
-
-#define RATE_LIMIT_DEFAULT_GET "disabled"
-#define RATE_LIMIT_DEFAULT_SET "off"
-static const char *rate_limit_arg_list[] = {    "off",
-                                                "64.kbps", "128.kbps", "192.kbps", "256.kbps", "320.kbps", "384.kbps", "448.kbps", "512.kbps",
-                                                "576.kbps", "640.kbps", "704.kbps", "768.kbps", "832.kbps", "896.kbps", "960.kbps",
-                                                "1.mbps", "2.mbps", "3.mbps", "4.mbps", "5.mbps", "6.mbps","7.mbps", "8.mbps", "9.mbps", "10.mbps",
-                                                "11.mbps", "12.mbps", "13.mbps", "14.mbps", "15.mbps", "16.mbps", "17.mbps", "18.mbps", "19.mbps", "20.mbps",
-                                                "21.mbps", "22.mbps", "23.mbps", "24.mbps", "25.mbps", "26.mbps", "27.mbps", "28.mbps", "29.mbps", "30.mbps",
-                                                "31.mbps", "32.mbps", "33.mbps", "34.mbps", "35.mbps", "36.mbps", "37.mbps", "38.mbps", "39.mbps", "40.mbps",
-                                                "41.mbps", "42.mbps", "43.mbps", "44.mbps", "45.mbps", "46.mbps", "47.mbps", "48.mbps", "49.mbps", "50.mbps",
-                                                "51.mbps", "52.mbps", "53.mbps", "54.mbps", "55.mbps", "56.mbps", "57.mbps", "58.mbps", "59.mbps", "60.mbps",
-                                                "61.mbps", "62.mbps", "63.mbps", "64.mbps", "65.mbps", "66.mbps", "67.mbps", "68.mbps", "69.mbps", "70.mbps",
-                                                "71.mbps", "72.mbps", "73.mbps", "74.mbps", "75.mbps", "76.mbps", "77.mbps", "78.mbps", "79.mbps", "80.mbps",
-                                                "81.mbps", "82.mbps", "83.mbps", "84.mbps", "85.mbps", "86.mbps", "87.mbps", "88.mbps", "89.mbps", "90.mbps",
-                                                "91.mbps", "92.mbps", "93.mbps", "94.mbps", "95.mbps", "96.mbps", "97.mbps", "98.mbps", "99.mbps",
-
-                                                NULL};
-
-const char *
-ct_libnet_get_rate_limit_by_index (size_t value)
-{
-  const char *rl;
-
-  if (value >= (sizeof(rate_limit_arg_list)/sizeof(rate_limit_arg_list[0])))
-  {
-    rl = NULL;
-  }
-  else
-  {
-    rl = rate_limit_arg_list[value];
-  }
-
-  return rl;
-}
-
-int ct_libnet_set_rate_limit(const char *dev, const char *value)
-{
-    if (ct_libnet_swconfig_is_unsupported_switch())
-      return strcmp(RATE_LIMIT_DEFAULT_SET, value);
-
-    return swconfig_set_attr(dev, "rate_limit", value, rate_limit_arg_list);
-}
-
-void ct_libnet_print_rate_limit_args(void)
-{
-    printValidArgs(rate_limit_arg_list);
-}
-
-int ct_libnet_get_rate_limit(const char *dev, char *value, size_t valueLen)
-{
-    assert(NULL != value);
-    assert(valueLen > 2);
-
-    if (ct_libnet_swconfig_default_for_unsupported_switch(RATE_LIMIT_DEFAULT_GET, value, valueLen))
-      return 0;
-
-    return swconfig_get_attr(dev, "rate_limit", value, valueLen);
-}
-
-#define FAST_AGING_DEFAULT "0"
-static const char *fast_aging_arg_list[] = {"0","1", NULL};
-
-void ct_libnet_print_fast_aging_args(void)
-{
-   printValidArgs(fast_aging_arg_list);
-}
-
-int ct_libnet_set_fast_aging(const char *dev, const char *value)
-{
-    (void) dev;
-
-    if(value[0] != '0' && value[0] != '1') {
-      return INVALID_PARAMETER;
-    }
-
-    netconf::Status netconf_status;
-    try {
-        napi::InterfaceConfigs interface_configs;
-        netconf_status = napi::GetInterfaceConfigs(interface_configs);
-        if(netconf_status.IsNotOk()) {
-            return MISSING_PARAMETER;
-        }
-
-        auto mac_learning = (value[0] == '1') ? MacLearning::OFF : MacLearning::ON;
-
-        napi::InterfaceConfigs new_interface_configs{};
-        for(auto &config : interface_configs.GetConfig()) {
-            if((config.interface_ == netconf::Interface::CreatePort("ethX1") || config.interface_ == netconf::Interface::CreatePort("ethX2"))) {
-                config.mac_learning_ = mac_learning;
-            }
-            new_interface_configs.AddConfig(config);
-        }
-
-        netconf_status = napi::SetInterfaceConfigs(new_interface_configs);
-    }
-    catch(...)
-    {
-      return MISSING_PARAMETER;
-    }
-
-    return (netconf_status.IsOk()) ? SUCCESS : ERROR;
-}
-
-int ct_libnet_get_fast_aging(const char *dev, char *value, size_t valueLen)
-{
-    (void) dev;
-
-    int status = SUCCESS;
-    int fast_aging = 0;
-
-    assert(NULL != value);
-    assert(valueLen > 1);
-
-    try {
-      napi::InterfaceConfigs interface_configs;
-      auto netconf_status = napi::GetInterfaceConfigs(interface_configs);
-      if(netconf_status.IsOk()) {
-        auto itf_configs = interface_configs.GetConfig();
-
-        int number_of_mac_learning_off_itfs = ::std::count_if(itf_configs.cbegin(), itf_configs.cend(), [](const InterfaceConfig& ic) {
-          return (ic.interface_ == netconf::Interface::CreatePort("ethX1") || ic.interface_ == netconf::Interface::CreatePort("ethX2"))
-              && (ic.mac_learning_ == MacLearning::OFF);
-        });
-
-        if(number_of_mac_learning_off_itfs == 2) {
-          // MAC learning is disabled for both interfaces X1 and X2, therefore, set global fast aging option to off.
-          fast_aging = 1;
-        }
-      } else {
-        status = MISSING_PARAMETER;
-      }
-    }
-    catch(...)
-    {
-      status = MISSING_PARAMETER;
-    }
-
-    snprintf(value, valueLen, "%d", fast_aging);
-
-    return status;
-}
-
-int ct_libnet_save_switch_settings_to_config(const char *configFile, ct_switch_settings_t *settings)
-{
-    // TODO: this function has code copied from ct_xml.c::__reliably_save_to_disk()
-    // This should be refactored. AGa, 2014-11-24
-
-    int status = SUCCESS;
-
-    char tmpFilename[strlen(configFile) + sizeof(".XXXXXX")];
-    snprintf(tmpFilename, sizeof(tmpFilename), "%s.XXXXXX", configFile);
-
-    int tmpFd = mkstemp(tmpFilename);
-
-    if(-1 == tmpFd)
-    {
-        perror("mkstemp");
-        status = FILE_OPEN_ERROR;
-    }
-
-    if(SUCCESS == status)
-    {
-        // the file created by mkstemp has 600 permissions, change it to 644
-        if(-1 == fchmod(tmpFd, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH))
-        {
-            perror("fchmod");
-            status = FILE_OPEN_ERROR;
-        }
-    }
-
-    if(SUCCESS == status)
-    {
-        const char *configFileContents = "#Auto-generated configuration file. Do not change!\n\nPORT_MIRROR=%s\nBCAST_PROTECT=%s\nRATE_LIMIT=%s\n";
-
-        status = dprintf(tmpFd,
-                         configFileContents,
-                         settings->portMirror,
-                         settings->bcastProtect,
-                         settings->rateLimit);
-
-        if(-1 == status)
-        {
-            perror("dprintf");
-            status = FILE_WRITE_ERROR;
-        }
-        else
-        {
-            // status contains number of written bytes
-            status = SUCCESS;
-        }
-    }
-
-    if(SUCCESS == status)
-    {
-        status = fsync(tmpFd);
-
-        if(-1 == status)
-        {
-            // possible errnos: EIO: sync error (i.e. not enough free space)
-            //                  EROFS, EINVAL: sync not supported (unlikely)
-            //                  EBADF: Not a valid writable fd    (impossible, because it has already been written to above)
-
-            perror("fsync");
-            status = FILE_WRITE_ERROR;
-        }
-    }
-
-    if(-1 != tmpFd)
-    {
-        if(-1 == close(tmpFd))
-        {
-        // At this point we cannot do anything, but our config might have been destroyed
-        // TODO: Ultima ratio: reset to factory settings?
-            perror("close");
-            status = FILE_WRITE_ERROR;
-        }
-    }
-
-    if(SUCCESS == status)
-    {
-        status = rename(tmpFilename, configFile);
-        if(-1 == status)
-        {
-            perror("rename");
-            status = FILE_WRITE_ERROR;
-        }
-        // rename fails: old config not touched
-    }
-
-    if(SUCCESS != status)
-    {
-        set_wbm_error_state(NULL, 0, "Error saving switch settings.\nChanges will not be restored after reboot.");
-    }
-
-    return status;
-}
-
-#endif

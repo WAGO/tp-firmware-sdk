@@ -27,7 +27,7 @@ class IPConfigs : public detail::ConfigBase<netconf::IPConfig> {
 
   IPConfigs(const IPConfigs&)            = default;
   IPConfigs& operator=(const IPConfigs&) = default;
-  IPConfigs(IPConfigs&&)                 = delete;
+  IPConfigs(IPConfigs&&)                 = default;
   IPConfigs& operator=(IPConfigs&&)      = default;
 
   /**

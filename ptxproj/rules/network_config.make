@@ -23,13 +23,13 @@ NETWORK_CONFIG_BUILDCONFIG    := Release
 NETWORK_CONFIG_SRC_DIR        := $(PTXDIST_WORKSPACE)/local_src/config-tools/$(NETWORK_CONFIG)
 NETWORK_CONFIG_BUILDROOT_DIR  := $(BUILDDIR)/$(NETWORK_CONFIG)
 NETWORK_CONFIG_DIR            := $(NETWORK_CONFIG_BUILDROOT_DIR)/src
-NETWORK_CONFIG_BUILD_DIR      := $(NETWORK_CONFIG_BUILDROOT_DIR)/bin/$(NETWORK_CONFIG_BUILDCONFIG)
+NETWORK_CONFIG_BIN_DIR      := $(NETWORK_CONFIG_BUILDROOT_DIR)/bin/$(NETWORK_CONFIG_BUILDCONFIG)
 NETWORK_CONFIG_LICENSE        := WAGO
 NETWORK_CONFIG_CONF_TOOL      := NO
 NETWORK_CONFIG_MAKE_ENV       := $(CROSS_ENV) \
 BUILDCONFIG=$(NETWORK_CONFIG_BUILDCONFIG) \
-BIN_DIR=$(NETWORK_CONFIG_BUILD_DIR) \
-SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/lib/ct-build
+BIN_DIR=$(NETWORK_CONFIG_BIN_DIR) \
+SCRIPT_DIR=$(PTXDIST_SYSROOT_HOST)/usr/lib/ct-build
 
 
 # ----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ $(STATEDIR)/network_config.targetinstall:
 	@$(call install_fixup, network_config,AUTHOR,"WAGO GmbH \& Co. KG")
 	@$(call install_fixup, network_config,DESCRIPTION,missing)
 
-	@$(call install_copy, network_config, 0, 0, 0755,$(NETWORK_CONFIG_BUILD_DIR)/network_config.elf, /etc/config-tools/network_config)
+	@$(call install_copy, network_config, 0, 0, 0755,$(NETWORK_CONFIG_BIN_DIR)/network_config.elf, /etc/config-tools/network_config)
 
 	@$(call install_finish, network_config)
 

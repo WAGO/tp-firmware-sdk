@@ -151,6 +151,13 @@ start()
     create_directory_if_needed "${LIGHTTPD_LOGDIR}"
     create_directory_if_needed "${LIGHTTPD_PHP_SESSION_DIR}"
 
+    # check for custom HTTPS certificate
+    local link; link=/etc/lighttpd/default-cert.pem
+    if [[ -a "/etc/lighttpd/custom-cert.pem" ]]; then
+        link="/etc/lighttpd/custom-cert.pem"
+    fi
+    ln -sf "$link" "/etc/lighttpd/https-cert.pem"
+
     # generate new certificate if default one was found, this is
     # done to ensure every device has a unique certificate (cf. TOFU)
     #

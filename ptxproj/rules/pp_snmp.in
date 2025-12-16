@@ -4,12 +4,12 @@ config PP_SNMP
 	bool
 	select HOST_CT_BUILD
 	select GOOGLETEST
-	select WAGO_PARAMETER_SERVICE_CORE
-  select WAGO_PARAMETER_SERVICE_MODEL_FILES
-  select WAGO_PARAMETER_SERVICE_MODEL_FILES_WDX_CPP_HEADERS
-  select WAGO_PARAMETER_SERVICE_COM
-  select GLIB
-  select SNMP_CONFIG_LIB
+	select WDX_CORE
+	select WDX_WDM
+	select WDX_WDM_CPP_HEADERS
+	select WDX_LINUX
+	select GLIB
+	select SNMP_CONFIG_LIB
 	prompt "pp_snmp"
 	help
 	  Parameter provider handles the snmp configuration

@@ -9,13 +9,13 @@ menuconfig SYSLOGNG
 #	select EVENTLOG
 	select GLIB
 	select OPENSSL
-	select PYTHON		if SYSLOGNG_PYTHON_DESTINATION
+#	select PYTHON		if SYSLOGNG_PYTHON_DESTINATION
 	select LIBC_NSL
 	select LIBC_RT
 	select LIBCURL
 	select LIBNET		if SYSLOGNG_SPOOF_SOURCE
 	select LIBPCRE
-	select TCPWRAPPER	if SYSLOGNG_TCP_WRAPPER
+#	select TCPWRAPPER	if SYSLOGNG_TCP_WRAPPER
 	select SYSTEMD		if SYSLOGNG_SYSTEMD
 	help
 	  The next generation syslog daemon.

@@ -7,7 +7,7 @@ TARGET = screensaverqt
 DEPENDPATH += .
 INCLUDEPATH += .
 
-QT += core gui widgets x11extras
+QT += core gui widgets
 #LIBS += -lX11
 
 # Input

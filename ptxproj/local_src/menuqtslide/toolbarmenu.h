@@ -40,7 +40,6 @@
 //------------------------------------------------------------------------------
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QWidget>
 #include <QTimer>
 #include <QStyle>

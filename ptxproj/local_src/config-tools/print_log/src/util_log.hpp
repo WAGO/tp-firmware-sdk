@@ -54,7 +54,8 @@ unsigned int ReadFileLineByLine(const boost::filesystem::path & filePath,
                                 unsigned int limit,
                                 std::ostream & out);
 
-eStatusCode PrintHelpText(std::ostream & out);
+eStatusCode PrintHelpText(std::ostream & out,
+                          const std::string & archive_dest_path);
 
 eStatusCode PrintExistingFiles(const boost::filesystem::path & folderpath,
                                bool json,

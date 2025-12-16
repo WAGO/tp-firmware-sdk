@@ -1,0 +1,27 @@
+## SECTION=wago_specific_config_parameterservice
+
+config WDA_OPENAPI
+	bool
+	default n
+	prompt "WAGO Parameter Service OpenAPI Definition"
+	depends on WDX_LINUX
+	select     REDOC_UI    if WDA_OPENAPI_HTML
+	help
+	  WDx (WAGO Parameter Service) OpenAPI definition and html visualization for target.
+
+config WDA_OPENAPI_HTML
+	bool
+	default n
+	prompt "HTML File for visualization using redoc"
+	depends on WDA_OPENAPI
+	help
+	  HTML visualization for WDA OpenAPI definition.
+
+config WDA_OPENAPI_URL_TEMPLATE
+	string
+	depends on WDA_OPENAPI
+	prompt "URL template"
+	default "%ARTIFACTORY_BASE_URL%/wdx-npm-prod-local/@wago/wda-openapi/-/wda-openapi-%VERSION%.tgz"
+	help
+	  Encodes the desired artifact version. Can be configured to a specific version or to a latest compatible version of an artifact.
+	  See Confluence for further details.

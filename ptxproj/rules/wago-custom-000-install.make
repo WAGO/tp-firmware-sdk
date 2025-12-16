@@ -601,14 +601,6 @@ endif
 
 endif
 
-ifdef PTXCONF_WAGO_CUSTOM_INSTALL_3G_MODEM_VERSION_INFO_FILE
-	@$(eval _VERSION := $(call remove_quotes,$(PTXCONF_WAGO_CUSTOM_INSTALL_3G_MODEM_VERSION)))
-	@$(eval _TMP_VERSION_FILE := $(PTXDIST_TEMPDIR)/modem_version)
-	@echo -e $(_VERSION) > $(_TMP_VERSION_FILE)
-
-	@$(call install_copy, wago-custom-install, 0, 0, 0755, $(_TMP_VERSION_FILE), /etc/specific/modem_version, n)
-endif
-
 ifdef PTXCONF_WAGO_CUSTOM_INSTALL_DETERMINE_HOSTNAME
 	@$(call install_alternative, wago-custom-install, 0, 0, 0755, /etc/init.d/determine_hostname, n)
 ifneq ($(PTXCONF_WAGO_CUSTOM_DETERMINE_HOSTNAME_BBINIT_LINK),)
@@ -691,6 +683,7 @@ ifdef PTXCONF_CDS3_TSCIOBACNET
 		-v $(BACNET_VERSION) \
 		-r $(BACNETSTACK_REVISION) \
 		-u $(PTXCONF_OPKG_OPKG_CONF_URL) \
+		--isarm64 $(or $(PTXCONF_ARCH_ARM64), n) \
 		--libwebsockets $(or $(PTXCONF_LIBWEBSOCKETS), n) \
 		--libbacnetstack $(or $(PTXCONF_LIBBACNETSTACK), n) \
 		--libbacnet $(or $(PTXCONF_LIBBACNET), n) \

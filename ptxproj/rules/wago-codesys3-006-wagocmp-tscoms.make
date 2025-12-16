@@ -14,7 +14,7 @@
 #
 PACKAGES-$(PTXCONF_CDS3_TSCOMS) += cds3-tscoms
 
-CDS3_TSCOMS_VERSION	 := 0.0.1
+CDS3_TSCOMS_VERSION	 := 0.0.2
 CDS3_TSCOMS              := TscOms
 CDS3_TSCOMS_DIR          := $(BUILDDIR)/$(CDS3_TSCOMS)
 CDS3_TSCOMS_URL          := file://$(PTXDIST_WORKSPACE)/wago_intern/codesys3-Component/$(CDS3_TSCOMS)

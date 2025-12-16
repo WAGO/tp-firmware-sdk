@@ -1,0 +1,39 @@
+/** \example  example_backend_client.cpp
+
+The following file shows the implementation of an example backend client.\n 
+This example uses
+\ref wago::wdx::linuxos::com::parameter_service_backend_proxy
+to register a collection of example providers by
+\ref wago::wdx::examples::example_providers.
+
+Function main():\n 
+At begin of the main() function a handler for the SIGINT signal is set up to allow the main loop to exit on request.
+In this example we use syslog as a predefined solution for the log output of libwdxlinuxoscom's components.
+Log initialization/deinitialization is done by \ref wago::logging::init() and \ref wago::logging::close().
+To allow early log output during component initialization it is highly recommended to configure logging 
+(with help of \ref wago::logging::set_log_function() and \ref wago::logging::set_log_level()) before first component
+instantiation (in this example \ref wago::wdx::linuxos::com::parameter_service_backend_proxy).\n 
+
+Provider setup:\n 
+To register the example providers, the \ref wago::wdx::parameter_service_backend_i interface is not used directly.
+The use of a connection notifier avoids backend access while the proxy component is not connected,
+what would result in an exception.
+The notifier is called each time a connection is established. In case of a re-connect, all previously registered
+providers will automatically re-registered by the proxy component. So creation and registration of the example providers
+is only done on first connect.
+
+In the main loop the driver method
+\ref wago::wdx::linuxos::com::driver_i::run_once()
+is called with a timeout of 1000 ms. This way the method returns at least after 1000 ms when no work has to be done or
+after one remaining task was done. Alternatively a program may use
+\ref wago::wdx::linuxos::com::driver_i::run()
+to avoid a turn around after a given amount of time.\n 
+
+Function wc_Fail():\n 
+This symbol is declared in header file <wc/assertion.h>. If an assertion fails this function is called as handler.
+The libwdxlinuxoscom library contain with a "weak" implementation of this symbol and a default handling.
+In this example executable we replace the default handling:
+A fatal error is logged and afterwards the default assertion is triggered.
+
+\see example_providers.cpp for an example how to register/unregister providers.
+*/

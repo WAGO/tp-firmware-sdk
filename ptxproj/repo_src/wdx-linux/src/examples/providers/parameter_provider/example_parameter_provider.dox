@@ -1,0 +1,36 @@
+/** \example  example_parameter_provider.hpp
+
+The following file shows the header file for the example parameter provider.\n 
+This \ref ::wago::wdx::examples::example_parameter_provider implements the parameter provider interface
+by inheritance of all necessary methods from the base class \ref ::wago::wdx::base_parameter_provider.
+
+The example provider serves an 16 bit integer value as readonly parameter, which is store in a private member for the purpose 
+of demonstration. To return the requested value the \ref ::wago::wdx::parameter_provider_i::get_parameter_values() method is overwritten
+accordingly.
+
+Additionally, the parameter service needs to know which parameters oder methods are provided by this provider,
+therefore the method \ref ::wago::wdx::parameter_provider_i::get_provided_parameters() is overwritten.
+
+For practical reasons such as unit-testing and demonstation, there is another public method added to the class.
+This method is not part of the parameter provider interface, but can be used from external classes (e.g. unit tests or 
+other example code) to set the provided value.
+
+\see example_parameter_provider.cpp for implementation of this class.
+*/
+
+
+/** \example  example_parameter_provider.cpp
+
+The following file shows the implementation file for the example parameter provider.\n 
+This example provider responds to deliver every requested parameter of an test ID published in
+\ref wago::wdx::examples::example_parameter_provider::get_provided_parameters().
+When no device collection is selected, as it is done here, this refers to the headstation device.
+
+The implementation of 
+\ref wago::wdx::examples::example_parameter_provider::get_parameter_values()
+delegates each request to an internal handle function. This function verifies the requested ID,
+which have to match a provided parameter ID and checks if some valid value can be delivered for the requested parameter.
+If the internal value was set to some value (!= initial value), the copy of this internal value is wrapped into a response.
+
+\see example_parameter_provider.hpp for definition of this class.
+*/
