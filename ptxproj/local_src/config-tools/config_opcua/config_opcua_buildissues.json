@@ -2,6 +2,15 @@
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
   "issues": [
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "config_opcua-tests"
+    },
+    {
       "fileName": "local_src/config-tools/config_opcua/src/config_opcua.cpp",
       "lineStart": "137",
       "columnStart": "20",
@@ -722,5 +731,5 @@
       "moduleName": "config_opcua-tests"
     }
   ],
-  "size": 80
+  "size": 81
 }

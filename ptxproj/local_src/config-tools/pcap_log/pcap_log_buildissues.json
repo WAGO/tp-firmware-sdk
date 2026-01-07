@@ -2,6 +2,15 @@
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
   "issues": [
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "pcap_log-tests"
+    },
+    {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
       "lineStart": "120",
       "columnStart": "10",
@@ -13,7 +22,7 @@
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
       "lineStart": "225",
-      "columnStart": "79",
+      "columnStart": "93",
       "category": "Warning:google-runtime-references",
       "severity": "NORMAL",
       "message": "non-const reference parameter 'pcapngFiles', make it const or use a pointer [google-runtime-references]",
@@ -21,7 +30,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "329",
+      "lineStart": "335",
       "columnStart": "7",
       "category": "Warning:readability-container-size-empty",
       "severity": "NORMAL",
@@ -30,7 +39,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "346",
+      "lineStart": "352",
       "columnStart": "9",
       "category": "Warning:cert-env33-c",
       "severity": "NORMAL",
@@ -39,7 +48,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "417",
+      "lineStart": "423",
       "columnStart": "22",
       "category": "Warning:readability-implicit-bool-conversion",
       "severity": "NORMAL",
@@ -48,7 +57,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "417",
+      "lineStart": "423",
       "columnStart": "28",
       "category": "Warning:readability-implicit-bool-conversion",
       "severity": "NORMAL",
@@ -57,7 +66,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "500",
+      "lineStart": "506",
       "columnStart": "31",
       "category": "Warning:readability-redundant-string-init",
       "severity": "NORMAL",
@@ -66,7 +75,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "501",
+      "lineStart": "507",
       "columnStart": "31",
       "category": "Warning:readability-redundant-string-init",
       "severity": "NORMAL",
@@ -75,17 +84,8 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "502",
+      "lineStart": "508",
       "columnStart": "32",
-      "category": "Warning:readability-redundant-string-init",
-      "severity": "NORMAL",
-      "message": "redundant string initialization [readability-redundant-string-init]",
-      "moduleName": "pcap_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/pcap_log/src/pcap_log_main/pcap_log.cpp",
-      "lineStart": "504",
-      "columnStart": "31",
       "category": "Warning:readability-redundant-string-init",
       "severity": "NORMAL",
       "message": "redundant string initialization [readability-redundant-string-init]",
@@ -102,7 +102,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/wago_pcap/wp_debug.hpp",
-      "lineStart": "43",
+      "lineStart": "44",
       "columnStart": "25",
       "category": "Warning:clang-diagnostic-format-security",
       "severity": "NORMAL",
@@ -174,7 +174,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/wago_pcap/wp_parameterc.cpp",
-      "lineStart": "260",
+      "lineStart": "263",
       "columnStart": "9",
       "category": "Warning:readability-container-size-empty",
       "severity": "NORMAL",
@@ -183,7 +183,7 @@
     },
     {
       "fileName": "local_src/config-tools/pcap_log/src/wago_pcap/wp_parameterc.hpp",
-      "lineStart": "235",
+      "lineStart": "237",
       "columnStart": "12",
       "category": "Warning:readability-inconsistent-declaration-parameter-name",
       "severity": "NORMAL",
@@ -264,7 +264,7 @@
     },
     {
       "fileName": "pfc/ptxproj/local_src/config-tools/pcap_log/src/wago_pcap/wp_parameterc.hpp",
-      "lineStart": "229",
+      "lineStart": "231",
       "columnStart": "53",
       "category": "Warning:google-runtime-references",
       "severity": "NORMAL",

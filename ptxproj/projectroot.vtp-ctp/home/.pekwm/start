@@ -1,7 +1,0 @@
-#!/bin/sh
-if [ -e /media/usb/production/production-auto-start.sh ]; then
-cd /media/usb/production
-./production-auto-start.sh &
-else
-/etc/script/start_application.sh &
-fi

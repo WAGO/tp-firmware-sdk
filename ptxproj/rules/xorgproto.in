@@ -1,6 +1,0 @@
-## SECTION=multimedia_xorg_proto
-
-config XORGPROTO
-	tristate
-	select HOST_MESON
-	default y if ALLYES

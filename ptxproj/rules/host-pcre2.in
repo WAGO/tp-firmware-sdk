@@ -1,5 +1,0 @@
-## SECTION=hosttools_noprompt
-
-config HOST_PCRE2
-	tristate
-	default y if ALLYES

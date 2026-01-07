@@ -1,5 +1,15 @@
 {
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
-  "issues": [],
-  "size": 0
+  "issues": [
+    {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "get_snmp_data-tests"
+    }
+  ],
+  "size": 1
 }

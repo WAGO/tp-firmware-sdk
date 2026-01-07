@@ -2,6 +2,15 @@
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
   "issues": [
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "get_stp_config-tests"
+    },
+    {
       "fileName": "local_src/get_stp_config/src/stp-config-output/utils.hpp",
       "lineStart": "10",
       "columnStart": "6",
@@ -488,5 +497,5 @@
       "moduleName": "get_stp_config-tests"
     }
   ],
-  "size": 54
+  "size": 55
 }

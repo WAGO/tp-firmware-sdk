@@ -64,8 +64,6 @@ PTXCONF_SYSROOT_HOST="${PTXDIST_PLATFORMDIR}/sysroot-host"
 PTXCONF_SYSROOT_CROSS="${PTXDIST_PLATFORMDIR}/sysroot-cross"
 # end of paths & directories           
 
-# PTXCONF_PTXDIST_Y2038 is not set
-
 #
 # toolchain                     
 #

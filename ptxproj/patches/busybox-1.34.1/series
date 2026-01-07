@@ -1,2 +1,0 @@
-0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch
-0002-nslookup-sanitize-all-printed-strings-with-printable.patch

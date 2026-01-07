@@ -20,6 +20,15 @@
       "moduleName": "netconfd-tests"
     },
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "netconfd-tests"
+    },
+    {
       "fileName": "local_src/netconfd/modules/common/extern/clientapi/BaseTypes.hpp",
       "lineStart": "125",
       "columnStart": "60",
@@ -47,12 +56,48 @@
       "moduleName": "netconfd-tests"
     },
     {
+      "fileName": "local_src/netconfd/modules/netconfd/src/EventManager/EventManager.cpp",
+      "lineStart": "204",
+      "columnStart": "5",
+      "category": "Warning:clang-diagnostic-shadow",
+      "severity": "NORMAL",
+      "message": "declaration shadows a local variable [clang-diagnostic-shadow]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "local_src/netconfd/modules/netconfd/src/IPManager/DynamicIPClient/BOOTPClient.cpp",
+      "lineStart": "21",
+      "columnStart": "31",
+      "category": "Warning:performance-unnecessary-value-param",
+      "severity": "NORMAL",
+      "message": "the parameter 'path' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "local_src/netconfd/modules/netconfd/src/IPManager/DynamicIPClient/DHCPClient.cpp",
+      "lineStart": "26",
+      "columnStart": "31",
+      "category": "Warning:performance-unnecessary-value-param",
+      "severity": "NORMAL",
+      "message": "the parameter 'path' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]",
+      "moduleName": "netconfd-tests"
+    },
+    {
       "fileName": "local_src/netconfd/modules/netconfd/src/IPManager/DynamicIPClient/DHCPClient.cpp",
       "lineStart": "85",
       "columnStart": "7",
       "category": "Warning:clang-diagnostic-deprecated-declarations",
       "severity": "NORMAL",
       "message": "'g_spawn_check_exit_status' is deprecated: Use 'g_spawn_check_wait_status' instead [clang-diagnostic-deprecated-declarations]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "local_src/netconfd/modules/netconfd/src/IPManager/IPManager.cpp",
+      "lineStart": "41",
+      "columnStart": "31",
+      "category": "Warning:performance-unnecessary-value-param",
+      "severity": "NORMAL",
+      "message": "the parameter 'link' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param]",
       "moduleName": "netconfd-tests"
     },
     {
@@ -102,24 +147,6 @@
     },
     {
       "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
-      "lineStart": "127",
-      "columnStart": "60",
-      "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
-      "severity": "NORMAL",
-      "message": "do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay]",
-      "moduleName": "netconfd-tests"
-    },
-    {
-      "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
-      "lineStart": "135",
-      "columnStart": "60",
-      "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
-      "severity": "NORMAL",
-      "message": "do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay]",
-      "moduleName": "netconfd-tests"
-    },
-    {
-      "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
       "lineStart": "143",
       "columnStart": "60",
       "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
@@ -129,7 +156,25 @@
     },
     {
       "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
-      "lineStart": "219",
+      "lineStart": "151",
+      "columnStart": "60",
+      "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
+      "severity": "NORMAL",
+      "message": "do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
+      "lineStart": "159",
+      "columnStart": "60",
+      "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
+      "severity": "NORMAL",
+      "message": "do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
+      "lineStart": "235",
       "columnStart": "19",
       "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
       "severity": "NORMAL",
@@ -138,20 +183,11 @@
     },
     {
       "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.cpp",
-      "lineStart": "219",
+      "lineStart": "235",
       "columnStart": "44",
       "category": "Warning:cppcoreguidelines-pro-bounds-array-to-pointer-decay",
       "severity": "NORMAL",
       "message": "do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay]",
-      "moduleName": "netconfd-tests"
-    },
-    {
-      "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/EthTool.hpp",
-      "lineStart": "37",
-      "columnStart": "8",
-      "category": "Warning:cppcoreguidelines-pro-type-member-init",
-      "severity": "NORMAL",
-      "message": "constructor does not initialize these fields: s_ [cppcoreguidelines-pro-type-member-init]",
       "moduleName": "netconfd-tests"
     },
     {
@@ -228,7 +264,7 @@
     },
     {
       "fileName": "local_src/netconfd/modules/netconfd/src/InterfaceManager/InterfaceConfigManager.cpp",
-      "lineStart": "126",
+      "lineStart": "129",
       "columnStart": "6",
       "category": "Warning:readability-else-after-return",
       "severity": "NORMAL",
@@ -245,12 +281,30 @@
       "moduleName": "netconfd-tests"
     },
     {
+      "fileName": "pfc/ptxproj/local_src/netconfd/modules/clientapi/extern/IPConfig.hpp",
+      "lineStart": "30",
+      "columnStart": "3",
+      "category": "Warning:readability-deleted-default",
+      "severity": "NORMAL",
+      "message": "move constructor is explicitly defaulted but implicitly deleted, probably because a non-static data member or a base class is neither copyable nor movable; definition can either be removed or explicitly deleted [readability-deleted-default]",
+      "moduleName": "netconfd-tests"
+    },
+    {
       "fileName": "pfc/ptxproj/local_src/netconfd/modules/common/test-src/MacAddressTest.cpp",
       "lineStart": "73",
       "columnStart": "50",
       "category": "Warning:missing-braces",
       "severity": "NORMAL",
       "message": "missing braces around initializer for ‘std::__array_traits<unsigned char, 6>::_Type’ {aka ‘unsigned char [6]’} [-Wmissing-braces]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "pfc/ptxproj/local_src/netconfd/modules/netconfd/src/Hostname/HostConfFile.hpp",
+      "lineStart": "8",
+      "columnStart": "7",
+      "category": "Warning:cppcoreguidelines-special-member-functions",
+      "severity": "NORMAL",
+      "message": "class 'HostConfFile' defines a default destructor, a copy constructor and a move constructor but does not define a copy assignment operator or a move assignment operator [cppcoreguidelines-special-member-functions]",
       "moduleName": "netconfd-tests"
     },
     {
@@ -263,12 +317,39 @@
       "moduleName": "netconfd-tests"
     },
     {
+      "fileName": "pfc/ptxproj/local_src/netconfd/modules/netconfd/src/IPManager/DynamicIPClient/LeaseFile.hpp",
+      "lineStart": "19",
+      "columnStart": "3",
+      "category": "Warning:readability-deleted-default",
+      "severity": "NORMAL",
+      "message": "move constructor is explicitly defaulted but implicitly deleted, probably because a non-static data member or a base class is neither copyable nor movable; definition can either be removed or explicitly deleted [readability-deleted-default]",
+      "moduleName": "netconfd-tests"
+    },
+    {
       "fileName": "pfc/ptxproj/local_src/netconfd/modules/netconfd/src/InterfaceManager/EthernetInterface.cpp",
       "lineStart": "37",
       "columnStart": "7",
       "category": "Warning:missing-braces",
       "severity": "NORMAL",
       "message": "missing braces around initializer for ‘std::__array_traits<unsigned char, 6>::_Type’ {aka ‘unsigned char [6]’} [-Wmissing-braces]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "pfc/ptxproj/local_src/netconfd/modules/netconfd/src/Logger/Logger.hpp",
+      "lineStart": "45",
+      "columnStart": "19",
+      "category": "Warning:shadow",
+      "severity": "NORMAL",
+      "message": "declaration of ‘file’ shadows a previous local [-Wshadow]",
+      "moduleName": "netconfd-tests"
+    },
+    {
+      "fileName": "pfc/ptxproj/local_src/netconfd/modules/netconfd/src/PersistenceProvider/FileEditor.hpp",
+      "lineStart": "12",
+      "columnStart": "7",
+      "category": "Warning:cppcoreguidelines-special-member-functions",
+      "severity": "NORMAL",
+      "message": "class 'FileEditor' defines a default destructor, a copy constructor and a move constructor but does not define a copy assignment operator or a move assignment operator [cppcoreguidelines-special-member-functions]",
       "moduleName": "netconfd-tests"
     },
     {
@@ -281,5 +362,5 @@
       "moduleName": "netconfd-tests"
     }
   ],
-  "size": 31
+  "size": 40
 }

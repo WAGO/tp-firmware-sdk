@@ -1,9 +1,0 @@
-## SECTION=multimedia_libs
-
-config LIBDRM_ARMADA
-	tristate
-	default n
-	select LIBDRM
-	prompt "libdrm-armada"
-	help
-	  libdrm-armada used for xorg-driver-video-armada

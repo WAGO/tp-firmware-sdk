@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<!-- HTML FILE GENERATED FROM iniNet  SpiderControl SCADA Editor on  08/31/20 18:30:48 -->
+	<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<title>Config</title>
+	<style type="text/css">
+
+		.SCViews {
+			-webkit-tap-highlight-color: rgba(0,0,0,0);
+			-moz-user-select: none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			z-index: 0;
+			position: relative;
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+		body {
+			padding: 0;
+			margin: 0;
+		}
+		iframe {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+		html {overflow: auto}
+	</style>
+	<script type="text/javascript" src="pako_inflate_min.js"></script>
+	<script type="text/javascript" src="load.js"></script>
+</head>
+<body>
+	<div class="SCViews" id="SC_View_Middle"></div>
+	<script type="text/javascript">
+		window.addEventListener('load', function(){
+			BlobMngr = new CBlobManager();
+			Loader = new CLoader(
+				function(){
+					SpiderControl.InitFromTeq({
+						ViewID: "SC_View_Middle",
+						Width: 480,
+						Height: 480,
+						TargetTypeNr: 100,
+						TargetPPOPrefix: "",
+						ZipMode: 0,
+						TeqJumpMode: 1,
+						Period: 500,
+						DebugLevel: 0,
+						MainTEQName: "Config_Main.teq",
+						InitCoTEQName: "Config.itq",
+						PPOInitFile: "Config.tcr",
+						languageCSV: "en.csv",
+						staticCSV: "",
+						MsgBox: "MsgBox.teq",
+						DEC_SYMB: ".",
+						PM_AM: 0,
+						cgiFail: 1,
+						WARNDISPLAYTIME_UNTILCLEARMSGBOX: 0,
+						CGI_RELATIVTOROOT: "",
+						cgiOrderListMaxSize: 500,
+						LocalPPORefresh: 0,
+						GENERATE_TIMESTAMP: "5f4d25b8",
+						SpiderHTMLVersion: 21,
+						ZoomMode: "No Auto Zoom"
+					});
+				}
+			);
+		
+		}, false );
+
+	/* - DO NOT REMOVE THIS COMMENT - */ 
+
+/*
+
+<!-- HTML FILE GENERATED FROM iniNet  SpiderControl SCADA Editor on  08/31/20 18:30:48 -->
+<!--  [ LICENCE_NR : 999 **** LICENCE_USERNAME : PRESOLD **** LICENCE_PLCTYPE : SCADA **** LICENCE_PLCRELEASE : EXTENDED ] -->
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">
+	<META NAME="GENERATOR" CONTENT="iniNet SpiderControl TM">
+	<TITLE>Config</TITLE>
+</HEAD>
+<BODY bgcolor="#FFFFFF">
+<p>
+<APPLET ARCHIVE="IMaster7_01_00.jar" CODE="IMaster7_01_00.class" ALIGN="BOTTOM" WIDTH="480" HEIGHT="480">
+<PARAM NAME="AppletName"   VALUE="Config">
+<PARAM NAME="ProjectName"   VALUE="Config">
+<PARAM NAME="TargetTypeNr"   VALUE="100">
+<PARAM NAME="TargetPPOPrefix"   VALUE="">
+<PARAM NAME="ZipMode"   VALUE="0">
+<PARAM NAME="TeqJumpMode"   VALUE="1">
+<PARAM NAME="Period"   VALUE="500">
+<PARAM NAME="FirstFileIndex"   VALUE="0">
+<PARAM NAME="LastFileIndex"   VALUE="19">
+<PARAM NAME="Main"   VALUE="0">
+<PARAM NAME="OrderPerView"   VALUE="on">
+<PARAM NAME="debug"   VALUE="off">
+<PARAM NAME="SpiderHTMLVersion"   VALUE="21">
+<PARAM NAME="MainTEQName"   VALUE="Config_Main.teq">
+<PARAM NAME="InitCoTEQName"   VALUE="Config.itq">
+<PARAM NAME="InitPPOASCIIName"   VALUE="Config.tcr">
+<PARAM NAME="IMASTERHTMLTAGSFILEName"   VALUE="en.csv">
+<PARAM NAME="StaticHTMLTagsFileName"   VALUE="">
+<PARAM NAME="MessageBox"   VALUE="MsgBox.teq">
+<PARAM NAME="encodeSpecialChar"   VALUE="on">
+<PARAM NAME="RUNTIMEACTIONMODE"   VALUE="CONSUMED ACTION">
+<PARAM NAME="BrowsingMode"   VALUE="DEFAULT">
+<PARAM NAME="MirrorPPOName"   VALUE="mirror">
+<PARAM NAME="LANG_SYMB"   VALUE="EN">
+<PARAM NAME="DEC_SYMB"   VALUE=".">
+<PARAM NAME="PM_AM"   VALUE="0">
+<PARAM NAME="CGIFAILNBR_UNTILWARN"   VALUE="1">
+<PARAM NAME="WARNDISPLAYTIME_UNTILCLEARMSGBOX"   VALUE="0">
+<PARAM NAME="TEQDISPLAYFACTOR"   VALUE="1.000000">
+<PARAM NAME="GENERATE_TIMESTAMP"   VALUE="5f4d25b8">
+<PARAM NAME="Day_NightColorMapFileName"   VALUE="">
+<PARAM NAME="ImagesPreloadList"   VALUE="">
+<PARAM NAME="EncodingPPO"   VALUE="">
+<PARAM NAME="CGI_RELATIVTOROOT"   VALUE="">
+<PARAM NAME="ZoomMode"   VALUE="No Auto Zoom">
+<!-- START TEQ FILES LIST -->
+<PARAM NAME="TEQ0NAME"   VALUE="alphapad.teq">
+<PARAM NAME="TEQ1NAME"   VALUE="Config_Adv.teq">
+<PARAM NAME="TEQ2NAME"   VALUE="Config_bgnd.teq">
+<PARAM NAME="TEQ3NAME"   VALUE="Config_ConfirmQuit.teq">
+<PARAM NAME="TEQ4NAME"   VALUE="Config_ConfirmReboot.teq">
+<PARAM NAME="TEQ5NAME"   VALUE="Config_ConfirmResetDef.teq">
+<PARAM NAME="TEQ6NAME"   VALUE="Config_Copyrights.teq">
+<PARAM NAME="TEQ7NAME"   VALUE="Config_CopyrightsDetail.teq">
+<PARAM NAME="TEQ8NAME"   VALUE="Config_CopyrightsList.teq">
+<PARAM NAME="TEQ9NAME"   VALUE="Config_Date.teq">
+<PARAM NAME="TEQ10NAME"   VALUE="Config_Eth.teq">
+<PARAM NAME="TEQ11NAME"   VALUE="Config_Eth_BootApply.teq">
+<PARAM NAME="TEQ12NAME"   VALUE="Config_Info.teq">
+<PARAM NAME="TEQ13NAME"   VALUE="Config_LCD.teq">
+<PARAM NAME="TEQ14NAME"   VALUE="Config_Main.teq">
+<PARAM NAME="TEQ15NAME"   VALUE="Config_Menu.teq">
+<PARAM NAME="TEQ16NAME"   VALUE="Config_StartURL.teq">
+<PARAM NAME="TEQ17NAME"   VALUE="Config_SwUp.teq">
+<PARAM NAME="TEQ18NAME"   VALUE="keypad.teq">
+<PARAM NAME="TEQ19NAME"   VALUE="MsgBox.teq">
+<!-- END TEQ FILES LIST -->
+
+<!-- START HTML FILES LIST -->
+<!-- HTML_0 = "Config.html" -->
+<!-- END HTML FILES LIST -->
+
+<!-- START LANGUAGE FILES LIST -->
+<!-- LANG_0 = "en.csv" -->
+<!-- END LANGUAGE FILES LIST -->
+
+<!-- START OTHER RESOURCE FILES LIST -->
+<!-- PRJ_0 = "arrowleft.svg" -->
+<!-- PRJ_1 = "arrowright.svg" -->
+<!-- PRJ_2 = "b_micro_k.png" -->
+<!-- PRJ_3 = "btn_grip.svg" -->
+<!-- PRJ_4 = "Config.itq" -->
+<!-- PRJ_5 = "Config.tcr" -->
+<!-- PRJ_6 = "copyrights.txt" -->
+<!-- PRJ_7 = "copyrights_detail.txt" -->
+<!-- PRJ_8 = "timezones.txt" -->
+<!-- END OTHER RESOURCE FILES LIST -->
+
+Java Applet is not supported or enabled in your web-browser!
+</APPLET>
+</p>
+</BODY>
+</HTML>
+
+*/
+
+		</script>
+	</body>
+</html>

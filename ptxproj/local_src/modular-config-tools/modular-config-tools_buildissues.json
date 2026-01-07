@@ -2,6 +2,15 @@
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
   "issues": [
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "modular-config-tools-tests"
+    },
+    {
       "fileName": "local_src/modular-config-tools/inc/ctparts/common_main_defaults.h",
       "lineStart": "115",
       "columnStart": "39",
@@ -1348,7 +1357,7 @@
       "columnStart": "24",
       "category": "Warning:readability-avoid-const-params-in-decls",
       "severity": "NORMAL",
-      "message": "parameter '_unused_pTimestamp' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls]",
+      "message": "parameter 'unused_pTimestamp' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls]",
       "moduleName": "modular-config-tools-tests"
     },
     {
@@ -1429,7 +1438,7 @@
       "columnStart": "19",
       "category": "Warning:readability-avoid-const-params-in-decls",
       "severity": "NORMAL",
-      "message": "parameter '_unused_pTimestamp' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls]",
+      "message": "parameter 'unused_pTimestamp' is const-qualified in the function declaration; const-qualification of parameters only has an effect in function definitions [readability-avoid-const-params-in-decls]",
       "moduleName": "modular-config-tools-tests"
     },
     {
@@ -10101,7 +10110,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/glib-autocleanups.h",
-      "lineStart": "36",
+      "lineStart": "38",
       "columnStart": "14",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10119,7 +10128,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1349",
+      "lineStart": "1355",
       "columnStart": "11",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10128,7 +10137,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1354",
+      "lineStart": "1360",
       "columnStart": "77",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10137,7 +10146,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1356",
+      "lineStart": "1362",
       "columnStart": "71",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10146,34 +10155,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1359",
-      "columnStart": "63",
-      "category": "Warning:bugprone-macro-parentheses",
-      "severity": "NORMAL",
-      "message": "macro argument should be enclosed in parentheses [bugprone-macro-parentheses]",
-      "moduleName": "modular-config-tools-tests"
-    },
-    {
-      "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1361",
-      "columnStart": "64",
-      "category": "Warning:bugprone-macro-parentheses",
-      "severity": "NORMAL",
-      "message": "macro argument should be enclosed in parentheses [bugprone-macro-parentheses]",
-      "moduleName": "modular-config-tools-tests"
-    },
-    {
-      "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1363",
-      "columnStart": "73",
-      "category": "Warning:bugprone-macro-parentheses",
-      "severity": "NORMAL",
-      "message": "macro argument should be enclosed in parentheses [bugprone-macro-parentheses]",
-      "moduleName": "modular-config-tools-tests"
-    },
-    {
-      "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1374",
+      "lineStart": "1382",
       "columnStart": "68",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10182,7 +10164,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1378",
+      "lineStart": "1386",
       "columnStart": "68",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10191,7 +10173,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmacros.h",
-      "lineStart": "1378",
+      "lineStart": "1386",
       "columnStart": "99",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10200,7 +10182,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmain.h",
-      "lineStart": "329",
+      "lineStart": "420",
       "columnStart": "36",
       "category": "Warning:bugprone-macro-parentheses",
       "severity": "NORMAL",
@@ -10218,7 +10200,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmessages.h",
-      "lineStart": "298",
+      "lineStart": "306",
       "columnStart": "11",
       "category": "Warning:readability-avoid-const-params-in-decls",
       "severity": "NORMAL",
@@ -10227,7 +10209,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gmessages.h",
-      "lineStart": "424",
+      "lineStart": "432",
       "columnStart": "10",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10263,7 +10245,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstrfuncs.h",
-      "lineStart": "492",
+      "lineStart": "486",
       "columnStart": "72",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10272,7 +10254,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "204",
+      "lineStart": "208",
       "columnStart": "7",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10281,7 +10263,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "226",
+      "lineStart": "230",
       "columnStart": "15",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10290,7 +10272,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "228",
+      "lineStart": "232",
       "columnStart": "7",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10299,7 +10281,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "234",
+      "lineStart": "238",
       "columnStart": "76",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10308,7 +10290,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "236",
+      "lineStart": "240",
       "columnStart": "11",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10317,7 +10299,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "242",
+      "lineStart": "246",
       "columnStart": "3",
       "category": "Warning:readability-else-after-return",
       "severity": "NORMAL",
@@ -10326,7 +10308,7 @@
     },
     {
       "fileName": "ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/usr/include/glib-2.0/glib/gstring.h",
-      "lineStart": "242",
+      "lineStart": "246",
       "columnStart": "7",
       "category": "Warning:readability-braces-around-statements",
       "severity": "NORMAL",
@@ -10487,5 +10469,5 @@
       "moduleName": "modular-config-tools-tests"
     }
   ],
-  "size": 1165
+  "size": 1163
 }

@@ -2,8 +2,17 @@
   "_class": "io.jenkins.plugins.analysis.core.restapi.ReportApi",
   "issues": [
     {
+      "fileName": "-",
+      "lineStart": "0",
+      "columnStart": "0",
+      "category": "Warning:missing-include-dirs",
+      "severity": "NORMAL",
+      "message": "/workspace/pfc/ptxproj.2013.03.0/platform-vtp-ctp/sysroot-target/include: No such file or directory [-Wmissing-include-dirs]",
+      "moduleName": "print_log-tests"
+    },
+    {
       "fileName": "local_src/config-tools/print_log/src/util_log.cpp",
-      "lineStart": "226",
+      "lineStart": "227",
       "columnStart": "8",
       "category": "Warning:cert-env33-c",
       "severity": "NORMAL",
@@ -11,30 +20,12 @@
       "moduleName": "print_log-tests"
     },
     {
-      "fileName": "local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "31",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
+      "fileName": "local_src/config-tools/print_log/src/util_log.cpp",
+      "lineStart": "88",
+      "columnStart": "37",
+      "category": "Warning:performance-unnecessary-copy-initialization",
       "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "34",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "41",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
+      "message": "the const qualified variable 'path' is copy-constructed from a const reference; consider making it a const reference [performance-unnecessary-copy-initialization]",
       "moduleName": "print_log-tests"
     },
     {
@@ -47,48 +38,12 @@
       "moduleName": "print_log-tests"
     },
     {
-      "fileName": "local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "45",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "71",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
       "fileName": "local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "56",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
+      "lineStart": "37",
+      "columnStart": "25",
+      "category": "Warning:performance-for-range-copy",
       "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "64",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "69",
-      "columnStart": "6",
-      "category": "Warning:clang-diagnostic-extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ';' after member function definition [clang-diagnostic-extra-semi]",
+      "message": "loop variable is copied but only used as const reference; consider making it a const reference [performance-for-range-copy]",
       "moduleName": "print_log-tests"
     },
     {
@@ -102,85 +57,13 @@
     },
     {
       "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "31",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "34",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "41",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
       "lineStart": "43",
       "columnStart": "39",
       "category": "Warning:deprecated-declarations",
       "severity": "NORMAL",
       "message": "‘gboolean g_spawn_check_exit_status(gint, GError**)’ is deprecated: Use 'g_spawn_check_wait_status' instead [-Wdeprecated-declarations]",
       "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "45",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_main.cpp",
-      "lineStart": "71",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "56",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "64",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
-    },
-    {
-      "fileName": "pfc/ptxproj/local_src/config-tools/print_log/test-src/test_util_log.cpp",
-      "lineStart": "69",
-      "columnStart": "6",
-      "category": "Warning:extra-semi",
-      "severity": "NORMAL",
-      "message": "extra ‘;’ after in-class function definition [-Wextra-semi]",
-      "moduleName": "print_log-tests"
     }
   ],
-  "size": 20
+  "size": 7
 }
